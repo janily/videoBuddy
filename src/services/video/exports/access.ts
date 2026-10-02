@@ -1,4 +1,4 @@
-import{ProjectStore}from'@/services/video/storage/project-store';
+import type{ProjectStore}from'@/services/video/storage/project-store';
 import{ObjectRef}from'@/contracts/video/domain';
 import{assertArtifactAccess}from'./export';
 import{issueArtifactToken}from'./local-token';

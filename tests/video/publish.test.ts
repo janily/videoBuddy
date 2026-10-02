@@ -14,3 +14,7 @@ it('explicit silent intent allows audio N/A, not a global QA bypass',()=>{
  expect(()=>qualityGate([{ruleId:'decode',result:'pass',severity:'blocking',evidenceRefs:['actual-decode-report']},{ruleId:'loudness',result:'not_applicable',severity:'blocking',evidenceRefs:[],reason:'silent'}],['loudness'])).not.toThrow();
  expect(()=>qualityGate([{ruleId:'decode',result:'not_applicable',severity:'blocking',evidenceRefs:[],reason:'silent'}],['loudness'])).toThrow('QUALITY_BLOCKED');
 });
+it('a required QA rule cannot be downgraded to warning or duplicated to hide failure',()=>{
+ expect(()=>qualityGate([{ruleId:'decode',result:'pass',severity:'warning',evidenceRefs:['report']}])).toThrow('QUALITY_BLOCKED');
+ expect(()=>qualityGate([{ruleId:'decode',result:'pass',severity:'blocking',evidenceRefs:['report']},{ruleId:'decode',result:'not_checked',severity:'warning',evidenceRefs:[]}])).toThrow('QUALITY_BLOCKED');
+});

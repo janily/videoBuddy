@@ -6,6 +6,7 @@ import {ProjectControl,ProjectView,ArchivedMessage,PublicOperation}from '@/contr
 import {CreateProjectRequest}from '@/contracts/video/commands';
 import {canonicalHash}from '@/services/video/domain/hash';
 import {readPreviewBundle}from '@/services/video/preview/commit';
+import {readResultManifest}from '@/services/video/results/publish';
 export class ProjectStore{
  readonly index:IndexStore;constructor(readonly store:AtomicStore){this.index=new IndexStore(store)}
  async create(owner:string,input:CreateProjectRequest){
@@ -35,7 +36,8 @@ export class ProjectStore{
   const c=await this.access(owner,id);const u=(await this.store.readFresh<Understanding>(c.understandingRef.key)).value;const meta=(await this.store.readFresh<{title:string}>(`projects/${id}/metadata`)).value;
   const preview=c.currentPreviewId?await readPreviewBundle(this,id,c.currentPreviewId):null;
   const currentPreview=preview?{previewId:preview.previewId,revisionId:preview.revisionId,briefVersion:preview.briefVersion,previewArtifactId:preview.previewArtifactId,bundleHash:preview.bundleHash,scriptHash:preview.scriptHash,factsHash:preview.factsHash,script:preview.script,criticalFacts:preview.criticalFacts,summary:preview.summary,expiresAt:preview.expiresAt,state:c.previewState}:null;
-  return{projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:null,previousResult:null,activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:[],actions:[{kind:'prepare_preview',enabled:false,disabledReason:'真实创作预览尚未就绪。'}],expiresAt:c.expiresAt};
+  const publicResult=async(resultId?:string)=>{if(!resultId)return null;const result=await readResultManifest(this,id,resultId);return{resultId:result.resultId,artifactId:result.artifactId,revisionId:result.revisionId,bundleHash:result.bundleHash,createdAt:result.createdAt}};
+  return{projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:[],actions:[{kind:'prepare_preview',enabled:false,disabledReason:'真实创作预览尚未就绪。'}],expiresAt:c.expiresAt};
  }
  async lookup(owner:string,ids:string[]){
   if(ids.length>20)throw Error('VALIDATION_FAILED');

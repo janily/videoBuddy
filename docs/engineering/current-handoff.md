@@ -20,6 +20,8 @@ T05 语音素材增量：固定 ASR 镜像更新为 `sha256:67786e6dbdd6b00f6177
 
 T11 预览基础设施增量：`createPreviewBundle` 将 FilmSpec、完整脚本与事实、源码/时间轴/音轨/素材/字体摘要、输出 profile、运行时和质量策略锁入规范 JSON 的 `bundleHash`；预览文件摘要单独校验，过期时间与预览文件不参与内容哈希。`commitPreviewBundle` 先持久化不可变 manifest，再通过 ProjectControl CAS 核对 briefVersion、inputPending、consentEpoch、制作槽和阶段，旧任务不能将过期预览发布为当前预览。ProjectView 只暴露用户需看的文案、关键事实与预览标识，不暴露内部存储引用。预览包/持久化测试先因模块缺失退出1，随后7项通过；全套 `npm test` 39文件172项、lint、build、构建后typecheck均退出0。其后 `approvePreview` 的缺模块红灯退出1，新增唯一 `preview_button` 批准记录、可重试命令凭据、原子制作槽及持久队列意图；同命令重复点击、不同命令并发、过期和错误哈希局部测试共10项通过，完整 `npm test` 39文件175项、build/typecheck退出0。lint退出0但先提示一个测试变量未使用，已修正并单独复核。当前仍没有真实创作预览、用户批准入口或 render Worker；UI主按钮继续禁用，T11仍partial。
 
+T12 发布边界增量：通用 `qualityGate` 已拒绝将必检项降为 warning 或重复同一 ruleId；`validateDelivery` 强制14类基础报告、锁定的质量策略摘要、最终文件摘要，未听验/未核版权/缺证据均阻断；静音 N/A 需额外 `decoded_silence` 通过且留证。`publishResult` 核对不可变 preview/approval/result 的 hash 和 owner、实际存储文件字节 SHA、操作 fence/consentEpoch，再以 ProjectControl CAS 切换结果指针；ProjectView 可投影当前/上一结果。局部测试先因缺模块和 warning 漏洞退出1，随后通过；全套 `npm test` 40文件180项、lint、build、构建后typecheck均退出0。发布测试中的100字节“媒体”只是验证 CAS 与哈希拒绝路径的夹具，绝非真实影片/真实 QA；本模块尚无对外发布入口，真实渲染、独立视觉/听验报告来源、完整产物写入与下载闭环未接通，T12仍partial。
+
 主要缺项：T05 扫描 PDF、图片、配乐/环境声及长音频用户实录的可靠解读，超长 Markdown/PDF 的分段检索；Visual/Audio/Critic 及16行为评估；T10 的特殊词发音复核、可靠字幕对齐、配乐音效与完整声音 QA；真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。图片仍仅到 `uploaded`，不会被当作已分析的事实；语音只有真实ASR与有声覆盖检查通过才会 `ready`。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、单测、目录规则或交付原型视频当作完整媒体验收。

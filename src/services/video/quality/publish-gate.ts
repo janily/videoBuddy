@@ -1,9 +1,10 @@
 export interface QualityCheck{ruleId:string;result:'pass'|'fail'|'not_checked'|'not_applicable'|'waived';severity:'blocking'|'warning';evidenceRefs:string[];reason?:string;waiverActor?:string}
 export function qualityGate(checks:QualityCheck[],allowedNotApplicable:string[]=[],requiredRules=['decode']){
- if(requiredRules.some(id=>!checks.some(c=>c.ruleId===id)))throw Error('QUALITY_BLOCKED');
+ const ids=new Set<string>();for(const check of checks){if(ids.has(check.ruleId))throw Error('QUALITY_BLOCKED');ids.add(check.ruleId)}
+ if(requiredRules.some(id=>!checks.some(c=>c.ruleId===id&&c.severity==='blocking')))throw Error('QUALITY_BLOCKED');
  for(const check of checks){if(check.severity!=='blocking')continue;
   if(check.result==='pass'&&check.evidenceRefs.length)continue;
-  if(check.result==='not_applicable'&&allowedNotApplicable.includes(check.ruleId)&&check.reason)continue;
+  if(check.result==='not_applicable'&&check.ruleId!=='decode'&&allowedNotApplicable.includes(check.ruleId)&&check.reason)continue;
   throw Error('QUALITY_BLOCKED');
  }
 }

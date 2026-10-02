@@ -79,3 +79,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T11预览包增量：`tests/video/preview.test.ts` 对缺失 `bundle.ts`/`commit.ts` 先实测退出1；实现严格预览包、内容哈希/独立预览媒体摘要、24小时有效期、节选映射校验、不可变存储与 ProjectControl CAS 提交后7项通过。测试覆盖改变音轨/脚本拒绝、换预览文件不改创作哈希但须单独核验、旧 brief/pending/取消 fence 不发布、同 previewId 不可换包。ProjectView 现可返回已提交预览的文案/事实/哈希，内部对象路径不暴露；没有真正预览制作，动作仍禁用。`npm test` 39文件172项、lint、build、构建后typecheck均退出0。T11仍partial，AT-034/035/082等真实闭环未验收。
 
 2026-10-02 T11正式批准边界增量：`approve.ts` 缺模块测试先退出1；实现对已存且未过期预览包的严格请求校验、唯一 `preview_button` 批准记录、控制态CAS占用制作槽、持久render intent和同命令重放补队列。两个不同命令并发仅1个占槽；相同命令重复点击复用operation；错误hash/过期均拒绝。局部10项及全套39文件175项通过，build/typecheck通过；lint曾提示测试中未用变量（退出0），随后移除并复核。生产预览、对外批准route、render Worker/预算/真实QA仍缺，T11不能标完成。
+
+2026-10-02 T12发布边界增量：`qualityGate` 必检项降为warning/重复ruleId的红灯先失败后通过；`delivery.ts` 缺模块、`results/publish.ts` 缺模块的测试分别退出1后实现。14类基础QA规则与不可变策略hash、最终文件hash绑定，`not_checked`听验/版权和缺证据均阻断；静音N/A需要单独实际解码静音证据。原子发布核对 preview/approval/result、owner、文件实际存储字节hash、操作 fence 和 consentEpoch；测试覆盖错误bundle、取消后迟到产物、文件篡改、成功指针切换及重复提交。发布测试中100字节文件仅是哈希/CAS夹具，绝不是有效MP4或真实QA；没有对外发布入口。`npm test` 40文件180项、lint、build、构建后typecheck退出0。完整渲染、视觉/听验真实证据、媒体写入与下载闭环未实现，T12仍partial。
