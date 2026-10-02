@@ -16,6 +16,8 @@ videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付�
 
 T05 语音素材增量：固定 ASR 镜像更新为 `sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c`，保留原中英文台词复核，并新增对上传语音的自动语言识别。新版ASR镜像下20秒技术片再测 -14.44 LUFS/-1.49 dBTP、中英文成片ASR通过。Source Worker 对明确语音用途、0.2–120秒的上传音频先用受限 FFmpeg 探测/转换（声明支持 WAV/MP3/M4A，此轮仅实测 WAV），再运行独立离线 ASR，将时间段、原文件哈希、解码 WAV 哈希、镜像摘要与不可信转录原文持久归档；Director 只能用 `time:起止毫秒` 与实际段落摘录引用事实。真实4.1秒离线TTS WAV作为上传技术素材，Worker 独立处理后 `ready`、briefVersion=1、inputPending=false，识别上海与10月8日；同字节但标“配乐”的上传明确失败 `AUDIO_MUSIC_UNSUPPORTED` 且解除 pending，不把音乐误作语音事实，见 [source-audio-probe.json](evidence/source-audio-probe.json)。进一步实测52秒机械重复语音被识别器漏掉大段，声音覆盖门槛以 `AUDIO_TRANSCRIPT_INCOMPLETE` 阻断；14条不同句子拼成56.525秒语音，三片带2秒上下文重叠的ASR均覆盖有声时段并归档为ready，见同一证据。该转录仍将“黄浦”听成“黄埔”、“晚间”听成“万间”，因此仅作为不可信素材，关键事实需用户核实。尚未验证用户实录、音乐/环境声或图像内容。最新 `npm test` 39文件167项、lint/build/构建后typecheck与56.525秒真实处理探针均退出0。
 
+媒体技术 QA 增量：独立 ffprobe 现在硬性核对 H.264/yuv420p 与 BT.709 色彩三元组，MP4 顶层原子扫描确认 `moov` 在 `mdat` 前；1秒媒体探针、停止与随机画面拒绝仍通过。20秒320×180技术场景第7秒左上角已知背景 RGB (24,48,74) 解码实测 (20,45,74)，最大通道误差4，见更新的 [composition-probe.json](evidence/composition-probe.json)。这些检查只覆盖一个已知颜色和容器格式，不能替代全片色彩/视觉/字幕检查。最新完整 `npm test` 39文件168项、lint、build、构建后typecheck、1秒媒体探针与20秒合成探针均退出0。
+
 主要缺项：T05 扫描 PDF、图片、配乐/环境声及长音频用户实录的可靠解读，超长 Markdown/PDF 的分段检索；Visual/Audio/Critic 及16行为评估；T10 的特殊词发音复核、可靠字幕对齐、配乐音效与完整声音 QA；真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。图片仍仅到 `uploaded`，不会被当作已分析的事实；语音只有真实ASR与有声覆盖检查通过才会 `ready`。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、单测、目录规则或交付原型视频当作完整媒体验收。
