@@ -1,0 +1,5 @@
+export const operationStatuses=['reserved','queued','running','cancelling','cancelled','succeeded','failed','interrupted','superseded'] as const;
+export type OperationStatus=typeof operationStatuses[number];
+const transitions:Record<OperationStatus,readonly OperationStatus[]>={reserved:['queued','running','cancelling','failed'],queued:['running','cancelling','failed'],running:['cancelling','succeeded','failed','interrupted','superseded'],cancelling:['cancelled','failed'],cancelled:[],succeeded:[],failed:[],interrupted:['superseded'],superseded:[]};
+export function transitionOperation(status:OperationStatus,next:OperationStatus):OperationStatus {if(status===next)return status;if(!transitions[status].includes(next))throw Error('INVALID_TRANSITION');return next;}
+export function applyBriefChange<T extends {briefVersion:number;controlVersion:number;previewState:string}>(control:T,affectsBrief:boolean):T {return {...control,controlVersion:control.controlVersion+1,briefVersion:control.briefVersion+(affectsBrief?1:0),previewState:affectsBrief&&control.previewState==='ready'?'stale':control.previewState};}
