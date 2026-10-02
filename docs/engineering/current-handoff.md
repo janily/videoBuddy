@@ -55,3 +55,5 @@ T10/T11 新增冻结 Treatment 到旁白时窗的纯编译器；台词和ASR期�
 T03/T06 修复预算拒绝后的错误未知效果：Director、Treatment、Visual 均先执行幂等预算预留，再创建可能调用外部模型的 effect 记录。新增失败→通过测试证明预算不足且模型尚未调用时，调整限额可安全重试；真正未知的外部调用继续阻断自动重试。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、技术节选、单测、目录规则或交付原型视频当作完整媒体验收。
+
+2026-10-03 T09/T11 画面阶段：`prepareVisualShotStage` 现可只读取和重验已归档 Visual 源码，不触发模型调用。`preparePictureShotStage` 用已冻结源码与 TimingDraft 派生逐镜、按 consentEpoch 隔离的 Docker 任务；实际 MP4 经独立全解码/BT.709/哈希QA 后才保存阶段记录，重放再验磁盘文件。真实技术探针以合成HTML渲染 20 秒480帧、320×180 画面，21,718字节、SHA `c2a55d9d…`，见 [picture-stage-probe.json](evidence/picture-stage-probe.json)。首次因媒体运行时环境未设置而拒绝；修复探针配置后通过。完整测试 49文件199项、lint/build/typecheck通过。此阶段尚未拼接镜头与音轨、生成真实项目预览，也未运行模型生成源码或任何风格基线；含素材的Visual源当前明确 `VISUAL_ASSET_RUNTIME_UNAVAILABLE`，避免把无素材画面算通过。

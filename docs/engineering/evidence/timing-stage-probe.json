@@ -1,8 +1,8 @@
 {
   "technicalProbeOnly": true,
   "styleSlug": "crayon-book",
-  "voiceStageSha256": "09ab68cf1b662d33d99ee9b3e4de0fd886bba9a9374e9fe610ff80c686bdc89b",
-  "timingDraftSha256": "8a58648b2ccfbca1d8c7fb2ff5a69394b6aef6fef4e67a2d98e856fb1600f156",
+  "voiceStageSha256": "513fa60cfbf0505f044578ebe7d51480a7c2c18aa5464ec091ed3b12e87afc46",
+  "timingDraftSha256": "f0789728aa50dfbce751e472cce6d2300dbd58d2da0f95d67a24207f3ed37ee7",
   "totalFrames": 480,
   "fps": 24,
   "narration": [
@@ -13,7 +13,7 @@
       "expectedAsrText": "上海的活动将在十月八日开始。",
       "startSample": 0,
       "endSample": 196800,
-      "voiceSha256": "e1713812a7d7b782632959022a8e198252c084767d6ce563e9caede06f221414",
+      "voiceSha256": "975d0ac4feeaa83f7216def3f883b451e1f7e6609a8f68c66d28c1bc4d8a0f1f",
       "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
       "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c"
     }
@@ -24,11 +24,11 @@
       "text": "上海的活动将在十月八日开始。",
       "startFrame": 0,
       "endFrame": 113,
-      "voiceSha256": "e1713812a7d7b782632959022a8e198252c084767d6ce563e9caede06f221414"
+      "voiceSha256": "975d0ac4feeaa83f7216def3f883b451e1f7e6609a8f68c66d28c1bc4d8a0f1f"
     }
   ],
   "track": {
-    "sha256": "2b65c5777a70e07fc919c1b272144a6d8259fe97b44264f083dc6e3c49b3721e",
+    "sha256": "218fa4c624a602eeed53f505e1ef9b20477c19362a6036624956765b9bbf56e2",
     "samples": 960000,
     "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
     "silence": false

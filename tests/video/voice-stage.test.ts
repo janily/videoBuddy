@@ -14,6 +14,8 @@ import {prepareTreatmentStage} from '@/services/video/preview/treatment-stage';
 import {prepareVoiceStage} from '@/services/video/preview/voice-stage';
 import {prepareTimingStage} from '@/services/video/preview/timing-stage';
 import {prepareVisualShotStage} from '@/services/video/preview/visual-stage';
+import {preparePictureShotStage} from '@/services/video/preview/picture-stage';
+import type {MediaJob} from '@/services/video/media/executor';
 
 function wav(){
  const data=Buffer.alloc(24000*4);
@@ -56,12 +58,25 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect([mixed,fontReads]).toEqual([1,1]);
   const visualHtml='<!doctype html><html><meta charset="utf-8"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4efe3";x.fillRect(0,0,1920,1080);x.fillText("欢迎参加",100+10*Math.sin(t),200)};window.READY=true;</script></html>';
   let visualCalls=0;const visualOptions={root,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10},decide:async()=>{visualCalls++;return{schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:[],assetIds:[],sourceHtml:visualHtml}}};
+  await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true})).rejects.toThrow('VISUAL_STAGE_MISSING');
   await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,env:{VIDEO_DATA_DIR:root}})).rejects.toThrow('GENERATION_DISABLED');
   const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions);
   expect(visual.runtimeStatus).toBe('not_checked');
   expect((await projects.store.readFresh<{sourceHtml:string}>(visual.sourceRef.key)).value.sourceHtml).toBe(visualHtml);
   expect(await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions)).toEqual(visual);
+  expect(await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true})).toEqual(visual);
   expect(visualCalls).toBe(1);
+  let submitted:MediaJob|undefined,qaHash='e'.repeat(64),renderCalls=0;
+  const pictureOptions={root,env:{VIDEO_DATA_DIR:root,VIDEO_MEDIA_IMAGE_REF:`sha256:${'a'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'120'},pollMs:1,
+   executor:{submit:async(job:MediaJob)=>{submitted=job;renderCalls++;return{containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}},inspect:async()=>({status:'succeeded' as const,outputs:['output/picture.mp4']}),cancel:async()=>({status:'cancelled' as const})},
+   qa:async(_dir:string,_image:string,_path:string,expected:{width:number;height:number;durationSec:number;fps:number;audio:boolean})=>({result:'pass' as const,sha256:qaHash,bytes:1234,...expected})};
+  const picture=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions);
+  expect(submitted).toMatchObject({startFrame:0,endFrame:480,logicalWidth:1920,logicalHeight:1080,outputWidth:1920,outputHeight:1080,fps:24});
+  expect(picture.technicalQa).toMatchObject({durationSec:20,sha256:'e'.repeat(64)});
+  expect(await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).toEqual(picture);
+  expect(renderCalls).toBe(1);
+  qaHash='f'.repeat(64);
+  await expect(preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).rejects.toThrow('PICTURE_OUTPUT_CHANGED');
   const archivedSource=await projects.store.readFresh<{sourceHtml:string}>(visual.sourceRef.key);
   await projects.store.cas(visual.sourceRef.key,archivedSource.etag,{...archivedSource.value,sourceHtml:'tampered'});
   await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions)).rejects.toThrow('VISUAL_REF_CHANGED');
