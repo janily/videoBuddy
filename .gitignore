@@ -157,3 +157,6 @@ src/app/.well-known/workflow/
 .workflow-data/
 __pycache__/
 *.pyc
+runtime/voice/voices/
+runtime/voice/model/
+runtime/voice/*.wav

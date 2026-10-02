@@ -1,0 +1,8 @@
+{
+  "name": "videobuddy-voice-runtime",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@uzen/kokoro-js": "1.2.4"
+  }
+}

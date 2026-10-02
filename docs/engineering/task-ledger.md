@@ -57,3 +57,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 审查修复：hot128 receipt淘汰仍按durable accepted重放；完成归档不得被空interrupted覆盖；SSE OPERATION_NOT_STARTED重试并可显式恢复；cancel在CAS内校验通道/终态，未claim取消立即终结；真实失败run可恢复为interrupted，unknown保留占用；用户新消息刷新30天activity期限。测试fixtures只用于本地测试，不进入生产返回值。
 
 2026-10-02 T05 增量：固定 `sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919` 镜像内 PDF.js 6.3.289 实际文本层读取；[pdf-probe.json](evidence/pdf-probe.json) 记录真实13,446字节中文PDF提取上海事实、1页、ready、briefVersion=1、pending=false，另有图片扫描PDF实际失败为 `PDF_TEXT_UNAVAILABLE`、pending=false。新镜像最小媒体探针复测通过；`npm test` 30文件138项、Playwright 17项、lint/typecheck/build均通过。此证据不代表扫描件OCR、模型事实质量或视频闭环通过。
+
+2026-10-02 T10 声音增量：`@uzen/kokoro-js@1.2.4` 与精确 ONNX 模型/voice SHA 构建本地镜像 `sha256:831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64`。受限无网容器用全新上海活动文案生成中文 4.1 秒、英文 3.7 秒 24 kHz 单声道 float WAV，独立检查真实时长、电平、SHA、重放，见 [voice-probe.json](evidence/voice-probe.json)。`tests/video/voice-runtime.test.ts` 3项通过；完整 `npm test` 31文件141项、lint、typecheck、build均通过，模型6项SHA复核通过。未做 ASR/字词时间戳、发音听验、48 kHz 混音或成片，T10仍 partial。

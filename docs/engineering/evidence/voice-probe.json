@@ -1,0 +1,34 @@
+{
+  "runtimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+  "provider": "kokoro-js@1.2.4",
+  "offline": true,
+  "network": "none",
+  "chinese": {
+    "text": "上海的活动将在十月八日开始。",
+    "voice": "zf_001",
+    "codec": "pcm_f32le",
+    "sampleRate": 24000,
+    "channels": 1,
+    "samples": 98400,
+    "durationMs": 4100,
+    "bytes": 393644,
+    "sha256": "bee201e9898c86ff9634a5b00deab3e71e1c7af43c92d431f198676964db9d59",
+    "peakDbfs": -9.43463858576704,
+    "rmsDbfs": -24.38691420287332
+  },
+  "english": {
+    "text": "The event in Shanghai begins on October eighth.",
+    "voice": "af_maple",
+    "codec": "pcm_f32le",
+    "sampleRate": 24000,
+    "channels": 1,
+    "samples": 88800,
+    "durationMs": 3700,
+    "bytes": 355244,
+    "sha256": "80241d96b8d748f512ed6cdd7ea52db55b6b2c8842a78f950bf33aa11ebecfec",
+    "peakDbfs": -12.01763107680522,
+    "rmsDbfs": -28.428589501534702
+  },
+  "sameStageReplay": true,
+  "limits": "WAV format, non-silence, hash and duration checked; speech recognition, intelligibility, alignment and 48 kHz mix not checked"
+}
