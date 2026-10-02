@@ -57,7 +57,7 @@ export async function runSourceAnalysisOnce(store:AtomicStore,root:string,extrac
     await publishAudioAnalysis(projects,projectId,asset.id,transcript);
    }catch(error){
     const message=error instanceof Error?error.message:'';
-    const code=['AUDIO_USE_UNCLEAR','AUDIO_MUSIC_UNSUPPORTED','AUDIO_DURATION_UNSUPPORTED','AUDIO_TEXT_UNAVAILABLE','VOICE_SILENT','ASSET_HASH_CONFLICT','ASR_RUNTIME_UNAVAILABLE'].includes(message)?message:message.startsWith('CAPABILITY_UNAVAILABLE:')?'AUDIO_RUNTIME_UNAVAILABLE':'AUDIO_ANALYSIS_FAILED';
+    const code=['AUDIO_USE_UNCLEAR','AUDIO_MUSIC_UNSUPPORTED','AUDIO_DURATION_UNSUPPORTED','AUDIO_TEXT_UNAVAILABLE','AUDIO_TRANSCRIPT_INCOMPLETE','VOICE_SILENT','ASSET_HASH_CONFLICT','ASR_RUNTIME_UNAVAILABLE'].includes(message)?message:message.startsWith('CAPABILITY_UNAVAILABLE:')?'AUDIO_RUNTIME_UNAVAILABLE':'AUDIO_ANALYSIS_FAILED';
     await failAsset(store,key,asset.id,code);
    }
   }

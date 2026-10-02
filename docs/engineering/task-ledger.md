@@ -34,7 +34,7 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 | T02 | Private Blob fresh body/ETag同响应、CAS、匿名owner、不可变归档/分块索引、容量预约；storage-access 9项、project-api 6项 | 云冷实例测试、全模态/产物存储布局、完整清理未验收 |
 | T03 | durable receipt、canonical claim、effect ledger、聊天恢复端点；commands 9项、reconcile 2项 | 完整生产资源恢复/停止核实、云故障演练；reserved原请求仍可重试 |
 | T04 | UTF8/SSE/游标/reducer、Workflow真实流端点、已归档回复保护、启动重连；stream 8项 | 真实跨云请求续流/流过期修复/中文长流未验收；当前Director结构化完成后发delta，并非原生token流 |
-| T05 | 预约容量/幂等/UTF8 Markdown探测、本地直传及完成 API；Markdown/文本 PDF 不可变原文、ready、消息附件、行号/页码引文验证；受限容器 PDF 探针与扫描件失败解除 pending 实测通过；明确语音用途的短音频真实ASR与时间引用接通 | 扫描 PDF/图片视觉解读、配乐/环境声、长音频与超长资料分段检索和全模态验收尚未接通 |
+| T05 | 预约容量/幂等/UTF8 Markdown探测、本地直传及完成 API；Markdown/文本 PDF 不可变原文、ready、消息附件、行号/页码引文验证；受限容器 PDF 探针与扫描件失败解除 pending 实测通过；明确语音用途的0.2–120秒分段ASR与时间引用接通，56.525秒多句测试通过、52秒机械重复漏识别被拒 | 扫描 PDF/图片视觉解读、配乐/环境声、真实用户长音频听验与超长资料分段检索和全模态验收尚未接通 |
 | T06 | 真实Mastra adapter、来源授权/逐轮引导/理解patch、持久聊天Workflow；guidance 6项、model-adapter 1项 | Visual/Audio/Critic代理、16项真实行为评估、材料来源授权；context超限明确失败而非偷删事实 |
 | T07 | 已确认布局、单输入、IME/草稿、聊天列表、手机标签、风格原生dialog；Playwright 14项 | 左侧目前欢迎/收集态；完整预览/制作/完成态、5条待发队列及进阶交互尚缺 |
 | T08 | 43原slug/9分类/固定版本STYLE规则与哈希、搜索/知识加载；styles 6项 | 推荐策略与完整StylePack执行适配尚缺；所有公开profiles为空，能力标not_run |
@@ -71,3 +71,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T10响度增量：固定媒体镜像对最终AAC运行独立`loudnorm`测量。未处理技术成片 -25.93 LUFS/-9.27 dBTP，按目标失败；仅做单级归一化 -15.57 LUFS/-1.19 dBTP仍失败。改为人声峰值压缩+归一化，合成器对有声影片在独立技术QA后强制检查 -14±1 LUFS与真峰值≤-1.2 dBTP；上一20秒技术片为 -14.41 LUFS/-1.49 dBTP并通过中英文成片ASR。静音片实际解码为纯静音后响度N/A。ASR偶发繁体“活動將在…開始”由锁定`opencc-js@1.4.1`在比较时正字归一化，原计划/期待文本保持不变，10月9日错误仍拒绝。证据见 [composition-probe.json](evidence/composition-probe.json)。配乐/音效、特殊发音听验、真实用户内容、1080p、43风格与语义QA未完成；完整 `npm test` 38文件163项、lint/build/顺序typecheck和最终真实探针均退出0，T10/T11仍partial。
 
 2026-10-02 T05语音素材增量：固定离线ASR镜像更新为 `sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c`，新增 `auto` 语言检测，保留原指定中英文台词检查；旧ASR探针在新镜像再次通过并拒绝错误日期；20秒合成探针复跑为 -14.44 LUFS/-1.49 dBTP，成片中英文ASR仍通过。明确语音用途的上传素材由Source Worker在无网媒体镜像中探测/转换为24 kHz WAV，独立ASR识别，再把时段转录、原字节哈希、转码哈希、镜像摘要作为不可信来源持久归档；Director新加 `time:起止毫秒` 摘录核验。真实4.1秒合成WAV以HTTP字节流上传后，Worker独立处理为ready，briefVersion=1、inputPending=false，识别“上海的活动将在10月8日开始”；同样字节作为“配乐”上传则显式 `AUDIO_MUSIC_UNSUPPORTED`、pending=false，不制造音乐事实。证据 [source-audio-probe.json](evidence/source-audio-probe.json)。目前只支持0.2–30秒的明确语音用途、中文或英文；人类实录、长音频、音乐/音效、扫描PDF和图片仍缺，完整 `npm test` 39文件165项、lint/build/顺序typecheck、Python语法与真实上传/原ASR/成片探针均退出0，T05继续partial。
+
+2026-10-02 T05长语音增量：按实测时长把≤120秒语音分成最多5个核心区间，前后各取2秒上下文，ASR后以时间中点选主区间，保留源时间与每段转码哈希；100毫秒PCM能量窗口若持续≥600毫秒有声却无转录，直接 `AUDIO_TRANSCRIPT_INCOMPLETE`，不得ready。52秒相同句子循环输入实际出现大段漏识别，Worker正确标failed、pending=false；14句不同内容拼接成56.525秒上传音频，三片ASR通过覆盖门槛并ready，按时段归档全部14句，见 [source-audio-probe.json](evidence/source-audio-probe.json)。模型仍把“黄浦”误听成“黄埔”、“晚间”误听成“万间”；覆盖不证明语义正确，重要事实需来源复核。真实人声、音乐/环境声、120秒边界及长音频听验未验收；最新 `npm test` 39文件167项、lint/build/顺序typecheck和真实56.525秒探针均退出0，T05仍partial。

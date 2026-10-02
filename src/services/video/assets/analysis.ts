@@ -6,7 +6,7 @@ import {ProjectStore} from '@/services/video/storage/project-store';
 import {updateJson} from '@/services/video/storage/atomic-store';
 import {probeMarkdown} from './probe';
 
-export interface TextAnalysis{schemaVersion:5;assetId:string;mime:'text/markdown'|'application/pdf'|'audio/wav'|'audio/mpeg'|'audio/mp4';sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string}>;language?:'zh-CN'|'en';durationMs?:number;asrRuntimeDigest?:string;mediaRuntimeDigest?:string;wavSha256?:string;trust:'untrusted_material'}
+export interface TextAnalysis{schemaVersion:5;assetId:string;mime:'text/markdown'|'application/pdf'|'audio/wav'|'audio/mpeg'|'audio/mp4';sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string;language?:'zh-CN'|'en'}>;language?:'zh-CN'|'en'|'mixed';durationMs?:number;asrRuntimeDigest?:string;mediaRuntimeDigest?:string;wavChunks?:Array<{startMs:number;sha256:string}>;chunkCount?:number;trust:'untrusted_material'}
 export async function publishMarkdownAnalysis(projects:ProjectStore,projectId:string,assetId:string,path:string){
  const parsed=probeMarkdown(await readFile(path));
  const record:TextAnalysis={schemaVersion:5,assetId,mime:'text/markdown',sha256:parsed.sha256,text:parsed.text,trust:parsed.trust};
@@ -52,14 +52,14 @@ export async function publishPdfAnalysis(projects:ProjectStore,projectId:string,
  });
  return next.assets.find(item=>item.id===assetId)!;
 }
-export async function publishAudioAnalysis(projects:ProjectStore,projectId:string,assetId:string,transcript:{durationMs:number;language:'zh-CN'|'en';segments:Array<{startMs:number;endMs:number;text:string}>;asrRuntimeDigest:string;mediaRuntimeDigest:string;wavSha256:string}){
+export async function publishAudioAnalysis(projects:ProjectStore,projectId:string,assetId:string,transcript:{durationMs:number;language:'zh-CN'|'en'|'mixed';segments:Array<{startMs:number;endMs:number;text:string;language:'zh-CN'|'en'}>;asrRuntimeDigest:string;mediaRuntimeDigest:string;wavChunks:Array<{startMs:number;sha256:string}>;chunkCount:number}){
  const prefix=`projects/${projectId}`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  const asset=control.assets.find(item=>item.id===assetId);
  if(!asset||!['audio/wav','audio/mpeg','audio/mp4'].includes(asset.declaredMime)||!asset.sha256||!['uploaded','analyzing','ready'].includes(asset.status))throw Error('ASSET_INVALID');
  const text=transcript.segments.map(segment=>`[${segment.startMs}-${segment.endMs}ms] ${segment.text}`).join('\n');
  if(!text||Buffer.byteLength(text)>40000||transcript.segments.some(segment=>segment.endMs>transcript.durationMs+1000))throw Error('AUDIO_TEXT_UNAVAILABLE');
- const record:TextAnalysis={schemaVersion:5,assetId,mime:asset.declaredMime as TextAnalysis['mime'],sha256:asset.sha256,text,segments:transcript.segments,language:transcript.language,durationMs:transcript.durationMs,asrRuntimeDigest:transcript.asrRuntimeDigest,mediaRuntimeDigest:transcript.mediaRuntimeDigest,wavSha256:transcript.wavSha256,trust:'untrusted_material'};
+ const record:TextAnalysis={schemaVersion:5,assetId,mime:asset.declaredMime as TextAnalysis['mime'],sha256:asset.sha256,text,segments:transcript.segments,language:transcript.language,durationMs:transcript.durationMs,asrRuntimeDigest:transcript.asrRuntimeDigest,mediaRuntimeDigest:transcript.mediaRuntimeDigest,wavChunks:transcript.wavChunks,chunkCount:transcript.chunkCount,trust:'untrusted_material'};
  const ref=await projects.index.immutable(`${prefix}/assets/${assetId}/analysis/${asset.sha256}`,record);
  const next=await updateJson(projects.store,`${prefix}/control`,async(current:ProjectControl)=>{
   if(current.deletedAt)throw Error('ACCESS_NOT_FOUND');

@@ -3,7 +3,7 @@ import {Understanding,UnderstandingSchema,UnderstandingPatchSchema,PreferencesSc
 import {createVideoAgent} from './model-adapter';
 export const GuidanceDecisionSchema=z.strictObject({action:z.enum(['ask','suggest_preview','acknowledge','status','change']),reply:z.string().min(1).max(8000),effect:z.enum(['no_change','update_brief','pending_followup','clarify_conflict']),question:z.strictObject({topic:z.string(),text:z.string(),required:z.boolean(),reason:z.string()}).optional(),understandingPatch:UnderstandingPatchSchema.optional(),recommendedStyleId:z.string().optional(),executionIntent:z.enum(['prepare_preview','classify_change','none']),evidenceMessageIds:z.array(z.string().uuid())});
 export type GuidanceDecision=z.infer<typeof GuidanceDecisionSchema>;
-export interface SourceAttachment{assetId:string;filename:string;mime:string;sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string}>}
+export interface SourceAttachment{assetId:string;filename:string;mime:string;sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string;language?:'zh-CN'|'en'}>}
 export interface SourceMessage{id:string;role:'user'|'assistant';text:string;attachments?:SourceAttachment[]}
 export function guardGuidance(decision:GuidanceDecision,messages:SourceMessage[],previewAuthorized:boolean,understanding?:Understanding){
  const users=new Set(messages.filter(m=>m.role==='user').map(m=>m.id));

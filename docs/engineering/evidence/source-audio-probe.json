@@ -1,17 +1,24 @@
 {
   "sourceKind": "fresh offline TTS WAV uploaded as speech-intended asset; not a user recording",
-  "sourceSha256": "58d2924cc05f4790912f2d73819eea282074fad29b811d421e5ee387e396d80b",
+  "sourceSha256": "117dd5b590b09b0050bedd17986ccd4404acbf04a99b38daecfb3834cf54303a",
   "sourceBytes": 393644,
   "sourceDurationMs": 4100,
   "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
   "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
-  "convertedWavSha256": "8ef6a0250d391e600d5574193e6313374c5ff7bf808bf1090cd27b383e545616",
+  "wavChunks": [
+    {
+      "startMs": 0,
+      "sha256": "cbe123803d1f9860a36652d39435b28e21d8693eb8363a3db2da9cdc6c5d3921"
+    }
+  ],
+  "chunkCount": 1,
   "detectedLanguage": "zh-CN",
   "segments": [
     {
       "startMs": 0,
-      "endMs": 3080,
-      "text": "上海的活动将在10月8日开始。"
+      "endMs": 3100,
+      "text": "上海的活动将在10月8日开始。",
+      "language": "zh-CN"
     }
   ],
   "assetStatus": "ready",
@@ -22,5 +29,122 @@
     "errorCode": "AUDIO_MUSIC_UNSUPPORTED",
     "inputPending": false
   },
-  "limits": "Short clean speech under 30 seconds only; music intent is explicitly unsupported, not turned into factual ASR; no ambient sound, long audio or human recording validated"
+  "repeatedSpeech": {
+    "sourceSha256": "348e7737e6dc78af75031a00fbe617d4c02f261b35642fac1a9e8baddd001de8",
+    "sourceBytes": 4992114,
+    "durationMs": 52000,
+    "status": "failed",
+    "errorCode": "AUDIO_TRANSCRIPT_INCOMPLETE",
+    "inputPending": false
+  },
+  "diverseSpeech": {
+    "sourceSha256": "f83d47013ccd5b6a0f14c1c291136709f6e58da3b04549ec27b6b35a53079e3c",
+    "sourceBytes": 5426514,
+    "durationMs": 56525,
+    "chunkCount": 3,
+    "wavChunks": [
+      {
+        "startMs": 0,
+        "sha256": "cdc88e8b789b841f5d1af815203ad652ecc96e1327098667fb41509eb852630f"
+      },
+      {
+        "startMs": 16842,
+        "sha256": "8c69454be01a1173cafcdac5a04df00b69c21b833150dbd351e790411f27269d"
+      },
+      {
+        "startMs": 35684,
+        "sha256": "18fc5f0979aea5ec51506dc08ca86b900571fafcca942ea632cd4ca80fc65f42"
+      }
+    ],
+    "language": "zh-CN",
+    "segments": [
+      {
+        "startMs": 0,
+        "endMs": 3740,
+        "text": "上海科技展將在10月8日上午開幕",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 4400,
+        "endMs": 7840,
+        "text": "駐會場設在黃埔區的文化中心",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 8580,
+        "endMs": 11320,
+        "text": "觀眾可以從東門進入展廳",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 12140,
+        "endMs": 15460,
+        "text": "第一場講座介紹 城市綠色交通",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 16320,
+        "endMs": 19600,
+        "text": "第二場活動展示新的教育工具",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 20362,
+        "endMs": 23662,
+        "text": "工作人員會在入口提供中文地圖",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 24382,
+        "endMs": 28062,
+        "text": "家庭觀眾可以參加下午的手工課",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 28842,
+        "endMs": 31582,
+        "text": "志願者將在每個樓層提供幫助",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 32202,
+        "endMs": 35242,
+        "text": "萬間討論圍繞社區服務展開",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 36022,
+        "endMs": 39162,
+        "text": "所有活動將在晚上6點結束",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 39884,
+        "endMs": 43504,
+        "text": "參觀者請在現場確認最新日程",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 44124,
+        "endMs": 47564,
+        "text": "如需無障礙通道可以諮詢服務台",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 48224,
+        "endMs": 51724,
+        "text": "主辦方提醒大家保管好個人物品",
+        "language": "zh-CN"
+      },
+      {
+        "startMs": 52524,
+        "endMs": 55604,
+        "text": "今天的介紹到此結束謝謝大家",
+        "language": "zh-CN"
+      }
+    ],
+    "status": "ready",
+    "inputPending": false
+  },
+  "limits": "Short and varied long synthetic speech with audio-coverage gate tested; human recording, music and ambient sound not validated"
 }
