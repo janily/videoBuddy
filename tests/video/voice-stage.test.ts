@@ -13,6 +13,7 @@ import {getStyle} from '@/services/video/styles/registry';
 import {prepareTreatmentStage} from '@/services/video/preview/treatment-stage';
 import {prepareVoiceStage} from '@/services/video/preview/voice-stage';
 import {prepareTimingStage} from '@/services/video/preview/timing-stage';
+import {prepareVisualShotStage} from '@/services/video/preview/visual-stage';
 
 function wav(){
  const data=Buffer.alloc(24000*4);
@@ -48,16 +49,28 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   const trackPath=join(root,'audio','fixture','track.wav');let mixed=0,fontReads=0;
   const trackBytes=Buffer.alloc(44+960000*4);trackBytes.write('RIFF',0);trackBytes.writeUInt32LE(trackBytes.length-8,4);trackBytes.write('WAVEfmt ',8);trackBytes.writeUInt32LE(16,16);trackBytes.writeUInt16LE(3,20);trackBytes.writeUInt16LE(1,22);trackBytes.writeUInt32LE(48000,24);trackBytes.writeUInt32LE(192000,28);trackBytes.writeUInt16LE(4,32);trackBytes.writeUInt16LE(32,34);trackBytes.write('data',36);trackBytes.writeUInt32LE(960000*4,40);for(let index=0;index<48000;index++)trackBytes.writeFloatLE(Math.sin(index*0.1)*0.1,44+index*4);
   const timingOptions={root,buildTrack:async()=>{mixed++;await mkdir(join(root,'audio','fixture'),{recursive:true});await writeFile(trackPath,trackBytes);return{outputPath:trackPath,runtimeDigest:'c'.repeat(64),wav:probeTrackWav(trackBytes,960000,false),kind:'narration_only' as const,qaStatus:'not_checked' as const}},readFont:async()=>{fontReads++;return{family:'Noto Sans CJK SC' as const,runtimeDigest:'c'.repeat(64),charsetSha256:'d'.repeat(64),glyphs:new Set(Array.from('欢迎参加。'))}}};
+  await expect(prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('TIMING_STAGE_MISSING');
   const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions);
   expect((await projects.store.readFresh<{totalFrames:number;narration:unknown[];captions:unknown[]}>(timing.draftRef.key)).value).toMatchObject({totalFrames:480,narration:[{}],captions:[{}]});
   expect(await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions)).toEqual(timing);
   expect([mixed,fontReads]).toEqual([1,1]);
+  const visualHtml='<!doctype html><html><meta charset="utf-8"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4efe3";x.fillRect(0,0,1920,1080);x.fillText("欢迎参加",100+10*Math.sin(t),200)};window.READY=true;</script></html>';
+  let visualCalls=0;const visualOptions={root,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10},decide:async()=>{visualCalls++;return{schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:[],assetIds:[],sourceHtml:visualHtml}}};
+  await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,env:{VIDEO_DATA_DIR:root}})).rejects.toThrow('GENERATION_DISABLED');
+  const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions);
+  expect(visual.runtimeStatus).toBe('not_checked');
+  expect((await projects.store.readFresh<{sourceHtml:string}>(visual.sourceRef.key)).value.sourceHtml).toBe(visualHtml);
+  expect(await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions)).toEqual(visual);
+  expect(visualCalls).toBe(1);
+  const archivedSource=await projects.store.readFresh<{sourceHtml:string}>(visual.sourceRef.key);
+  await projects.store.cas(visual.sourceRef.key,archivedSource.etag,{...archivedSource.value,sourceHtml:'tampered'});
+  await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions)).rejects.toThrow('VISUAL_REF_CHANGED');
   await writeFile(trackPath,Buffer.from('tampered'));
   await expect(prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions)).rejects.toThrow('TIMING_TRACK_CHANGED');
   await writeFile(voicePath,Buffer.from('tampered'));
   await expect(prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options)).rejects.toThrow('VOICE_SOURCE_CHANGED');
   const changedRevision=randomUUID();
-  const changedTreatment=await prepareTreatmentStage(projects,projectId,changedRevision,operationId,0,{decide:async()=>plan,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10}});
+  const changedTreatment=await prepareTreatmentStage(projects,projectId,changedRevision,operationId,0,{decide:async()=>plan,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:30000,dailyCalls:10}});
   await expect(prepareVoiceStage(projects,projectId,changedRevision,operationId,0,changedTreatment,{...options,generate:async(dir,job)=>{
    const voice=await options.generate(dir,job);
    await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,consentEpoch:1}));

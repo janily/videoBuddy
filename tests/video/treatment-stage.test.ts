@@ -44,5 +44,11 @@ it('T11 reserves one real model effect and never publishes a plan after the prev
   await expect(prepareTreatmentStage(projects,projectId,unknownRevision,unknownOperation,2,{limits,decide:uncertain})).rejects.toThrow('PROVIDER_UNAVAILABLE');
   await expect(prepareTreatmentStage(projects,projectId,unknownRevision,unknownOperation,2,{limits,decide:uncertain})).rejects.toThrow('EFFECT_UNKNOWN');
   expect(unknownCalls).toBe(1);
+  const budgetOperation=randomUUID(),budgetRevision=randomUUID();
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,activeProduction:budgetOperation}));
+  let budgetCalls=0;const retryAfterBudget=async()=>{budgetCalls++;return plan};
+  await expect(prepareTreatmentStage(projects,projectId,budgetRevision,budgetOperation,2,{limits:{...limits,projectCalls:1},decide:retryAfterBudget})).rejects.toThrow('BUDGET_EXCEEDED');
+  await expect(prepareTreatmentStage(projects,projectId,budgetRevision,budgetOperation,2,{limits,decide:retryAfterBudget})).resolves.toMatchObject({mime:'application/json'});
+  expect(budgetCalls).toBe(1);
  }finally{await rm(root,{recursive:true,force:true})}
 });

@@ -18,7 +18,7 @@ import {compileTimingDraft,TimingDraftSchema,type TimingDraft} from './timing-dr
 import {prepareVoiceStage,type VoiceStageRecord} from './voice-stage';
 
 type FontResult=Awaited<ReturnType<typeof readPinnedSubtitleFont>>;
-interface Options{root?:string;env?:Environment;buildTrack?:(root:string,verified:VerifiedNarrationManifest)=>Promise<NarrationTrack>;readFont?:()=>Promise<FontResult>}
+interface Options{root?:string;env?:Environment;buildTrack?:(root:string,verified:VerifiedNarrationManifest)=>Promise<NarrationTrack>;readFont?:()=>Promise<FontResult>;mustExist?:boolean}
 export interface TimingStageRecord{schemaVersion:1;briefVersion:number;understandingSha256:string;treatmentSha256:string;voiceStageHash:string;draftRef:ObjectRef}
 
 async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Promise<T>{
@@ -58,6 +58,7 @@ export async function prepareTimingStage(projects:ProjectStore,projectId:string,
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
   return existing;
  }
+ if(options.mustExist)throw Error('TIMING_STAGE_MISSING');
  const track=await (options.buildTrack||((dir,manifest)=>buildNarrationTrack(dir,manifest,env)))(root,verified);
  const font=understanding.preferences.captions==='auto'&&verified.lines.length?await (options.readFont||(()=>readPinnedSubtitleFont(env)))():null;
  const cues=font?compileSubtitles(verified,treatmentPlan.fps,font.glyphs):[];

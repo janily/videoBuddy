@@ -38,9 +38,9 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
     return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(analysis.pages?{pages:analysis.pages}:{}),...(analysis.segments?{segments:analysis.segments}:{})};
    }))}:{}),
   })));
+  const bytes=Buffer.byteLength(JSON.stringify({understanding,messages:context}));if(bytes>60000)throw Error('CONTEXT_LIMIT');
+  const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
   const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
-   const bytes=Buffer.byteLength(JSON.stringify({understanding,messages:context}));if(bytes>60000)throw Error('CONTEXT_LIMIT');
-   const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
    const result=GuidanceDecisionSchema.parse(await (options.decide||runDirector)(understanding,context,reservation.maxOutputTokens));
    guardGuidance(result,context,false,understanding);return result;
   });

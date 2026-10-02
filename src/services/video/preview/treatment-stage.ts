@@ -26,8 +26,8 @@ export async function prepareTreatmentStage(projects:ProjectStore, projectId:str
  const contextBytes=Buffer.byteLength(canonicalJson({understanding,styleRules:knowledge.rules}));
  if (contextBytes>100000) throw Error('CONTEXT_LIMIT');
  const limits=options.limits||modelLimits(env);
+ const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-treatment-${revisionId}`,{inputTokens:contextBytes+4096,outputTokens:5000},limits);
  const plan=await runEffect<TreatmentPlan>(projects.store,`${prefix}/operations/${operationId}/effects/treatment/${revisionId}`,async()=>{
-  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-treatment-${revisionId}`,{inputTokens:contextBytes+4096,outputTokens:5000},limits);
   return guardTreatment(await (options.decide||runTreatment)(understanding,reservation.maxOutputTokens,env),understanding,knowledge.sha256);
  });
  guardTreatment(plan,understanding,knowledge.sha256);
