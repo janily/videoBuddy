@@ -1,0 +1,30 @@
+{
+  "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "fontFamily": "Noto Sans CJK SC",
+  "fontCharsetSha256": "520335296aaf1ae3c73fc85b3c1b5276af285d1be41256ac2f239b3aead62525",
+  "fontGlyphCount": 44810,
+  "durationMs": 20000,
+  "fps": 24,
+  "cues": [
+    {
+      "lineId": "probe_0",
+      "text": "上海的活动将在十月八日开始。",
+      "startFrame": 24,
+      "endFrame": 137,
+      "startMs": 1000,
+      "endMs": 5708,
+      "voiceSha256": "75dd6071fd3f99e2322ddca00f9256bb9274a7e47b44a01a8f7b8994d960eb8b"
+    },
+    {
+      "lineId": "probe_1",
+      "text": "The event starts in Shanghai.",
+      "startFrame": 216,
+      "endFrame": 293,
+      "startMs": 9000,
+      "endMs": 12208,
+      "voiceSha256": "dceedf0c510f4a31840d310941d4a96fa4bb438515668cce5a4fee91602085ed"
+    }
+  ],
+  "srtSha256": "0313e8f55818fb3bf5e503283cf6e37230ed160aab9cda76e4797b2247d47d0a",
+  "limits": "Compiled SRT and actual font glyph coverage only; burn-in, visual layout and final media QA not yet checked"
+}

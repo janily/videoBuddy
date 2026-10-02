@@ -1,6 +1,6 @@
 # 开发任务与证据
 
-> 2026-10-02 架构变更：以下早期 Vercel/Blob/Workflow/Sandbox 记录仅保留为历史证据，已由 [自托管架构](self-hosted-architecture.md) 与 [执行计划](self-hosted-plan.md) 替代，不再是待索取的凭据。当前仍按原 T00–T21 产品范围验收；C0/C1/C2 未完成。最新本地结果：`npm ci --ignore-scripts --no-audit` 退出0、`npm test` 30文件138项通过、`npm run typecheck` 退出0、`npm run lint` 退出0、`npm run build` 退出0、Playwright 17项通过、Python runner 3项通过；原交付包独立校验通过，22任务/22需求/92验收/43风格/86基线目标和60份未改设计文件均匹配。T09 最小 Docker 2D/中文探针通过，真实1秒H.264/320×180/9,249字节、无网络、运行中停止、随机画面拒绝及独立 ffprobe/全解码技术QA证据见 [media-probe.json](evidence/media-probe.json) 和首帧；完整声音、合成、语义/字幕QA、WebGL仍未通过。付费模型评估、T05 全模态分析、43风格86基线未运行。自托管存储、队列/Worker、SSE、私有下载、本地素材字节 API 与 Markdown/文本 PDF 解析及附件消息已开发并各有局部测试；不能据此标整项 T05/T09/T21 完成。
+> 2026-10-02 架构变更：以下早期 Vercel/Blob/Workflow/Sandbox 记录仅保留为历史证据，已由 [自托管架构](self-hosted-architecture.md) 与 [执行计划](self-hosted-plan.md) 替代，不再是待索取的凭据。当前仍按原 T00–T21 产品范围验收；C0/C1/C2 未完成。最新本地结果：`npm ci --ignore-scripts --no-audit` 退出0、`npm test` 36文件158项通过、`npm run typecheck` 退出0、`npm run lint` 退出0、`npm run build` 退出0、Playwright 17项此前通过、Python runner 3项通过；原交付包独立校验通过，22任务/22需求/92验收/43风格/86基线目标和60份未改设计文件均匹配。T09 最小 Docker 2D/中文探针通过，真实1秒H.264/320×180/9,249字节、无网络、运行中停止、随机画面拒绝及独立 ffprobe/全解码技术QA证据见 [media-probe.json](evidence/media-probe.json) 和首帧；随后真实语音、字幕与20秒技术合成证据见文末增量记录。付费模型评估、T05 全模态分析、43风格86基线未运行。自托管存储、队列/Worker、SSE、私有下载、本地素材字节 API 与 Markdown/文本 PDF 解析及附件消息已开发并各有局部测试；不能据此标整项 T05/T09/T21 完成。
 
 唯一规格：docs/hand-off/videobuddy-v5.1。依赖按 T00–T21 执行。
 
@@ -39,8 +39,8 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 | T07 | 已确认布局、单输入、IME/草稿、聊天列表、手机标签、风格原生dialog；Playwright 14项 | 左侧目前欢迎/收集态；完整预览/制作/完成态、5条待发队列及进阶交互尚缺 |
 | T08 | 43原slug/9分类/固定版本STYLE规则与哈希、搜索/知识加载；styles 6项 | 推荐策略与完整StylePack执行适配尚缺；所有公开profiles为空，能力标not_run |
 | T09 | SDK Sandbox deny-all固定镜像配置、detached submit/inspect/stop、固定Python锁/marker、Chromium绝对时间截图/FFmpeg picture编码；media-executor 7项、Python 3项 | 固定镜像尚未构建/提供；可信素材传输、真实检测、跨请求stop/GL报告未跑；本机没有ffmpeg/ffprobe，未渲染真实媒体 |
-| T10 | 帧/采样绝对时间、字幕边界/字形/可读时间、ASR不改原稿；audio-timeline 5项 | TTS/ASR实际provider、音乐/音效合成混音、完整AudioManifest尚缺 |
-| T11 | 6–12秒excerpt映射、null转场/语义审批基线；preview 3项及domain覆盖 | 真实复合预览生产、bundleHash全链路、批准route/唯一正式启动尚缺 |
+| T10 | 帧/采样绝对时间、真实离线TTS/ASR、按字词时间编译SRT、真实字体字形、48 kHz旁白轨和AAC/H.264技术合成；见文末探针 | 音乐/音效、响度母带、最终混音ASR/听验、字幕视觉全尺寸QA和完整AudioManifest尚缺 |
+| T11 | 6–12秒excerpt映射、null转场/语义审批基线、可复用技术合成器；preview 3项及domain覆盖 | 真实复合预览生产、bundleHash全链路、批准route/唯一正式启动尚缺 |
 | T12 | QA blocking/not_checked门槛、证据与发布fence/hash；publish 3项 | 独立真实FFmpeg/ASR/逐帧QA、正式render workflow/原子发布尚缺 |
 | T13 | 自然语言修改风险/来源/预算/撤回策略、回复取消竞态/预claim取消；changes 4项及commands覆盖 | safe-direct实际混音/字幕更新、新预览、制作取消与恢复原片尚缺 |
 | T14 | 私有artifact短期授权GET route、工程导出白名单、删除立即禁访问、最近20个项目ID服务端鉴权查找；delivery 8项 | 稳定播放器/URL续期、实际ZIP/字幕导出、资源取消后清理尚缺 |
@@ -63,3 +63,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T10 时间轴增量：`prepareNarration` 严格区分显示文字/发声文字/ASR期待文本，用真实 WAV 时长拒绝超出预留时段，空旁白可表达明确静音；`buildNarrationTrack` 在固定无网媒体镜像中用 FFmpeg 48 kHz 精确采样偏移合成旁白轨。实测 20 秒 960,000 采样；0–0.8秒、5.5–7.5秒、12.5–19秒 RMS 为零，中文/英文窗口分别为0.066/0.042；独立空旁白轨为纯静音，同stage重放哈希相同。见更新的 [voice-probe.json](evidence/voice-probe.json)。`npm test` 33文件147项、typecheck、lint、build均退出0。音乐/音效、响度、ASR、字词时间戳、听验及成片仍未完成；T10仍 partial。
 
 2026-10-02 T10 ASR增量：锁定 `Systran/faster-whisper-small@2ec96c5` 及 Python 依赖、固定无网只读镜像 `sha256:c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4`。识别容器只收实际 WAV 与语言，不收期望台词；`verifyNarration` 将识别结果和词时间与原始计划核对，日期数字做窄范围等值归一化，实测错误的10月9日被拒绝。中文12个、英文5个词级时间及实际识别文案见 [asr-probe.json](evidence/asr-probe.json)。探针首轮曾真实 `ASR_MISMATCH` 退出1，下一轮通过，显示 TTS/ASR 波动；没有偷偷调整原稿。`npm test` 34文件151项、lint、build、Python语法、顺序typecheck均通过（并发build/typecheck曾因`.next/types`竞态短暂失败，顺序复跑通过）。成片混音后ASR、特殊专名、听验和自动修复策略仍缺，T10不标完成。
+
+2026-10-02 T10/T11技术合成增量：真实ASR证据生成两条SRT字幕；媒体镜像内 Noto Sans CJK SC 字形表实际44,810字符、SHA见 [subtitle-probe.json](evidence/subtitle-probe.json)。字幕编译器按实测发声+0.6秒/阅读速度取较长值并量化到帧，时间冲突直接失败。`composeVideo`实际连接画面、48 kHz旁白、烧录字幕及AAC音轨；最新20秒320×180/24fps场景输出141,704字节，另有38,001字节无旁白纯静音成片，两者均经固定镜像独立ffprobe与全片解码通过，见 [composition-probe.json](evidence/composition-probe.json) 和三个实际抽帧。媒体QA新增AAC/48 kHz检查；`npm test` 36文件158项、lint/build/顺序typecheck通过。此场景为确定性技术验证，不是模型生成用户内容、1080p正式影片或43风格基线；未做响度、最终音轨ASR/听验、真实预览审批/发布，T10/T11仍partial。

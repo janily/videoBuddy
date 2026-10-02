@@ -6,13 +6,13 @@ import {isAbsolute,join} from 'node:path';
 import {z} from 'zod';
 import {validateOutputPath} from './executor';
 
-const probeSchema=z.object({streams:z.array(z.object({codec_type:z.string(),codec_name:z.string(),width:z.number().optional(),height:z.number().optional(),avg_frame_rate:z.string().optional()})),format:z.object({duration:z.string()})});
+const probeSchema=z.object({streams:z.array(z.object({codec_type:z.string(),codec_name:z.string(),width:z.number().optional(),height:z.number().optional(),avg_frame_rate:z.string().optional(),sample_rate:z.string().optional(),channels:z.number().optional()})),format:z.object({duration:z.string()})});
 export interface ExpectedVideo{width:number;height:number;durationSec:number;fps:number;audio:boolean}
 export function validateVideoProbe(raw:unknown,expected:ExpectedVideo){
  const probe=probeSchema.parse(raw),video=probe.streams.filter(stream=>stream.codec_type==='video'),audio=probe.streams.filter(stream=>stream.codec_type==='audio');
  const duration=Number(probe.format.duration),rate=video[0]?.avg_frame_rate?.split('/').map(Number),fps=rate?.length===2?rate[0]/rate[1]:NaN;
  if(video.length!==1||video[0].codec_name!=='h264'||video[0].width!==expected.width||video[0].height!==expected.height||
-  audio.length!==(expected.audio?1:0)||!Number.isFinite(duration)||Math.abs(duration-expected.durationSec)>1/expected.fps||
+  audio.length!==(expected.audio?1:0)||(expected.audio&&(audio[0].codec_name!=='aac'||audio[0].sample_rate!=='48000'||![1,2].includes(audio[0].channels??0)))||!Number.isFinite(duration)||Math.abs(duration-expected.durationSec)>1/expected.fps||
   !Number.isFinite(fps)||Math.abs(fps-expected.fps)>0.001)throw Error('QA_FAILED: media metadata');
  return{width:video[0].width,height:video[0].height,durationSec:duration,fps,audio:audio.length===1};
 }
@@ -37,7 +37,7 @@ export async function technicalVideoQa(stageDir:string,image:string,outputRelati
  const hash=createHash('sha256');for await(const chunk of createReadStream(filePath))hash.update(chunk);
  const mount=`type=bind,src=${stageDir},dst=/input,readonly`;
  const prefix=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--mount',mount,image];
- const raw=await docker([...prefix,'ffprobe','-v','error','-show_entries','stream=codec_type,codec_name,width,height,avg_frame_rate:format=duration','-of','json',`/input/${outputRelative}`]);
+ const raw=await docker([...prefix,'ffprobe','-v','error','-show_entries','stream=codec_type,codec_name,width,height,avg_frame_rate,sample_rate,channels:format=duration','-of','json',`/input/${outputRelative}`]);
  const metadata=validateVideoProbe(JSON.parse(raw),expected);
  await docker([...prefix,'ffmpeg','-nostdin','-v','error','-xerror','-threads','2','-filter_threads','2','-i',`/input/${outputRelative}`,'-map','0','-f','null','-']);
  return{result:'pass' as const,sha256:hash.digest('hex'),bytes:file.size,...metadata};

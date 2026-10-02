@@ -22,6 +22,8 @@
     "probe:video:pdf": "tsx scripts/video/probe-pdf.ts",
     "probe:video:voice": "tsx scripts/video/probe-voice.ts",
     "probe:video:asr": "tsx scripts/video/probe-asr.ts",
+    "probe:video:subtitles": "tsx scripts/video/probe-subtitles.ts",
+    "probe:video:composition": "tsx scripts/video/probe-composition.ts",
     "test:video:platform": "vitest run tests/video/self-hosted-storage.test.ts tests/video/local-stream.test.ts tests/video/local-worker.test.ts tests/video/worker-lease.test.ts tests/video/local-director.test.ts tests/video/artifact-token.test.ts tests/video/local-artifact.test.ts tests/video/media-executor.test.ts"
   },
   "dependencies": {

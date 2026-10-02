@@ -9,3 +9,9 @@ it('accepts a decoded video only when its actual metadata matches the render con
  expect(()=>validateVideoProbe({...valid,format:{duration:'0.500000'}},expected)).toThrow('QA_FAILED');
  expect(()=>validateVideoProbe({...valid,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac'}]},expected)).toThrow('QA_FAILED');
 });
+it('requires AAC at 48 kHz when a completed film has an audio track',()=>{
+ const film={...valid,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac',sample_rate:'48000',channels:1}]};
+ expect(validateVideoProbe(film,{...expected,audio:true})).toMatchObject({audio:true});
+ expect(()=>validateVideoProbe({...film,streams:[valid.streams[0],{codec_type:'audio',codec_name:'mp3',sample_rate:'48000',channels:1}]},{...expected,audio:true})).toThrow('QA_FAILED');
+ expect(()=>validateVideoProbe({...film,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac',sample_rate:'24000',channels:1}]},{...expected,audio:true})).toThrow('QA_FAILED');
+});

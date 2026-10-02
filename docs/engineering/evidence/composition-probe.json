@@ -1,0 +1,42 @@
+{
+  "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+  "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+  "sourceKind": "deterministic technical scene; not a model-generated user film",
+  "pictureStageKey": "537507ac86a62a12ff321373a5393b8f690bcc36a44eb711fb86bab234d25d10",
+  "trackSha256": "836a54c7739acdf064fd4aeed16fe220c89773a46c629448a6c96ca7d4ced9cf",
+  "subtitleCues": [
+    {
+      "lineId": "composition_zh",
+      "startFrame": 24,
+      "endFrame": 137,
+      "text": "上海的活动将在十月八日开始。"
+    },
+    {
+      "lineId": "composition_en",
+      "startFrame": 216,
+      "endFrame": 293,
+      "text": "The event starts in Shanghai."
+    }
+  ],
+  "fontCharsetSha256": "520335296aaf1ae3c73fc85b3c1b5276af285d1be41256ac2f239b3aead62525",
+  "output": {
+    "sha256": "ef0768edb005c0d78615cb6f5027a2112bb020e07d4334baeeec60f28425ce63",
+    "bytes": 141704,
+    "width": 320,
+    "height": 180,
+    "durationSec": 20,
+    "fps": 24,
+    "audio": true,
+    "qaStatus": "semantic_not_checked"
+  },
+  "intentionalSilence": {
+    "trackSilent": true,
+    "outputSha256": "559c98d7574c70f4ba277c155c2d6d2053bee2b1bc700d50d73d179cb68e6aa8",
+    "bytes": 38001,
+    "durationSec": 20,
+    "audio": true,
+    "qaStatus": "semantic_not_checked"
+  },
+  "limits": "Technical 320x180 composition and independent full decode only; no 1080p, style baseline, loudness, final mixed-audio ASR or semantic QA"
+}
