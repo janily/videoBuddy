@@ -1,8 +1,8 @@
 import{it,expect}from'vitest';
-import{mkdtemp,rm}from'node:fs/promises';
+import{mkdtemp,mkdir,rm,writeFile}from'node:fs/promises';
 import{tmpdir}from'node:os';
 import{join}from'node:path';
-import{randomUUID}from'node:crypto';
+import{createHash,randomUUID}from'node:crypto';
 import{mapPreviewTime,validateExcerptMap}from'@/services/video/preview/excerpt';
 import{assertPreviewArtifact,createPreviewBundle,verifyPreviewBundle}from'@/services/video/preview/bundle';
 import type{PreviewBundleInput}from'@/services/video/preview/bundle';
@@ -21,6 +21,14 @@ it('an excerpt is six to twelve seconds and source intervals retain equal durati
  expect(()=>validateExcerptMap([{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:4000,shotId:'bad'}],45000)).toThrow('EXCERPT_INVALID');
 });
 const sha=(letter:string)=>letter.repeat(64);
+const previewBytes=Buffer.alloc(100);previewBytes.write('ftyp',4);
+const previewSha=createHash('sha256').update(previewBytes).digest('hex');
+async function storedPreviewArtifact(projects:ProjectStore,dir:string,projectId:string,bundle:{previewArtifactId:string;revisionId:string}){
+ const key=`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files/preview.mp4`,path=join(dir,'objects',key);
+ await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files`),{recursive:true});await writeFile(path,previewBytes);
+ await projects.store.create(`projects/${projectId}/artifacts/${bundle.previewArtifactId}/manifest`,{id:bundle.previewArtifactId,revisionId:bundle.revisionId,objectRef:{key,sha256:previewSha,bytes:previewBytes.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'preview.mp4'});
+ return path;
+}
 const bundleInput={
  previewId:'00000000-0000-4000-8000-000000000001',revisionId:'00000000-0000-4000-8000-000000000002',briefVersion:3,
  filmSpecRef:{key:'projects/p/revisions/r/film',sha256:sha('a'),bytes:500,mime:'application/json'},
@@ -51,14 +59,15 @@ it('T11 commits one immutable preview only for the live brief and production slo
   const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
   const operationId=randomUUID();
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId}));
-  const bundle=createPreviewBundle(bundleInput);
-  await commitPreviewBundle(projects,projectId,operationId,0,bundle,sha('4'));
+  const bundle=createPreviewBundle({...bundleInput,previewArtifactSha256:previewSha}),path=await storedPreviewArtifact(projects,dir,projectId,bundle);
+  await commitPreviewBundle(projects,projectId,operationId,0,bundle,dir);
   const control=(await projects.access(owner,projectId));
   expect(control).toMatchObject({phase:'preview_ready',previewState:'ready',currentPreviewId:bundle.previewId,activeProduction:null});
   expect(await readPreviewBundle(projects,projectId,bundle.previewId)).toEqual(bundle);
   expect((await projects.view(owner,projectId)).currentPreview).toMatchObject({previewId:bundle.previewId,bundleHash:bundle.bundleHash,script:bundle.script,state:'ready'});
-  await expect(commitPreviewBundle(projects,projectId,operationId,0,{...bundle,summary:'changed'},sha('4'))).rejects.toThrow('PREVIEW_ID_CONFLICT');
-  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,sha('5'))).rejects.toThrow('PREVIEW_ARTIFACT_MISMATCH');
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,{...bundle,summary:'changed'},dir)).rejects.toThrow('PREVIEW_ID_CONFLICT');
+  await writeFile(path,Buffer.alloc(previewBytes.length));
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,dir)).rejects.toThrow('PREVIEW_ARTIFACT_MISMATCH');
  }finally{await rm(dir,{recursive:true,force:true})}
 });
 it('T11 rejects a completed render after new input or cancellation fenced the slot',async()=>{
@@ -66,11 +75,23 @@ it('T11 rejects a completed render after new input or cancellation fenced the sl
  try{
   const projects=new ProjectStore(new FileStore(dir)),owner='owner';
   const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
-  const operationId=randomUUID(),bundle=createPreviewBundle(bundleInput);
+  const operationId=randomUUID(),bundle=createPreviewBundle({...bundleInput,previewArtifactSha256:previewSha});
+  await storedPreviewArtifact(projects,dir,projectId,bundle);
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId,inputPending:true}));
-  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,sha('4'))).rejects.toThrow('PREVIEW_STALE');
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,dir)).rejects.toThrow('PREVIEW_STALE');
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,inputPending:false,consentEpoch:1,activeProduction:null}));
-  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,sha('4'))).rejects.toThrow('PREVIEW_STALE');
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,dir)).rejects.toThrow('PREVIEW_STALE');
+  expect((await projects.access(owner,projectId)).currentPreviewId).toBeUndefined();
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
+it('T11 cannot expose a preview manifest without its private media object',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vb-preview-'));
+ try{
+  const projects=new ProjectStore(new FileStore(dir)),owner='owner';
+  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
+  const operationId=randomUUID(),bundle=createPreviewBundle({...bundleInput,previewArtifactSha256:previewSha});
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId}));
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,dir)).rejects.toThrow('PREVIEW_ARTIFACT_MISMATCH');
   expect((await projects.access(owner,projectId)).currentPreviewId).toBeUndefined();
  }finally{await rm(dir,{recursive:true,force:true})}
 });
@@ -79,9 +100,10 @@ it('AT-035 one preview button approval creates one durable render intent and rep
  try{
   const projects=new ProjectStore(new FileStore(dir)),queue=new LocalOperationQueue(projects.store,dir),owner='owner';
   const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
-  const prepareId=randomUUID(),bundle=createPreviewBundle(bundleInput);
+  const prepareId=randomUUID(),bundle=createPreviewBundle({...bundleInput,previewArtifactSha256:previewSha});
+  await storedPreviewArtifact(projects,dir,projectId,bundle);
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:prepareId}));
-  await commitPreviewBundle(projects,projectId,prepareId,0,bundle,sha('4'));
+  await commitPreviewBundle(projects,projectId,prepareId,0,bundle,dir);
   const request={schemaVersion:5 as const,clientCommandId:randomUUID(),previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
   await expect(approvePreview(projects,queue,owner,projectId,{...request,clientCommandId:randomUUID(),bundleHash:sha('9')})).rejects.toThrow('PREVIEW_STALE');
   const [a,b]=await Promise.all([approvePreview(projects,queue,owner,projectId,request),approvePreview(projects,queue,owner,projectId,request)]);
@@ -115,9 +137,10 @@ it('AT-035 two distinct approval commands cannot reserve two render slots',async
  try{
   const projects=new ProjectStore(new FileStore(dir)),queue=new LocalOperationQueue(projects.store,dir),owner='owner';
   const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
-  const prepareId=randomUUID(),bundle=createPreviewBundle(bundleInput);
+  const prepareId=randomUUID(),bundle=createPreviewBundle({...bundleInput,previewArtifactSha256:previewSha});
+  await storedPreviewArtifact(projects,dir,projectId,bundle);
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:prepareId}));
-  await commitPreviewBundle(projects,projectId,prepareId,0,bundle,sha('4'));
+  await commitPreviewBundle(projects,projectId,prepareId,0,bundle,dir);
   const body={schemaVersion:5 as const,previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
   const results=await Promise.allSettled([approvePreview(projects,queue,owner,projectId,{...body,clientCommandId:randomUUID()}),approvePreview(projects,queue,owner,projectId,{...body,clientCommandId:randomUUID()})]);
   expect(results.filter(item=>item.status==='fulfilled')).toHaveLength(1);

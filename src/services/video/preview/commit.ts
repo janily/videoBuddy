@@ -1,7 +1,9 @@
 import type{ProjectControl}from '@/contracts/video/project';
 import{canonicalHash}from '@/services/video/domain/hash';
 import type{ProjectStore}from '@/services/video/storage/project-store';
-import{createOrRead,updateJson}from '@/services/video/storage/atomic-store';
+import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomic-store';
+import{resolveArtifact}from '@/services/video/exports/access';
+import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{assertPreviewArtifact,verifyPreviewBundle,type PreviewBundle}from './bundle';
 
 function key(projectId:string,previewId:string){return`projects/${projectId}/previews/${previewId}/manifest`}
@@ -12,8 +14,12 @@ export async function readPreviewBundle(projects:ProjectStore,projectId:string,p
  return bundle;
 }
 
-export async function commitPreviewBundle(projects:ProjectStore,projectId:string,operationId:string,expectedConsentEpoch:number,bundle:PreviewBundle,actualArtifactSha256:string){
- assertPreviewArtifact(bundle,actualArtifactSha256);
+export async function commitPreviewBundle(projects:ProjectStore,projectId:string,operationId:string,expectedConsentEpoch:number,bundle:PreviewBundle,storageRoot:string){
+ const current=(await projects.store.readFresh<ProjectControl>(`projects/${projectId}/control`)).value;
+ const artifact=await resolveArtifact(projects,current.ownerKeyHash,projectId,bundle.previewArtifactId).catch(error=>{if(error instanceof StoreMissing)throw Error('PREVIEW_ARTIFACT_MISMATCH');throw error});
+ if(artifact.revisionId!==bundle.revisionId||artifact.objectRef.mime!=='video/mp4'||artifact.objectRef.sha256!==bundle.previewArtifactSha256)throw Error('PREVIEW_ARTIFACT_MISMATCH');
+ const actual=await actualArtifactSha256(storageRoot,artifact.objectRef.key,artifact.objectRef.bytes).catch(()=>{throw Error('PREVIEW_ARTIFACT_MISMATCH')});
+ assertPreviewArtifact(bundle,actual);
  if(bundle.expiresAt<=new Date().toISOString())throw Error('PREVIEW_STALE');
  const stored=await createOrRead(projects.store,key(projectId,bundle.previewId),bundle);
  if(canonicalHash(stored)!==canonicalHash(bundle))throw Error('PREVIEW_ID_CONFLICT');

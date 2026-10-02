@@ -2,9 +2,10 @@ import{RestoreResultRequestSchema,type RestoreResultRequest}from '@/contracts/vi
 import type{ProjectControl}from '@/contracts/video/project';
 import{canonicalHash}from '@/services/video/domain/hash';
 import{resolveArtifact}from '@/services/video/exports/access';
+import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomic-store';
 import type{ProjectStore}from '@/services/video/storage/project-store';
-import{actualArtifactSha256,readResultManifest}from './publish';
+import{readResultManifest}from './publish';
 
 interface RestoreIntent{hash:string;fromResultId:string;toResultId:string;artifactId:string;completed:boolean}
 export async function restoreResult(projects:ProjectStore,owner:string,projectId:string,artifactId:string,untrusted:RestoreResultRequest,storageRoot:string){

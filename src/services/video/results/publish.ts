@@ -1,12 +1,9 @@
-import{createHash}from 'node:crypto';
-import{createReadStream}from 'node:fs';
-import{lstat,realpath}from 'node:fs/promises';
-import{isAbsolute,join}from 'node:path';
 import{z}from 'zod';
 import{canonicalHash}from '@/services/video/domain/hash';
 import{assertPublishable}from '@/services/video/quality/publish-gate';
 import{validateDelivery,mandatoryDeliveryRules}from '@/services/video/quality/delivery';
 import{resolveArtifact}from '@/services/video/exports/access';
+import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{readPreviewBundle}from '@/services/video/preview/commit';
 import type{ApprovalRecord}from '@/services/video/preview/approve';
 import{createOrRead,updateJson}from '@/services/video/storage/atomic-store';
@@ -21,13 +18,6 @@ function key(projectId:string,resultId:string){return`projects/${projectId}/resu
 export async function readResultManifest(projects:ProjectStore,projectId:string,resultId:string){
  const result=Manifest.parse((await projects.store.readFresh<unknown>(key(projectId,resultId))).value);
  if(result.resultId!==resultId)throw Error('RESULT_INVALID');return result;
-}
-export async function actualArtifactSha256(root:string,relative:string,expectedBytes:number){
- if(!isAbsolute(root)||!/^projects\/[a-f0-9-]{36}\/artifacts\/[a-f0-9-]{36}\/files\/[A-Za-z0-9_-]+\.mp4$/.test(relative))throw Error('ARTIFACT_INVALID');
- const base=join(root,'objects'),path=join(base,relative),baseReal=await realpath(base),fileReal=await realpath(path),info=await lstat(path);
- if(!fileReal.startsWith(baseReal+'/')||!info.isFile()||info.isSymbolicLink()||info.nlink!==1||info.size!==expectedBytes)throw Error('ARTIFACT_INVALID');
- const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);
- return hash.digest('hex');
 }
 export async function publishResult(projects:ProjectStore,owner:string,projectId:string,operationId:string,expectedFence:number,untrusted:ResultManifest,storageRoot:string){
  const parsed=Manifest.safeParse(untrusted);if(!parsed.success)throw Error('RESULT_INVALID');const result=parsed.data,p=`projects/${projectId}`;

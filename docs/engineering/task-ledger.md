@@ -85,3 +85,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T13制作取消增量：`cancelProduction` 的新测试先因缺函数退出1；实现ProjectControl CAS先撤销制作授权、递增consentEpoch、记录cancelRequested并保留旧currentResult，再更新操作fence/状态；排队且未claim直接cancelled，运行中cancelling。重复取消不重复计数，旧操作不误伤新操作。现有取消API接入`scope=production`，AT-039迟到发布测试改为调用真实取消命令。`npm test` 40文件182项、lint、build、构建后typecheck均退出0。Docker容器停止/清理、render Worker、自然语言修改/恢复仍缺，T13部分实现。
 
 2026-10-02 T13/T14恢复上一版增量：`results/restore.ts` 缺模块测试先退出1；实现规范路径POST `/results/:artifactId/restore`，核对前版manifest、产物记录和磁盘真实字节hash后，CAS只交换current/previous指针并递增consentEpoch，不启动媒体任务。同command重试不再次翻转，错误artifact或篡改文件拒绝；`npm test` 40文件183项、lint、build、构建后typecheck退出0。测试仍使用合成文件作存储/CAS夹具，非真实成片；只支持上一版，历史多版本选择及UI/真实片验收未完成。
+
+2026-10-02 T11预览存储核验增量：`commitPreviewBundle` 不再信任调用方提供的实际hash；从同项目/同revision/已上传且QA通过的私有MP4记录读取实际字节再核对SHA。缺文件用例先实际返回STORE_NOT_FOUND并失败，映射为PREVIEW_ARTIFACT_MISMATCH后通过；篡改字节、换包、过期fence仍拒绝。`npm test` 40文件184项、lint、build、构建后typecheck退出0。夹具文件不是有效MP4，未冒充真实预演或风格证据。
