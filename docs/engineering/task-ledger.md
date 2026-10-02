@@ -39,7 +39,7 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 | T07 | 已确认布局、单输入、IME/草稿、聊天列表、手机标签、风格原生dialog；Playwright 14项 | 左侧目前欢迎/收集态；完整预览/制作/完成态、5条待发队列及进阶交互尚缺 |
 | T08 | 43原slug/9分类/固定版本STYLE规则与哈希、搜索/知识加载；styles 6项 | 推荐策略与完整StylePack执行适配尚缺；所有公开profiles为空，能力标not_run |
 | T09 | SDK Sandbox deny-all固定镜像配置、detached submit/inspect/stop、固定Python锁/marker、Chromium绝对时间截图/FFmpeg picture编码；media-executor 7项、Python 3项 | 固定镜像尚未构建/提供；可信素材传输、真实检测、跨请求stop/GL报告未跑；本机没有ffmpeg/ffprobe，未渲染真实媒体 |
-| T10 | 帧/采样绝对时间、真实离线TTS/ASR、按字词时间编译SRT、真实字体字形、48 kHz旁白轨和AAC/H.264技术合成；见文末探针 | 音乐/音效、响度母带、长篇/复杂混音的最终ASR与听验、字幕视觉全尺寸QA和完整AudioManifest尚缺 |
+| T10 | 帧/采样绝对时间、真实离线TTS/ASR、按字词时间编译SRT、真实字体字形、48 kHz旁白轨和AAC/H.264技术合成；见文末探针 | 音乐/音效及其响度母带、长篇/复杂混音的最终ASR与听验、字幕视觉全尺寸QA和完整AudioManifest尚缺 |
 | T11 | 6–12秒excerpt映射、null转场/语义审批基线、可复用技术合成器；preview 3项及domain覆盖 | 真实复合预览生产、bundleHash全链路、批准route/唯一正式启动尚缺 |
 | T12 | QA blocking/not_checked门槛、证据与发布fence/hash；publish 3项 | 独立真实FFmpeg/ASR/逐帧QA、正式render workflow/原子发布尚缺 |
 | T13 | 自然语言修改风险/来源/预算/撤回策略、回复取消竞态/预claim取消；changes 4项及commands覆盖 | safe-direct实际混音/字幕更新、新预览、制作取消与恢复原片尚缺 |
@@ -67,3 +67,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T10/T11技术合成增量：真实ASR证据生成两条SRT字幕；媒体镜像内 Noto Sans CJK SC 字形表实际44,810字符、SHA见 [subtitle-probe.json](evidence/subtitle-probe.json)。字幕编译器按实测发声+0.6秒/阅读速度取较长值并量化到帧，时间冲突直接失败。`composeVideo`实际连接画面、48 kHz旁白、烧录字幕及AAC音轨；最新20秒320×180/24fps场景输出141,704字节，另有38,001字节无旁白纯静音成片，两者均经固定镜像独立ffprobe与全片解码通过，见 [composition-probe.json](evidence/composition-probe.json) 和三个实际抽帧。媒体QA新增AAC/48 kHz检查；`npm test` 36文件158项、lint/build/顺序typecheck通过。此场景为确定性技术验证，不是模型生成用户内容、1080p正式影片或43风格基线；当时未做响度、最终音轨ASR/听验、真实预览审批/发布，T10/T11仍partial。
 
 2026-10-02 T10成片复核增量：真实20秒AAC/H.264技术场景中提取两条音频窗口，离线ASR再次识别中文“上海的活动将在10月8日开始。”12词、英文“The event starts in Shanghai.”5词，均与原始期望核对通过；不读期望文案的识别容器和原始计划哈希/文本防篡改门槛保持。无旁白成片全程提取48 kHz PCM并实测纯静音后才标记ASR `not_applicable`。实测详情及产物SHA见 [composition-probe.json](evidence/composition-probe.json)。首次试跑因AAC解码采样与原始PCM不完全相同而报 `AUDIO_DURATION_INVALID`，仅对最终AAC解码增加最多1024采样容差，原始混音轨仍精确采样验证。该探针只有两条短句和确定性技术画面；静音成片实测960,512采样，较原轨多512；最新 `npm test` 37文件160项、lint/build/顺序typecheck和真实探针均退出0。音乐/音效、响度/真峰值、长篇语音听验、1080p、43风格基线和模型生成影片完整链路未验收，T10/T11仍partial。
+
+2026-10-02 T10响度增量：固定媒体镜像对最终AAC运行独立`loudnorm`测量。未处理技术成片 -25.93 LUFS/-9.27 dBTP，按目标失败；仅做单级归一化 -15.57 LUFS/-1.19 dBTP仍失败。改为人声峰值压缩+归一化，合成器对有声影片在独立技术QA后强制检查 -14±1 LUFS与真峰值≤-1.2 dBTP；最新20秒技术片为 -14.41 LUFS/-1.49 dBTP并通过中英文成片ASR。静音片实际解码为纯静音后响度N/A。ASR偶发繁体“活動將在…開始”由锁定`opencc-js@1.4.1`在比较时正字归一化，原计划/期待文本保持不变，10月9日错误仍拒绝。证据见 [composition-probe.json](evidence/composition-probe.json)。配乐/音效、特殊发音听验、真实用户内容、1080p、43风格与语义QA未完成；完整 `npm test` 38文件163项、lint/build/顺序typecheck和最终真实探针均退出0，T10/T11仍partial。

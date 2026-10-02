@@ -4,7 +4,7 @@
   "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
   "sourceKind": "deterministic technical scene; not a model-generated user film",
   "pictureStageKey": "537507ac86a62a12ff321373a5393b8f690bcc36a44eb711fb86bab234d25d10",
-  "trackSha256": "f5c757baac6bbc73aed2b46f28fb43b98d8730b9d6dfe28821df2d2b19f27ecf",
+  "trackSha256": "b906cae578b15db8a4a25be153fd85edbea95d0e3458321d9f10e880930c5395",
   "subtitleCues": [
     {
       "lineId": "composition_zh",
@@ -21,8 +21,8 @@
   ],
   "fontCharsetSha256": "520335296aaf1ae3c73fc85b3c1b5276af285d1be41256ac2f239b3aead62525",
   "output": {
-    "sha256": "de6f0cbb5a922a136b83a90eebe70594330a39bd054d652a5b15d7e336364a9b",
-    "bytes": 141663,
+    "sha256": "d4ceb537c756a75d70019c74b1d4dd59a861273d7100e1eb4988dc08ab7b976f",
+    "bytes": 175825,
     "width": 320,
     "height": 180,
     "durationSec": 20,
@@ -32,12 +32,12 @@
   },
   "postMixAsr": {
     "status": "pass",
-    "filmSha256": "de6f0cbb5a922a136b83a90eebe70594330a39bd054d652a5b15d7e336364a9b",
+    "filmSha256": "d4ceb537c756a75d70019c74b1d4dd59a861273d7100e1eb4988dc08ab7b976f",
     "lines": [
       {
         "lineId": "composition_zh",
-        "recognizedText": "上海的活动将在10月8日开始。",
-        "sourceSha256": "db59ea2b5dd2fee2d9f7c769e696f5daffc893a5e4d8c4e4f83e0497412b56e0",
+        "recognizedText": "上海的活動將在10月8日開始",
+        "sourceSha256": "b5ca57ebe66f54d6c71e6280059e492009a70d819a0418ffd41f0c87440e1868",
         "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
         "wordCount": 12,
         "status": "pass"
@@ -45,12 +45,22 @@
       {
         "lineId": "composition_en",
         "recognizedText": "The event starts in Shanghai.",
-        "sourceSha256": "47add680d043d414103e3ef7f05b95b81cf02553b648987eaa1a1be65c72748b",
+        "sourceSha256": "5ec96df846546bd58bf0002545b32db281369afaed3415fa894faaf3c1b50c17",
         "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
         "wordCount": 5,
         "status": "pass"
       }
     ]
+  },
+  "loudness": {
+    "status": "pass",
+    "filmSha256": "d4ceb537c756a75d70019c74b1d4dd59a861273d7100e1eb4988dc08ab7b976f",
+    "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "integratedLufs": -14.41,
+    "truePeakDbtp": -1.49,
+    "targetLufs": -14,
+    "toleranceLu": 1,
+    "maxTruePeakDbtp": -1.2
   },
   "intentionalSilence": {
     "trackSilent": true,
@@ -68,7 +78,17 @@
       "rmsDbfs": null,
       "lines": []
     },
+    "loudness": {
+      "status": "not_applicable",
+      "filmSha256": "559c98d7574c70f4ba277c155c2d6d2053bee2b1bc700d50d73d179cb68e6aa8",
+      "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+      "integratedLufs": null,
+      "truePeakDbtp": null,
+      "targetLufs": -14,
+      "toleranceLu": 1,
+      "maxTruePeakDbtp": -1.2
+    },
     "qaStatus": "semantic_not_checked"
   },
-  "limits": "Technical 320x180 composition and independent full decode plus post-mix ASR/silence measurement only; no 1080p, style baseline, loudness, listening or semantic QA"
+  "limits": "Technical 320x180 composition and independent full decode plus post-mix ASR/silence and loudness measurement only; no 1080p, style baseline, listening or semantic QA"
 }

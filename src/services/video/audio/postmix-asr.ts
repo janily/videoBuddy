@@ -27,14 +27,14 @@ async function runDocker(args:string[]){
  const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
  if(code!==0)throw Error(`POSTMIX_EXTRACTION_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,250)}`);
 }
-async function verifiedFilmHash(root:string,film:PostMixFilm){
+export async function verifiedFilmHash(root:string,film:PostMixFilm){
  const path=film.outputPath,rel=relative(join(root,'composition'),path);
  if(!isAbsolute(root)||!isAbsolute(path)||rel.startsWith('..')||isAbsolute(rel)||!/^\/[A-Za-z0-9_./-]+$/.test(path)||!/^\/[A-Za-z0-9_./-]+$/.test(root)||!Number.isSafeInteger(film.durationMs)||film.durationMs<20000||film.durationMs>120000||film.technicalQa!=='pass'||!/^[a-f0-9]{64}$/.test(film.sha256))throw Error('POSTMIX_SOURCE_INVALID');
  const file=await lstat(path);if(!file.isFile()||file.isSymbolicLink()||file.nlink!==1||file.size<1024)throw Error('POSTMIX_SOURCE_INVALID');
  const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);
  if(hash.digest('hex')!==film.sha256)throw Error('POSTMIX_SOURCE_CHANGED');
 }
-export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env){
+export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void){
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
  await verifiedFilmHash(root,film);
  if(verified.lines.length===0){
@@ -66,7 +66,9 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
    wav=await inspectVoiceWav(outputPath);
   }
   const transcript=await transcribeAudio(root,{language:line.language,outputPath,wav},'postmix',env);
-  const checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript);
+  let checked:ReturnType<typeof verifySpokenText>;
+  try{checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript)}
+  catch(error){if((error as Error).message!=='ASR_MISMATCH')throw error;onMismatch?.(line.lineId,transcript.recognizedText);throw Error(`POSTMIX_ASR_MISMATCH: ${line.lineId}`)}
   results.push({lineId:line.lineId,recognizedText:checked.recognizedText,sourceSha256:wav.sha256,asrRuntimeDigest:transcript.runtimeDigest,wordCount:checked.words.length,status:checked.status});
  }
  return{status:'pass' as const,filmSha256:film.sha256,lines:results};

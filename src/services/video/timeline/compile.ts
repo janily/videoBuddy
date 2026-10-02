@@ -22,8 +22,9 @@ function chineseNumber(value:string){
  }
  return String(total+section+current);
 }
+const traditionalToSimplified=OpenCC.Converter({from:'t',to:'cn'});
 function normalizeAsr(value:string){
- return value.normalize('NFKC').replace(/([零〇一二三四五六七八九十百千万两]+)(?=年|月|日|号|点|分|秒|个|次|元|米|公里|倍|层|页|天|小时|分钟|%|％)/gu,match=>chineseNumber(match)).replace(/[\p{P}\s]/gu,'').toLowerCase();
+ return traditionalToSimplified(value.normalize('NFKC')).replace(/([零〇一二三四五六七八九十百千万两]+)(?=年|月|日|号|点|分|秒|个|次|元|米|公里|倍|层|页|天|小时|分钟|%|％)/gu,match=>chineseNumber(match)).replace(/[\p{P}\s]/gu,'').toLowerCase();
 }
 export function assertAsrExpected(originalExpected:string,proposedExpected:string,asr:string){if(originalExpected!==proposedExpected)throw Error('ASR_EXPECTATION_CHANGED');if(normalizeAsr(originalExpected)!==normalizeAsr(asr))throw Error('ASR_MISMATCH')}
 export function compileTimeline(input:{durationSec:number;fps:24|30|60;shots:ShotRange[];narration:NarrationRange[];captions:CaptionRange[]}){
@@ -34,3 +35,4 @@ export function compileTimeline(input:{durationSec:number;fps:24|30|60;shots:Sho
  for(const c of input.captions)if(!Number.isInteger(c.startFrame)||!Number.isInteger(c.endFrame)||c.startFrame<0||c.endFrame>totalFrames||c.endFrame<=c.startFrame)throw Error('CAPTION_INVALID');
  return{totalFrames,fps:input.fps,sampleRate:48000 as const,totalSamples:input.durationSec*48000,shots,narration:input.narration.map(n=>({...n,startSample:n.startMs*48,endSample:(n.startMs+n.durationMs)*48})),captions:input.captions};
 }
+import OpenCC from 'opencc-js/t2cn';
