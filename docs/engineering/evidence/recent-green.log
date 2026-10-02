@@ -1,0 +1,13 @@
+
+> videobuddy@0.1.0 test
+> vitest run --run tests/video/project-api.test.ts
+
+
+ RUN  v5.0.3 /Users/janily/Desktop/dev/videoBuddy
+
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  16:35:03
+   Duration  201ms (tests 69%, transform 15%, import 15%, worker 1%)
+

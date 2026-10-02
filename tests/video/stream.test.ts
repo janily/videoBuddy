@@ -54,3 +54,7 @@ describe('T04 message reducer',()=>{
   expect(reduceEvent(s,event('message.started',{messageId:ids.messageId,contentVersion:1,role:'assistant',ordinal:1}),0)).toBe(s);
  });
 });
+it('startup before the canonical claim retries rather than permanently closing SSE',async()=>{
+ const {streamHttpAction}=await import('@/services/video/stream/reconnect-policy');
+ expect(streamHttpAction(409,'OPERATION_NOT_STARTED')).toBe('retry');expect(streamHttpAction(409,'STREAM_RESET_REQUIRED')).toBe('refresh_stop');expect(streamHttpAction(410)).toBe('refresh_stop');
+});

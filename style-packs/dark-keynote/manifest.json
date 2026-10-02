@@ -1,0 +1,16 @@
+{
+  "id": "dark-keynote",
+  "nameZh": "暗色科技发布",
+  "nameEn": "Dark Tech Keynote",
+  "categoryZh": "信息与发布",
+  "technicalReviewFocus": "暗场可读性、产品叙述与尺度",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/dark-keynote/STYLE.md",
+  "slug": "dark-keynote",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "b0791b5e95f56bf46c621e6064d426ebbee810c7515fb87e951b73668a2a0d24",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

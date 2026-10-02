@@ -1,0 +1,16 @@
+{
+  "id": "halftone-dossier",
+  "nameZh": "复古半调案卷",
+  "nameEn": "Halftone Dossier",
+  "categoryZh": "印刷与版画",
+  "technicalReviewFocus": "半调、案卷信息、阅读层级",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/halftone-dossier/STYLE.md",
+  "slug": "halftone-dossier",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "afe98514f065c9f924dda0a483388617122f38df99462025542d2f23d9eb7e3b",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

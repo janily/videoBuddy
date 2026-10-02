@@ -1,0 +1,16 @@
+{
+  "id": "microgame",
+  "nameZh": "微游戏快闪（瓦里奥制造式）",
+  "nameEn": "Microgame Frenzy",
+  "categoryZh": "游戏",
+  "technicalReviewFocus": "多个媒介、统一角色识别、速度阶梯",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/microgame/STYLE.md",
+  "slug": "microgame",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "ce209dde1270d032436e02569857bed373cee86e45870bf853d4d8797dc719fb",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "watercolor",
+  "nameZh": "水彩笔刷",
+  "nameEn": "Watercolor Brush",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "真实笔触/透明叠色/纸张水痕",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/watercolor/STYLE.md",
+  "slug": "watercolor",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "662d57568408a7c82ef8f64980ca85798b8bb239df3dc3a6715283d7f4555ef0",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

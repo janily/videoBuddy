@@ -1,0 +1,16 @@
+{
+  "id": "blueprint",
+  "nameZh": "蓝图 / 工程制图",
+  "nameEn": "Blueprint",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "工程线型、尺寸、绘图顺序",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/blueprint/STYLE.md",
+  "slug": "blueprint",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "de01fc7fcb38b17b58eb017c9cdbcb36b9242b029435a33587614c93088e1717",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

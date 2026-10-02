@@ -43,3 +43,28 @@ it('START_FAILED retains the receipt and recover reuses the reserved operation',
  const reserved=await store.readFresh<{receipts:{operationId:string}[]}>('projects/p/control');working=true;
  const recovered=await service.submit('p','chat',input);expect(recovered.operationId).toBe(reserved.value.receipts[0].operationId);
 });
+it('durable acceptance survives hot receipt eviction without reserving a completed lane',async()=>{
+ const store=new FileStore(dir);await store.create('projects/p/control',{controlVersion:0,receipts:[],activeConversation:null});
+ let starts=0;const service=new CommandService(store,async()=>({runId:`r-${++starts}`}));
+ const input={clientCommandId:'old',text:'hello'};const first=await service.submit('p','chat',input);
+ const control=await store.readFresh<Record<string,unknown>>('projects/p/control');await store.cas('projects/p/control',control.etag,{...control.value,receipts:[],activeConversation:null});
+ const replay=await service.submit('p','chat',input);expect(replay.operationId).toBe(first.operationId);expect(replay.status).toBe('replayed');expect(starts).toBe(1);
+ expect((await store.readFresh<{activeConversation:null}>('projects/p/control')).value.activeConversation).toBeNull();
+});
+it('late cancellation never resurrects a terminal operation',async()=>{
+ const {cancelReply}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
+ await store.create('projects/p/control',{controlVersion:1,activeConversation:'op'});await store.create('projects/p/operations/op',{status:'succeeded',fence:1});
+ expect(await cancelReply(store,'p','op')).toBe('already_completed');expect((await store.readFresh<{status:string}>('projects/p/operations/op')).value.status).toBe('succeeded');
+});
+it('cancellation rechecks lane ownership in the CAS',async()=>{
+ const {cancelReply}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
+ await store.create('projects/p/control',{controlVersion:1,activeConversation:null});await store.create('projects/p/operations/op',{status:'succeeded',fence:1});
+ expect(await cancelReply(store,'p','op')).toBe('already_completed');expect((await store.readFresh<{fence:number}>('projects/p/operations/op')).value.fence).toBe(1);
+});
+it('cancellation before canonical claim finalizes without holding the chat lane',async()=>{
+ const {cancelReply}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
+ await store.create('projects/p/control',{controlVersion:1,activeConversation:'op'});await store.create('projects/p/operations/op',{status:'reserved',fence:0,canonicalRunId:null});
+ expect(await cancelReply(store,'p','op')).toBe('cancelled');
+ expect((await store.readFresh<{activeConversation:null}>('projects/p/control')).value.activeConversation).toBeNull();
+ expect((await claimOperation(store,'projects/p/operations/op','late-run')).claimed).toBe(false);
+});

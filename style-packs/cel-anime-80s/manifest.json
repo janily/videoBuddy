@@ -1,0 +1,16 @@
+{
+  "id": "cel-anime-80s",
+  "nameZh": "80 年代赛璐璐动画",
+  "nameEn": "80s Cel Anime",
+  "categoryZh": "卡通与动画",
+  "technicalReviewFocus": "赛璐璐图层、角色步进、摄影机流畅",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/cel-anime-80s/STYLE.md",
+  "slug": "cel-anime-80s",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "1e16f5c6f90ebf09556ec94d37434400d309c978e00ee89e9d38dec476664eaf",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

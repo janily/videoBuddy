@@ -1,0 +1,16 @@
+{
+  "id": "stained-glass",
+  "nameZh": "彩色玻璃窗",
+  "nameEn": "Stained Glass",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "玻璃分块、铅线、透光逻辑",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/stained-glass/STYLE.md",
+  "slug": "stained-glass",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "0f6551bd109a4127404068aa1e75f18f16b58c80b486c23480b3d193e597b060",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

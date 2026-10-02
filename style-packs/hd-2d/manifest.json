@@ -1,0 +1,16 @@
+{
+  "id": "hd-2d",
+  "nameZh": "HD-2D",
+  "nameEn": "HD-2D",
+  "categoryZh": "游戏",
+  "technicalReviewFocus": "像素角色/3D灯光/景深/不同更新频率",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/hd-2d/STYLE.md",
+  "slug": "hd-2d",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "23c027f48b5342bb8ac5dcd3ea6e5baab901628d89f4ef6dd857764ce78c9c92",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

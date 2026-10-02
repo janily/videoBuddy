@@ -1,0 +1,16 @@
+{
+  "id": "ascii-crt",
+  "nameZh": "ASCII / CRT 终端",
+  "nameEn": "ASCII / CRT Terminal",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "可读字符、CRT效果、像素与镜头一致",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/ascii-crt/STYLE.md",
+  "slug": "ascii-crt",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "cbe0b8957c785a165f85ccb3b8eba61c30c0462b32983db6a16c76046a2bb333",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "one-line",
+  "nameZh": "一笔画",
+  "nameEn": "One-line Drawing",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "连续笔线及线的因果转化",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/one-line/STYLE.md",
+  "slug": "one-line",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "69d26cb06f48ab6b03c12a76c2390d0945cdaddc38bc109b7d5e292b9af1399b",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

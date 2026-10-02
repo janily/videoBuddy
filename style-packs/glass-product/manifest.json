@@ -1,0 +1,16 @@
+{
+  "id": "glass-product",
+  "nameZh": "玻璃质感产品",
+  "nameEn": "Glass Product Render",
+  "categoryZh": "材质与 3D",
+  "technicalReviewFocus": "透明/折射、材质、产品光效与细节",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/glass-product/STYLE.md",
+  "slug": "glass-product",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "630fa80cde0930154ba64f15bce5c8ee0c8dcf48d921253f8c7e3194712c8fb5",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

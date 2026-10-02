@@ -1,0 +1,16 @@
+{
+  "id": "midcentury-toon",
+  "nameZh": "50s 扁平卡通",
+  "nameEn": "Mid-century Cartoon",
+  "categoryZh": "卡通与动画",
+  "technicalReviewFocus": "扁平造型、表演、时代色彩",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/midcentury-toon/STYLE.md",
+  "slug": "midcentury-toon",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "e73614b6f9e2f2e8ee279f4909da8429235b96f6d13a12345b6e57d5823c30b8",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

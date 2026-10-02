@@ -15,3 +15,9 @@
 | T20 Preview验收 | 项目负责人选择云项目与消耗授权 | not_run | 不自动 Production 部署 |
 
 精确缺项由 evidence/T00-doctor.json 记录，只输出配置名称，绝不输出值。付费测试授权与凭据须同时具备；当前不依据连接器的存在推定可以收费。
+
+## 本地运行与实现缺口补充
+
+最新 `evidence/current-doctor.json` 仍报告生成关闭、签名key/Blob/model/预算缺失。本机 `command -v ffmpeg` 和 `command -v ffprobe` 均无结果；没有真实媒体运行证据。还没有固定Sandbox镜像/runtime digest、已核许可的字体和声音环境，不能声称2D/3D或音频已支持。
+
+这些是外部验证阻断；素材直传/分析、完整声音/预览/正式render/QA/发布/修改/导出/清理工作流，以及43种执行适配则是**尚未完成的开发工作**，不是仅缺凭据。对应清单见 task-ledger.md。总开关保持关闭，未运行的86基线不标passed。

@@ -1,0 +1,16 @@
+{
+  "id": "rubber-hose",
+  "nameZh": "1930s 橡皮管卡通",
+  "nameEn": "1930s Rubber Hose Cartoon",
+  "categoryZh": "卡通与动画",
+  "technicalReviewFocus": "橡皮管动作、表情和喜剧节拍",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/rubber-hose/STYLE.md",
+  "slug": "rubber-hose",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "bf850f9cd22e68b2125fed00d1b9804e91479620b44420ba7ec50e570e472a94",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

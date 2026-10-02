@@ -1,0 +1,16 @@
+{
+  "id": "pictogram-motion",
+  "nameZh": "象形运动图形",
+  "nameEn": "Pictogram Motion",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "象形动作可辨认、赛事节奏与真实项目",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/pictogram-motion/STYLE.md",
+  "slug": "pictogram-motion",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "e982606f3d7d132d320abdc1a74c226b1e0642b664a0c41582bc76fec646da1a",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

@@ -1,0 +1,16 @@
+{
+  "id": "swiss-motion",
+  "nameZh": "瑞士动态排版",
+  "nameEn": "Swiss Motion Graphics",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "网格、精准卡点、单一强调色",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/swiss-motion/STYLE.md",
+  "slug": "swiss-motion",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "14ddeb6dc495e691a220497069a2ee4827d820f9ee7a3173de5846489ef41f57",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

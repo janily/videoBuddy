@@ -13,6 +13,7 @@ export class CommandService{
   const initial:CommandIntent={hash,kind,body,receipt:{schemaVersion:5,commandId:id,projectId,operationId:randomUUID(),controlVersion:0,status:'reserved'}};
   const intent=await createOrRead(this.store,key,initial);
   if(intent.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');
+  if(intent.receipt.status!=='reserved')return {...intent.receipt,status:'replayed'};
   const lane=kind==='chat'||kind==='asset_analysis'?'activeConversation':'activeProduction';
   const control=await updateJson(this.store,`projects/${projectId}/control`,(c:Control)=>{
    if(c.receipts.some(r=>r.commandId===id))return c;
@@ -20,10 +21,11 @@ export class CommandService{
    return {...c,[lane]:intent.receipt.operationId,controlVersion:c.controlVersion+1,receipts:[...c.receipts.slice(-127),{...intent.receipt,controlVersion:c.controlVersion+1}]};
   });
   const receipt=control.receipts.find(r=>r.commandId===id)!;
-  if(receipt.status!=='reserved')return {...receipt,status:'replayed'};
+  if(receipt.status!=='reserved'){await updateJson(this.store,key,(i:CommandIntent)=>({...i,receipt}));return {...receipt,status:'replayed'};}
   await createOrRead(this.store,`projects/${projectId}/operations/${receipt.operationId}`,{id:receipt.operationId,projectId,commandId:id,kind,status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,inputHash:hash});
   try{await this.start(projectId,receipt.operationId,kind)}catch{throw new StartFailed(receipt)}
   const accepted={...receipt,status:'accepted' as const};
+  await updateJson(this.store,key,(i:CommandIntent)=>({...i,receipt:accepted}));
   await updateJson(this.store,`projects/${projectId}/control`,(c:Control)=>({...c,controlVersion:c.controlVersion+1,receipts:c.receipts.map(r=>r.commandId===id?accepted:r)}));
   return accepted;
  }

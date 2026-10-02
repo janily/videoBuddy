@@ -1,0 +1,16 @@
+{
+  "id": "ink-wash",
+  "nameZh": "中国水墨",
+  "nameEn": "Chinese Ink Wash",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "墨色、留白、飞白与渗化转场",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/ink-wash/STYLE.md",
+  "slug": "ink-wash",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "5d71598f0b9cf4034c6461956b0d8bd63bd33750b4045376044f0d956b01d645",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

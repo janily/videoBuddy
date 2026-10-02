@@ -1,0 +1,33 @@
+
+> videobuddy@0.1.0 test:video:e2e
+> playwright test
+
+[WebServer] (node:60381) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:60383) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:60391) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 14 tests using 2 workers
+
+(node:60395) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60394) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/video/e2e/companion.spec.ts:4:1 › AT-023 submitting one draft never clears typing made while request is pending (487ms)
+  ✓   3 tests/video/e2e/companion.spec.ts:13:1 › a draft survives reload and mobile tab switches (398ms)
+  ✓   4 tests/video/e2e/companion.spec.ts:18:1 › AT-074/027 style modal restores focus and keeps the creative draft (278ms)
+  ✓   2 tests/video/e2e/bootstrap.spec.ts:2:1 › BT-07 React companion keeps a single draft and reports unavailable services honestly (1.2s)
+  ✓   5 tests/video/e2e/companion.spec.ts:23:1 › recent projects list uses only server-authorized project summaries (284ms)
+  ✓   6 tests/video/e2e/bootstrap.spec.ts:11:1 › examples fill only the draft; IME Enter never submits (315ms)
+  ✓   7 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 360 has one input and no horizontal overflow (222ms)
+  ✓   8 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 390 has one input and no horizontal overflow (215ms)
+  ✓   9 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 768 has one input and no horizontal overflow (216ms)
+  ✓  10 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 960 has one input and no horizontal overflow (222ms)
+  ✓  11 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 1024 has one input and no horizontal overflow (223ms)
+  ✓  12 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 1280 has one input and no horizontal overflow (241ms)
+  ✓  13 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 1440 has one input and no horizontal overflow (225ms)
+  ✓  14 tests/video/e2e/bootstrap.spec.ts:18:60 › companion width 1920 has one input and no horizontal overflow (224ms)
+
+  14 passed (6.5s)

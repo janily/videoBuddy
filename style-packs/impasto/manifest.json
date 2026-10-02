@@ -1,0 +1,16 @@
+{
+  "id": "impasto",
+  "nameZh": "油画厚涂",
+  "nameEn": "Impasto Oil Painting",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "厚涂笔触、色块与材料感",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/impasto/STYLE.md",
+  "slug": "impasto",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "38a0dcb2808c2ff03ef721c1319b9145438b4074ed37ab7a09dcf20b7268e062",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

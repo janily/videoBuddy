@@ -1,0 +1,16 @@
+{
+  "id": "silent-film",
+  "nameZh": "1920s 默片",
+  "nameEn": "1920s Silent Film",
+  "categoryZh": "电影与时代",
+  "technicalReviewFocus": "字幕卡、默片节奏、胶片效果",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/silent-film/STYLE.md",
+  "slug": "silent-film",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "44633a4edd4ec6b84be809bd48b38503a75a71531112b3d28a52f27135012b20",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

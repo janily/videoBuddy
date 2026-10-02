@@ -1,0 +1,16 @@
+{
+  "id": "iso-infographic",
+  "nameZh": "等距信息图",
+  "nameEn": "Isometric Infographic",
+  "categoryZh": "信息与发布",
+  "technicalReviewFocus": "等距空间、信息到达顺序",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/iso-infographic/STYLE.md",
+  "slug": "iso-infographic",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "17fc6b78512548483d8bf21723882a4fef6f1e266e4d173c883a2b45ef9ab0d2",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

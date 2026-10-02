@@ -1,0 +1,16 @@
+{
+  "id": "papercut-red",
+  "nameZh": "红色窗花剪纸",
+  "nameEn": "Red Paper-cut",
+  "categoryZh": "东方传统",
+  "technicalReviewFocus": "镂空轮廓、剪刻与剪纸转场",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/papercut-red/STYLE.md",
+  "slug": "papercut-red",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "65e317d83335e0cb34696b643e31ad9e46fb0bb93fd748c2e21d74358aea61ec",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

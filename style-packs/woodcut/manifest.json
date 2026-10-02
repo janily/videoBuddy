@@ -1,0 +1,16 @@
+{
+  "id": "woodcut",
+  "nameZh": "木刻版画",
+  "nameEn": "Woodcut Print",
+  "categoryZh": "印刷与版画",
+  "technicalReviewFocus": "刀刻、木纹、黑白块面",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/woodcut/STYLE.md",
+  "slug": "woodcut",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "b96fda6eeac038137310cc0766d979c8d8a5f3ff6acd87bada5aa50d5136a6a0",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

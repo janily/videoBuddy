@@ -1,0 +1,16 @@
+{
+  "id": "shadow-puppet",
+  "nameZh": "皮影戏",
+  "nameEn": "Shadow Puppetry",
+  "categoryZh": "东方传统",
+  "technicalReviewFocus": "铆钉、背光、半透明皮影、材料音",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/shadow-puppet/STYLE.md",
+  "slug": "shadow-puppet",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "8be075a8262d5a3deea9b05684d8a9abdc1e54c0d90649bf14609ecb4106c3af",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

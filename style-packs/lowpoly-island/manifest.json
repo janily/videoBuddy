@@ -1,0 +1,16 @@
+{
+  "id": "lowpoly-island",
+  "nameZh": "低多边形等距",
+  "nameEn": "Low-poly Isometric Island",
+  "categoryZh": "材质与 3D",
+  "technicalReviewFocus": "低多边形场景、等距构图与变化",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/lowpoly-island/STYLE.md",
+  "slug": "lowpoly-island",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "d87e56fd3677841e19f273352ea3481328a237403012ffa7ccb6089c97401702",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

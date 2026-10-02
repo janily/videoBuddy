@@ -1,0 +1,16 @@
+{
+  "id": "tilt-shift",
+  "nameZh": "移轴微缩",
+  "nameEn": "Tilt-Shift Miniature",
+  "categoryZh": "材质与 3D",
+  "technicalReviewFocus": "微缩景深、焦点路径、镜头尺度",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/tilt-shift/STYLE.md",
+  "slug": "tilt-shift",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "131ae50c6bddd30922638cbd5f2fae5c047223360a3f6924b074b0db525a5c63",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

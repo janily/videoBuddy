@@ -1,0 +1,16 @@
+{
+  "id": "art-deco",
+  "nameZh": "装饰艺术",
+  "nameEn": "Art Deco",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "几何装饰、金属/时代感、爵士语法",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/art-deco/STYLE.md",
+  "slug": "art-deco",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "d73b30c0fa6d153487549d32d8c6c599733cf5e7576badec862a12da6d284761",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

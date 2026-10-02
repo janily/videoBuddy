@@ -1,0 +1,16 @@
+{
+  "id": "whiteboard",
+  "nameZh": "白板讲解",
+  "nameEn": "Whiteboard Explainer",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "笔顺、讲解词和笔画的时间对应",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/whiteboard/STYLE.md",
+  "slug": "whiteboard",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "1a3a707f94c2da8f014a14cf7860cd5414dcf1a9faa76c96104bb91ae1ac7ff5",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

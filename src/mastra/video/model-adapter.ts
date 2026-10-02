@@ -12,5 +12,5 @@ export function configuredModel(role: AgentRole, env: Environment = process.env)
   return { id: `${providerId}/${model}` as `${string}/${string}`, apiKey: env.MODEL_API_KEY, url: env.MODEL_BASE_URL, ...(provider === 'openai-compatible' ? { api: 'chat' as const } : {}) };
 }
 export function createVideoAgent(role: AgentRole, instructions: string, env: Environment = process.env) {
-  return new Agent({ id: `video-${role}`, name: `VideoBuddy ${role}`, instructions, model: configuredModel(role,env) });
+  return new Agent({ id: `video-${role}`, name: `VideoBuddy ${role}`, instructions, maxRetries:0, model: configuredModel(role,env) });
 }

@@ -1,0 +1,76 @@
+{
+  "generationEnabled": false,
+  "missing": [
+    "VIDEO_ENVIRONMENT",
+    "VIDEO_APP_ORIGIN",
+    "VIDEO_SESSION_SIGNING_KEY",
+    "BLOB_READ_WRITE_TOKEN",
+    "MODEL_API_KEY",
+    "VIDEO_DIRECTOR_MODEL",
+    "VIDEO_PROJECT_MAX_MODEL_CALLS",
+    "VIDEO_PROJECT_MAX_INPUT_TOKENS",
+    "VIDEO_PROJECT_MAX_OUTPUT_TOKENS",
+    "VIDEO_PROJECT_MAX_TTS_CHARACTERS",
+    "VIDEO_PROJECT_MAX_SANDBOX_SECONDS",
+    "VIDEO_DAILY_MAX_MODEL_CALLS",
+    "VIDEO_DAILY_MAX_SANDBOX_SECONDS"
+  ],
+  "probes": [
+    {
+      "id": "blob-cas-initialize",
+      "status": "blocked",
+      "missing": [
+        "BLOB_READ_WRITE_TOKEN",
+        "VIDEO_ENVIRONMENT"
+      ],
+      "reason": "RUN_VIDEO_CLOUD_TESTS=1 authorization is absent; no real probe executed."
+    },
+    {
+      "id": "workflow-claim",
+      "status": "blocked",
+      "missing": [
+        "VIDEO_PROBE_BASE_URL",
+        "VIDEO_CRON_SECRET"
+      ],
+      "reason": "RUN_VIDEO_CLOUD_TESTS=1 authorization is absent; no real probe executed."
+    },
+    {
+      "id": "workflow-stream-resume",
+      "status": "blocked",
+      "missing": [
+        "VIDEO_PROBE_BASE_URL",
+        "VIDEO_CRON_SECRET"
+      ],
+      "reason": "RUN_VIDEO_CLOUD_TESTS=1 authorization is absent; no real probe executed."
+    },
+    {
+      "id": "sandbox-detached-stop",
+      "status": "blocked",
+      "missing": [
+        "VERCEL_PROJECT_ID",
+        "VERCEL_TEAM_ID",
+        "VERCEL_TOKEN",
+        "VIDEO_SANDBOX_IMAGE_REF"
+      ],
+      "reason": "RUN_VIDEO_CLOUD_TESTS=1 authorization is absent; no real probe executed."
+    },
+    {
+      "id": "cjk-audio",
+      "status": "blocked",
+      "missing": [
+        "VIDEO_SANDBOX_IMAGE_REF",
+        "VIDEO_SANDBOX_RUNTIME_DIGEST"
+      ],
+      "reason": "RUN_VIDEO_CLOUD_TESTS=1 authorization is absent; no real probe executed."
+    },
+    {
+      "id": "2d-3d-renderer",
+      "status": "blocked",
+      "missing": [
+        "VIDEO_SANDBOX_IMAGE_REF",
+        "VIDEO_SANDBOX_RUNTIME_DIGEST"
+      ],
+      "reason": "RUN_VIDEO_CLOUD_TESTS=1 authorization is absent; no real probe executed."
+    }
+  ]
+}

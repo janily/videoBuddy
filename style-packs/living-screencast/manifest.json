@@ -1,0 +1,16 @@
+{
+  "id": "living-screencast",
+  "nameZh": "活体实机录屏",
+  "nameEn": "Living Screencast",
+  "categoryZh": "信息与发布",
+  "technicalReviewFocus": "DOM测量、真实产品状态、游标与角色",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/living-screencast/STYLE.md",
+  "slug": "living-screencast",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "91e75f666a6ab5122ead52aa5c47a603f83d0578bab0b9aa223cf83b639fbb16",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

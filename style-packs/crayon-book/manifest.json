@@ -1,0 +1,16 @@
+{
+  "id": "crayon-book",
+  "nameZh": "蜡笔儿童绘本",
+  "nameEn": "Crayon Picture Book",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "蜡笔颗粒、线条抖动与童书表演",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/crayon-book/STYLE.md",
+  "slug": "crayon-book",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

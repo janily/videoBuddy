@@ -1,0 +1,16 @@
+{
+  "id": "paper-popup",
+  "nameZh": "纸片立体书",
+  "nameEn": "Paper Pop-up Book",
+  "categoryZh": "材质与 3D",
+  "technicalReviewFocus": "纸片轮廓阴影、折叠翻页、宏微尺度",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/paper-popup/STYLE.md",
+  "slug": "paper-popup",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "8e5c0ca430fd96b75c4d9c2af92a87c84d4d1af8cda64280a189c51279e1ee9b",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

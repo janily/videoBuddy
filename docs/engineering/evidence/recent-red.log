@@ -1,0 +1,25 @@
+
+> videobuddy@0.1.0 test
+> vitest run --run tests/video/project-api.test.ts
+
+
+ RUN  v5.0.3 /Users/janily/Desktop/dev/videoBuddy
+
+ ❯ tests/video/project-api.test.ts (6 tests | 1 failed) 164ms
+   × recent project lookup filters foreign, deleted and absent IDs without exposing them 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/video/project-api.test.ts > recent project lookup filters foreign, deleted and absent IDs without exposing them
+TypeError: projects.lookup is not a function
+ ❯ tests/video/project-api.test.ts:35:30
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  16:34:07
+   Duration  286ms (tests 70%, import 18%, transform 11%, worker 1%)
+

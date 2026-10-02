@@ -1,0 +1,16 @@
+{
+  "id": "urban-sketch",
+  "nameZh": "钢笔淡彩",
+  "nameEn": "Urban Sketch · Pen & Wash",
+  "categoryZh": "手绘与绘画",
+  "technicalReviewFocus": "笔线/透明淡彩错位与渐染",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/urban-sketch/STYLE.md",
+  "slug": "urban-sketch",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "2baf1a19f31b06e55d66d62e4c3449c7a2686c689190976f3e3d0cbdce2faa9a",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

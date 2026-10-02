@@ -1,0 +1,16 @@
+{
+  "id": "backrooms",
+  "nameZh": "后室 / 新怪谈",
+  "nameEn": "Liminal Found Footage",
+  "categoryZh": "电影与时代",
+  "technicalReviewFocus": "空间/摄影机、故障感、暗场与听感",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/backrooms/STYLE.md",
+  "slug": "backrooms",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "621f204f5bc4576af497a169f2442b91caffee99046989a117ba06c6c1d572a0",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

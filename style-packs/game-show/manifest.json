@@ -1,0 +1,16 @@
+{
+  "id": "game-show",
+  "nameZh": "综艺节奏扁平",
+  "nameEn": "Game Show Flat",
+  "categoryZh": "游戏",
+  "technicalReviewFocus": "舞台状态、知识/节奏、声音提示",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/game-show/STYLE.md",
+  "slug": "game-show",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "027ed83dbee6596dbd255bcaf20275db18b41b4f7b8f2f5ef72d1d3ebf06ba8f",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

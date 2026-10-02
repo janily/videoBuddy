@@ -1,0 +1,9 @@
+'use client';
+import {useRef,useState,useEffect}from 'react';
+import {ChatComposer}from './chat-composer';
+import type{useProject}from '@/hooks/video/use-project';
+export function ConversationSidebar({project}:{project:ReturnType<typeof useProject>}){
+ const scroll=useRef<HTMLDivElement>(null),[following,setFollowing]=useState(true),[readCount,setReadCount]=useState(0);const newMessages=!following&&project.messages.length>readCount;
+ useEffect(()=>{const node=scroll.current;if(!node)return;if(following)node.scrollTop=node.scrollHeight},[project.messages,following]);
+ return<aside className="conversation" aria-label="创作聊天"><div className="chat-heading"><h2>♧ 创作助手</h2><p>边聊边完善，不必一次想清楚。</p></div><div className="chat-messages" ref={scroll} onScroll={()=>{const node=scroll.current;if(node){setFollowing(node.scrollHeight-node.scrollTop-node.clientHeight<80);setReadCount(project.messages.length)}}}>{project.messages.length?project.messages.map(message=><div key={message.id} className={`message ${message.role}`}><p>{message.text}</p>{message.status==='interrupted'&&<small>这轮回复已中断，未保存的文字无法恢复。</small>}{message.status==='stopped'&&<small>已停止回复</small>}</div>):<p>你想讲什么，讲给谁看？<br/>有资料也可以一起发来。</p>}</div>{newMessages&&<button className="text-button" onClick={()=>{if(scroll.current)scroll.current.scrollTop=scroll.current.scrollHeight;setFollowing(true);setReadCount(project.messages.length)}}>有新消息 ↓</button>}<div className="composer-area"><p role="status" className="service-status">{project.error||project.connection}</p>{project.view?.activeConversation&&<button className="text-button" onClick={()=>void project.stopReply()}>停止回复</button>}<ChatComposer draft={project.draft} onDraft={project.setDraft} onSend={project.send} sending={project.sending} onAttach={()=>project.setError('资料直传与真实解读尚未接通，草稿已保留。')}/><p className="input-hint">Enter 发送 · Shift + Enter 换行</p></div></aside>;
+}

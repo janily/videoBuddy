@@ -1,0 +1,16 @@
+{
+  "id": "brick-toy",
+  "nameZh": "积木玩具",
+  "nameEn": "Brick Toy",
+  "categoryZh": "材质与 3D",
+  "technicalReviewFocus": "积木材质、拼接结构、真实空间灯光",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/brick-toy/STYLE.md",
+  "slug": "brick-toy",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "29b23e846951856b722a698a03c9458cfc17b4fc71d044f45d773acf2a742768",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

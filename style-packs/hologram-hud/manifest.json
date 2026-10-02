@@ -1,0 +1,16 @@
+{
+  "id": "hologram-hud",
+  "nameZh": "科幻全息界面",
+  "nameEn": "Sci-fi Hologram HUD",
+  "categoryZh": "信息与发布",
+  "technicalReviewFocus": "界面层次、规格事实与光效限制",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/hologram-hud/STYLE.md",
+  "slug": "hologram-hud",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "81e2c6b0ede2cc211a8dd676417a1ce5efda278514f273c5249165e38ff34573",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

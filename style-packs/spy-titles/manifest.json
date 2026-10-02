@@ -1,0 +1,16 @@
+{
+  "id": "spy-titles",
+  "nameZh": "60s 间谍片头",
+  "nameEn": "60s Spy Title Sequence",
+  "categoryZh": "图形与排版",
+  "technicalReviewFocus": "剪影、图形匹配、片头节奏",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/spy-titles/STYLE.md",
+  "slug": "spy-titles",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "ea6e9e9073af43ef0bb860e368f60b16ec32a91668386115a142907d92cb1f75",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

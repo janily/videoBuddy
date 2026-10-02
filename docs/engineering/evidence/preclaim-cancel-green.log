@@ -1,0 +1,13 @@
+
+> videobuddy@0.1.0 test
+> vitest run --run tests/video/commands.test.ts
+
+
+ RUN  v5.0.3 /Users/janily/Desktop/dev/videoBuddy
+
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  16:27:43
+   Duration  131ms (tests 65%, transform 25%, import 8%, worker 2%)
+

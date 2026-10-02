@@ -1,0 +1,16 @@
+{
+  "id": "engraving",
+  "nameZh": "铜版画",
+  "nameEn": "Copperplate Engraving",
+  "categoryZh": "印刷与版画",
+  "technicalReviewFocus": "排线、雕刻纹理与信息板",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/engraving/STYLE.md",
+  "slug": "engraving",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "0c6816b8b47163d158ae0ea668feecf53dcbef9d1310e27b9e797d9b9e7aac0d",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

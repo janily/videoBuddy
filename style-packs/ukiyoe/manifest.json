@@ -1,0 +1,16 @@
+{
+  "id": "ukiyoe",
+  "nameZh": "浮世绘",
+  "nameEn": "Ukiyo-e",
+  "categoryZh": "东方传统",
+  "technicalReviewFocus": "版画平面构成、波浪/云纹语法",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/ukiyoe/STYLE.md",
+  "slug": "ukiyoe",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "a668f2bc5b0b74675c57819e75acc318417a77cb695fa89041b3ed78cb085655",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

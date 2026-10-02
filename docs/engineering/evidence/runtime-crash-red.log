@@ -1,0 +1,16 @@
+F..
+======================================================================
+FAIL: test_abandoned_process_without_terminal_marker_is_not_restarted (test_runner.CrashTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/janily/Desktop/dev/videoBuddy/runtime/media/test_runner.py", line 27, in test_abandoned_process_without_terminal_marker_is_not_restarted
+    self.assertEqual(state['status'],'failed');self.assertEqual(state['errorCode'],'STAGE_UNKNOWN');self.assertEqual(calls,[])
+AssertionError: 'succeeded' != 'failed'
+- succeeded
++ failed
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+FAILED (failures=1)

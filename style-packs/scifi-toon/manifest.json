@@ -1,0 +1,16 @@
+{
+  "id": "scifi-toon",
+  "nameZh": "科幻情景喜剧卡通",
+  "nameEn": "Sci-Fi Sitcom Toon",
+  "categoryZh": "卡通与动画",
+  "technicalReviewFocus": "角色反应、科幻转场、声音喜剧",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/scifi-toon/STYLE.md",
+  "slug": "scifi-toon",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "9a720a57ce50dc554e9237e698a979cdf7311527e6e6a0dad803278dfe8ad2ce",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

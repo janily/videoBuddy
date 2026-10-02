@@ -1,0 +1,3 @@
+'use client';
+import Link from 'next/link';import {listStyles}from '@/services/video/styles/registry';
+export function StyleCatalog(){return<main className="vb-easy catalog-page"><header className="topbar"><Link href="/video" className="brand">VideoBuddy</Link><Link href="/video" className="text-button">继续聊想法</Link></header><div className="catalog-content"><h1>43 种画风，找到你的表达</h1><p className="intro">全部画风均在交付范围内；尚未完成真实渲染验收的能力会明确标记。</p><div className="style-grid">{listStyles().map(s=><article key={s.id}><h2>{s.nameZh}</h2><p>{s.nameEn}</p><p>{s.technicalReviewFocus}</p><small>{s.capabilityReason}</small></article>)}</div></div></main>}

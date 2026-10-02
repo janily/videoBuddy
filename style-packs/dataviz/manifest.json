@@ -1,0 +1,16 @@
+{
+  "id": "dataviz",
+  "nameZh": "数据叙事",
+  "nameEn": "Data Storytelling",
+  "categoryZh": "信息与发布",
+  "technicalReviewFocus": "来源、单位、比例、事实可追溯",
+  "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/dataviz/STYLE.md",
+  "slug": "dataviz",
+  "packVersion": "0.1.0",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "rulesHash": "e94013d5a7c548c8844598a671ff0b49bc78770696cbca0d8d00846336f3c67f",
+  "supportedProfiles": [],
+  "deliveryStatus": "not_run",
+  "capabilityReason": "真实媒体环境与该风格横竖基线尚未验证",
+  "license": "MIT; third-party assets require individual CREDITS verification"
+}

@@ -1,0 +1,24 @@
+
+> videobuddy@0.1.0 test
+> vitest run --run tests/video/reconcile.test.ts
+
+
+ RUN  v5.0.3 /Users/janily/Desktop/dev/videoBuddy
+
+ ❯ tests/video/reconcile.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/video/reconcile.test.ts [ tests/video/reconcile.test.ts ]
+Error: Cannot find package '@/services/video/commands/reconcile' imported from /Users/janily/Desktop/dev/videoBuddy/tests/video/reconcile.test.ts
+ ❯ tests/video/reconcile.test.ts:1:165
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  16:29:05
+   Duration  67ms (worker 96%, environment 4%)
+
