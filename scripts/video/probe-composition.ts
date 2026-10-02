@@ -3,14 +3,17 @@ import {randomUUID} from 'node:crypto';
 import {copyFile,mkdtemp,mkdir,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {computeStageKey,DockerExecutor} from '../../src/services/video/media/docker-executor';
+import {computeStageKey,DockerExecutor,dockerConfiguration} from '../../src/services/video/media/docker-executor';
 import {prepareNarration} from '../../src/services/video/audio/narration';
-import {verifyNarration} from '../../src/services/video/audio/asr';
+import {transcribeAudio,verifyNarration,verifySpokenText} from '../../src/services/video/audio/asr';
 import {buildNarrationTrack} from '../../src/services/video/audio/mix';
 import {compileSubtitles,readPinnedSubtitleFont} from '../../src/services/video/audio/subtitles';
 import {composeVideo} from '../../src/services/video/media/compose';
 import {verifyPostMixNarration} from '../../src/services/video/audio/postmix-asr';
 import {measureFinalLoudness} from '../../src/services/video/audio/loudness';
+import {renderPreviewExcerpt} from '../../src/services/video/preview/render-excerpt';
+import {postMixDockerArguments,postMixSilenceDockerArguments} from '../../src/services/video/audio/postmix-asr';
+import {inspectTrackWav,inspectVoiceWav} from '../../src/services/video/audio/wav';
 
 async function docker(args:string[]){
  const child=spawn('docker',args,{stdio:['ignore','pipe','pipe'],signal:AbortSignal.timeout(120000)}),out:Buffer[]=[],err:Buffer[]=[];
@@ -23,14 +26,14 @@ async function docker(args:string[]){
 async function extractFrame(image:string,source:string,destination:string,seconds:number){
  await docker(['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--user',`${process.getuid?.()??10001}:${process.getgid?.()??10001}`,'--mount',`type=bind,src=${source},dst=/input/video.mp4,readonly`,'--mount',`type=bind,src=${destination},dst=/output/frame.png`,image,'ffmpeg','-hide_banner','-loglevel','error','-nostdin','-y','-i','/input/video.mp4','-ss',String(seconds),'-frames:v','1','/output/frame.png']);
 }
-async function probeBackgroundPixel(image:string,source:string){
- const child=spawn('docker',['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--mount',`type=bind,src=${source},dst=/input/video.mp4,readonly`,image,'ffmpeg','-hide_banner','-loglevel','error','-xerror','-nostdin','-i','/input/video.mp4','-ss','7','-vf','crop=2:2:0:0,format=rgb24','-frames:v','1','-f','rawvideo','pipe:1'],{stdio:['ignore','pipe','pipe'],signal:AbortSignal.timeout(60000)}),out:Buffer[]=[],err:Buffer[]=[];
+async function probeBackgroundPixel(image:string,source:string,seconds=7){
+ const child=spawn('docker',['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--mount',`type=bind,src=${source},dst=/input/video.mp4,readonly`,image,'ffmpeg','-hide_banner','-loglevel','error','-xerror','-nostdin','-i','/input/video.mp4','-ss',String(seconds),'-vf','crop=2:2:0:0,format=rgb24','-frames:v','1','-f','rawvideo','pipe:1'],{stdio:['ignore','pipe','pipe'],signal:AbortSignal.timeout(60000)}),out:Buffer[]=[],err:Buffer[]=[];
  child.stdout.on('data',(part:Buffer)=>out.push(part));child.stderr.on('data',(part:Buffer)=>{if(Buffer.concat(err).length<1024)err.push(part)});
  const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
  const bytes=Buffer.concat(out);if(code!==0||bytes.length!==12)throw Error(`COLOR_PROBE_FAILED: ${Buffer.concat(err).toString('utf8').slice(0,160)}`);
  const actual=[bytes[0],bytes[1],bytes[2]],expected=[24,48,74],maxChannelError=Math.max(...actual.map((value,index)=>Math.abs(value-expected[index])));
  if(maxChannelError>12)throw Error(`COLOR_PROBE_FAILED: ${actual.join(',')}`);
- return{expected,actual,maxChannelError,frameTimeSec:7};
+ return{expected,actual,maxChannelError,frameTimeSec:seconds};
 }
 async function main(){
  const image=process.env.VIDEO_MEDIA_IMAGE_REF,digest=process.env.VIDEO_MEDIA_RUNTIME_DIGEST;
@@ -55,6 +58,25 @@ async function main(){
   const postMixAsr=await verifyPostMixNarration(root,{outputPath:film.outputPath,sha256:film.technicalQa.sha256,durationMs:20000,technicalQa:'pass'},originalPlan,verified,process.env,(lineId,recognizedText)=>console.error(JSON.stringify({lineId,recognizedText})));
   const loudness=await measureFinalLoudness(root,{outputPath:film.outputPath,sha256:film.technicalQa.sha256,durationMs:20000,technicalQa:'pass'},false);
   const colorSample=await probeBackgroundPixel(image,film.outputPath);
+  const excerptMap=[
+   {previewStartMs:0,previewEndMs:6000,sourceStartMs:0,sourceEndMs:6000,shotId:'opening'},
+   {previewStartMs:6000,previewEndMs:10000,sourceStartMs:9000,sourceEndMs:13000,shotId:'middle'},
+   {previewStartMs:10000,previewEndMs:12000,sourceStartMs:15000,sourceEndMs:17000,shotId:'ending'},
+  ];
+  const preview=await renderPreviewExcerpt({root,sourcePath:film.outputPath,sourceSha256:film.technicalQa.sha256,sourceDurationMs:20000,segments:excerptMap,speechWindows:verified.lines.map(line=>({startMs:line.startMs,endMs:line.startMs+line.durationMs})),width:320,height:180,fps:24});
+  const previewColorSample=await probeBackgroundPixel(image,preview.outputPath,7);
+  const mediaConfig=dockerConfiguration(process.env,'preview-probe'),previewAudioDir=join(root,'postmix','preview-audio','output');await mkdir(previewAudioDir,{recursive:true});
+  await docker(postMixSilenceDockerArguments(mediaConfig.image,mediaConfig.user,preview.outputPath,previewAudioDir));
+  const previewTrack=await inspectTrackWav(join(previewAudioDir,'track.wav'),preview.durationMs*48,false,1024);
+  const previewSpeech=[];
+  for(const item of[{line:originalPlan.lines[0],startMs:1000,lengthMs:5000},{line:originalPlan.lines[1],startMs:6000,lengthMs:4000}]){
+   const outputDir=join(root,'postmix',`preview-${item.line.lineId}`),outputPath=join(outputDir,'line.wav');await mkdir(outputDir,{recursive:true});
+   await docker(postMixDockerArguments(mediaConfig.image,mediaConfig.user,preview.outputPath,outputDir,item.startMs,item.lengthMs));
+   const wav=await inspectVoiceWav(outputPath),transcript=await transcribeAudio(root,{language:item.line.language,outputPath,wav},'postmix');
+   let verifiedLine:ReturnType<typeof verifySpokenText>;
+   try{verifiedLine=verifySpokenText(item.line.expectedAsrText,item.line.expectedAsrText,transcript)}catch(error){console.error(JSON.stringify({lineId:item.line.lineId,recognizedText:transcript.recognizedText}));throw error}
+   previewSpeech.push({lineId:item.line.lineId,recognizedText:verifiedLine.recognizedText,wordCount:verifiedLine.words.length,status:verifiedLine.status});
+  }
   const silentNarration=await prepareNarration({durationMs:20000,lines:[]},root),silentTrack=await buildNarrationTrack(root,silentNarration);
   const silentFilm=await composeVideo(root,join(root,'media',stageKey),silentTrack,[],null,{width:320,height:180,durationSec:20,fps:24,bundleHash:params.bundleHash,fence:params.fence});
   if(!silentTrack.wav.silence||!silentFilm.technicalQa.audio)throw Error('SILENT_COMPOSITION_INVALID');
@@ -62,9 +84,9 @@ async function main(){
   const postMixSilence=await verifyPostMixNarration(root,{outputPath:silentFilm.outputPath,sha256:silentFilm.technicalQa.sha256,durationMs:20000,technicalQa:'pass'},silentPlan,{durationMs:20000,lines:[]});
   const silentLoudness=await measureFinalLoudness(root,{outputPath:silentFilm.outputPath,sha256:silentFilm.technicalQa.sha256,durationMs:20000,technicalQa:'pass'},true);
   const frameDir=join(root,'frames');await mkdir(frameDir);
-  const frames=[{time:2,name:'composition-caption-zh.png'},{time:7,name:'composition-caption-gap.png'},{time:10,name:'composition-caption-en.png'}];
-  for(const frame of frames){const path=join(frameDir,frame.name);await writeFile(path,'');await extractFrame(image,film.outputPath,path,frame.time);if(process.argv.includes('--record'))await copyFile(path,join('docs/engineering/evidence',frame.name))}
-  const evidence={mediaRuntimeDigest:digest,voiceRuntimeDigest:narration.lines[0].voice.runtimeDigest,asrRuntimeDigest:process.env.VIDEO_ASR_RUNTIME_DIGEST,sourceKind:'deterministic technical scene; not a model-generated user film',pictureStageKey:stageKey,trackSha256:track.wav.sha256,subtitleCues:cues.map(cue=>({lineId:cue.lineId,startFrame:cue.startFrame,endFrame:cue.endFrame,text:cue.text})),fontCharsetSha256:font.charsetSha256,output:{sha256:film.technicalQa.sha256,bytes:film.technicalQa.bytes,width:film.technicalQa.width,height:film.technicalQa.height,durationSec:film.technicalQa.durationSec,fps:film.technicalQa.fps,audio:film.technicalQa.audio,qaStatus:film.qaStatus},postMixAsr,loudness,colorSample,intentionalSilence:{trackSilent:silentTrack.wav.silence,outputSha256:silentFilm.technicalQa.sha256,bytes:silentFilm.technicalQa.bytes,durationSec:silentFilm.technicalQa.durationSec,audio:silentFilm.technicalQa.audio,postMixSilence,loudness:silentLoudness,qaStatus:silentFilm.qaStatus},limits:'Technical 320x180 composition and independent full decode plus post-mix ASR/silence, loudness and one known RGB sample only; no 1080p, style baseline, listening or semantic QA'};
+  const frames=[{source:film.outputPath,time:2,name:'composition-caption-zh.png'},{source:film.outputPath,time:7,name:'composition-caption-gap.png'},{source:film.outputPath,time:10,name:'composition-caption-en.png'},{source:preview.outputPath,time:2,name:'preview-caption-zh.png'},{source:preview.outputPath,time:7,name:'preview-caption-en.png'},{source:preview.outputPath,time:11,name:'preview-caption-gap.png'}];
+  for(const frame of frames){const path=join(frameDir,frame.name);await writeFile(path,'');await extractFrame(image,frame.source,path,frame.time);if(process.argv.includes('--record'))await copyFile(path,join('docs/engineering/evidence',frame.name))}
+  const evidence={mediaRuntimeDigest:digest,voiceRuntimeDigest:narration.lines[0].voice.runtimeDigest,asrRuntimeDigest:process.env.VIDEO_ASR_RUNTIME_DIGEST,sourceKind:'deterministic technical scene; not a model-generated user film',pictureStageKey:stageKey,trackSha256:track.wav.sha256,subtitleCues:cues.map(cue=>({lineId:cue.lineId,startFrame:cue.startFrame,endFrame:cue.endFrame,text:cue.text})),fontCharsetSha256:font.charsetSha256,output:{sha256:film.technicalQa.sha256,bytes:film.technicalQa.bytes,width:film.technicalQa.width,height:film.technicalQa.height,durationSec:film.technicalQa.durationSec,fps:film.technicalQa.fps,audio:film.technicalQa.audio,qaStatus:film.qaStatus},postMixAsr,loudness,colorSample,previewExcerpt:{sourceFilmSha256:preview.sourceFilmSha256,sha256:preview.sha256,bytes:preview.bytes,durationMs:preview.durationMs,excerptMap,technicalQa:preview.technicalQa,track:{sha256:previewTrack.sha256,samples:previewTrack.samples,peakDbfs:previewTrack.peakDbfs,rmsDbfs:previewTrack.rmsDbfs},colorSample:previewColorSample,speech:previewSpeech},intentionalSilence:{trackSilent:silentTrack.wav.silence,outputSha256:silentFilm.technicalQa.sha256,bytes:silentFilm.technicalQa.bytes,durationSec:silentFilm.technicalQa.durationSec,audio:silentFilm.technicalQa.audio,postMixSilence,loudness:silentLoudness,qaStatus:silentFilm.qaStatus},limits:'Technical 320x180 composition and independent full decode plus post-mix ASR/silence, loudness and one known RGB sample only; excerpt is from same technical film; no model-generated topic, 1080p, style baseline, listening or semantic QA'};
   if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/composition-probe.json',JSON.stringify(evidence,null,2)+'\n');
   process.stdout.write(JSON.stringify(evidence)+'\n');
  }finally{

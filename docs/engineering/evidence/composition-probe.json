@@ -4,7 +4,7 @@
   "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
   "sourceKind": "deterministic technical scene; not a model-generated user film",
   "pictureStageKey": "537507ac86a62a12ff321373a5393b8f690bcc36a44eb711fb86bab234d25d10",
-  "trackSha256": "e058a8b4275aed8841a6eba27d435c18e23afe076408a33a7f042342be215d4a",
+  "trackSha256": "4829d6bb98a594eb47a73629d7a6df0c139eb48ca492c253ff3ae7592c07122e",
   "subtitleCues": [
     {
       "lineId": "composition_zh",
@@ -21,8 +21,8 @@
   ],
   "fontCharsetSha256": "520335296aaf1ae3c73fc85b3c1b5276af285d1be41256ac2f239b3aead62525",
   "output": {
-    "sha256": "d95011481da30b4eb3b1f69d22245814abcfda611d8557ac34def9f82af407ea",
-    "bytes": 175343,
+    "sha256": "b33a8f5e4fd184323da166aff86c8142570be7655fa6c9f493012c63958c6b24",
+    "bytes": 175049,
     "width": 320,
     "height": 180,
     "durationSec": 20,
@@ -32,12 +32,12 @@
   },
   "postMixAsr": {
     "status": "pass",
-    "filmSha256": "d95011481da30b4eb3b1f69d22245814abcfda611d8557ac34def9f82af407ea",
+    "filmSha256": "b33a8f5e4fd184323da166aff86c8142570be7655fa6c9f493012c63958c6b24",
     "lines": [
       {
         "lineId": "composition_zh",
         "recognizedText": "上海的活動將在10月8日開始",
-        "sourceSha256": "59933963a9773db99c657f609fb3c766f207d85ea834721e62a857ccd6b1d380",
+        "sourceSha256": "1318ec3e915f34e030c5e75a7d7993c5d1ea9ec94d6f58c005a901366e5ba2b4",
         "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 12,
         "status": "pass"
@@ -45,7 +45,7 @@
       {
         "lineId": "composition_en",
         "recognizedText": "The event starts in Shanghai.",
-        "sourceSha256": "dc3fff83465da188ba4ace8c4b5cfcb7d2b65de00bb873fa27980be6bb092c38",
+        "sourceSha256": "1ae28c03f43c62780335cab15c846fd71718ccc730c62a4be599be6622942e6e",
         "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 5,
         "status": "pass"
@@ -54,10 +54,10 @@
   },
   "loudness": {
     "status": "pass",
-    "filmSha256": "d95011481da30b4eb3b1f69d22245814abcfda611d8557ac34def9f82af407ea",
+    "filmSha256": "b33a8f5e4fd184323da166aff86c8142570be7655fa6c9f493012c63958c6b24",
     "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
-    "integratedLufs": -14.44,
-    "truePeakDbtp": -1.49,
+    "integratedLufs": -14.45,
+    "truePeakDbtp": -1.46,
     "targetLufs": -14,
     "toleranceLu": 1,
     "maxTruePeakDbtp": -1.2
@@ -75,6 +75,79 @@
     ],
     "maxChannelError": 4,
     "frameTimeSec": 7
+  },
+  "previewExcerpt": {
+    "sourceFilmSha256": "b33a8f5e4fd184323da166aff86c8142570be7655fa6c9f493012c63958c6b24",
+    "sha256": "e5ddf6be782eba66ebd3b23f9c1622b41caa89a50092e775820c63bebd969332",
+    "bytes": 157827,
+    "durationMs": 12000,
+    "excerptMap": [
+      {
+        "previewStartMs": 0,
+        "previewEndMs": 6000,
+        "sourceStartMs": 0,
+        "sourceEndMs": 6000,
+        "shotId": "opening"
+      },
+      {
+        "previewStartMs": 6000,
+        "previewEndMs": 10000,
+        "sourceStartMs": 9000,
+        "sourceEndMs": 13000,
+        "shotId": "middle"
+      },
+      {
+        "previewStartMs": 10000,
+        "previewEndMs": 12000,
+        "sourceStartMs": 15000,
+        "sourceEndMs": 17000,
+        "shotId": "ending"
+      }
+    ],
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "e5ddf6be782eba66ebd3b23f9c1622b41caa89a50092e775820c63bebd969332",
+      "bytes": 157827,
+      "width": 320,
+      "height": 180,
+      "durationSec": 12,
+      "fps": 24,
+      "audio": true
+    },
+    "track": {
+      "sha256": "ef411e7f3f95f6d7beb6479f75f760359aa3a3a8f81fbe15e932b8bc95383729",
+      "samples": 575488,
+      "peakDbfs": -1.4068114385562729,
+      "rmsDbfs": -16.58779282774541
+    },
+    "colorSample": {
+      "expected": [
+        24,
+        48,
+        74
+      ],
+      "actual": [
+        20,
+        45,
+        74
+      ],
+      "maxChannelError": 4,
+      "frameTimeSec": 7
+    },
+    "speech": [
+      {
+        "lineId": "composition_zh",
+        "recognizedText": "上海的活動將在10月8日開始",
+        "wordCount": 12,
+        "status": "pass"
+      },
+      {
+        "lineId": "composition_en",
+        "recognizedText": "The event starts in Shanghai.",
+        "wordCount": 5,
+        "status": "pass"
+      }
+    ]
   },
   "intentionalSilence": {
     "trackSilent": true,
@@ -104,5 +177,5 @@
     },
     "qaStatus": "semantic_not_checked"
   },
-  "limits": "Technical 320x180 composition and independent full decode plus post-mix ASR/silence, loudness and one known RGB sample only; no 1080p, style baseline, listening or semantic QA"
+  "limits": "Technical 320x180 composition and independent full decode plus post-mix ASR/silence, loudness and one known RGB sample only; excerpt is from same technical film; no model-generated topic, 1080p, style baseline, listening or semantic QA"
 }
