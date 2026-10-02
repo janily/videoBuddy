@@ -1,3 +1,4 @@
+import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
 import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -12,9 +13,19 @@ import {prepareVoiceStage} from '../../src/services/video/preview/voice-stage';
 import {prepareTimingStage} from '../../src/services/video/preview/timing-stage';
 import {prepareVisualShotStage} from '../../src/services/video/preview/visual-stage';
 import {preparePictureShotStage} from '../../src/services/video/preview/picture-stage';
+import {preparePictureSequenceStage} from '../../src/services/video/preview/picture-sequence-stage';
+import {prepareCompositeStage} from '../../src/services/video/preview/composite-stage';
+import {canonicalHash} from '../../src/services/video/domain/hash';
+
+async function removeProbeContainer(name:string){
+ const child=spawn('docker',['rm','--force',name],{stdio:'ignore'});
+ const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
+ if(code!==0)throw Error('PICTURE_PROBE_CONTAINER_CLEANUP_FAILED');
+}
 
 async function main(){
  const root=await mkdtemp(join(tmpdir(),'vb-voice-stage-probe-'));
+ let pictureContainerName:string|undefined;
  try{
   const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('probe-owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
   const revisionId=randomUUID(),operationId=randomUUID(),messageId=randomUUID(),style=getStyle('crayon-book'),base=initialUnderstanding(),line='上海的活动将在十月八日开始。';
@@ -35,13 +46,13 @@ async function main(){
   const evidence={technicalProbeOnly:true,styleSlug:style.slug,briefVersion:1,voiceRuntimeDigest:verified.lines[0].voice.runtimeDigest,asrRuntimeDigest:verified.lines[0].asr.runtimeDigest,voiceSha256:verified.lines[0].voice.wav.sha256,voiceDurationMs:verified.lines[0].voice.wav.durationMs,wordCount:verified.lines[0].wordTimings.length,asrStatus:verified.lines[0].asrStatus,immutablePlanSha256:first.planRef.sha256,immutableVerifiedSha256:first.verifiedRef.sha256,replayIdentical:true,limits:'One synthetic 20-second project brief and one real offline TTS/ASR line; no visual preview, full mix, listening review or user footage.'};
   if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/voice-stage-probe.json',JSON.stringify(evidence,null,2)+'\n');
   process.stdout.write(JSON.stringify(evidence)+'\n');
-  if(process.argv.includes('--picture')){
+  if(process.argv.includes('--picture')||process.argv.includes('--film')){
    const image=process.env.VIDEO_MEDIA_IMAGE_REF;
    if(!image||!/^sha256:[a-f0-9]{64}$/.test(image))throw Error('CAPABILITY_UNAVAILABLE: VIDEO_MEDIA_IMAGE_REF');
    process.env.VIDEO_MEDIA_RUNTIME_DIGEST=image.slice(7);
    process.env.VIDEO_MEDIA_TIMEOUT_SECONDS='300';
   }
-  if(process.argv.includes('--timing')||process.argv.includes('--picture')){
+  if(process.argv.includes('--timing')||process.argv.includes('--picture')||process.argv.includes('--film')){
    const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
    const timingReplay=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
    if(timing.draftRef.sha256!==timingReplay.draftRef.sha256)throw Error('TIMING_STAGE_REPLAY_CHANGED');
@@ -50,17 +61,27 @@ async function main(){
    const result={technicalProbeOnly:true,styleSlug:style.slug,voiceStageSha256:first.verifiedRef.sha256,timingDraftSha256:timing.draftRef.sha256,totalFrames:draft.totalFrames,fps:draft.fps,narration:draft.narration,captions:draft.captions,track:{sha256:draft.track.sha256,samples:draft.track.samples,runtimeDigest:draft.track.runtimeDigest,silence:draft.track.silence},font:draft.font,replayIdentical:true,qualityStatus:draft.qualityStatus,limits:'One synthetic project brief; real offline voice, ASR, 48 kHz narration mix, pinned CJK font and subtitle timing. No visual source, burned captions, preview video or listening review.'};
    if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/timing-stage-probe.json',JSON.stringify(result,null,2)+'\n');
    process.stdout.write(JSON.stringify(result)+'\n');
-   if(process.argv.includes('--picture')){
+   if(process.argv.includes('--picture')||process.argv.includes('--film')){
     const sourceHtml='<!doctype html><html><meta charset="utf-8"><body style="margin:0"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4eee5";x.fillRect(0,0,1920,1080);x.fillStyle="#48657a";x.fillRect(80,80,1760,920);x.fillStyle="#ffffff";x.font="bold 110px sans-serif";x.fillText("上海活动 10 月 8 日",170,520);x.fillStyle="#f3ba65";x.fillRect(160+t*20,680,400,28)};window.READY=true;</script></body></html>';
     const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,decide:async()=>({schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:['event-date'],assetIds:[],sourceHtml}),limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10}});
     const picture=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,profile:'probe'});
+    pictureContainerName=`vb-${operationId}-picture-probe-${canonicalHash({shotId:'shot'}).slice(0,12)}`;
     const replay=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,profile:'probe'});
     if(picture.stageKey!==replay.stageKey||picture.technicalQa.sha256!==replay.technicalQa.sha256)throw Error('PICTURE_STAGE_REPLAY_CHANGED');
     const pictureEvidence={technicalProbeOnly:true,styleSlug:style.slug,visualSourceSha256:visual.sourceSha256,timingDraftSha256:timing.draftRef.sha256,stageKey:picture.stageKey,runtimeDigest:picture.runtimeDigest,technicalQa:picture.technicalQa,replayIdentical:true,limits:'Synthetic HTML via injected visual decision, 320x180 technical probe of all 480 frames; no paid Visual model, asset transfer, semantic/style QA, 1080p or user preview.'};
     if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/picture-stage-probe.json',JSON.stringify(pictureEvidence,null,2)+'\n');
     process.stdout.write(JSON.stringify(pictureEvidence)+'\n');
+    if(process.argv.includes('--film')){
+     const sequence=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,profile:'probe'});
+     const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,profile:'probe'});
+     const compositeReplay=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,profile:'probe'});
+     if(composite.technicalQa.sha256!==compositeReplay.technicalQa.sha256)throw Error('COMPOSITE_STAGE_REPLAY_CHANGED');
+     const compositeEvidence={technicalProbeOnly:true,styleSlug:style.slug,timingDraftSha256:timing.draftRef.sha256,visualSourceSha256:visual.sourceSha256,pictureSequence:{stageKey:sequence.stageKey,sha256:sequence.technicalQa.sha256,frames:sequence.technicalQa.frames},stageKey:composite.stageKey,technicalQa:composite.technicalQa,loudness:composite.loudness,postMix:composite.postMix,qualityStatus:composite.qualityStatus,replayIdentical:true,limits:'Synthetic Visual source in one 20-second project, real local TTS/ASR, narration mix, burned caption, video composition, post-mix ASR and independent decode. No paid model, 1080p, style/semantic QA, user preview or approval.'};
+     if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/composite-stage-probe.json',JSON.stringify(compositeEvidence,null,2)+'\n');
+     process.stdout.write(JSON.stringify(compositeEvidence)+'\n');
+    }
    }
   }
- }finally{await rm(root,{recursive:true,force:true})}
+ }finally{try{if(pictureContainerName)await removeProbeContainer(pictureContainerName)}finally{await rm(root,{recursive:true,force:true})}}
 }
 main().catch(error=>{console.error(error instanceof Error?error.message:'VOICE_STAGE_PROBE_FAILED');process.exitCode=1});

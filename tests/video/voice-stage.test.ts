@@ -1,5 +1,5 @@
 import {expect,it} from 'vitest';
-import {randomUUID} from 'node:crypto';
+import {createHash,randomUUID} from 'node:crypto';
 import {mkdtemp,mkdir,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -18,6 +18,9 @@ import {preparePictureShotStage} from '@/services/video/preview/picture-stage';
 import type {MediaJob} from '@/services/video/media/executor';
 import {preparePictureSequenceStage} from '@/services/video/preview/picture-sequence-stage';
 import {pictureSequenceStageKey,type PictureSequenceInput} from '@/services/video/media/picture-sequence';
+import {prepareCompositeStage} from '@/services/video/preview/composite-stage';
+import {composeStageKey} from '@/services/video/media/compose';
+import {formatSrt} from '@/services/video/audio/subtitles';
 
 function wav(){
  const data=Buffer.alloc(24000*4);
@@ -52,7 +55,7 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect([generated,recognized]).toEqual([1,1]);
   const trackPath=join(root,'audio','fixture','track.wav');let mixed=0,fontReads=0;
   const trackBytes=Buffer.alloc(44+960000*4);trackBytes.write('RIFF',0);trackBytes.writeUInt32LE(trackBytes.length-8,4);trackBytes.write('WAVEfmt ',8);trackBytes.writeUInt32LE(16,16);trackBytes.writeUInt16LE(3,20);trackBytes.writeUInt16LE(1,22);trackBytes.writeUInt32LE(48000,24);trackBytes.writeUInt32LE(192000,28);trackBytes.writeUInt16LE(4,32);trackBytes.writeUInt16LE(32,34);trackBytes.write('data',36);trackBytes.writeUInt32LE(960000*4,40);for(let index=0;index<48000;index++)trackBytes.writeFloatLE(Math.sin(index*0.1)*0.1,44+index*4);
-  const timingOptions={root,buildTrack:async()=>{mixed++;await mkdir(join(root,'audio','fixture'),{recursive:true});await writeFile(trackPath,trackBytes);return{outputPath:trackPath,runtimeDigest:'c'.repeat(64),wav:probeTrackWav(trackBytes,960000,false),kind:'narration_only' as const,qaStatus:'not_checked' as const}},readFont:async()=>{fontReads++;return{family:'Noto Sans CJK SC' as const,runtimeDigest:'c'.repeat(64),charsetSha256:'d'.repeat(64),glyphs:new Set(Array.from('欢迎参加。'))}}};
+  const timingOptions={root,buildTrack:async()=>{mixed++;await mkdir(join(root,'audio','fixture'),{recursive:true});await writeFile(trackPath,trackBytes);return{outputPath:trackPath,runtimeDigest:'a'.repeat(64),wav:probeTrackWav(trackBytes,960000,false),kind:'narration_only' as const,qaStatus:'not_checked' as const}},readFont:async()=>{fontReads++;return{family:'Noto Sans CJK SC' as const,runtimeDigest:'a'.repeat(64),charsetSha256:'d'.repeat(64),glyphs:new Set(Array.from('欢迎参加。'))}}};
   await expect(prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('TIMING_STAGE_MISSING');
   const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions);
   expect((await projects.store.readFresh<{totalFrames:number;narration:unknown[];captions:unknown[]}>(timing.draftRef.key)).value).toMatchObject({totalFrames:480,narration:[{}],captions:[{}]});
@@ -84,6 +87,19 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect(sequence.totalFrames).toBe(480);
   expect(await preparePictureSequenceStage(projects,projectId,revisionId,operationId,0,treatmentRef,sequenceOptions)).toEqual(sequence);
   expect(assemblyCalls).toBe(1);
+  let compositionCalls=0,postMixCalls=0,filmHash='f'.repeat(64);
+  const compositeOptions={root,env:pictureOptions.env,pictureQa:pictureOptions.qa,readFont:timingOptions.readFont,
+   filmQa:async(_dir:string,_image:string,_path:string,expected:{width:number;height:number;durationSec:number;fps:number;audio:boolean})=>({result:'pass' as const,sha256:filmHash,bytes:4321,frames:Math.round(expected.durationSec*expected.fps),...expected}),
+   compose:async(_root:string,_pictureDir:string,track:{wav:{sha256:string;silence:boolean}},cues:Parameters<typeof formatSrt>[0],captionStyle:Parameters<typeof composeStageKey>[0]['style'],spec:Parameters<typeof composeStageKey>[0]['spec'])=>{
+    compositionCalls++;const srt=formatSrt(cues),stageKey=composeStageKey({pictureSha256:qaHash,trackSha256:track.wav.sha256,trackSilent:track.wav.silence,srtSha256:srt?createHash('sha256').update(srt).digest('hex'):null,style:captionStyle,runtimeDigest:'a'.repeat(64),spec});
+    return{stageKey,outputPath:join(root,'composition',stageKey,'output','final.mp4'),subtitlesPath:join(root,'composition',stageKey,'subtitles.srt'),technicalQa:{result:'pass' as const,sha256:filmHash,bytes:4321,width:1920,height:1080,durationSec:20,fps:24,frames:480,audio:true},loudness:{status:'pass' as const,filmSha256:filmHash,runtimeDigest:'a'.repeat(64),integratedLufs:-14,truePeakDbtp:-1.5,targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2},qaStatus:'semantic_not_checked' as const};
+   },postMix:async(_root:string,film:{sha256:string})=>{postMixCalls++;return{status:'pass' as const,filmSha256:film.sha256,lines:[{lineId:'line_1',recognizedText:'欢迎参加。',sourceSha256:'b'.repeat(64),asrRuntimeDigest:'b'.repeat(64),wordCount:1,status:'pass' as const}]}}};
+  const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions);
+  expect(composite.qualityStatus).toBe('semantic_not_checked');
+  expect(await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).toEqual(composite);
+  expect([compositionCalls,postMixCalls]).toEqual([1,1]);
+  filmHash='e'.repeat(64);
+  await expect(prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).rejects.toThrow('COMPOSITE_OUTPUT_CHANGED');
   qaHash='f'.repeat(64);
   await expect(preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).rejects.toThrow('PICTURE_OUTPUT_CHANGED');
   const archivedSource=await projects.store.readFresh<{sourceHtml:string}>(visual.sourceRef.key);

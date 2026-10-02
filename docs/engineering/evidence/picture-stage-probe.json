@@ -2,8 +2,8 @@
   "technicalProbeOnly": true,
   "styleSlug": "crayon-book",
   "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
-  "timingDraftSha256": "f0789728aa50dfbce751e472cce6d2300dbd58d2da0f95d67a24207f3ed37ee7",
-  "stageKey": "83a4c8ff252bc92b47ab90cda46edec626d75bb9bc5c3a620ef638ade5364c11",
+  "timingDraftSha256": "8d1ae55166c4422a03a98d19ff35a8ea0a5dbf52f54cc43e004086a66290d26d",
+  "stageKey": "26008793827fdf0d9d7c6a77d1f95aac28e0b4133700afe549d7d5ccce5add08",
   "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
   "technicalQa": {
     "result": "pass",
@@ -13,6 +13,7 @@
     "height": 180,
     "durationSec": 20,
     "fps": 24,
+    "frames": 480,
     "audio": false
   },
   "replayIdentical": true,

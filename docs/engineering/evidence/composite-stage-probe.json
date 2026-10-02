@@ -1,0 +1,50 @@
+{
+  "technicalProbeOnly": true,
+  "styleSlug": "crayon-book",
+  "timingDraftSha256": "8d1ae55166c4422a03a98d19ff35a8ea0a5dbf52f54cc43e004086a66290d26d",
+  "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
+  "pictureSequence": {
+    "stageKey": "0c80bd1a7a9590d5c31cf0d8d3e7ab96af88d10536199477c842bac89545af1e",
+    "sha256": "08143fdaddf5dba5938f22f54120a3f5fe2095cfb9ded8b4882c83b44981cb3f",
+    "frames": 480
+  },
+  "stageKey": "7b9de0b7ef3d55b88ca7dda4dd8d12f5aa624be178cf8ca4d52dfdc4e39ba78b",
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "c4c7302004d7c67f105012b46deba4cd4c7578a09d0c3b20e22e28d929ef95f4",
+    "bytes": 121477,
+    "width": 320,
+    "height": 180,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true
+  },
+  "loudness": {
+    "status": "pass",
+    "filmSha256": "c4c7302004d7c67f105012b46deba4cd4c7578a09d0c3b20e22e28d929ef95f4",
+    "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "integratedLufs": -14.2,
+    "truePeakDbtp": -1.5,
+    "targetLufs": -14,
+    "toleranceLu": 1,
+    "maxTruePeakDbtp": -1.2
+  },
+  "postMix": {
+    "status": "pass",
+    "filmSha256": "c4c7302004d7c67f105012b46deba4cd4c7578a09d0c3b20e22e28d929ef95f4",
+    "lines": [
+      {
+        "lineId": "line_1",
+        "recognizedText": "上海的活動將在10月8日開始",
+        "sourceSha256": "ab37cf3d70eda3c9a9e7e7c965bfc1b35d89d225f8dfc05557eee3b8e2c1bc00",
+        "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+        "wordCount": 12,
+        "status": "pass"
+      }
+    ]
+  },
+  "qualityStatus": "semantic_not_checked",
+  "replayIdentical": true,
+  "limits": "Synthetic Visual source in one 20-second project, real local TTS/ASR, narration mix, burned caption, video composition, post-mix ASR and independent decode. No paid model, 1080p, style/semantic QA, user preview or approval."
+}
