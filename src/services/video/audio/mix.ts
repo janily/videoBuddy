@@ -5,10 +5,11 @@ import {isAbsolute,join,relative} from 'node:path';
 import {Environment} from '@/services/video/config/environment';
 import {dockerConfiguration} from '@/services/video/media/docker-executor';
 import {NarrationManifest} from './narration';
+import type {VerifiedNarrationManifest} from './asr';
 import {inspectTrackWav,inspectVoiceWav,TrackWavProbe} from './wav';
 
 export interface NarrationTrack{outputPath:string;runtimeDigest:string;wav:TrackWavProbe;kind:'narration_only';qaStatus:'not_checked'}
-export function mixStageKey(manifest:NarrationManifest,runtimeDigest:string){
+export function mixStageKey(manifest:NarrationManifest|VerifiedNarrationManifest,runtimeDigest:string){
  if(!/^[a-f0-9]{64}$/.test(runtimeDigest))throw Error('AUDIO_RUNTIME_UNAVAILABLE');
  return createHash('sha256').update(JSON.stringify([manifest.durationMs,manifest.lines.map(line=>[line.lineId,line.startMs,line.durationMs,line.voice.wav.sha256]),runtimeDigest,'narration-v1'])).digest('hex');
 }
@@ -32,7 +33,7 @@ async function runMix(args:string[]){
  const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',code=>resolve(code??1))});
  if(code!==0)throw Error(`AUDIO_MIX_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,300)}`);
 }
-export async function buildNarrationTrack(root:string,manifest:NarrationManifest,env:Environment=process.env):Promise<NarrationTrack>{
+export async function buildNarrationTrack(root:string,manifest:NarrationManifest|VerifiedNarrationManifest,env:Environment=process.env):Promise<NarrationTrack>{
  if(!isAbsolute(root)||!Number.isInteger(manifest.durationMs)||manifest.durationMs<20000||manifest.durationMs>120000||manifest.lines.length>120)throw Error('AUDIO_JOB_INVALID');
  const config=dockerConfiguration(env,'audio-mix'),key=mixStageKey(manifest,config.runtimeDigest),outputDir=join(root,'audio',key),outputPath=join(outputDir,'track.wav');
  const voiceRoot=join(root,'voice');

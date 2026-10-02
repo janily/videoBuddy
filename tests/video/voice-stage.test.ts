@@ -5,13 +5,14 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {initialUnderstanding} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
-import {probeVoiceWav} from '@/services/video/audio/wav';
+import {probeTrackWav,probeVoiceWav} from '@/services/video/audio/wav';
 import {StoreMissing,updateJson} from '@/services/video/storage/atomic-store';
 import {FileStore} from '@/services/video/storage/file-store';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {getStyle} from '@/services/video/styles/registry';
 import {prepareTreatmentStage} from '@/services/video/preview/treatment-stage';
 import {prepareVoiceStage} from '@/services/video/preview/voice-stage';
+import {prepareTimingStage} from '@/services/video/preview/timing-stage';
 
 function wav(){
  const data=Buffer.alloc(24000*4);
@@ -32,6 +33,7 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   const plan={schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,durationSec:20,aspect:'16:9',fps:24,summary:'活动预告',options:[{id:'a',concept:'绘图',visualApproach:'蜡笔',soundApproach:'鼓点',tradeoff:'动画多'},{id:'b',concept:'纸页',visualApproach:'翻页',soundApproach:'纸声',tradeoff:'人物少'},{id:'c',concept:'角色',visualApproach:'走路',soundApproach:'脚步',tradeoff:'造型复杂'}],selectedOptionId:'a',selectionReason:'信息清晰',shots:[{id:'shot',startFrame:0,endFrame:480,visualIntent:'活动日期',scriptLine:'欢迎参加。',factIds:[]}],script:['欢迎参加。']};
   const treatmentRef=await prepareTreatmentStage(projects,projectId,revisionId,operationId,0,{decide:async()=>plan,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10}});
   const voicePath=join(root,'voice','fixture','narration.wav');let generated=0,recognized=0;
+  await expect(prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('VOICE_STAGE_MISSING');
   const options={root,generate:async(_root:string,job:{lineId:string;language:'zh-CN'|'en';text:string})=>{
    generated++;await mkdir(join(root,'voice','fixture'),{recursive:true});const bytes=wav();await writeFile(voicePath,bytes);
    return{lineId:job.lineId,language:job.language,voice:'zf_001' as const,provider:'kokoro-js' as const,model:'test-runtime',modelLicense:'Apache-2.0' as const,runtimeDigest:'a'.repeat(64),outputPath:voicePath,wav:probeVoiceWav(bytes)};
@@ -43,6 +45,15 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect((await projects.store.readFresh<{lines:Array<{asrStatus:string}>}>(first.verifiedRef.key)).value.lines[0].asrStatus).toBe('pass');
   expect(await prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options)).toEqual(first);
   expect([generated,recognized]).toEqual([1,1]);
+  const trackPath=join(root,'audio','fixture','track.wav');let mixed=0,fontReads=0;
+  const trackBytes=Buffer.alloc(44+960000*4);trackBytes.write('RIFF',0);trackBytes.writeUInt32LE(trackBytes.length-8,4);trackBytes.write('WAVEfmt ',8);trackBytes.writeUInt32LE(16,16);trackBytes.writeUInt16LE(3,20);trackBytes.writeUInt16LE(1,22);trackBytes.writeUInt32LE(48000,24);trackBytes.writeUInt32LE(192000,28);trackBytes.writeUInt16LE(4,32);trackBytes.writeUInt16LE(32,34);trackBytes.write('data',36);trackBytes.writeUInt32LE(960000*4,40);for(let index=0;index<48000;index++)trackBytes.writeFloatLE(Math.sin(index*0.1)*0.1,44+index*4);
+  const timingOptions={root,buildTrack:async()=>{mixed++;await mkdir(join(root,'audio','fixture'),{recursive:true});await writeFile(trackPath,trackBytes);return{outputPath:trackPath,runtimeDigest:'c'.repeat(64),wav:probeTrackWav(trackBytes,960000,false),kind:'narration_only' as const,qaStatus:'not_checked' as const}},readFont:async()=>{fontReads++;return{family:'Noto Sans CJK SC' as const,runtimeDigest:'c'.repeat(64),charsetSha256:'d'.repeat(64),glyphs:new Set(Array.from('欢迎参加。'))}}};
+  const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions);
+  expect((await projects.store.readFresh<{totalFrames:number;narration:unknown[];captions:unknown[]}>(timing.draftRef.key)).value).toMatchObject({totalFrames:480,narration:[{}],captions:[{}]});
+  expect(await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions)).toEqual(timing);
+  expect([mixed,fontReads]).toEqual([1,1]);
+  await writeFile(trackPath,Buffer.from('tampered'));
+  await expect(prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions)).rejects.toThrow('TIMING_TRACK_CHANGED');
   await writeFile(voicePath,Buffer.from('tampered'));
   await expect(prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options)).rejects.toThrow('VOICE_SOURCE_CHANGED');
   const changedRevision=randomUUID();

@@ -15,7 +15,7 @@ import {compileVoicePlan} from './voice-plan';
 
 type Generate=(root:string,job:VoiceJob)=>Promise<VoiceResult>;
 type Recognize=(root:string,voice:VoiceResult)=>Promise<AsrTranscript>;
-interface Options{root?:string;env?:Environment;generate?:Generate;recognize?:Recognize}
+interface Options{root?:string;env?:Environment;generate?:Generate;recognize?:Recognize;mustExist?:boolean}
 export interface VoiceStageRecord{schemaVersion:1;briefVersion:number;understandingSha256:string;treatmentSha256:string;planRef:ObjectRef;verifiedRef:ObjectRef}
 
 async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Promise<T>{
@@ -62,6 +62,7 @@ export async function prepareVoiceStage(projects:ProjectStore,projectId:string,r
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
   return existing;
  }
+ if(options.mustExist)throw Error('VOICE_STAGE_MISSING');
  if(plan.lines.length){if(!options.generate)voiceConfiguration(env);if(!options.recognize)asrConfiguration(env)}
  const prepared=await prepareNarration(plan,root,options.generate||((dir,job)=>synthesizeVoice(dir,job,env)));
  const verified=await verifyNarration(plan,prepared,root,options.recognize||((dir,voice)=>transcribeVoice(dir,voice,env)));

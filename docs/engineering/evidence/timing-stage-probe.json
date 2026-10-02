@@ -1,0 +1,44 @@
+{
+  "technicalProbeOnly": true,
+  "styleSlug": "crayon-book",
+  "voiceStageSha256": "09ab68cf1b662d33d99ee9b3e4de0fd886bba9a9374e9fe610ff80c686bdc89b",
+  "timingDraftSha256": "8a58648b2ccfbca1d8c7fb2ff5a69394b6aef6fef4e67a2d98e856fb1600f156",
+  "totalFrames": 480,
+  "fps": 24,
+  "narration": [
+    {
+      "lineId": "line_1",
+      "spokenText": "上海的活动将在十月八日开始。",
+      "displayText": "上海的活动将在十月八日开始。",
+      "expectedAsrText": "上海的活动将在十月八日开始。",
+      "startSample": 0,
+      "endSample": 196800,
+      "voiceSha256": "e1713812a7d7b782632959022a8e198252c084767d6ce563e9caede06f221414",
+      "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c"
+    }
+  ],
+  "captions": [
+    {
+      "lineId": "line_1",
+      "text": "上海的活动将在十月八日开始。",
+      "startFrame": 0,
+      "endFrame": 113,
+      "voiceSha256": "e1713812a7d7b782632959022a8e198252c084767d6ce563e9caede06f221414"
+    }
+  ],
+  "track": {
+    "sha256": "2b65c5777a70e07fc919c1b272144a6d8259fe97b44264f083dc6e3c49b3721e",
+    "samples": 960000,
+    "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "silence": false
+  },
+  "font": {
+    "family": "Noto Sans CJK SC",
+    "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "charsetSha256": "520335296aaf1ae3c73fc85b3c1b5276af285d1be41256ac2f239b3aead62525"
+  },
+  "replayIdentical": true,
+  "qualityStatus": "semantic_not_checked",
+  "limits": "One synthetic project brief; real offline voice, ASR, 48 kHz narration mix, pinned CJK font and subtitle timing. No visual source, burned captions, preview video or listening review."
+}
