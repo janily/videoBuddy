@@ -37,10 +37,10 @@ export function probeVoiceWav(bytes:Buffer):VoiceWavProbe{
  if(result.silence||result.peakDbfs===null||result.rmsDbfs===null)throw Error('VOICE_SILENT');
  return{codec:'pcm_f32le',sampleRate:24000,channels:1,samples:result.samples,durationMs:result.durationMs,bytes:result.bytes,sha256:result.sha256,peakDbfs:result.peakDbfs,rmsDbfs:result.rmsDbfs};
 }
-export function probeTrackWav(bytes:Buffer,expectedSamples:number,allowSilence:boolean):TrackWavProbe{
+export function probeTrackWav(bytes:Buffer,expectedSamples:number,allowSilence:boolean,toleranceSamples=0):TrackWavProbe{
  let result:ReturnType<typeof probeFloatWav>;
  try{result=probeFloatWav(bytes,48000,32*1024*1024)}catch{throw Error('AUDIO_OUTPUT_INVALID')}
- if(!Number.isSafeInteger(expectedSamples)||expectedSamples<48000||expectedSamples>120*48000||result.samples!==expectedSamples)throw Error('AUDIO_DURATION_INVALID');
+ if(!Number.isSafeInteger(expectedSamples)||expectedSamples<48000||expectedSamples>120*48000||!Number.isSafeInteger(toleranceSamples)||toleranceSamples<0||toleranceSamples>1024||Math.abs(result.samples-expectedSamples)>toleranceSamples)throw Error(`AUDIO_DURATION_INVALID: expected ${expectedSamples}, actual ${result.samples}`);
  if(result.silence&&!allowSilence)throw Error('AUDIO_SILENT');
  return{...result,sampleRate:48000};
 }
@@ -48,7 +48,7 @@ export async function inspectVoiceWav(path:string){
  const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||info.size>20*1024*1024)throw Error('VOICE_OUTPUT_INVALID');
  return probeVoiceWav(await readFile(path));
 }
-export async function inspectTrackWav(path:string,expectedSamples:number,allowSilence:boolean){
+export async function inspectTrackWav(path:string,expectedSamples:number,allowSilence:boolean,toleranceSamples=0){
  const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||info.size>32*1024*1024)throw Error('AUDIO_OUTPUT_INVALID');
- return probeTrackWav(await readFile(path),expectedSamples,allowSilence);
+ return probeTrackWav(await readFile(path),expectedSamples,allowSilence,toleranceSamples);
 }

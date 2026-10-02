@@ -16,6 +16,8 @@ it('requires an exact 48 kHz sample count, and accepts intentional silence only 
  expect(probeTrackWav(buffer,samples,true).silence).toBe(true);
  expect(()=>probeTrackWav(buffer,samples,false)).toThrow('AUDIO_SILENT');
  expect(()=>probeTrackWav(buffer,samples+1,true)).toThrow('AUDIO_DURATION_INVALID');
+ expect(probeTrackWav(buffer,samples+512,true,1024).samples).toBe(samples);
+ expect(()=>probeTrackWav(buffer,samples+1025,true,1024)).toThrow('AUDIO_DURATION_INVALID');
  const extended=Buffer.alloc(68+samples*4);extended.write('RIFF',0);extended.writeUInt32LE(extended.length-8,4);extended.write('WAVEfmt ',8);extended.writeUInt32LE(40,16);extended.writeUInt16LE(0xfffe,20);extended.writeUInt16LE(1,22);extended.writeUInt32LE(48000,24);extended.writeUInt32LE(192000,28);extended.writeUInt16LE(4,32);extended.writeUInt16LE(32,34);extended.writeUInt16LE(22,36);extended.writeUInt16LE(32,38);extended.writeUInt32LE(4,40);Buffer.from('0300000000001000800000aa00389b71','hex').copy(extended,44);extended.write('data',60);extended.writeUInt32LE(samples*4,64);extended.writeFloatLE(0.1,68);
  expect(probeTrackWav(extended,samples,true).sampleRate).toBe(48000);
  extended.writeUInt32LE(1,44);expect(()=>probeTrackWav(extended,samples,true)).toThrow('AUDIO_OUTPUT_INVALID');

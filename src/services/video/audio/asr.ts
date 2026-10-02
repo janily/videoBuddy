@@ -6,7 +6,7 @@ import {z} from 'zod';
 import {Environment} from '@/services/video/config/environment';
 import {VoiceResult} from './voice';
 import {NarrationManifest,NarrationPlan} from './narration';
-import {inspectVoiceWav} from './wav';
+import {inspectVoiceWav,VoiceWavProbe} from './wav';
 import {assertAsrExpected} from '@/services/video/timeline/compile';
 
 const wordSchema=z.strictObject({text:z.string().max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)});
@@ -36,7 +36,8 @@ async function runAsr(args:string[]){
  if(code!==0||size>1024*1024)throw Error(`ASR_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,300)}`);
  return Buffer.concat(output).toString('utf8').trim();
 }
-function validateTranscript(raw:string,voice:VoiceResult,config:ReturnType<typeof asrConfiguration>):AsrTranscript{
+export interface AsrAudioInput{language:'zh-CN'|'en';outputPath:string;wav:VoiceWavProbe}
+function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typeof asrConfiguration>):AsrTranscript{
  const parsed=transcriptSchema.parse(JSON.parse(raw));
  if(parsed.language!==voice.language||parsed.segments.length===0)throw Error('ASR_OUTPUT_INVALID');
  let last=0;
@@ -49,9 +50,9 @@ function validateTranscript(raw:string,voice:VoiceResult,config:ReturnType<typeo
  if(!recognizedText)throw Error('ASR_OUTPUT_INVALID');
  return{...parsed,voiceSha256:voice.wav.sha256,runtimeDigest:config.runtimeDigest,recognizedText};
 }
-export async function transcribeVoice(root:string,voice:VoiceResult,env:Environment=process.env):Promise<AsrTranscript>{
+export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix',env:Environment=process.env):Promise<AsrTranscript>{
  if(!isAbsolute(root))throw Error('ASR_JOB_INVALID');
- const rel=relative(join(root,'voice'),voice.outputPath);
+ const rel=relative(join(root,sourceDirectory),voice.outputPath);
  if(!isAbsolute(voice.outputPath)||rel.startsWith('..')||isAbsolute(rel))throw Error('ASR_JOB_INVALID');
  const inspected=await inspectVoiceWav(voice.outputPath);
  if(inspected.sha256!==voice.wav.sha256)throw Error('ASR_SOURCE_CHANGED');
@@ -67,6 +68,9 @@ export async function transcribeVoice(root:string,voice:VoiceResult,env:Environm
   await writeOnce(resultPath,raw);
  }
  return validateTranscript(raw,voice,config);
+}
+export async function transcribeVoice(root:string,voice:VoiceResult,env:Environment=process.env):Promise<AsrTranscript>{
+ return transcribeAudio(root,voice,'voice',env);
 }
 export function verifySpokenText(originalExpectedAsrText:string,proposedExpectedAsrText:string,transcript:AsrTranscript){
  assertAsrExpected(originalExpectedAsrText,proposedExpectedAsrText,transcript.recognizedText);
