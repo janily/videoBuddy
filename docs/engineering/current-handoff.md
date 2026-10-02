@@ -36,6 +36,8 @@ T11 真实节选渲染增量：`renderPreviewExcerpt` 从已独立验证 SHA/完
 
 2026-10-03 T11 自托管节选落盘增量：新增 `stagePreviewArtifact`，只接受与固定媒体运行时及节选stageKey对应的实际文件；对源片标识/节选映射/目标profile重算stageKey，复跑独立MP4全片解码与技术QA，核对SHA/字节数后用临时文件、fsync和排他硬链接写入私有对象卷，再持久化不可变artifact manifest。真实20秒技术片本轮生成12秒节选157,770字节，SHA `eda8dc33…`；同ID重放相同哈希，提交项目预览指针前公开访问拒绝，伪造源片哈希及篡改私有字节均拒绝，见 [composition-probe.json](evidence/composition-probe.json)。真实容器探针、`npm test` 42文件191项、lint、build和构建后typecheck均退出0。该临时技术项目没有生成FilmSpec或公开预览，仍未接通项目预览Worker/API、用户批准和正式视频。
 
+2026-10-03 T01 制作包来源增量：新增 `loadVerifiedFilmPackage`，从七个项目/修订版不可变引用读取规范JSON、重算SHA与字节数，再严格解析理解、处理方案、事实、素材、源码及音频清单；可引用的镜头模块、演员、字幕样式、声音来源与bus全部由这些存储清单推导，不接受调用方直接传白名单。事实必须与冻结的Understanding逐项一致且有用户消息/已声明素材来源；上传素材必须出现在Understanding的assetUses中，并核验分析记录ID与权利来源。缺源码模块、虚构事实、过期brief、未授权素材和CAS篡改后的时间轴测试均拒绝。旧外部白名单包校验入口已移除。新测试先因模块缺失失败；首轮lint发现局部变量名触发Next规则，修正后`npm test` 43文件191项、lint、build、构建后typecheck退出0。此处核对清单结构与持久化来源，不证明模型创作、HTML安全可执行、真实素材版权或音频可用；预览Worker还未消费该包，T01/T11继续partial。
+
 主要缺项：T05 扫描 PDF、图片、配乐/环境声及长音频用户实录的可靠解读，超长 Markdown/PDF 的分段检索；Visual/Audio/Critic 及16行为评估；T10 的特殊词发音复核、可靠字幕对齐、配乐音效与完整声音 QA；真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。图片仍仅到 `uploaded`，不会被当作已分析的事实；语音只有真实ASR与有声覆盖检查通过才会 `ready`。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、技术节选、单测、目录规则或交付原型视频当作完整媒体验收。

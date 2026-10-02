@@ -1,11 +1,6 @@
 import{expect,it}from'vitest';
-import{validateFilmSpec,validateFilmTimeline,verifyFilmPackageRefs}from'@/contracts/video/film';
+import{validateFilmSpec,validateFilmTimeline}from'@/contracts/video/film';
 import{getStyle}from'@/services/video/styles/registry';
-import{ProjectStore}from'@/services/video/storage/project-store';
-import{FileStore}from'@/services/video/storage/file-store';
-import{mkdtemp,rm}from'node:fs/promises';
-import{tmpdir}from'node:os';
-import{join}from'node:path';
 
 const projectId='00000000-0000-4000-8000-000000000011',revisionId='00000000-0000-4000-8000-000000000012';
 const digest='a'.repeat(64),ref=(name:string,mime='application/json')=>({key:`projects/${projectId}/revisions/${revisionId}/${name}`,sha256:digest,bytes:100,mime});
@@ -20,19 +15,6 @@ it('T01 checks a 1080p FilmSpec against known style version and exact timeline p
  expect(()=>validateFilmSpec({...spec,output:{...spec.output,totalFrames:479}},timeline)).toThrow('FILM_SPEC_INVALID');
  expect(()=>validateFilmSpec({...spec,style:{...spec.style,upstreamCommit:'stale'}},timeline)).toThrow('FILM_SPEC_INVALID');
  expect(()=>validateFilmSpec({...spec,unknown:true},timeline)).toThrow('FILM_SPEC_INVALID');
-});
-it('T01 reads every immutable package ref and rejects a changed timeline byte hash',async()=>{
- const root=await mkdtemp(join(tmpdir(),'vb-film-contract-'));
- try{
-  const projects=new ProjectStore(new FileStore(root)),prefix=`projects/${projectId}/revisions/${revisionId}`;
-  const refsForSpec=Object.fromEntries(await Promise.all(['understanding','treatment','facts','timeline','assetManifest','sourceManifest','audioManifest'].map(async name=>[`${name}Ref`,await projects.index.immutable(name==='understanding'?`projects/${projectId}/understanding/1`:`${prefix}/${name}`,name==='timeline'?timeline:{name})])));
-  const storedSpec={...spec,...refsForSpec};
-  await expect(verifyFilmPackageRefs(projects.store,storedSpec,timeline,refs)).resolves.toMatchObject({projectId,revisionId});
-  await expect(verifyFilmPackageRefs(projects.store,{...storedSpec,timelineRef:{...storedSpec.timelineRef,sha256:'b'.repeat(64)}},timeline,refs)).rejects.toThrow('FILM_REF_CHANGED');
-  const old=await projects.store.readFresh<typeof timeline>(storedSpec.timelineRef.key);
-  await projects.store.cas(storedSpec.timelineRef.key,old.etag,{...timeline,shots:[{...timeline.shots[0],purpose:'changed'},timeline.shots[1]]});
-  await expect(verifyFilmPackageRefs(projects.store,storedSpec,timeline,refs)).rejects.toThrow('FILM_REF_CHANGED');
- }finally{await rm(root,{recursive:true,force:true})}
 });
 it('T01 checks full frame coverage, declared crossfades, and source references',()=>{
  expect(validateFilmTimeline(timeline,refs)).toMatchObject({totalFrames:480});

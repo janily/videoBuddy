@@ -2,8 +2,6 @@ import{z}from'zod';
 import{ObjectRefSchema}from'./domain';
 import{quantizeCue}from'@/services/video/timeline/compile';
 import{getStyle}from'@/services/video/styles/registry';
-import{canonicalHash,canonicalJson}from'@/services/video/domain/hash';
-import type{AtomicStore}from'@/services/video/storage/atomic-store';
 
 const id=z.string().min(1).max(120),digest=z.string().regex(/^[a-f0-9]{64}$/),frame=z.number().int().nonnegative(),sample=z.number().int().nonnegative(),fps=z.union([z.literal(24),z.literal(30),z.literal(60)]);
 const transition=z.strictObject({kind:z.enum(['cut','crossfade']),overlapFrames:frame});
@@ -70,16 +68,4 @@ export function validateFilmSpec(input:unknown,timeline:unknown):FilmSpec{
  const refs=[value.understandingRef,value.treatmentRef,value.factsRef,value.timelineRef,value.assetManifestRef,value.sourceManifestRef,value.audioManifestRef];
  if(refs.some(ref=>ref.mime!=='application/json'||ref.bytes===0)||!distinct(refs.map(ref=>ref.key)))throw Error('FILM_SPEC_INVALID');
  return value;
-}
-export async function verifyFilmPackageRefs(store:AtomicStore,input:unknown,timeline:unknown,refs:TimelineReferences):Promise<FilmSpec>{
- const verifiedTimeline=validateFilmTimeline(timeline,refs),spec=validateFilmSpec(input,verifiedTimeline);
- const entries=[['understanding',spec.understandingRef],['treatment',spec.treatmentRef],['facts',spec.factsRef],['timeline',spec.timelineRef],['assetManifest',spec.assetManifestRef],['sourceManifest',spec.sourceManifestRef],['audioManifest',spec.audioManifestRef]]as const;
- const revisionPrefix=`projects/${spec.projectId}/revisions/${spec.revisionId}/`;
- await Promise.all(entries.map(async([name,ref])=>{
-  const prefix=name==='understanding'?`projects/${spec.projectId}/understanding/`:revisionPrefix;
-  if(!ref.key.startsWith(prefix))throw Error('FILM_REF_CHANGED');
-  let value:unknown;try{value=(await store.readFresh<unknown>(ref.key)).value}catch{throw Error('FILM_REF_CHANGED')}
-  if(canonicalHash(value)!==ref.sha256||Buffer.byteLength(canonicalJson(value))!==ref.bytes||name==='timeline'&&canonicalHash(verifiedTimeline)!==ref.sha256)throw Error('FILM_REF_CHANGED');
- }));
- return spec;
 }
