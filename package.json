@@ -22,6 +22,7 @@
     "probe:video:pdf": "tsx scripts/video/probe-pdf.ts",
     "probe:video:source-audio": "tsx scripts/video/probe-source-audio.ts",
     "probe:video:voice": "tsx scripts/video/probe-voice.ts",
+    "probe:video:voice-stage": "tsx scripts/video/probe-voice-stage.ts",
     "probe:video:asr": "tsx scripts/video/probe-asr.ts",
     "probe:video:subtitles": "tsx scripts/video/probe-subtitles.ts",
     "probe:video:composition": "tsx scripts/video/probe-composition.ts",

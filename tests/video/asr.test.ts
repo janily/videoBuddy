@@ -26,5 +26,7 @@ it('checks the immutable narration plan before recognizing any audio',async()=>{
  await expect(verifyNarration(plan,{...manifest,lines:[{...manifest.lines[0],expectedAsrText:'Yellow'}]},'/tmp',recognize)).rejects.toThrow('ASR_EXPECTATION_CHANGED');
  expect(calls).toBe(0);
  const checked=await verifyNarration(plan,manifest,'/tmp',recognize);
- expect(checked.lines[0]).toMatchObject({asrStatus:'pass',wordTimingsStatus:'available',recognizedText:'Hello.'});
+ expect(checked.lines[0]).toMatchObject({asrStatus:'pass',wordTimingsStatus:'available',recognizedText:'Hello.',asr:{model:'Systran/faster-whisper-small',runtimeDigest:'c'.repeat(64),voiceSha256:voice.wav.sha256}});
+ await expect(verifyNarration(plan,manifest,'/tmp',async()=>({...await recognize(),voiceSha256:'f'.repeat(64)}))).rejects.toThrow('ASR_SOURCE_CHANGED');
+ await expect(verifyNarration(plan,manifest,'/tmp',async()=>({...await recognize(),language:'zh-CN'}))).rejects.toThrow('ASR_OUTPUT_INVALID');
 });

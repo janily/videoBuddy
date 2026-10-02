@@ -46,4 +46,6 @@ T11 真实节选渲染增量：`renderPreviewExcerpt` 从已独立验证 SHA/完
 
 T10/T11 新增冻结 Treatment 到旁白时窗的纯编译器；台词和ASR期望保持原文，过长明确失败，`none` 不发声，用户录音未接通时报错。真实预览尚未调用这个编译器或离线TTS/ASR。
 
+2026-10-03 T10/T11 更新：`prepareVoiceStage` 现读取持久化 Treatment 与 Understanding，经实际离线TTS和ASR核验后才写入不可变旁白计划及清单；重复执行复查实际 WAV 字节SHA。新增ASR语音来源哈希核对，错误来源测试先失败再通过；阶段测试拒绝文件篡改与执行中授权撤销。固定ASR镜像重新构建为 `sha256:67786e6d…`，一条中文台词真实项目阶段探针通过，见 [voice-stage-probe.json](evidence/voice-stage-probe.json)。全套 `npm test` 47文件196项、lint、build和构建后typecheck退出0。音轨混音、字幕、画面、预览Worker/API仍未接通；此探针不证明真实预览。
+
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、技术节选、单测、目录规则或交付原型视频当作完整媒体验收。

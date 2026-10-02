@@ -15,3 +15,5 @@ Vercel Blob、Sandbox、Workflow 凭据不再需要。用户已要求完全离�
 这些阻断中，缺模型凭据只影响依赖该服务的真实调用。其余大量项目是未完成的开发与验证，不应归咎于凭据。`VIDEO_GENERATION_ENABLED` 保持默认关闭，不用固定回复、计时器或样片冒充生产能力。
 
 T11 节选更新：现已从真实合成的20秒确定性技术片剪接出12秒同步AV节选，经独立全片解码、节选中英文ASR、非静音音轨、背景色像素与三张字幕抽帧复核。首轮剪断中文旁白被ASR阻断，已在渲染入口加入整句发声区间覆盖校验。此结果不解除模型内容、实际项目预览Worker/API、1080p、43风格和用户批准闭环的阻断；证据见 [composition-probe.json](evidence/composition-probe.json)。
+
+T10/T11 项目语音阶段已用离线固定镜像完成真实TTS、ASR、WAV字节复核与不可变记录，见 [voice-stage-probe.json](evidence/voice-stage-probe.json)。仍未在预览Worker中与混音、字幕和画面合成，也没有用户录音旁白路径、完整听验或正式结果音轨；该技术探针不解除视频闭环阻断。

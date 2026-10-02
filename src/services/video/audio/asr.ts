@@ -80,7 +80,7 @@ export function verifySpokenText(originalExpectedAsrText:string,proposedExpected
  return{status:'pass' as const,model:transcript.model,voiceSha256:transcript.voiceSha256,recognizedText:transcript.recognizedText,words};
 }
 
-export type VerifiedNarrationManifest={durationMs:number;lines:Array<Omit<NarrationManifest['lines'][number],'asrStatus'|'wordTimingsStatus'> & {asrStatus:'pass';wordTimingsStatus:'available';recognizedText:string;wordTimings:Array<{text:string;startMs:number;endMs:number;probability:number}>}>};
+export type VerifiedNarrationManifest={durationMs:number;lines:Array<Omit<NarrationManifest['lines'][number],'asrStatus'|'wordTimingsStatus'> & {asrStatus:'pass';wordTimingsStatus:'available';asr:{model:AsrTranscript['model'];runtimeDigest:string;voiceSha256:string};recognizedText:string;wordTimings:Array<{text:string;startMs:number;endMs:number;probability:number}>}>};
 export async function verifyNarration(originalPlan:NarrationPlan,manifest:NarrationManifest,root:string,recognize:(root:string,voice:VoiceResult)=>Promise<AsrTranscript>=transcribeVoice):Promise<VerifiedNarrationManifest>{
  if(originalPlan.durationMs!==manifest.durationMs||originalPlan.lines.length!==manifest.lines.length)throw Error('NARRATION_PLAN_CHANGED');
  const original=new Map(originalPlan.lines.map(line=>[line.lineId,line]));
@@ -90,8 +90,11 @@ export async function verifyNarration(originalPlan:NarrationPlan,manifest:Narrat
   const source=original.get(line.lineId);
   if(!source||source.language!==line.language||source.spokenText!==line.spokenText||source.displayText!==line.displayText||source.startMs!==line.startMs||source.reservedMs!==line.reservedMs)throw Error('NARRATION_PLAN_CHANGED');
   if(source.expectedAsrText!==line.expectedAsrText)throw Error('ASR_EXPECTATION_CHANGED');
-  const transcript=await recognize(root,line.voice),verified=verifySpokenText(source.expectedAsrText,line.expectedAsrText,transcript);
-  lines.push({...line,asrStatus:'pass',wordTimingsStatus:'available',recognizedText:verified.recognizedText,wordTimings:verified.words});
+  const transcript=await recognize(root,line.voice);
+  if(transcript.voiceSha256!==line.voice.wav.sha256)throw Error('ASR_SOURCE_CHANGED');
+  if(transcript.language!==line.language)throw Error('ASR_OUTPUT_INVALID');
+  const verified=verifySpokenText(source.expectedAsrText,line.expectedAsrText,transcript);
+  lines.push({...line,asrStatus:'pass',wordTimingsStatus:'available',asr:{model:transcript.model,runtimeDigest:transcript.runtimeDigest,voiceSha256:transcript.voiceSha256},recognizedText:verified.recognizedText,wordTimings:verified.words});
  }
  return{durationMs:manifest.durationMs,lines};
 }
