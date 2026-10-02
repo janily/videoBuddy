@@ -24,6 +24,8 @@ T12 发布边界增量：通用 `qualityGate` 已拒绝将必检项降为 warnin
 
 T13 取消制作增量：现有 `/operations/:id/cancel` 已支持 `scope=production`；服务先通过 ProjectControl CAS 撤销活跃制作槽、递增 consentEpoch、记录 cancelRequested，再改变操作 fence/状态。排队未 claim 的任务会直接取消，运行任务进入 `cancelling`；重复请求不重复递增，旧操作不能取消新操作或原结果。AT-039 从模拟控制态变化改为实际调用 `cancelProduction`，迟到发布被拒。`npm test` 40文件182项、lint、build、构建后typecheck均退出0。运行中媒体容器的停止/清理和状态终结仍待 render Worker 集成，T13仍partial。
 
+T13/T14 恢复上一版增量：`restoreResult` 依照规范路径 `/results/:artifactId/restore` 接入服务端；核对前一版 manifest、已保存产物授权及磁盘文件实际 SHA 后，通过 ProjectControl CAS 交换 current/previous 指针并递增 consentEpoch，旧修改计划因此失效。同一命令重试不会再次交换；错误目标或文件被篡改会拒绝。未重渲染，局部测试因缺模块先退出1，随后通过；全套 `npm test` 40文件183项、lint、build、构建后typecheck均退出0。当前只支持上一版，历史多版本恢复、UI入口和实际用户成片恢复验收仍缺。
+
 主要缺项：T05 扫描 PDF、图片、配乐/环境声及长音频用户实录的可靠解读，超长 Markdown/PDF 的分段检索；Visual/Audio/Critic 及16行为评估；T10 的特殊词发音复核、可靠字幕对齐、配乐音效与完整声音 QA；真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。图片仍仅到 `uploaded`，不会被当作已分析的事实；语音只有真实ASR与有声覆盖检查通过才会 `ready`。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、单测、目录规则或交付原型视频当作完整媒体验收。

@@ -83,3 +83,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T12发布边界增量：`qualityGate` 必检项降为warning/重复ruleId的红灯先失败后通过；`delivery.ts` 缺模块、`results/publish.ts` 缺模块的测试分别退出1后实现。14类基础QA规则与不可变策略hash、最终文件hash绑定，`not_checked`听验/版权和缺证据均阻断；静音N/A需要单独实际解码静音证据。原子发布核对 preview/approval/result、owner、文件实际存储字节hash、操作 fence 和 consentEpoch；测试覆盖错误bundle、取消后迟到产物、文件篡改、成功指针切换及重复提交。发布测试中100字节文件仅是哈希/CAS夹具，绝不是有效MP4或真实QA；没有对外发布入口。`npm test` 40文件180项、lint、build、构建后typecheck退出0。完整渲染、视觉/听验真实证据、媒体写入与下载闭环未实现，T12仍partial。
 
 2026-10-02 T13制作取消增量：`cancelProduction` 的新测试先因缺函数退出1；实现ProjectControl CAS先撤销制作授权、递增consentEpoch、记录cancelRequested并保留旧currentResult，再更新操作fence/状态；排队且未claim直接cancelled，运行中cancelling。重复取消不重复计数，旧操作不误伤新操作。现有取消API接入`scope=production`，AT-039迟到发布测试改为调用真实取消命令。`npm test` 40文件182项、lint、build、构建后typecheck均退出0。Docker容器停止/清理、render Worker、自然语言修改/恢复仍缺，T13部分实现。
+
+2026-10-02 T13/T14恢复上一版增量：`results/restore.ts` 缺模块测试先退出1；实现规范路径POST `/results/:artifactId/restore`，核对前版manifest、产物记录和磁盘真实字节hash后，CAS只交换current/previous指针并递增consentEpoch，不启动媒体任务。同command重试不再次翻转，错误artifact或篡改文件拒绝；`npm test` 40文件183项、lint、build、构建后typecheck退出0。测试仍使用合成文件作存储/CAS夹具，非真实成片；只支持上一版，历史多版本选择及UI/真实片验收未完成。

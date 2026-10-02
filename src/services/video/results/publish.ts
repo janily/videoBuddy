@@ -22,7 +22,7 @@ export async function readResultManifest(projects:ProjectStore,projectId:string,
  const result=Manifest.parse((await projects.store.readFresh<unknown>(key(projectId,resultId))).value);
  if(result.resultId!==resultId)throw Error('RESULT_INVALID');return result;
 }
-async function actualArtifactSha256(root:string,relative:string,expectedBytes:number){
+export async function actualArtifactSha256(root:string,relative:string,expectedBytes:number){
  if(!isAbsolute(root)||!/^projects\/[a-f0-9-]{36}\/artifacts\/[a-f0-9-]{36}\/files\/[A-Za-z0-9_-]+\.mp4$/.test(relative))throw Error('ARTIFACT_INVALID');
  const base=join(root,'objects'),path=join(base,relative),baseReal=await realpath(base),fileReal=await realpath(path),info=await lstat(path);
  if(!fileReal.startsWith(baseReal+'/')||!info.isFile()||info.isSymbolicLink()||info.nlink!==1||info.size!==expectedBytes)throw Error('ARTIFACT_INVALID');
