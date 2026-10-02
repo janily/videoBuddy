@@ -1,11 +1,13 @@
 import{z}from'zod';
 import{FactSchema,ObjectRefSchema,UnderstandingSchema,type ObjectRef}from'./domain';
 import{FilmSpecSchema,FilmTimelineSchema,validateFilmSpec,validateFilmTimeline,type TimelineReferences}from'./film';
+import{guardTreatment}from'./treatment';
 import{canonicalHash,canonicalJson}from'@/services/video/domain/hash';
 import type{AtomicStore}from'@/services/video/storage/atomic-store';
+import{getStyle}from'@/services/video/styles/registry';
 
 const id=z.string().min(1).max(120);
-export const TreatmentSchema=z.strictObject({schemaVersion:z.literal(1),summary:z.string().min(1),script:z.array(z.string().min(1)).min(1),factIds:z.array(id)});
+export const TreatmentSchema=z.strictObject({schemaVersion:z.literal(1),summary:z.string().min(1),script:z.array(z.string().min(1)).min(1),factIds:z.array(id),planRef:ObjectRefSchema});
 export const FactsManifestSchema=z.strictObject({schemaVersion:z.literal(1),facts:z.array(FactSchema)});
 export const AssetManifestSchema=z.strictObject({schemaVersion:z.literal(1),assets:z.array(z.strictObject({id:z.string().uuid(),analysisRef:ObjectRefSchema,rightsRef:ObjectRefSchema,usage:z.string().min(1)}))});
 export const SourceManifestSchema=z.strictObject({schemaVersion:z.literal(1),modules:z.array(z.strictObject({id,sourceRef:ObjectRefSchema})).min(1),actors:z.array(z.strictObject({id,sourceModuleId:id})),captionStyles:z.array(z.strictObject({id,styleRef:ObjectRefSchema}))});
@@ -41,6 +43,11 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
   if(!understood||!['provided','confirmed'].includes(fact.status)||canonicalHash(understood)!==canonicalHash(fact)||fact.sourceRefs.some(ref=>ref.type==='user_message'&&!messages.has(ref.id)||ref.type==='uploaded_material'&&!assetIds.has(ref.id))||fact.critical&&fact.sourceRefs.every(ref=>ref.type==='inferred_preference'))throw Error('FILM_FACT_INVALID');
  }
  if(treatment.factIds.some(id=>!factIds.has(id))||facts.facts.some(fact=>fact.mustInclude&&!treatment.factIds.includes(fact.id)))throw Error('FILM_FACT_INVALID');
+ const treatmentPlan=guardTreatment(await readVerifiedJson(store,treatment.planRef,revisionPrefix),understanding,getStyle(spec.style.slug).rulesHash);
+ const plannedFacts=[...new Set(treatmentPlan.shots.flatMap(shot=>shot.factIds))].sort();
+ if(treatment.summary!==treatmentPlan.summary||canonicalHash(treatment.script)!==canonicalHash(treatmentPlan.script)||canonicalHash([...treatment.factIds].sort())!==canonicalHash(plannedFacts)||treatmentPlan.shots.length!==timeline.shots.length||treatmentPlan.shots.some((shot,index)=>{
+  const rendered=timeline.shots[index];return shot.id!==rendered.id||shot.startFrame!==rendered.startFrame||shot.endFrame!==rendered.endFrame||canonicalHash([...shot.factIds].sort())!==canonicalHash([...rendered.factIds].sort());
+ }))throw Error('TREATMENT_TIMELINE_INVALID');
  const sourceIds=new Set(sources.modules.map(module=>module.id));
  for(const entry of sources.modules){const code=await readVerifiedJson(store,entry.sourceRef,revisionPrefix);parse(SourceCodeSchema,code)}
  for(const actor of sources.actors)if(!sourceIds.has(actor.sourceModuleId))throw Error('FILM_MANIFEST_INVALID');
@@ -55,5 +62,5 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  for(const source of audio.sources){await readVerifiedJson(store,source.sourceRef,revisionPrefix);const rights=parse(RightsSchema,await readVerifiedJson(store,source.rightsRef,revisionPrefix));if(rights.basis!==source.kind)throw Error('FILM_MANIFEST_INVALID')}
  const refs:TimelineReferences={sourceModules:sourceIds,actorIds:new Set(sources.actors.map(actor=>actor.id)),factIds,captionStyles:new Set(sources.captionStyles.map(style=>style.id)),audioSources:new Set(audio.sources.map(source=>source.id)),audioBuses:new Set(audio.buses.map(bus=>bus.id))};
  validateFilmTimeline(timeline,refs);validateFilmSpec(spec,timeline);
- return{filmSpec:spec,understanding,treatment,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio};
+ return{filmSpec:spec,understanding,treatment,treatmentPlan,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio};
 }
