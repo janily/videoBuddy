@@ -5,11 +5,12 @@ import {join} from 'node:path';
 import {assertMp4Faststart,validateVideoProbe} from '@/services/video/media/technical-qa';
 
 const expected={width:320,height:180,durationSec:1,fps:24,audio:false};
-const valid={streams:[{codec_type:'video',codec_name:'h264',pix_fmt:'yuv420p',color_primaries:'bt709',color_transfer:'bt709',color_space:'bt709',width:320,height:180,avg_frame_rate:'24/1'}],format:{duration:'1.000000'}};
+const valid={streams:[{codec_type:'video',codec_name:'h264',pix_fmt:'yuv420p',color_primaries:'bt709',color_transfer:'bt709',color_space:'bt709',width:320,height:180,avg_frame_rate:'24/1',nb_read_frames:'24'}],format:{duration:'1.000000'}};
 it('accepts a decoded video only when its actual metadata matches the render contract',()=>{
  expect(validateVideoProbe(valid,expected)).toMatchObject({width:320,height:180,durationSec:1,fps:24});
  expect(()=>validateVideoProbe({...valid,streams:[{...valid.streams[0],height:181}]},expected)).toThrow('QA_FAILED');
  expect(()=>validateVideoProbe({...valid,format:{duration:'0.500000'}},expected)).toThrow('QA_FAILED');
+ expect(()=>validateVideoProbe({...valid,streams:[{...valid.streams[0],nb_read_frames:'23'}]},expected)).toThrow('QA_FAILED');
  expect(()=>validateVideoProbe({...valid,streams:[{...valid.streams[0],color_space:'bt601'}]},expected)).toThrow('QA_FAILED');
  expect(()=>validateVideoProbe({...valid,streams:[{...valid.streams[0],pix_fmt:'yuv444p'}]},expected)).toThrow('QA_FAILED');
  expect(()=>validateVideoProbe({...valid,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac'}]},expected)).toThrow('QA_FAILED');

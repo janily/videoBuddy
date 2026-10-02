@@ -16,7 +16,7 @@ import {prepareVisualShotStage} from './visual-stage';
 
 type Qa=typeof technicalVideoQa;
 type Profile='full'|'probe';
-interface Options{root?:string;env?:Environment;executor?:MediaExecutor;qa?:Qa;profile?:Profile;pollMs?:number}
+interface Options{root?:string;env?:Environment;executor?:MediaExecutor;qa?:Qa;profile?:Profile;pollMs?:number;mustExist?:boolean}
 export interface PictureShotRecord{
  schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;visualSourceSha256:string;
  shotId:string;profile:Profile;stageKey:string;runtimeDigest:string;outputPath:string;
@@ -60,6 +60,7 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
   return record;
  }
  try{return await verify((await projects.store.readFresh<PictureShotRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
+ if(options.mustExist)throw Error('PICTURE_STAGE_MISSING');
  const executor=options.executor||new DockerExecutor(root),job:MediaJob={...parameters,operationId,attemptId:`picture-${profile}-${shotKey.slice(0,12)}`,stageKey};
  const handle=await executor.submit(job),deadline=Date.now()+config.timeoutSeconds*1000+30000,pollMs=options.pollMs??1000;
  let status=await executor.inspect(handle);

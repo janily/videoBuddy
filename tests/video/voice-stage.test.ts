@@ -16,6 +16,8 @@ import {prepareTimingStage} from '@/services/video/preview/timing-stage';
 import {prepareVisualShotStage} from '@/services/video/preview/visual-stage';
 import {preparePictureShotStage} from '@/services/video/preview/picture-stage';
 import type {MediaJob} from '@/services/video/media/executor';
+import {preparePictureSequenceStage} from '@/services/video/preview/picture-sequence-stage';
+import {pictureSequenceStageKey,type PictureSequenceInput} from '@/services/video/media/picture-sequence';
 
 function wav(){
  const data=Buffer.alloc(24000*4);
@@ -67,14 +69,21 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect(await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true})).toEqual(visual);
   expect(visualCalls).toBe(1);
   let submitted:MediaJob|undefined,qaHash='e'.repeat(64),renderCalls=0;
+  await expect(preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true,env:{VIDEO_MEDIA_IMAGE_REF:`sha256:${'a'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'120'}})).rejects.toThrow('PICTURE_STAGE_MISSING');
   const pictureOptions={root,env:{VIDEO_DATA_DIR:root,VIDEO_MEDIA_IMAGE_REF:`sha256:${'a'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'120'},pollMs:1,
    executor:{submit:async(job:MediaJob)=>{submitted=job;renderCalls++;return{containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}},inspect:async()=>({status:'succeeded' as const,outputs:['output/picture.mp4']}),cancel:async()=>({status:'cancelled' as const})},
-   qa:async(_dir:string,_image:string,_path:string,expected:{width:number;height:number;durationSec:number;fps:number;audio:boolean})=>({result:'pass' as const,sha256:qaHash,bytes:1234,...expected})};
+   qa:async(_dir:string,_image:string,_path:string,expected:{width:number;height:number;durationSec:number;fps:number;audio:boolean})=>({result:'pass' as const,sha256:qaHash,bytes:1234,frames:Math.round(expected.durationSec*expected.fps),...expected})};
   const picture=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions);
   expect(submitted).toMatchObject({startFrame:0,endFrame:480,logicalWidth:1920,logicalHeight:1080,outputWidth:1920,outputHeight:1080,fps:24});
   expect(picture.technicalQa).toMatchObject({durationSec:20,sha256:'e'.repeat(64)});
   expect(await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).toEqual(picture);
   expect(renderCalls).toBe(1);
+  let assemblyCalls=0;
+  const sequenceOptions={root,env:pictureOptions.env,qa:pictureOptions.qa,assemble:async(_root:string,input:PictureSequenceInput)=>{assemblyCalls++;const stageKey=pictureSequenceStageKey(input);return{stageKey,outputPath:join(root,'picture-sequence',stageKey,'output','picture.mp4'),technicalQa:{result:'pass' as const,sha256:qaHash,bytes:1234,width:1920,height:1080,durationSec:20,fps:24,frames:480,audio:false},totalFrames:480}}};
+  const sequence=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,0,treatmentRef,sequenceOptions);
+  expect(sequence.totalFrames).toBe(480);
+  expect(await preparePictureSequenceStage(projects,projectId,revisionId,operationId,0,treatmentRef,sequenceOptions)).toEqual(sequence);
+  expect(assemblyCalls).toBe(1);
   qaHash='f'.repeat(64);
   await expect(preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).rejects.toThrow('PICTURE_OUTPUT_CHANGED');
   const archivedSource=await projects.store.readFresh<{sourceHtml:string}>(visual.sourceRef.key);

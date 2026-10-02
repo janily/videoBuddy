@@ -6,15 +6,15 @@ import {isAbsolute,join} from 'node:path';
 import {z} from 'zod';
 import {validateOutputPath} from './executor';
 
-const probeSchema=z.object({streams:z.array(z.object({codec_type:z.string(),codec_name:z.string(),width:z.number().optional(),height:z.number().optional(),avg_frame_rate:z.string().optional(),pix_fmt:z.string().optional(),color_primaries:z.string().optional(),color_transfer:z.string().optional(),color_space:z.string().optional(),sample_rate:z.string().optional(),channels:z.number().optional()})),format:z.object({duration:z.string()})});
+const probeSchema=z.object({streams:z.array(z.object({codec_type:z.string(),codec_name:z.string(),width:z.number().optional(),height:z.number().optional(),avg_frame_rate:z.string().optional(),nb_read_frames:z.string().optional(),pix_fmt:z.string().optional(),color_primaries:z.string().optional(),color_transfer:z.string().optional(),color_space:z.string().optional(),sample_rate:z.string().optional(),channels:z.number().optional()})),format:z.object({duration:z.string()})});
 export interface ExpectedVideo{width:number;height:number;durationSec:number;fps:number;audio:boolean}
 export function validateVideoProbe(raw:unknown,expected:ExpectedVideo){
  const probe=probeSchema.parse(raw),video=probe.streams.filter(stream=>stream.codec_type==='video'),audio=probe.streams.filter(stream=>stream.codec_type==='audio');
- const duration=Number(probe.format.duration),rate=video[0]?.avg_frame_rate?.split('/').map(Number),fps=rate?.length===2?rate[0]/rate[1]:NaN;
+ const duration=Number(probe.format.duration),rate=video[0]?.avg_frame_rate?.split('/').map(Number),fps=rate?.length===2?rate[0]/rate[1]:NaN,frames=Number(video[0]?.nb_read_frames),expectedFrames=Math.round(expected.durationSec*expected.fps);
  if(video.length!==1||video[0].codec_name!=='h264'||video[0].pix_fmt!=='yuv420p'||video[0].color_primaries!=='bt709'||video[0].color_transfer!=='bt709'||video[0].color_space!=='bt709'||video[0].width!==expected.width||video[0].height!==expected.height||
   audio.length!==(expected.audio?1:0)||(expected.audio&&(audio[0].codec_name!=='aac'||audio[0].sample_rate!=='48000'||![1,2].includes(audio[0].channels??0)))||!Number.isFinite(duration)||Math.abs(duration-expected.durationSec)>1/expected.fps||
-  !Number.isFinite(fps)||Math.abs(fps-expected.fps)>0.001)throw Error('QA_FAILED: media metadata');
- return{width:video[0].width,height:video[0].height,durationSec:duration,fps,audio:audio.length===1};
+  !Number.isFinite(fps)||Math.abs(fps-expected.fps)>0.001||!Number.isSafeInteger(frames)||frames!==expectedFrames||Math.abs(expected.durationSec*expected.fps-expectedFrames)>0.001)throw Error('QA_FAILED: media metadata');
+ return{width:video[0].width,height:video[0].height,durationSec:duration,fps,frames,audio:audio.length===1};
 }
 export async function assertMp4Faststart(path:string,size:number){
  const file=await open(path,'r');let offset=0,ftyp=false,moov=false,mdat=false;
@@ -57,7 +57,7 @@ export async function technicalVideoQa(stageDir:string,image:string,outputRelati
  const hash=createHash('sha256');for await(const chunk of createReadStream(filePath))hash.update(chunk);
  const mount=`type=bind,src=${stageDir},dst=/input,readonly`;
  const prefix=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--mount',mount,image];
- const raw=await docker([...prefix,'ffprobe','-v','error','-show_entries','stream=codec_type,codec_name,width,height,avg_frame_rate,pix_fmt,color_primaries,color_transfer,color_space,sample_rate,channels:format=duration','-of','json',`/input/${outputRelative}`]);
+ const raw=await docker([...prefix,'ffprobe','-v','error','-count_frames','-show_entries','stream=codec_type,codec_name,width,height,avg_frame_rate,nb_read_frames,pix_fmt,color_primaries,color_transfer,color_space,sample_rate,channels:format=duration','-of','json',`/input/${outputRelative}`]);
  const metadata=validateVideoProbe(JSON.parse(raw),expected);
  await docker([...prefix,'ffmpeg','-nostdin','-v','error','-xerror','-threads','2','-filter_threads','2','-i',`/input/${outputRelative}`,'-map','0','-f','null','-']);
  return{result:'pass' as const,sha256:hash.digest('hex'),bytes:file.size,...metadata};

@@ -1,0 +1,43 @@
+{
+  "technicalProbeOnly": true,
+  "shots": [
+    {
+      "shotId": "shot-0",
+      "startFrame": 0,
+      "endFrame": 240,
+      "stageKey": "c2bc8cc76eba08f5b124b36747da7ba372854f54fdf92a79af03ec49c383e433",
+      "sha256": "0564dc67f6161235ab0fdcb5a95624fe8493923d82feb4a7568903744d1fe92f"
+    },
+    {
+      "shotId": "shot-1",
+      "startFrame": 240,
+      "endFrame": 480,
+      "stageKey": "75f269e8003cf1f4511713dcf4c126cf1c0a4ae432b459bd5e4bd048a53ac171",
+      "sha256": "5c9e369ecd56560a06d2b9288022c48f60f08c25fadaa3057de2799c00291262"
+    }
+  ],
+  "stageKey": "7c3a5b78a3838a5a427b75cff8a76657e62f4151b03a15bf7ceaba04e3ecb7ba",
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "8b0305e11316c3cb7d45b08801f8840a3c039d5aa9a903cba1edf6cf247ba726",
+    "bytes": 19057,
+    "width": 320,
+    "height": 180,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": false
+  },
+  "centerPixelAt5Seconds": [
+    176,
+    74,
+    28
+  ],
+  "centerPixelAt15Seconds": [
+    26,
+    83,
+    172
+  ],
+  "replayIdentical": true,
+  "limits": "Two synthetic 320x180 Docker scenes; no model output, user assets, 1080p, style QA, audio, subtitles or preview publication."
+}

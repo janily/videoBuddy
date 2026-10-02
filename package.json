@@ -19,6 +19,7 @@
     "worker": "tsx scripts/video/worker.ts",
     "worker:sources": "tsx scripts/video/source-worker.ts",
     "probe:video:media": "tsx scripts/video/probe-media.ts",
+    "probe:video:picture-sequence": "tsx scripts/video/probe-picture-sequence.ts",
     "probe:video:pdf": "tsx scripts/video/probe-pdf.ts",
     "probe:video:source-audio": "tsx scripts/video/probe-source-audio.ts",
     "probe:video:voice": "tsx scripts/video/probe-voice.ts",

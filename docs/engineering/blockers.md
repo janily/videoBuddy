@@ -21,3 +21,5 @@ T10/T11 项目语音阶段已用离线固定镜像完成真实TTS、ASR、WAV字
 T10/T11 项目 TimingDraft 已把冻结镜头与真实48 kHz旁白轨、字幕帧、固定字体摘要绑定；20秒技术brief及相同阶段重放实际通过，见 [timing-stage-probe.json](evidence/timing-stage-probe.json)。仍未生成或验证Visual源码及最终FilmTimeline，也未有实际预览MP4与音乐/音效/用户听验；不能把TimingDraft当作媒体成片。
 
 T09/T11 画面阶段已能只读取冻结Visual源码，并用固定Docker镜像渲染单镜全部帧；20秒/480帧/320×180技术场景经独立MP4全片解码、BT.709与文件哈希检查，见 [picture-stage-probe.json](evidence/picture-stage-probe.json)。这不解除真实Visual模型、已上传素材送入隔离容器、1080p、43风格视觉QA、音画合成、预览Worker/API或用户审批的阻断；含素材源码当前明确失败，不能静默漏用素材。生产画面任务的已退出容器清理/崩溃恢复仍待Worker接入。
+
+T09/T11 两镜头技术拼接已实际通过20秒480帧全解码、逐帧计数、输入哈希、前后抽帧像素及重放；项目持久阶段只读已完成镜头，见 [picture-sequence-probe.json](evidence/picture-sequence-probe.json)。底层真实探针与项目阶段注入测试还未组成同一次真实项目流程；音轨/字幕、预览发布和正式渲染Worker仍未接通，不解除视频闭环阻断。
