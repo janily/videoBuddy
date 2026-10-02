@@ -1,8 +1,30 @@
 {
   "runtimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+  "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
   "provider": "kokoro-js@1.2.4",
   "offline": true,
   "network": "none",
+  "narrationPlan": {
+    "durationMs": 20000,
+    "lines": [
+      {
+        "lineId": "probe_zh",
+        "startMs": 1000,
+        "reservedMs": 6000,
+        "actualDurationMs": 4100,
+        "asrStatus": "not_checked",
+        "wordTimingsStatus": "not_checked"
+      },
+      {
+        "lineId": "probe_en",
+        "startMs": 8000,
+        "reservedMs": 6000,
+        "actualDurationMs": 3700,
+        "asrStatus": "not_checked",
+        "wordTimingsStatus": "not_checked"
+      }
+    ]
+  },
   "chinese": {
     "text": "上海的活动将在十月八日开始。",
     "voice": "zf_001",
@@ -12,9 +34,9 @@
     "samples": 98400,
     "durationMs": 4100,
     "bytes": 393644,
-    "sha256": "bee201e9898c86ff9634a5b00deab3e71e1c7af43c92d431f198676964db9d59",
-    "peakDbfs": -9.43463858576704,
-    "rmsDbfs": -24.38691420287332
+    "sha256": "39468604ede634cc916a2428618f2f841109155740f570f2f2218185a5509788",
+    "peakDbfs": -9.355856180215321,
+    "rmsDbfs": -24.38366442193073
   },
   "english": {
     "text": "The event in Shanghai begins on October eighth.",
@@ -25,10 +47,36 @@
     "samples": 88800,
     "durationMs": 3700,
     "bytes": 355244,
-    "sha256": "80241d96b8d748f512ed6cdd7ea52db55b6b2c8842a78f950bf33aa11ebecfec",
-    "peakDbfs": -12.01763107680522,
-    "rmsDbfs": -28.428589501534702
+    "sha256": "d6e72b3ef62fe43833c5b5c74dbafee4550dd6dc69634947cb219421cb3b4ecf",
+    "peakDbfs": -12.25917098015573,
+    "rmsDbfs": -28.43100011740683
+  },
+  "track": {
+    "kind": "narration_only",
+    "qaStatus": "not_checked",
+    "codec": "pcm_f32le",
+    "sampleRate": 48000,
+    "channels": 1,
+    "samples": 960000,
+    "durationMs": 20000,
+    "bytes": 3840114,
+    "sha256": "6f52ac52af165f6603f878897b6fb41906b4aa3685b9a34426269dfc21da1512",
+    "peakDbfs": -9.278176650459004,
+    "rmsDbfs": -29.94602390440913,
+    "silence": false,
+    "windowRms": {
+      "before": 0,
+      "chinese": 0.0663169849605281,
+      "between": 0,
+      "english": 0.042266604223830544,
+      "after": 0
+    }
+  },
+  "intentionalSilence": {
+    "samples": 960000,
+    "durationMs": 20000,
+    "silence": true
   },
   "sameStageReplay": true,
-  "limits": "WAV format, non-silence, hash and duration checked; speech recognition, intelligibility, alignment and 48 kHz mix not checked"
+  "limits": "WAV format, non-silence, hash, duration and 48 kHz narration-only track checked; speech recognition, intelligibility, alignment, music, loudness and final mix QA not checked"
 }
