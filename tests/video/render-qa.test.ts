@@ -16,6 +16,7 @@ import{commitPreviewBundle}from'@/services/video/preview/commit';
 import{approvePreview}from'@/services/video/preview/approve';
 import{publishResult}from'@/services/video/results/publish';
 import type{ProjectControl}from'@/contracts/video/project';
+import{cancelProduction}from'@/services/video/commands/cancel';
 
 const evidence=(ruleId:string):QualityCheck=>({ruleId,result:'pass',severity:'blocking',evidenceRefs:[`qa/${ruleId}/actual`]});
 const baseline=['decode','media_metadata','duration','file_hash','source_integrity','resource_ready','license','critical_facts','visual_review','listening_review','loudness','true_peak','subtitle_sync','font_coverage'];
@@ -65,7 +66,7 @@ it('AT-037/039 publishes only the approved bundle and rejects a late result afte
  const{dir,projects,owner,projectId,approved,result}=await preparedRender();
  try{
   await expect(publishResult(projects,owner,projectId,approved.operationId!,0,{...result,bundleHash:'9'.repeat(64)},dir)).rejects.toThrow('PREVIEW_STALE');
-  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,consentEpoch:c.consentEpoch+1,activeProduction:null,phase:'cancelled' as const}));
+  expect(await cancelProduction(projects.store,projectId,approved.operationId!)).toBe('cancelling');
   await expect(publishResult(projects,owner,projectId,approved.operationId!,0,result,dir)).rejects.toThrow('PUBLISH_FENCED');
   expect((await projects.access(owner,projectId)).currentResultId).toBeUndefined();
  }finally{await rm(dir,{recursive:true,force:true})}

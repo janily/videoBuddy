@@ -22,6 +22,8 @@ T11 预览基础设施增量：`createPreviewBundle` 将 FilmSpec、完整脚本
 
 T12 发布边界增量：通用 `qualityGate` 已拒绝将必检项降为 warning 或重复同一 ruleId；`validateDelivery` 强制14类基础报告、锁定的质量策略摘要、最终文件摘要，未听验/未核版权/缺证据均阻断；静音 N/A 需额外 `decoded_silence` 通过且留证。`publishResult` 核对不可变 preview/approval/result 的 hash 和 owner、实际存储文件字节 SHA、操作 fence/consentEpoch，再以 ProjectControl CAS 切换结果指针；ProjectView 可投影当前/上一结果。局部测试先因缺模块和 warning 漏洞退出1，随后通过；全套 `npm test` 40文件180项、lint、build、构建后typecheck均退出0。发布测试中的100字节“媒体”只是验证 CAS 与哈希拒绝路径的夹具，绝非真实影片/真实 QA；本模块尚无对外发布入口，真实渲染、独立视觉/听验报告来源、完整产物写入与下载闭环未接通，T12仍partial。
 
+T13 取消制作增量：现有 `/operations/:id/cancel` 已支持 `scope=production`；服务先通过 ProjectControl CAS 撤销活跃制作槽、递增 consentEpoch、记录 cancelRequested，再改变操作 fence/状态。排队未 claim 的任务会直接取消，运行任务进入 `cancelling`；重复请求不重复递增，旧操作不能取消新操作或原结果。AT-039 从模拟控制态变化改为实际调用 `cancelProduction`，迟到发布被拒。`npm test` 40文件182项、lint、build、构建后typecheck均退出0。运行中媒体容器的停止/清理和状态终结仍待 render Worker 集成，T13仍partial。
+
 主要缺项：T05 扫描 PDF、图片、配乐/环境声及长音频用户实录的可靠解读，超长 Markdown/PDF 的分段检索；Visual/Audio/Critic 及16行为评估；T10 的特殊词发音复核、可靠字幕对齐、配乐音效与完整声音 QA；真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。图片仍仅到 `uploaded`，不会被当作已分析的事实；语音只有真实ASR与有声覆盖检查通过才会 `ready`。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、单测、目录规则或交付原型视频当作完整媒体验收。

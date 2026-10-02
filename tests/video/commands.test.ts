@@ -68,3 +68,21 @@ it('cancellation before canonical claim finalizes without holding the chat lane'
  expect((await store.readFresh<{activeConversation:null}>('projects/p/control')).value.activeConversation).toBeNull();
  expect((await claimOperation(store,'projects/p/operations/op','late-run')).claimed).toBe(false);
 });
+it('production cancellation fences the project before a queued render can claim, and is idempotent',async()=>{
+ const {cancelProduction}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
+ await store.create('projects/p/control',{controlVersion:1,consentEpoch:4,phase:'rendering',previewState:'ready',activeProduction:'op',currentResultId:'old'});
+ await store.create('projects/p/operations/op',{status:'reserved',fence:0,canonicalRunId:null});
+ expect(await cancelProduction(store,'p','op')).toBe('cancelled');
+ const control=(await store.readFresh<{consentEpoch:number;activeProduction:null;currentResultId:string;previewState:string}>('projects/p/control')).value;
+ expect(control).toMatchObject({consentEpoch:5,activeProduction:null,currentResultId:'old',previewState:'stale'});
+ expect((await claimOperation(store,'projects/p/operations/op','late-run')).claimed).toBe(false);
+ expect(await cancelProduction(store,'p','op')).toBe('cancelled');
+ expect((await store.readFresh<{consentEpoch:number}>('projects/p/control')).value.consentEpoch).toBe(5);
+});
+it('stale production cancel cannot revoke a newer operation or old result',async()=>{
+ const {cancelProduction}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
+ await store.create('projects/p/control',{controlVersion:2,consentEpoch:5,phase:'rendering',previewState:'ready',activeProduction:'new',currentResultId:'old'});
+ await store.create('projects/p/operations/old',{status:'succeeded',fence:0,canonicalRunId:'old'});
+ expect(await cancelProduction(store,'p','old')).toBe('already_completed');
+ expect((await store.readFresh<{consentEpoch:number;activeProduction:string;currentResultId:string}>('projects/p/control')).value).toMatchObject({consentEpoch:5,activeProduction:'new',currentResultId:'old'});
+});
