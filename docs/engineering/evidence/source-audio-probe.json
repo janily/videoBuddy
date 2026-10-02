@@ -1,0 +1,26 @@
+{
+  "sourceKind": "fresh offline TTS WAV uploaded as speech-intended asset; not a user recording",
+  "sourceSha256": "58d2924cc05f4790912f2d73819eea282074fad29b811d421e5ee387e396d80b",
+  "sourceBytes": 393644,
+  "sourceDurationMs": 4100,
+  "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+  "convertedWavSha256": "8ef6a0250d391e600d5574193e6313374c5ff7bf808bf1090cd27b383e545616",
+  "detectedLanguage": "zh-CN",
+  "segments": [
+    {
+      "startMs": 0,
+      "endMs": 3080,
+      "text": "上海的活动将在10月8日开始。"
+    }
+  ],
+  "assetStatus": "ready",
+  "briefVersion": 1,
+  "inputPending": false,
+  "musicIntent": {
+    "status": "failed",
+    "errorCode": "AUDIO_MUSIC_UNSUPPORTED",
+    "inputPending": false
+  },
+  "limits": "Short clean speech under 30 seconds only; music intent is explicitly unsupported, not turned into factual ASR; no ambient sound, long audio or human recording validated"
+}

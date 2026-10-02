@@ -1,10 +1,10 @@
 {
   "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
   "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
-  "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+  "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
   "sourceKind": "deterministic technical scene; not a model-generated user film",
   "pictureStageKey": "537507ac86a62a12ff321373a5393b8f690bcc36a44eb711fb86bab234d25d10",
-  "trackSha256": "b906cae578b15db8a4a25be153fd85edbea95d0e3458321d9f10e880930c5395",
+  "trackSha256": "96541de6bdd022adc3586514a1ecb0e43142ec1f6d4763217c8f693155f5b60c",
   "subtitleCues": [
     {
       "lineId": "composition_zh",
@@ -21,8 +21,8 @@
   ],
   "fontCharsetSha256": "520335296aaf1ae3c73fc85b3c1b5276af285d1be41256ac2f239b3aead62525",
   "output": {
-    "sha256": "d4ceb537c756a75d70019c74b1d4dd59a861273d7100e1eb4988dc08ab7b976f",
-    "bytes": 175825,
+    "sha256": "ca3ca9a0cd905ffa7a3971a0937e619b94b5f792505f4771dc2b072a7f798a52",
+    "bytes": 175506,
     "width": 320,
     "height": 180,
     "durationSec": 20,
@@ -32,21 +32,21 @@
   },
   "postMixAsr": {
     "status": "pass",
-    "filmSha256": "d4ceb537c756a75d70019c74b1d4dd59a861273d7100e1eb4988dc08ab7b976f",
+    "filmSha256": "ca3ca9a0cd905ffa7a3971a0937e619b94b5f792505f4771dc2b072a7f798a52",
     "lines": [
       {
         "lineId": "composition_zh",
         "recognizedText": "上海的活動將在10月8日開始",
-        "sourceSha256": "b5ca57ebe66f54d6c71e6280059e492009a70d819a0418ffd41f0c87440e1868",
-        "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+        "sourceSha256": "473217bb9ff1bb34cfd038e35a3331bd09b9f76a492df76e46c3d0a85c86f882",
+        "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 12,
         "status": "pass"
       },
       {
         "lineId": "composition_en",
         "recognizedText": "The event starts in Shanghai.",
-        "sourceSha256": "5ec96df846546bd58bf0002545b32db281369afaed3415fa894faaf3c1b50c17",
-        "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+        "sourceSha256": "15f5a6bdfdbfd437a3e8c85e09fb7fe83c74e9db1de9e44bed8f3410861b6e9d",
+        "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 5,
         "status": "pass"
       }
@@ -54,9 +54,9 @@
   },
   "loudness": {
     "status": "pass",
-    "filmSha256": "d4ceb537c756a75d70019c74b1d4dd59a861273d7100e1eb4988dc08ab7b976f",
+    "filmSha256": "ca3ca9a0cd905ffa7a3971a0937e619b94b5f792505f4771dc2b072a7f798a52",
     "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
-    "integratedLufs": -14.41,
+    "integratedLufs": -14.44,
     "truePeakDbtp": -1.49,
     "targetLufs": -14,
     "toleranceLu": 1,

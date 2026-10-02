@@ -15,78 +15,78 @@
           "text": "上",
           "startMs": 0,
           "endMs": 480,
-          "probability": 0.9554223418235779
+          "probability": 0.9439679384231567
         },
         {
           "text": "海",
           "startMs": 480,
           "endMs": 700,
-          "probability": 0.9995487332344055
+          "probability": 0.9994964599609375
         },
         {
           "text": "的",
           "startMs": 700,
           "endMs": 820,
-          "probability": 0.9736367464065552
+          "probability": 0.9733023643493652
         },
         {
           "text": "活",
           "startMs": 820,
           "endMs": 1020,
-          "probability": 0.9995747208595276
+          "probability": 0.9995926022529602
         },
         {
           "text": "动",
           "startMs": 1020,
           "endMs": 1280,
-          "probability": 0.5107705593109131
+          "probability": 0.3898506462574005
         },
         {
           "text": "将",
           "startMs": 1280,
           "endMs": 1700,
-          "probability": 0.9266935586929321
+          "probability": 0.9112001657485962
         },
         {
           "text": "在",
           "startMs": 1700,
           "endMs": 1900,
-          "probability": 0.9974129796028137
+          "probability": 0.9976553916931152
         },
         {
           "text": "10",
           "startMs": 1900,
           "endMs": 2180,
-          "probability": 0.9658721089363098
+          "probability": 0.9668106436729431
         },
         {
           "text": "月",
           "startMs": 2180,
           "endMs": 2360,
-          "probability": 0.9751137495040894
+          "probability": 0.9738711714744568
         },
         {
           "text": "8",
           "startMs": 2360,
           "endMs": 2600,
-          "probability": 0.9835794568061829
+          "probability": 0.984931230545044
         },
         {
           "text": "日",
           "startMs": 2600,
-          "endMs": 2820,
-          "probability": 0.9989595413208008
+          "endMs": 2800,
+          "probability": 0.9990673661231995
         },
         {
           "text": "开始。",
-          "startMs": 2820,
+          "startMs": 2800,
           "endMs": 3100,
-          "probability": 0.9870890974998474
+          "probability": 0.9878684878349304
         }
       ],
-      "voiceSha256": "75dd6071fd3f99e2322ddca00f9256bb9274a7e47b44a01a8f7b8994d960eb8b",
+      "voiceSha256": "7f302f83b998dc8324a93f39b81e36fa7d6e5f24854e26a1e995e0730878cace",
       "voiceDurationMs": 4100,
-      "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
       "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
       "status": "pass",
       "wordTimingsStatus": "available",
@@ -103,41 +103,41 @@
           "text": " The",
           "startMs": 0,
           "endMs": 320,
-          "probability": 0.9388185143470764
+          "probability": 0.9495928287506104
         },
         {
           "text": " event",
           "startMs": 320,
           "endMs": 580,
-          "probability": 0.9723600149154663
+          "probability": 0.9712783694267273
         },
         {
           "text": " starts",
           "startMs": 580,
           "endMs": 920,
-          "probability": 0.996634304523468
+          "probability": 0.9966377019882202
         },
         {
           "text": " in",
           "startMs": 920,
           "endMs": 1180,
-          "probability": 0.9971844553947449
+          "probability": 0.997461199760437
         },
         {
           "text": " Shanghai.",
           "startMs": 1180,
-          "endMs": 1420,
-          "probability": 0.9844014048576355
+          "endMs": 1440,
+          "probability": 0.9840776920318604
         }
       ],
-      "voiceSha256": "dceedf0c510f4a31840d310941d4a96fa4bb438515668cce5a4fee91602085ed",
+      "voiceSha256": "5174e2a64ecb7239cefe9a645d3e8c77afa54216572f18a35e9577c45aa8ba1e",
       "voiceDurationMs": 2500,
-      "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
       "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
       "status": "pass",
       "wordTimingsStatus": "available",
       "sameStageReplay": true
     }
   ],
-  "limits": "Short clean synthetic speech only; model fallibility, unusual names, final mixed-audio ASR and listening QA remain unchecked"
+  "limits": "Short clean synthetic speech only; model fallibility, unusual names, long or user-supplied mixed audio and listening QA remain unchecked"
 }

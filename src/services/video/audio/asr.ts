@@ -36,10 +36,10 @@ async function runAsr(args:string[]){
  if(code!==0||size>1024*1024)throw Error(`ASR_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,300)}`);
  return Buffer.concat(output).toString('utf8').trim();
 }
-export interface AsrAudioInput{language:'zh-CN'|'en';outputPath:string;wav:VoiceWavProbe}
+export interface AsrAudioInput{language:'zh-CN'|'en'|'auto';outputPath:string;wav:VoiceWavProbe}
 function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typeof asrConfiguration>):AsrTranscript{
  const parsed=transcriptSchema.parse(JSON.parse(raw));
- if(parsed.language!==voice.language||parsed.segments.length===0)throw Error('ASR_OUTPUT_INVALID');
+ if(voice.language!=='auto'&&parsed.language!==voice.language||parsed.segments.length===0)throw Error('ASR_OUTPUT_INVALID');
  let last=0;
  for(const segment of parsed.segments){
   if(segment.startMs<last||segment.endMs<segment.startMs||segment.endMs>voice.wav.durationMs+1000)throw Error('ASR_OUTPUT_INVALID');
@@ -50,7 +50,7 @@ function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typ
  if(!recognizedText)throw Error('ASR_OUTPUT_INVALID');
  return{...parsed,voiceSha256:voice.wav.sha256,runtimeDigest:config.runtimeDigest,recognizedText};
 }
-export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix',env:Environment=process.env):Promise<AsrTranscript>{
+export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env):Promise<AsrTranscript>{
  if(!isAbsolute(root))throw Error('ASR_JOB_INVALID');
  const rel=relative(join(root,sourceDirectory),voice.outputPath);
  if(!isAbsolute(voice.outputPath)||rel.startsWith('..')||isAbsolute(rel))throw Error('ASR_JOB_INVALID');

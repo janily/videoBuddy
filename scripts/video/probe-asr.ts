@@ -25,7 +25,7 @@ async function main(){
    outputs.push({language:job.language,spokenText:job.text,expectedAsrText:job.expected,recognizedText:line.recognizedText,wordCount:line.wordTimings.length,words:line.wordTimings,voiceSha256:voice.wav.sha256,voiceDurationMs:voice.wav.durationMs,asrRuntimeDigest:transcript.runtimeDigest,voiceRuntimeDigest:voice.runtimeDigest,status:line.asrStatus,wordTimingsStatus:line.wordTimingsStatus,sameStageReplay:true});
   }
   if(!wrongDateRejected)throw Error('ASR_PROBE_FAILED: incorrect date passed');
-  const evidence={model:'Systran/faster-whisper-small@2ec96c5472da50d38d40c0cfe0602af2e94b4c8a',network:'none',inputBlind:true,wrongDateRejected,outputs,limits:'Short clean synthetic speech only; model fallibility, unusual names, final mixed-audio ASR and listening QA remain unchecked'};
+  const evidence={model:'Systran/faster-whisper-small@2ec96c5472da50d38d40c0cfe0602af2e94b4c8a',network:'none',inputBlind:true,wrongDateRejected,outputs,limits:'Short clean synthetic speech only; model fallibility, unusual names, long or user-supplied mixed audio and listening QA remain unchecked'};
   if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/asr-probe.json',JSON.stringify(evidence,null,2)+'\n');
   process.stdout.write(JSON.stringify(evidence)+'\n');
  }finally{await rm(root,{recursive:true,force:true})}
