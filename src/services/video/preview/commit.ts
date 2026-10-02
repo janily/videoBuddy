@@ -5,12 +5,14 @@ import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomi
 import{inspectArtifact}from '@/services/video/exports/access';
 import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{assertPreviewArtifact,verifyPreviewBundle,type PreviewBundle}from './bundle';
+import{verifyPreviewPackage}from './package';
 
 function key(projectId:string,previewId:string){return`projects/${projectId}/previews/${previewId}/manifest`}
 
 export async function readPreviewBundle(projects:ProjectStore,projectId:string,previewId:string):Promise<PreviewBundle>{
  const bundle=(await projects.store.readFresh<PreviewBundle>(key(projectId,previewId))).value;
  if(bundle.previewId!==previewId||!verifyPreviewBundle(bundle))throw Error('PREVIEW_BUNDLE_INVALID');
+ await verifyPreviewPackage(projects,projectId,bundle);
  return bundle;
 }
 
@@ -20,6 +22,7 @@ export async function commitPreviewBundle(projects:ProjectStore,projectId:string
  if(artifact.revisionId!==bundle.revisionId||artifact.objectRef.mime!=='video/mp4'||artifact.objectRef.sha256!==bundle.previewArtifactSha256)throw Error('PREVIEW_ARTIFACT_MISMATCH');
  const actual=await actualArtifactSha256(storageRoot,artifact.objectRef.key,artifact.objectRef.bytes).catch(()=>{throw Error('PREVIEW_ARTIFACT_MISMATCH')});
  assertPreviewArtifact(bundle,actual);
+ await verifyPreviewPackage(projects,projectId,bundle);
  if(bundle.expiresAt<=new Date().toISOString())throw Error('PREVIEW_STALE');
  const stored=await createOrRead(projects.store,key(projectId,bundle.previewId),bundle);
  if(canonicalHash(stored)!==canonicalHash(bundle))throw Error('PREVIEW_ID_CONFLICT');

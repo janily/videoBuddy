@@ -11,7 +11,7 @@ import{FileStore}from'@/services/video/storage/file-store';
 import{ProjectStore}from'@/services/video/storage/project-store';
 import{LocalOperationQueue}from'@/services/video/commands/local-queue';
 import{updateJson}from'@/services/video/storage/atomic-store';
-import{createPreviewBundle}from'@/services/video/preview/bundle';
+import{seedPreviewBundle}from'./fixtures/preview-package';
 import{commitPreviewBundle}from'@/services/video/preview/commit';
 import{approvePreview}from'@/services/video/preview/approve';
 import{publishResult}from'@/services/video/results/publish';
@@ -44,13 +44,9 @@ async function preparedRender(){
  const dir=await mkdtemp(join(tmpdir(),'vb-publish-'));
   const projects=new ProjectStore(new FileStore(dir)),queue=new LocalOperationQueue(projects.store,dir),owner='owner';
   const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
-  const prepareId=randomUUID(),sha=(x:string)=>x.repeat(64);
+  const prepareId=randomUUID();
   const previewMedia=Buffer.alloc(100);previewMedia.write('ftyp',4);const previewSha=createHash('sha256').update(previewMedia).digest('hex');
-  const bundle=createPreviewBundle({previewId:randomUUID(),revisionId:randomUUID(),briefVersion:1,
-   filmSpecRef:{key:`projects/${projectId}/film`,sha256:sha('a'),bytes:100,mime:'application/json'},
-   renderInputs:{sourceCodeSha256:sha('b'),timelineSha256:sha('c'),audioSha256:sha('d'),assetSha256s:[],fontSha256s:[sha('e')],profile:{width:1920,height:1080,fps:24},runtimeDigests:{media:sha('f')},qualityPolicySha256:canonicalHash(policy)},
-   script:['真实创作内容'],facts:[],criticalFacts:[],summary:'预览',previewArtifactId:randomUUID(),previewArtifactSha256:previewSha,
-   excerptMap:[{previewStartMs:0,previewEndMs:8000,sourceStartMs:0,sourceEndMs:8000,shotId:'shot'}],sourceDurationMs:20000,qualityEvidenceRefs:['qa/preview']});
+  const bundle=await seedPreviewBundle(projects,{projectId,briefVersion:1,durationSec:20,script:['真实创作内容'],factTexts:[],summary:'预览',previewArtifactSha256:previewSha,qualityPolicySha256:canonicalHash(policy)});
   const previewKey=`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files/preview.mp4`;
   await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files`),{recursive:true});await writeFile(join(dir,'objects',previewKey),previewMedia);
   await projects.store.create(`projects/${projectId}/artifacts/${bundle.previewArtifactId}/manifest`,{id:bundle.previewArtifactId,revisionId:bundle.revisionId,objectRef:{key:previewKey,sha256:previewSha,bytes:previewMedia.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'preview.mp4'});
