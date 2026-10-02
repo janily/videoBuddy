@@ -44,4 +44,6 @@ T11 真实节选渲染增量：`renderPreviewExcerpt` 从已独立验证 SHA/完
 
 2026-10-03 T06/T11 Treatment 增量：Director 已有严格 TreatmentPlan 输出与冻结 STYLE/Understanding 输入；FilmSpec 的 Treatment 清单强制引用不可变方案，并与脚本、事实和逐镜头 Timeline 核对。自托管 Treatment 阶段使用预算预留和持久 effect ledger，验证重复调用、执行中版本变化和未知模型调用的处理。测试先因缺阶段模块失败，完成后全套 `npm test` 45文件194项、lint、build、构建后typecheck退出0。本地假提供方仅验证 Mastra 适配协议；缺真实 `MODEL_API_KEY`、Director 模型 ID/服务地址与付费调用授权，未验证模型产出的创意或质量。预览 Worker/API、Visual/Audio/Critic、正式渲染和43风格基线仍缺，C0/C1/C2未达到。
 
+T10/T11 新增冻结 Treatment 到旁白时窗的纯编译器；台词和ASR期望保持原文，过长明确失败，`none` 不发声，用户录音未接通时报错。真实预览尚未调用这个编译器或离线TTS/ASR。
+
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、技术节选、单测、目录规则或交付原型视频当作完整媒体验收。
