@@ -1,0 +1,1604 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:videobuddy:public:v5",
+  "title": "VideoBuddy v5 public boundary contracts",
+  "description": "Application-defined development contract; not SDK types or implementation. Use $defs entrypoints; MIME/owner/semantic version/budget checks remain server business validation.",
+  "$defs": {
+    "FeedbackTarget": {
+      "type": "object",
+      "properties": {
+        "artifactId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "sourceTimeMs": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previewTimeMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "artifactId",
+        "revisionId",
+        "sourceTimeMs"
+      ],
+      "additionalProperties": false
+    },
+    "PreferencesPatch": {
+      "type": "object",
+      "properties": {
+        "durationSec": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 120
+        },
+        "aspect": {
+          "enum": [
+            "16:9",
+            "9:16"
+          ]
+        },
+        "language": {
+          "enum": [
+            "zh-CN",
+            "en"
+          ]
+        },
+        "styleSlug": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "voiceMode": {
+          "enum": [
+            "tts",
+            "user_recording",
+            "none"
+          ]
+        },
+        "voiceAssetId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "musicMode": {
+          "enum": [
+            "composed",
+            "user_track",
+            "none"
+          ]
+        },
+        "musicAssetId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "captions": {
+          "enum": [
+            "auto",
+            "none"
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "CreateProjectRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "clientCreateId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 120
+        },
+        "preferences": {
+          "$ref": "#/$defs/PreferencesPatch"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "clientCreateId"
+      ],
+      "additionalProperties": false
+    },
+    "SendMessageRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "clientMessageId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "text": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 8000
+        },
+        "attachmentIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 10
+        },
+        "target": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FeedbackTarget"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "clientMessageId",
+        "text",
+        "attachmentIds"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "properties": {
+            "text": {
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        {
+          "properties": {
+            "attachmentIds": {
+              "minItems": 1
+            }
+          }
+        }
+      ]
+    },
+    "PreparePreviewRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expectedBriefVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "sourceMessageId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "expectedBriefVersion"
+      ],
+      "additionalProperties": false
+    },
+    "ApprovePreviewRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "previewId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "revisionId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expectedBriefVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "bundleHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "scriptHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "factsHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "previewId",
+        "revisionId",
+        "expectedBriefVersion",
+        "bundleHash",
+        "scriptHash",
+        "factsHash"
+      ],
+      "additionalProperties": false
+    },
+    "UpdatePreferencesRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expectedBriefVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "patch": {
+          "$ref": "#/$defs/PreferencesPatch"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "expectedBriefVersion",
+        "patch"
+      ],
+      "additionalProperties": false
+    },
+    "ConfirmChangeRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "decision": {
+          "enum": [
+            "prepare_preview",
+            "decline"
+          ]
+        },
+        "expectedRevisionId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "decision",
+        "expectedRevisionId"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteProjectRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId"
+      ],
+      "additionalProperties": false
+    },
+    "RestoreResultRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId"
+      ],
+      "additionalProperties": false
+    },
+    "DeleteAssetRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId"
+      ],
+      "additionalProperties": false
+    },
+    "RetryAssetRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId"
+      ],
+      "additionalProperties": false
+    },
+    "RecoverRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId"
+      ],
+      "additionalProperties": false
+    },
+    "CancelOperationRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "scope": {
+          "enum": [
+            "reply",
+            "production",
+            "export"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 300
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "RetryOperationRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "expectedFence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "expectedFence"
+      ],
+      "additionalProperties": false
+    },
+    "ReserveUploadRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "declaredBytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 52428800
+        },
+        "declaredMime": {
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "text/markdown",
+            "application/pdf",
+            "audio/wav",
+            "audio/mpeg",
+            "audio/mp4"
+          ]
+        },
+        "intendedUse": {
+          "enum": [
+            "reference",
+            "logo",
+            "photo",
+            "voice",
+            "music",
+            "unspecified"
+          ]
+        },
+        "rightsConfirmed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "filename",
+        "declaredBytes",
+        "declaredMime",
+        "intendedUse",
+        "rightsConfirmed"
+      ],
+      "additionalProperties": false
+    },
+    "CompleteUploadRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "reservationId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "reservationId"
+      ],
+      "additionalProperties": false
+    },
+    "ExportRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "clientCommandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "artifactId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "format": {
+          "enum": [
+            "mp4",
+            "poster",
+            "srt",
+            "treatment",
+            "credits",
+            "quality",
+            "source_zip"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "clientCommandId",
+        "artifactId",
+        "format"
+      ],
+      "additionalProperties": false
+    },
+    "LookupProjectsRequest": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "projectIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "projectIds"
+      ],
+      "additionalProperties": false
+    },
+    "CommandReceipt": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "const": 5
+        },
+        "commandId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "projectId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "operationId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "messageId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "controlVersion": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "replayed",
+            "completed",
+            "reserved"
+          ]
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "commandId",
+        "projectId",
+        "controlVersion",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "message": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "requestId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "field": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 120
+            },
+            "retryAfterSec": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "code",
+            "message",
+            "retryable",
+            "requestId"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "StreamEvent": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "message.started"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "contentVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "role": {
+                  "enum": [
+                    "assistant"
+                  ]
+                },
+                "ordinal": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "messageId",
+                "contentVersion",
+                "role",
+                "ordinal"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "message.reset"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "contentVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 0,
+                  "maxLength": 12000
+                }
+              },
+              "required": [
+                "messageId",
+                "contentVersion",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "message.delta"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "contentVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "offset": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 8000
+                }
+              },
+              "required": [
+                "messageId",
+                "contentVersion",
+                "offset",
+                "text"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "message.committed"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "contentVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "archiveRevision": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "messageId",
+                "contentVersion",
+                "archiveRevision"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "message.stopped"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "messageId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "contentVersion": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": [
+                "messageId",
+                "contentVersion"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "understanding.updated"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "briefVersion": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "summary": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500
+                  },
+                  "maxItems": 3
+                }
+              },
+              "required": [
+                "briefVersion",
+                "summary"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "asset.updated"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "assetId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "status": {
+                  "enum": [
+                    "reserved",
+                    "uploading",
+                    "uploaded",
+                    "analyzing",
+                    "ready",
+                    "failed",
+                    "removed"
+                  ]
+                },
+                "errorCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              },
+              "required": [
+                "assetId",
+                "status"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "activity.updated"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "stage": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "completed": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "total": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "unit": {
+                  "enum": [
+                    "frames",
+                    "lines",
+                    "files",
+                    "segments"
+                  ]
+                }
+              },
+              "required": [
+                "stage",
+                "label"
+              ],
+              "additionalProperties": false,
+              "dependentRequired": {
+                "completed": [
+                  "total",
+                  "unit"
+                ],
+                "total": [
+                  "completed",
+                  "unit"
+                ],
+                "unit": [
+                  "completed",
+                  "total"
+                ]
+              }
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "preview.ready"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "previewId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "revisionId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "briefVersion": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "previewId",
+                "revisionId",
+                "briefVersion"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "preview.invalidated"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "previewId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 500
+                }
+              },
+              "required": [
+                "previewId",
+                "reason"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "result.ready"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "artifactId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "revisionId": {
+                  "type": "string",
+                  "format": "uuid"
+                }
+              },
+              "required": [
+                "artifactId",
+                "revisionId"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "change.confirmation"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "changePlanId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "summary": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "changePlanId",
+                "summary"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "schemaVersion": {
+              "const": 5
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "operationId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "epoch": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "eventId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": {
+              "const": "operation.terminal"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "payload": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "enum": [
+                    "cancelled",
+                    "succeeded",
+                    "failed",
+                    "interrupted",
+                    "superseded"
+                  ]
+                },
+                "errorCode": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "retryable": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "status",
+                "retryable"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "schemaVersion",
+            "projectId",
+            "operationId",
+            "epoch",
+            "eventId",
+            "type",
+            "createdAt",
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

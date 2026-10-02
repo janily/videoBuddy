@@ -1,0 +1,557 @@
+[
+  {
+    "id": "T00",
+    "title": "空仓库初始化、参考复用与六项云能力探针",
+    "dependsOn": [],
+    "requirements": [
+      "FR-21",
+      "FR-22"
+    ],
+    "files": [
+      "package.json",
+      "package-lock.json",
+      "tsconfig.json",
+      "next.config.ts",
+      "eslint.config.mjs",
+      "postcss.config.mjs",
+      "vitest.config.ts",
+      "playwright.config.ts",
+      ".gitignore",
+      ".env.local.example",
+      "src/app/layout.tsx",
+      "src/app/page.tsx",
+      "src/app/globals.css",
+      "src/app/video/page.tsx",
+      "src/styles/video-easy-tokens.css",
+      "scripts/video/doctor.ts",
+      "docs/engineering/bootstrap-report.md",
+      "docs/engineering/reference-reuse-map.md",
+      "docs/engineering/dependency-matrix.md"
+    ],
+    "consumes": "用户videoBuddy空仓库及已有Git/README/交付文档；已批准design和外部参考；云端探针需要配置与授权",
+    "produces": "根目录可启动新工程、唯一lockfile、参考复用映射；probePlatform(): Promise<PlatformReport>及六组真实云能力报告",
+    "testPath": "tests/video/platform.test.ts",
+    "status": "not_started",
+    "additionalTestPaths": [
+      "tests/video/bootstrap.test.ts"
+    ],
+    "checkpoints": [
+      {
+        "id": "T00-A",
+        "status": "not_started"
+      },
+      {
+        "id": "T00-B",
+        "status": "not_started"
+      },
+      {
+        "id": "T00-C",
+        "status": "not_started"
+      }
+    ]
+  },
+  {
+    "id": "T01",
+    "title": "领域契约和语义状态机",
+    "dependsOn": [
+      "T00"
+    ],
+    "requirements": [
+      "FR-05",
+      "FR-07",
+      "FR-09",
+      "FR-15",
+      "FR-16"
+    ],
+    "files": [
+      "src/contracts/video/*.ts",
+      "src/services/video/domain/{state-machine,hash,preview-policy,change-policy}.ts"
+    ],
+    "consumes": "docs/02、public.schema.json及样例",
+    "produces": "validateCommand(kind,body): ValidatedCommand；deriveActions(view): PrimaryAction；assertPreviewBaseline(control,preview,request): void",
+    "testPath": "tests/video/domain.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T02",
+    "title": "Blob文件存储、匿名访问与容量保护",
+    "dependsOn": [
+      "T01"
+    ],
+    "requirements": [
+      "FR-01",
+      "FR-19"
+    ],
+    "files": [
+      "src/services/video/storage/{blob-store,project-store,index-store,admission}.ts",
+      "src/services/video/access/{session,authorize}.ts"
+    ],
+    "consumes": "ProjectControl/ObjectRef、平台探针、秘密配置",
+    "produces": "readFresh<T>(key): Promise<{value:T;etag:string}>；updateProject(id,expected,mutator): Promise<ProjectControl>；requireProjectAccess(request,id): Promise<OwnerScope>",
+    "testPath": "tests/video/storage-access.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T03",
+    "title": "持久命令、run claim与step幂等",
+    "dependsOn": [
+      "T02"
+    ],
+    "requirements": [
+      "FR-09",
+      "FR-13",
+      "FR-16",
+      "FR-19"
+    ],
+    "files": [
+      "src/services/video/commands/{submit,claim,reconcile,effect-ledger}.ts",
+      "src/workflows/video/runtime-adapter.ts",
+      "src/app/api/video/projects/[projectId]/recover/route.ts"
+    ],
+    "consumes": "持久Store、Operation、CommandReceipt及Workflow SDK",
+    "produces": "submitCommand(scope,kind,body): Promise<CommandReceipt>；claimOperation(operationId,runId): Promise<ClaimResult>；reconcileProject(projectId): Promise<RecoveryReport>",
+    "testPath": "tests/video/commands.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T04",
+    "title": "消息归档与可续接SSE",
+    "dependsOn": [
+      "T03"
+    ],
+    "requirements": [
+      "FR-13",
+      "FR-14",
+      "FR-16"
+    ],
+    "files": [
+      "src/services/video/messages/{archive,stream-adapter,stream-events}.ts",
+      "src/hooks/{use-project-events,use-video-messages}.ts",
+      "src/app/api/video/projects/[projectId]/operations/[operationId]/events/route.ts"
+    ],
+    "consumes": "operationId到canonicalRun的映射、StreamEvent、消息索引",
+    "produces": "openOperationStream(scope,operationId,cursor,signal): Promise<Response>；reduceVideoEvent(state,event): EventState；commitMessage(message): Promise<MessageRef>",
+    "testPath": "tests/video/sse.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T05",
+    "title": "素材直传、真实解读与来源",
+    "dependsOn": [
+      "T03",
+      "T04"
+    ],
+    "requirements": [
+      "FR-04",
+      "FR-19"
+    ],
+    "files": [
+      "src/services/video/assets/{reservations,probe,analysis,provenance}.ts",
+      "src/app/api/video/projects/[projectId]/assets/**/route.ts"
+    ],
+    "consumes": "文件预约、Blob、analysis model、事实契约",
+    "produces": "reserveUpload(scope,input): Promise<UploadReservation>；completeUpload(scope,input): Promise<AssetView>；analyzeAsset(input): Promise<AnalysisResult>",
+    "testPath": "tests/video/assets.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T06",
+    "title": "Mastra创作助手与引导记忆",
+    "dependsOn": [
+      "T04",
+      "T05"
+    ],
+    "requirements": [
+      "FR-03",
+      "FR-05",
+      "FR-14",
+      "FR-15"
+    ],
+    "files": [
+      "src/mastra/video/{index,model-adapter}.ts",
+      "src/mastra/video/agents/{director,visual,audio,critic}.ts",
+      "src/services/video/conversation/{next-question,understanding,authorize-intent}.ts",
+      "src/workflows/video/director-turn.ts"
+    ],
+    "consumes": "消息/素材真实分析/Understanding/活动状态/跳过项",
+    "produces": "runDirectorTurn(input): Promise<GuidanceDecision>；applyUnderstandingPatch(scope,baseVersion,patch): Promise<Understanding>；authorizeIntent(decision,userMessage): ExecutionIntent",
+    "testPath": "tests/video/guidance.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T07",
+    "title": "已确认UI外壳与真实消息接入",
+    "dependsOn": [
+      "T04",
+      "T06"
+    ],
+    "requirements": [
+      "FR-02",
+      "FR-05",
+      "FR-14",
+      "FR-20"
+    ],
+    "files": [
+      "src/styles/video-easy-tokens.css",
+      "src/components/video-studio/{companion-shell,conversation-sidebar,chat-composer,understanding-summary,result-stage,primary-action}.tsx",
+      "src/app/video/page.tsx",
+      "src/app/video/[projectId]/page.tsx"
+    ],
+    "consumes": "design/已确认原型变量、ProjectView及SSE reducers",
+    "produces": "CompanionShell；ChatComposer.onSubmit(message)；ResultStage(view,actions)；没有第二个创作输入",
+    "testPath": "tests/video/ui-shell.test.tsx",
+    "status": "not_started"
+  },
+  {
+    "id": "T08",
+    "title": "43风格目录、知识加载与适配协议",
+    "dependsOn": [
+      "T01",
+      "T06"
+    ],
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10"
+    ],
+    "files": [
+      "src/services/video/styles/{registry,knowledge-loader,capabilities}.ts",
+      "src/components/video-studio/style-picker.tsx",
+      "style-packs/*/manifest.json"
+    ],
+    "consumes": "固定43项身份、上游STYLE/DEMO、StylePack schema",
+    "produces": "getStyle(slug): StylePack；recommendStyles(understanding): StyleRecommendation[]；loadStageKnowledge(slug,stage): KnowledgeBundle",
+    "testPath": "tests/video/styles.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T09",
+    "title": "隔离媒体执行器与可信检测",
+    "dependsOn": [
+      "T00",
+      "T03",
+      "T08"
+    ],
+    "requirements": [
+      "FR-10",
+      "FR-19"
+    ],
+    "files": [
+      "src/services/video/media/{executor,sandbox-executor,transfer,output-probe}.ts",
+      "runtime/media/{runner,manifest,prepare}.py",
+      "runtime/media/image-spec.md"
+    ],
+    "consumes": "RenderJob/不可变包/固定依赖与资源上限",
+    "produces": "MediaExecutor.submit(job): Promise<MediaJobHandle>；inspect(handle): Promise<MediaStatus>；cancel(handle): Promise<CancelResult>",
+    "testPath": "tests/video/media-executor.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T10",
+    "title": "声音、字幕与统一时间轴",
+    "dependsOn": [
+      "T06",
+      "T09"
+    ],
+    "requirements": [
+      "FR-07",
+      "FR-11",
+      "FR-12"
+    ],
+    "files": [
+      "src/services/video/timeline/{compile,validate}.ts",
+      "src/services/video/audio/{voice,asr,score,mix,subtitles}.ts",
+      "runtime/media/audio/*"
+    ],
+    "consumes": "Treatment/VoiceProvider实际音频/风格声音规则",
+    "produces": "compileTimeline(input): Timeline；prepareNarration(plan): Promise<NarrationManifest>；buildAudio(timeline,plan): Promise<AudioManifest>",
+    "testPath": "tests/video/audio-timeline.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T11",
+    "title": "真实预览与唯一正式确认",
+    "dependsOn": [
+      "T06",
+      "T08",
+      "T09",
+      "T10"
+    ],
+    "requirements": [
+      "FR-07",
+      "FR-08",
+      "FR-09"
+    ],
+    "files": [
+      "src/workflows/video/prepare-preview.ts",
+      "src/services/video/preview/{bundle,excerpt,approve}.ts",
+      "src/app/api/video/projects/[projectId]/preview/**/route.ts",
+      "src/components/video-studio/preview-result.tsx"
+    ],
+    "consumes": "完整代码包/实际音轨/briefVersion/事实和脚本",
+    "produces": "preparePreview(projectId,operationId): Promise<PreviewBundle>；approvePreview(scope,input): Promise<CommandReceipt>；mapPreviewTime(bundle,timeMs): FeedbackTarget|null",
+    "testPath": "tests/video/preview.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T12",
+    "title": "正式渲染、QA及原子发布",
+    "dependsOn": [
+      "T11"
+    ],
+    "requirements": [
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-18"
+    ],
+    "files": [
+      "src/workflows/video/render-approved.ts",
+      "src/services/video/quality/{technical,visual,policy,repair}.ts",
+      "src/services/video/results/publish.ts"
+    ],
+    "consumes": "有效批准、不可变bundle、MediaExecutor、可信QA工具",
+    "produces": "renderApproved(projectId,operationId): Promise<ResultManifest>；validateDelivery(input): QualityReport；publishResult(scope,result,fence): Promise<ProjectView>",
+    "testPath": "tests/video/render-qa.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T13",
+    "title": "自然语言修改、取消与恢复",
+    "dependsOn": [
+      "T12",
+      "T06"
+    ],
+    "requirements": [
+      "FR-14",
+      "FR-15",
+      "FR-16"
+    ],
+    "files": [
+      "src/services/video/revisions/{classify-change,apply-change,pending-feedback}.ts",
+      "src/workflows/video/{apply-change,cancel-cleanup}.ts",
+      "src/services/video/operations/retry.ts"
+    ],
+    "consumes": "用户明确message、实际所看artifact、预算、风险规则和fence",
+    "produces": "classifyChange(input): ChangePlan；executeAuthorizedChange(plan): Promise<CommandReceipt>；requestCancel(scope,operationId): Promise<CancelReceipt>",
+    "testPath": "tests/video/changes.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T14",
+    "title": "播放、下载、我的视频与删除",
+    "dependsOn": [
+      "T12",
+      "T13",
+      "T02"
+    ],
+    "requirements": [
+      "FR-01",
+      "FR-17",
+      "FR-18"
+    ],
+    "files": [
+      "src/components/video-studio/{video-player,results-menu,recent-projects,preferences-dialog,asset-list-dialog}.tsx",
+      "src/services/video/exports/{export,source-archive}.ts",
+      "src/workflows/video/export.ts"
+    ],
+    "consumes": "ProjectView、不可变产物、受限signedURL、最近projectID列表",
+    "produces": "getArtifactAccess(scope,id,purpose): Promise<AccessGrant>；buildExport(scope,request): Promise<ExportResult>；restoreResult(scope,id): Promise<ProjectView>",
+    "testPath": "tests/video/delivery.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T15",
+    "title": "风格批次A：绘画、东方、印刷16项",
+    "dependsOn": [
+      "T12",
+      "T08"
+    ],
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "files": [
+      "style-packs/{crayon-book,watercolor,ink-wash,impasto,one-line,whiteboard,urban-sketch,shadow-puppet,ukiyoe,papercut-red,paper-lantern,risograph,halftone-dossier,woodcut,engraving,silkscreen-poster}/",
+      "tests/video/styles/batch-a.test.ts"
+    ],
+    "consumes": "统一StylePack/MediaExecutor、原STYLE约束、非demo新内容",
+    "produces": "16项风格逐一适配；32个横竖基线证据（各style的media/evidence.json）",
+    "testPath": "tests/video/styles/batch-a.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T16",
+    "title": "风格批次B：图形与信息12项",
+    "dependsOn": [
+      "T12",
+      "T08"
+    ],
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10",
+      "FR-22"
+    ],
+    "files": [
+      "style-packs/{swiss-motion,spy-titles,art-deco,blueprint,stained-glass,pictogram-motion,ascii-crt,dataviz,iso-infographic,dark-keynote,living-screencast,hologram-hud}/",
+      "tests/video/styles/batch-b.test.ts"
+    ],
+    "consumes": "统一时间轴/事实来源/DOM或图形引擎",
+    "produces": "12项适配；24个横竖基线证据；数据/产品模式的事实审查",
+    "testPath": "tests/video/styles/batch-b.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T17",
+    "title": "风格批次C：卡通、游戏、电影10项",
+    "dependsOn": [
+      "T12",
+      "T08"
+    ],
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-11",
+      "FR-22"
+    ],
+    "files": [
+      "style-packs/{rubber-hose,cel-anime-80s,scifi-toon,midcentury-toon,pixel-rpg,hd-2d,microgame,game-show,silent-film,backrooms}/",
+      "tests/video/styles/batch-c.test.ts"
+    ],
+    "consumes": "角色与相机、混合材质、速度段、声音规则",
+    "produces": "10项适配；20个横竖基线证据；角色/动作与混合媒介QA",
+    "testPath": "tests/video/styles/batch-c.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T18",
+    "title": "风格批次D：材质与3D五项",
+    "dependsOn": [
+      "T09",
+      "T12",
+      "T08"
+    ],
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-19",
+      "FR-22"
+    ],
+    "files": [
+      "style-packs/{brick-toy,paper-popup,tilt-shift,lowpoly-island,glass-product}/",
+      "tests/video/styles/batch-d.test.ts"
+    ],
+    "consumes": "真实WebGL2资源能力、镜头/光照/后处理与预算",
+    "produces": "5项适配；10个横竖基线证据；执行器资源报告",
+    "testPath": "tests/video/styles/batch-d.test.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T19",
+    "title": "小白流程、异常与移动端集成验收",
+    "dependsOn": [
+      "T07",
+      "T11",
+      "T13",
+      "T14"
+    ],
+    "requirements": [
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-08",
+      "FR-13",
+      "FR-14",
+      "FR-17",
+      "FR-20"
+    ],
+    "files": [
+      "tests/video/e2e/*.spec.ts",
+      "docs/engineering/ux-acceptance.md",
+      "docs/engineering/screens/*"
+    ],
+    "consumes": "真实服务端与已确认design/screens、中文长文案和错误fixture",
+    "produces": "desktop/mobile/reconnect/IME/preview_first E2E证据与5名新用户任务观察",
+    "testPath": "tests/video/e2e/companion.spec.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T20",
+    "title": "部署、运营开关与恢复演练",
+    "dependsOn": [
+      "T00",
+      "T03",
+      "T04",
+      "T09",
+      "T13",
+      "T14",
+      "T19"
+    ],
+    "requirements": [
+      "FR-01",
+      "FR-13",
+      "FR-16",
+      "FR-18",
+      "FR-19",
+      "FR-21",
+      "FR-22"
+    ],
+    "files": [
+      "vercel.json",
+      ".env.local.example",
+      "scripts/video/{smoke,reconcile,cleanup}.ts",
+      "docs/engineering/deploy-runbook.md"
+    ],
+    "consumes": "配置负责人提供的Vercel/Blob/Sandbox/模型连接、预算和测试授权",
+    "produces": "Preview部署smoke、故障演练、退回版本与全站暂停流程；不自动生产发布",
+    "testPath": "tests/video/e2e/cloud.spec.ts",
+    "status": "not_started"
+  },
+  {
+    "id": "T21",
+    "title": "全部交付审查与验收报告",
+    "dependsOn": [
+      "T15",
+      "T16",
+      "T17",
+      "T18",
+      "T19",
+      "T20"
+    ],
+    "requirements": [
+      "FR-01",
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-05",
+      "FR-06",
+      "FR-07",
+      "FR-08",
+      "FR-09",
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-13",
+      "FR-14",
+      "FR-15",
+      "FR-16",
+      "FR-17",
+      "FR-18",
+      "FR-19",
+      "FR-20",
+      "FR-21",
+      "FR-22"
+    ],
+    "files": [
+      "docs/engineering/final-handoff.md",
+      "acceptance/style-evidence.json",
+      "README.md"
+    ],
+    "consumes": "所有任务实际测试/部署/视频/安全与UX证据",
+    "produces": "可复现启动方式、全部43风格86基线、参数边界矩阵、开放问题和运维交接",
+    "testPath": "tests/video/e2e/release.spec.ts",
+    "status": "not_started"
+  }
+]

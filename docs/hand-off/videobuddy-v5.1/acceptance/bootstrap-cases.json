@@ -1,0 +1,58 @@
+[
+  {
+    "id": "BT-01",
+    "taskId": "T00",
+    "scenario": "仅有 .git、README 和交付文档",
+    "expected": "在原仓库根目录初始化成功；原有文件不丢，origin 不变",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-02",
+    "taskId": "T00",
+    "scenario": "没有 package.json / lockfile / 测试脚本",
+    "expected": "正确识别未初始化，不先执行 npm ci，也不伪报原有测试失败",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-03",
+    "taskId": "T00",
+    "scenario": "已经运行一次初始化，再次执行入口",
+    "expected": "增量继续，不能覆盖现有配置、用户代码或重复创建应用",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-04",
+    "taskId": "T00",
+    "scenario": "根目录到处都没有旧 PPT 路径",
+    "expected": "直接建立 video 模块，不要求用户补齐旧路由",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-05",
+    "taskId": "T00",
+    "scenario": "迁入的参考代码使用 @/src 前缀",
+    "expected": "适配到 @/，typecheck 能发现未处理的引用",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-06",
+    "taskId": "T00",
+    "scenario": "缺少云 API Key 或未授权测试消耗",
+    "expected": "本地外壳/纯测试可用；真实服务明确 blocked，无假结果和静默付费",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-07",
+    "taskId": "T00",
+    "scenario": "/video 已显示且 SDK 依赖已配置",
+    "expected": "真 React 页面，有侧栏与一个输入框；不是静态原型套壳",
+    "status": "not_run"
+  },
+  {
+    "id": "BT-08",
+    "taskId": "T00",
+    "scenario": "产品打包与测试收集",
+    "expected": "交付示例不进入生产业务或应用测试，设计60份参考文件hash不变",
+    "status": "not_run"
+  }
+]

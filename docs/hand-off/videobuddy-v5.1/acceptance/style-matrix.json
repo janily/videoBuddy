@@ -1,0 +1,1722 @@
+[
+  {
+    "slug": "crayon-book",
+    "nameZh": "蜡笔儿童绘本",
+    "nameEn": "Crayon Picture Book",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "watercolor",
+    "nameZh": "水彩笔刷",
+    "nameEn": "Watercolor Brush",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "ink-wash",
+    "nameZh": "中国水墨",
+    "nameEn": "Chinese Ink Wash",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "impasto",
+    "nameZh": "油画厚涂",
+    "nameEn": "Impasto Oil Painting",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "one-line",
+    "nameZh": "一笔画",
+    "nameEn": "One-line Drawing",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "whiteboard",
+    "nameZh": "白板讲解",
+    "nameEn": "Whiteboard Explainer",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "urban-sketch",
+    "nameZh": "钢笔淡彩",
+    "nameEn": "Urban Sketch · Pen & Wash",
+    "categoryZh": "手绘与绘画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "shadow-puppet",
+    "nameZh": "皮影戏",
+    "nameEn": "Shadow Puppetry",
+    "categoryZh": "东方传统",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "ukiyoe",
+    "nameZh": "浮世绘",
+    "nameEn": "Ukiyo-e",
+    "categoryZh": "东方传统",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "papercut-red",
+    "nameZh": "红色窗花剪纸",
+    "nameEn": "Red Paper-cut",
+    "categoryZh": "东方传统",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "paper-lantern",
+    "nameZh": "纸雕灯影",
+    "nameEn": "Paper-cut Lightbox",
+    "categoryZh": "东方传统",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "risograph",
+    "nameZh": "Risograph 丝网印刷",
+    "nameEn": "Risograph Print",
+    "categoryZh": "印刷与版画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "halftone-dossier",
+    "nameZh": "复古半调案卷",
+    "nameEn": "Halftone Dossier",
+    "categoryZh": "印刷与版画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "woodcut",
+    "nameZh": "木刻版画",
+    "nameEn": "Woodcut Print",
+    "categoryZh": "印刷与版画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "engraving",
+    "nameZh": "铜版画",
+    "nameEn": "Copperplate Engraving",
+    "categoryZh": "印刷与版画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "silkscreen-poster",
+    "nameZh": "丝印旅行海报",
+    "nameEn": "Silkscreen Travel Poster",
+    "categoryZh": "印刷与版画",
+    "taskId": "T15",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "swiss-motion",
+    "nameZh": "瑞士动态排版",
+    "nameEn": "Swiss Motion Graphics",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "spy-titles",
+    "nameZh": "60s 间谍片头",
+    "nameEn": "60s Spy Title Sequence",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "art-deco",
+    "nameZh": "装饰艺术",
+    "nameEn": "Art Deco",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "blueprint",
+    "nameZh": "蓝图 / 工程制图",
+    "nameEn": "Blueprint",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "stained-glass",
+    "nameZh": "彩色玻璃窗",
+    "nameEn": "Stained Glass",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "pictogram-motion",
+    "nameZh": "象形运动图形",
+    "nameEn": "Pictogram Motion",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "ascii-crt",
+    "nameZh": "ASCII / CRT 终端",
+    "nameEn": "ASCII / CRT Terminal",
+    "categoryZh": "图形与排版",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "dataviz",
+    "nameZh": "数据叙事",
+    "nameEn": "Data Storytelling",
+    "categoryZh": "信息与发布",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "iso-infographic",
+    "nameZh": "等距信息图",
+    "nameEn": "Isometric Infographic",
+    "categoryZh": "信息与发布",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "dark-keynote",
+    "nameZh": "暗色科技发布",
+    "nameEn": "Dark Tech Keynote",
+    "categoryZh": "信息与发布",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "living-screencast",
+    "nameZh": "活体实机录屏",
+    "nameEn": "Living Screencast",
+    "categoryZh": "信息与发布",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "hologram-hud",
+    "nameZh": "科幻全息界面",
+    "nameEn": "Sci-fi Hologram HUD",
+    "categoryZh": "信息与发布",
+    "taskId": "T16",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "rubber-hose",
+    "nameZh": "1930s 橡皮管卡通",
+    "nameEn": "1930s Rubber Hose Cartoon",
+    "categoryZh": "卡通与动画",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "cel-anime-80s",
+    "nameZh": "80 年代赛璐璐动画",
+    "nameEn": "80s Cel Anime",
+    "categoryZh": "卡通与动画",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "scifi-toon",
+    "nameZh": "科幻情景喜剧卡通",
+    "nameEn": "Sci-Fi Sitcom Toon",
+    "categoryZh": "卡通与动画",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "midcentury-toon",
+    "nameZh": "50s 扁平卡通",
+    "nameEn": "Mid-century Cartoon",
+    "categoryZh": "卡通与动画",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "pixel-rpg",
+    "nameZh": "16-bit 像素 RPG",
+    "nameEn": "16-bit Pixel RPG",
+    "categoryZh": "游戏",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "hd-2d",
+    "nameZh": "HD-2D",
+    "nameEn": "HD-2D",
+    "categoryZh": "游戏",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "microgame",
+    "nameZh": "微游戏快闪（瓦里奥制造式）",
+    "nameEn": "Microgame Frenzy",
+    "categoryZh": "游戏",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "game-show",
+    "nameZh": "综艺节奏扁平",
+    "nameEn": "Game Show Flat",
+    "categoryZh": "游戏",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "silent-film",
+    "nameZh": "1920s 默片",
+    "nameEn": "1920s Silent Film",
+    "categoryZh": "电影与时代",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "backrooms",
+    "nameZh": "后室 / 新怪谈",
+    "nameEn": "Liminal Found Footage",
+    "categoryZh": "电影与时代",
+    "taskId": "T17",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "brick-toy",
+    "nameZh": "积木玩具",
+    "nameEn": "Brick Toy",
+    "categoryZh": "材质与 3D",
+    "taskId": "T18",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "paper-popup",
+    "nameZh": "纸片立体书",
+    "nameEn": "Paper Pop-up Book",
+    "categoryZh": "材质与 3D",
+    "taskId": "T18",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "tilt-shift",
+    "nameZh": "移轴微缩",
+    "nameEn": "Tilt-Shift Miniature",
+    "categoryZh": "材质与 3D",
+    "taskId": "T18",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "lowpoly-island",
+    "nameZh": "低多边形等距",
+    "nameEn": "Low-poly Isometric Island",
+    "categoryZh": "材质与 3D",
+    "taskId": "T18",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  },
+  {
+    "slug": "glass-product",
+    "nameZh": "玻璃质感产品",
+    "nameEn": "Glass Product Render",
+    "categoryZh": "材质与 3D",
+    "taskId": "T18",
+    "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+    "readiness": "not_started",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "evidence": [
+      {
+        "aspect": "16:9",
+        "width": 1920,
+        "height": 1080,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      },
+      {
+        "aspect": "9:16",
+        "width": 1080,
+        "height": 1920,
+        "status": "not_run",
+        "artifactId": null,
+        "scriptHash": null,
+        "runtimeDigest": null,
+        "qaReportRef": null,
+        "resourceReportRef": null,
+        "originalContentEvidenceRef": null
+      }
+    ]
+  }
+]

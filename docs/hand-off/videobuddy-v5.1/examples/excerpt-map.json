@@ -1,0 +1,40 @@
+{
+  "note": "contract fixture, not generated media",
+  "segments": [
+    {
+      "previewStartMs": 0,
+      "previewEndMs": 3000,
+      "sourceStartMs": 0,
+      "sourceEndMs": 3000,
+      "shotId": "opening"
+    },
+    {
+      "previewStartMs": 3000,
+      "previewEndMs": 6000,
+      "sourceStartMs": 23000,
+      "sourceEndMs": 26000,
+      "shotId": "turn"
+    },
+    {
+      "previewStartMs": 6000,
+      "previewEndMs": 9000,
+      "sourceStartMs": 42000,
+      "sourceEndMs": 45000,
+      "shotId": "ending"
+    }
+  ],
+  "assertions": [
+    {
+      "previewTimeMs": 4000,
+      "expectedSourceTimeMs": 24000
+    },
+    {
+      "previewTimeMs": 8999,
+      "expectedSourceTimeMs": 44999
+    },
+    {
+      "previewTimeMs": 9000,
+      "expectedSourceTimeMs": null
+    }
+  ]
+}

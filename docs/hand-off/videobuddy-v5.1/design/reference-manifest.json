@@ -1,0 +1,302 @@
+[
+  {
+    "path": "design/assets/film-1.png",
+    "sha256": "ee07c39eb657b7568d47410d8bfc16f34e0a301b4379c7b620f8f64926979bdc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/sample-8s.mp4",
+    "sha256": "922a4d33b43fa4693a533a1814c9c8d7be8bffea5d174db6e58e433ec3e0ee59",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-art-deco.svg",
+    "sha256": "c6166126ae3b0f17c9dd947c904fd6dc8694833632deda7cfd9c7f973615f605",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-ascii-crt.svg",
+    "sha256": "9132d2d066b4dc284eb58f9a7192c5787d47d0c01115086fe3beae071afa98d3",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-backrooms.svg",
+    "sha256": "9132d2d066b4dc284eb58f9a7192c5787d47d0c01115086fe3beae071afa98d3",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-blueprint.svg",
+    "sha256": "03afafe535bf62bcbb800c52f70dc9c855a259a1d554ad58fb5729e9a3292f6a",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-brick-toy.svg",
+    "sha256": "27508bb93f50f3adf8c03403be4ec4b6c699b6556dd862a8df6c6b62d839a1f8",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-cel-anime-80s.svg",
+    "sha256": "fe0802dd44b0ab07515c5fd4d5ef497cc31321effcbd9410e4b4d8acc57f9a19",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-crayon-book.svg",
+    "sha256": "d57b0d1e3f12ba76ec91cd55e68fbc2942b8f21ae72a20404424e5bbba1498dc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-dark-keynote.svg",
+    "sha256": "cf8f90e4ea3d871ec76177fd899a1c9ae162088780d7537e385ce263d728daf6",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-dataviz.svg",
+    "sha256": "cf8f90e4ea3d871ec76177fd899a1c9ae162088780d7537e385ce263d728daf6",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-engraving.svg",
+    "sha256": "a68db24d70b664e0fcab1b1a96b6469451f505a80d5a90303c8cbb26f0c0db10",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-game-show.svg",
+    "sha256": "a476ad28013421fce6f797880e2607c199d752720832f55191f0d33186ecba4d",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-glass-product.svg",
+    "sha256": "fb2020e65876e7e75a628fd2345b457ea704b47ccbf0ab30a478486ce3d7c613",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-halftone-dossier.svg",
+    "sha256": "b0bf8a632c0199fc605bbfce3923506dd51ae06a5ebb07aafeca477b8bfe8277",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-hd-2d.svg",
+    "sha256": "9132d2d066b4dc284eb58f9a7192c5787d47d0c01115086fe3beae071afa98d3",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-hologram-hud.svg",
+    "sha256": "03afafe535bf62bcbb800c52f70dc9c855a259a1d554ad58fb5729e9a3292f6a",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-impasto.svg",
+    "sha256": "d57b0d1e3f12ba76ec91cd55e68fbc2942b8f21ae72a20404424e5bbba1498dc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-ink-wash.svg",
+    "sha256": "a68db24d70b664e0fcab1b1a96b6469451f505a80d5a90303c8cbb26f0c0db10",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-iso-infographic.svg",
+    "sha256": "cf8f90e4ea3d871ec76177fd899a1c9ae162088780d7537e385ce263d728daf6",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-living-screencast.svg",
+    "sha256": "9cd3a47584616809f5afc79758bdf9824c245bb8bc2e11102e9aaffa6a7534c6",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-lowpoly-island.svg",
+    "sha256": "88d9b3bff4327c3f36925a3a34304e3158d1bf431486362ab159c86788afe0c5",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-microgame.svg",
+    "sha256": "0ac3b10bfceb71343cf93d884d72abf3b2f0297857f7800f5e0a842628d99472",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-midcentury-toon.svg",
+    "sha256": "1c81709082444146d7d57f94c6bc5edb296db2e56fcd3fe54a494f4f09aed259",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-one-line.svg",
+    "sha256": "d57b0d1e3f12ba76ec91cd55e68fbc2942b8f21ae72a20404424e5bbba1498dc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-paper-lantern.svg",
+    "sha256": "88d9b3bff4327c3f36925a3a34304e3158d1bf431486362ab159c86788afe0c5",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-paper-popup.svg",
+    "sha256": "88d9b3bff4327c3f36925a3a34304e3158d1bf431486362ab159c86788afe0c5",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-papercut-red.svg",
+    "sha256": "0f263957ac5180433951a066fd6326adaf8ab44dd5fa436a3097df956c47a294",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-pictogram-motion.svg",
+    "sha256": "210e4949e93307263e089159f73b63ae15e35eeb36db1b20ef874f6dc52eac82",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-pixel-rpg.svg",
+    "sha256": "9132d2d066b4dc284eb58f9a7192c5787d47d0c01115086fe3beae071afa98d3",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-risograph.svg",
+    "sha256": "5f365401d1cfd70c8a321db26cbc1f990aeae1db7997589e4f3c86683981a667",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-rubber-hose.svg",
+    "sha256": "f6822f5cec09669c40eed9f2d812c44a8bfa5e6e5fe7008208544226703a6ab3",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-scifi-toon.svg",
+    "sha256": "0275012cc4350cfe323ca50797fe7bbab66fa7275b2d3b48896d69ea3dc806ee",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-shadow-puppet.svg",
+    "sha256": "0f263957ac5180433951a066fd6326adaf8ab44dd5fa436a3097df956c47a294",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-silent-film.svg",
+    "sha256": "f21a7f6cdeacfd1f8ffcf873624bab24bd5c2bda325d2fa5be2ff15448d0f5be",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-silkscreen-poster.svg",
+    "sha256": "d57b0d1e3f12ba76ec91cd55e68fbc2942b8f21ae72a20404424e5bbba1498dc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-spy-titles.svg",
+    "sha256": "210d35cdbc3ce677c5b008c762d378d0c7f72a60fc03b000d429a28087ae4514",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-stained-glass.svg",
+    "sha256": "0f263957ac5180433951a066fd6326adaf8ab44dd5fa436a3097df956c47a294",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-swiss-motion.svg",
+    "sha256": "43f9a1336495f156fb23a1126235c069d1055b40fb3d450bf77a28f5a14208f8",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-tilt-shift.svg",
+    "sha256": "88d9b3bff4327c3f36925a3a34304e3158d1bf431486362ab159c86788afe0c5",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-ukiyoe.svg",
+    "sha256": "380dbe0d2988c034a2197ff0ab12f2de476cfbb032781568b2764c472a502683",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-urban-sketch.svg",
+    "sha256": "d57b0d1e3f12ba76ec91cd55e68fbc2942b8f21ae72a20404424e5bbba1498dc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-watercolor.svg",
+    "sha256": "d57b0d1e3f12ba76ec91cd55e68fbc2942b8f21ae72a20404424e5bbba1498dc",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-whiteboard.svg",
+    "sha256": "13cd61b8744b9a65c7958a30af8c45edde20d263797c4bb62c263456ba0e3fac",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/assets/style-woodcut.svg",
+    "sha256": "a68db24d70b664e0fcab1b1a96b6469451f505a80d5a90303c8cbb26f0c0db10",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/preview.html",
+    "sha256": "e53c744ce8ec9f575a896c2ebafe051731a69cd94478857c6f5da7a5706d81ab",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/prototype.css",
+    "sha256": "3fac7747af7a4d64200f073c452c451b68725ad9a108232b4dc45d45015cefb2",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/prototype.js",
+    "sha256": "e83f44411b32196aad44129fc4b3df4852b441e5cc90f654fe665917aa3772c5",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/01_start_desktop.png",
+    "sha256": "7ace54af963ca7bfcdba096d9e1db7e389ba4970be82eaffef60342ee2c31e5e",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/02_collect_desktop.png",
+    "sha256": "cd115f6a52ca874266cb3fa8fa8d106e4a0895c7d91bfd321fd5f8b03671ec7e",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/03_preview_desktop.png",
+    "sha256": "fafd81119e2f3b4511cf07996a1c2c4e47460fc592784bdb75c755978d48b4d1",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/04_making_desktop.png",
+    "sha256": "65a31a0fbda2832572ef8aa83ba85e8c477f9325eeff9c500cfe54f06f3c7bef",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/05_ready_desktop.png",
+    "sha256": "3eb168b3e4f67fcded7e9070e084c19943cfa7eee2693c394bbdb2beedb9be0f",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/06_mobile_chat.png",
+    "sha256": "5261cf70b94f87e2e8a60a3e118ede7712d45a4f92a37946ad2eefb557e9e520",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/07_all_styles.png",
+    "sha256": "9cf60fc72e108340d1d6f5708c1b1cd437a69d7d668883bdf2c989d76171b310",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/08_mobile_preview.png",
+    "sha256": "144e8efb29ad730795ed2c2ec9d3e004cbcb18f602862e36b2765064f0a521c0",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/screens/09_failure_desktop.png",
+    "sha256": "88bfa42b0f34e069d62d78a122ab2e30680c7fa42658063f68a8615b3b139263",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/style-catalog.json",
+    "sha256": "26411c0d377c7c0b0557a4f0dba51f4ff8e01acb20a5eadd17eab2ca1d28d392",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/tokens.css",
+    "sha256": "37a6772cfbb387e27737dab4b5e42b2a6915644e96715a34bb959ba203cbc2de",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  },
+  {
+    "path": "design/tokens.json",
+    "sha256": "db4ad92b7ea146836f2111408e2721479c3b99610db25dd4fd28f03de4a79848",
+    "source": "approved Easy Companion 2.1 archive; copied unchanged"
+  }
+]

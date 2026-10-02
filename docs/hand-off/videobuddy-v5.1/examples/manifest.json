@@ -1,0 +1,97 @@
+[
+  {
+    "file": "examples/create-project.json",
+    "definition": "CreateProjectRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/send-message.json",
+    "definition": "SendMessageRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/send-attachment-only.json",
+    "definition": "SendMessageRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/approve-preview.json",
+    "definition": "ApprovePreviewRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/reserve-upload.json",
+    "definition": "ReserveUploadRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/lower-music.json",
+    "definition": "SendMessageRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/frame-feedback.json",
+    "definition": "SendMessageRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/cancel-production.json",
+    "definition": "CancelOperationRequest",
+    "valid": true
+  },
+  {
+    "file": "examples/receipt.json",
+    "definition": "CommandReceipt",
+    "valid": true
+  },
+  {
+    "file": "examples/api-error.json",
+    "definition": "ApiError",
+    "valid": true
+  },
+  {
+    "file": "examples/invalid-empty-message.json",
+    "definition": "SendMessageRequest",
+    "valid": false
+  },
+  {
+    "file": "examples/invalid-approval-extra-field.json",
+    "definition": "ApprovePreviewRequest",
+    "valid": false
+  },
+  {
+    "file": "examples/invalid-duration.json",
+    "definition": "UpdatePreferencesRequest",
+    "valid": false
+  },
+  {
+    "file": "examples/event-00.json",
+    "definition": "StreamEvent",
+    "valid": true
+  },
+  {
+    "file": "examples/event-01.json",
+    "definition": "StreamEvent",
+    "valid": true
+  },
+  {
+    "file": "examples/event-02.json",
+    "definition": "StreamEvent",
+    "valid": true
+  },
+  {
+    "file": "examples/event-03.json",
+    "definition": "StreamEvent",
+    "valid": true
+  },
+  {
+    "file": "examples/event-04.json",
+    "definition": "StreamEvent",
+    "valid": true
+  },
+  {
+    "file": "examples/event-05.json",
+    "definition": "StreamEvent",
+    "valid": true
+  }
+]

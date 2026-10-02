@@ -1,31 +1,11 @@
 # 当前工程交接（2026-10-02）
 
-这是阶段交接，不是 T21 最终完成报告。当前 C0/C1/C2 均未达到，未部署、未 push，未执行付费模型或云调用。
+videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付文档保留；未 push、未生产部署、未运行付费模型。当前仍是阶段工程，C0/C1/C2 均未达到。用户已将 Vercel 方案改为完全自托管；以 [自托管架构](self-hosted-architecture.md) 和 [执行计划](self-hosted-plan.md) 为当前部署依据，原规格的产品功能、SSE、持久消息、43 风格及验收范围继续有效。
 
-应用已在 videoBuddy 根目录初始化。`.git`、main、原 origin 和交付文档保留。参考 presentationBuddy 的指定 commit 后独立实现 provider，未复制无许可证源代码。43种风格采用固定上游 commit 的规则与 MIT 声明；没有拷贝示例视频、字体或权重。原设计文件通过 SHA256 回归检查，新增界面截图放 engineering/screens。
+已替换 Blob/Workflow/Sandbox：生产 `FileStore` 使用 Python `fcntl` 跨进程 CAS、原子写入和持久卷；本地持久操作队列与独占 Worker 执行 Director；事件日志支撑 SSE 续流；私有产物使用短期签名下载；Docker 媒体执行器使用固定镜像 ID、无网络和资源约束。新增本地素材预约、字节上传与完成 API，验证 MIME 签名和同内容重放。原设计与布局未重做。
 
-已实现：严格公共请求/SSE契约、理解patch与语义审批保护、匿名访问、生产Private Blob CAS、不可变持久消息、幂等命令/claim/effect、真实Director Workflow及SSE路由、启动/断流恢复、回复取消保护、草稿与IME、响应式单输入布局、43风格知识目录、最近项目鉴权查找、媒体SDK接口与可信runner、时间轴/预览映射/QA/修改/导出访问策略。
+最新实际验证：Node 22.23.1，`npm ci --ignore-scripts --no-audit` 退出0；`npm test` 29文件131项通过；`npm run typecheck`、`npm run lint`、`npm run build` 均退出0；Playwright 14项通过；Python runner 3项通过。旧 Workflow SDK 留下的未跟踪生成路由曾使构建失败，确认非用户文件后已清理，重建通过。固定 Docker 镜像已构建，1秒中文2D/H.264最小探针、无网络、运行中停止、随机画面拒绝和容器清理测试通过；独立技术 QA 复核文件哈希、元数据及完整解码；见 evidence/media-probe.json 与 media-probe-frame.png。这不代表真实用户内容、声音、完整QA或风格基线完成。
 
-仍未实现的部分与缺配置必须分开看。素材直传与全模态分析、Visual/Audio/Critic链路、TTS/混音、完整预览/正式渲染及发布工作流、真实QA、safe-direct执行、播放器/工程ZIP、资源清理、43风格执行适配都尚未完成；补凭据不会自动补齐这些代码。逐任务细表见 task-ledger.md。
+主要缺项：T05 图片/PDF/音频真实解读和来源进入聊天；Visual/Audio/Critic 及16行为评估；TTS/ASR、时间轴混音、真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。只上传的素材保持 `uploaded` 和 pending，当前不会被当作已分析的事实。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
-## 最新实际验证
-
-Node 22.23.1、唯一 package-lock.json。每条 current-* 日志保存完整输出：
-
-- `npm ci`：T00阶段已实际通过，908包、0 vulnerabilities；后续没有新增依赖。
-- `npm test`：19文件、107项通过，包括真实已安装Mastra SDK对本地HTTP协议服务器调用。不是云模型评估。
-- `npm run typecheck`、`npm run lint`、`npm run build`：退出0。Workflow实际构建注册由 `scripts/video/verify-build.ts` 另外检查；不是只检查源码存在。
-- `npm run test:video:e2e`：14项浏览器测试，包含360/390/768/960/1024/1280/1440/1920、IME、请求中编辑不丢草稿、手机切页/刷新、风格弹窗、最近项目列表。测试中的API fixture只用于前端错误和草稿回归，不作为生产响应。
-- Python runner：3项通过，覆盖完成/失败marker与崩溃后未知状态不重启。
-- 缺真实模型/Blob/Sandbox凭据、固定运行镜像、预算与测试消耗授权；doctor输出具体名称且不输出任何值。
-- 实际视频：0；43风格86基线全部 `not_run`；公开profile能力声明为空；16模型评估、92基础完整验收、5人观察及Preview部署未执行。
-
-## 已发现并修复的问题
-
-审查与回归证明 hot128 receipt淘汰会重启旧操作、断流会覆盖完成归档、启动409停止重连、迟到取消覆盖终态、preclaim取消卡住通道。现已保护durable receipt、final archive、启动退避恢复、CAS通道/终态和preclaim立即取消。新增预算先预约后计费，输入保守上界与输出硬限额，模型重试为0，未知效果不退款不自动重试。已知run失败可释放自己的聊天通道，无法核实状态则保留占用。详细失败→通过日志包括 budget、runtime-crash、preclaim-cancel、reconcile、recent。
-
-## 继续开发入口
-
-先补 T05 素材直传/分析与 T06 其它代理，再完成 T09可信固定镜像与素材传输、T10真实声音、T11复合预览及批准、T12真实QA发布，随后T13/T14完整操作。不得拿当前policy单元通过当成媒体闭环。T15–T18必须在统一执行接口和QA成立后逐风格生成新主题横竖证据；当前STYLE目录不算执行适配。T19–T21最终验收全部未完成。
-
-本地启动与命令见根README；精确云条件与尚未实现探针见 blockers.md。默认 `VIDEO_GENERATION_ENABLED=false`。真实云测试和部署必须遵守用户授权范围，本次没有请求或执行生产部署。
+下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、单测、目录规则或交付原型视频当作完整媒体验收。

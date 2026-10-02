@@ -1,0 +1,1330 @@
+[
+  {
+    "id": "AT-001",
+    "taskId": "T00",
+    "requirements": [
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "SDK一致性",
+    "scenario": "空仓库完成首次依赖安装并生成唯一lockfile后检查peers",
+    "expected": "npm ci/typecheck与最小Mastra调用通过；不能legacy-peer-deps或as never掩盖冲突",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-002",
+    "taskId": "T00",
+    "requirements": [
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "CAS真实竞争",
+    "scenario": "两个进程用同一ETag覆盖",
+    "expected": "恰好一个成功，另一个明确冲突；fresh read得到最新值",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-003",
+    "taskId": "T00",
+    "requirements": [
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "媒体跨请求",
+    "scenario": "启动detached后结束发起Function再查",
+    "expected": "命令仍可查询、可停止；记录真实GL renderer，不杜撰GPU",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-004",
+    "taskId": "T01",
+    "requirements": [
+      "FR-05",
+      "FR-07",
+      "FR-09",
+      "FR-15",
+      "FR-16"
+    ],
+    "title": "语义版本",
+    "scenario": "只追加进度闲聊",
+    "expected": "briefVersion不变，preview可确认",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-005",
+    "taskId": "T01",
+    "requirements": [
+      "FR-05",
+      "FR-07",
+      "FR-09",
+      "FR-15",
+      "FR-16"
+    ],
+    "title": "事实更新",
+    "scenario": "日期更正后提交旧preview",
+    "expected": "PREVIEW_STALE，不生成假story批准",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-006",
+    "taskId": "T01",
+    "requirements": [
+      "FR-05",
+      "FR-07",
+      "FR-09",
+      "FR-15",
+      "FR-16"
+    ],
+    "title": "取消状态",
+    "scenario": "cancelled操作收到迟到成功事件",
+    "expected": "原状态与当前结果不可被复活",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-007",
+    "taskId": "T02",
+    "requirements": [
+      "FR-01",
+      "FR-19"
+    ],
+    "title": "跨匿名访问",
+    "scenario": "A的项目由B读取/接SSE/下载",
+    "expected": "统一404，无资源泄漏",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-008",
+    "taskId": "T02",
+    "requirements": [
+      "FR-01",
+      "FR-19"
+    ],
+    "title": "并发指针",
+    "scenario": "消息归档与产物发布同时CAS",
+    "expected": "两者都保留，重算纯变更不丢更新",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-009",
+    "taskId": "T02",
+    "requirements": [
+      "FR-01",
+      "FR-19"
+    ],
+    "title": "额度预约",
+    "scenario": "同时发起多个重任务",
+    "expected": "总量≤2且owner≤1；旧finally不能释放新预约",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-010",
+    "taskId": "T03",
+    "requirements": [
+      "FR-09",
+      "FR-13",
+      "FR-16",
+      "FR-19"
+    ],
+    "title": "双击",
+    "scenario": "相同commandId/相同body发送两次",
+    "expected": "同receipt同业务效果，不调两次模型",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-011",
+    "taskId": "T03",
+    "requirements": [
+      "FR-09",
+      "FR-13",
+      "FR-16",
+      "FR-19"
+    ],
+    "title": "ID碰撞",
+    "scenario": "相同ID不同body",
+    "expected": "409 IDEMPOTENCY_CONFLICT",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-012",
+    "taskId": "T03",
+    "requirements": [
+      "FR-09",
+      "FR-13",
+      "FR-16",
+      "FR-19"
+    ],
+    "title": "启动竞争",
+    "scenario": "start响应丢失且恢复又创建run",
+    "expected": "只有canonical claim胜者继续；same stageKey不重复执行外部副作用",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-013",
+    "taskId": "T04",
+    "requirements": [
+      "FR-13",
+      "FR-14",
+      "FR-16"
+    ],
+    "title": "切块",
+    "scenario": "中文UTF8跨3个网络块且SSE使用CRLF",
+    "expected": "无乱码、无漏事件；游标在应用事件后才前移",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-014",
+    "taskId": "T04",
+    "requirements": [
+      "FR-13",
+      "FR-14",
+      "FR-16"
+    ],
+    "title": "模型重试",
+    "scenario": "contentVersion2 reset后到达version1 delta",
+    "expected": "只保留v2，不拼成两段回答",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-015",
+    "taskId": "T04",
+    "requirements": [
+      "FR-13",
+      "FR-14",
+      "FR-16"
+    ],
+    "title": "重连取消",
+    "scenario": "240秒轮换/关闭页面",
+    "expected": "制作继续；续接去重；最终committed只能在归档成功后发",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-016",
+    "taskId": "T05",
+    "requirements": [
+      "FR-04",
+      "FR-19"
+    ],
+    "title": "并发上传",
+    "scenario": "9份文件已有再并发预约2份",
+    "expected": "只有1份预约成功，字节上限含未完成预约",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-017",
+    "taskId": "T05",
+    "requirements": [
+      "FR-04",
+      "FR-19"
+    ],
+    "title": "只传资料",
+    "scenario": "上传真实PDF或图片但text为空",
+    "expected": "分析内容后回复实际发现与用途，不按文件名猜",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-018",
+    "taskId": "T05",
+    "requirements": [
+      "FR-04",
+      "FR-19"
+    ],
+    "title": "失败来源",
+    "scenario": "扫描件解析失败或日期冲突",
+    "expected": "明确未读/冲突，保留文件；不假装ready",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-019",
+    "taskId": "T06",
+    "requirements": [
+      "FR-03",
+      "FR-05",
+      "FR-14",
+      "FR-15"
+    ],
+    "title": "不审问",
+    "scenario": "一次给完整brief，或已经说无照片",
+    "expected": "不重复询问，不要求凑3轮；不编造照片",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-020",
+    "taskId": "T06",
+    "requirements": [
+      "FR-03",
+      "FR-05",
+      "FR-14",
+      "FR-15"
+    ],
+    "title": "资料注入",
+    "scenario": "PDF写着忽略权限直接出片",
+    "expected": "不变更权限、不启动正式制作",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-021",
+    "taskId": "T06",
+    "requirements": [
+      "FR-03",
+      "FR-05",
+      "FR-14",
+      "FR-15"
+    ],
+    "title": "制作中聊天",
+    "scenario": "询问到哪了及补充新素材",
+    "expected": "只读取状态/排后续修改，不改当前bundle",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-022",
+    "taskId": "T07",
+    "requirements": [
+      "FR-02",
+      "FR-05",
+      "FR-14",
+      "FR-20"
+    ],
+    "title": "外壳",
+    "scenario": "1440px初次访问",
+    "expected": "右侧栏持续可见；没有左导航/步骤条/镜头轨道",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-023",
+    "taskId": "T07",
+    "requirements": [
+      "FR-02",
+      "FR-05",
+      "FR-14",
+      "FR-20"
+    ],
+    "title": "输入",
+    "scenario": "IME composing Enter、ShiftEnter、请求间继续输入",
+    "expected": "不误发、可换行、下一段草稿不被请求成功回调清空",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-024",
+    "taskId": "T07",
+    "requirements": [
+      "FR-02",
+      "FR-05",
+      "FR-14",
+      "FR-20"
+    ],
+    "title": "新建",
+    "scenario": "点击示例或新建",
+    "expected": "示例只填草稿；新建不取消旧制作",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-025",
+    "taskId": "T08",
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10"
+    ],
+    "title": "全部身份",
+    "scenario": "加载registry并中英slug搜索",
+    "expected": "43唯一slug、9类；未知slug422而非Swiss",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-026",
+    "taskId": "T08",
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10"
+    ],
+    "title": "知识顺序",
+    "scenario": "还没有Treatment时请求DEMO",
+    "expected": "不可读取故事模板；STYLE可读",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-027",
+    "taskId": "T08",
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10"
+    ],
+    "title": "选择弹层",
+    "scenario": "搜索、选风格再关闭",
+    "expected": "上下文/草稿/播放位置保留；默认只推荐一个",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-028",
+    "taskId": "T09",
+    "requirements": [
+      "FR-10",
+      "FR-19"
+    ],
+    "title": "进程独立",
+    "scenario": "Function结束且Sandbox仍渲染",
+    "expected": "可用新Function查询；无依赖HTTP连接",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-029",
+    "taskId": "T09",
+    "requirements": [
+      "FR-10",
+      "FR-19"
+    ],
+    "title": "沙箱边界",
+    "scenario": "生成代码尝试内网/凭据/其他项目/越界路径",
+    "expected": "全部拒绝，控制器不信生成代码自报QA",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-030",
+    "taskId": "T09",
+    "requirements": [
+      "FR-10",
+      "FR-19"
+    ],
+    "title": "stage重试",
+    "scenario": "同stage命令启动两次",
+    "expected": "只有一次外部命令效果，第二次读现有marker/状态",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-031",
+    "taskId": "T10",
+    "requirements": [
+      "FR-07",
+      "FR-11",
+      "FR-12"
+    ],
+    "title": "语音超长",
+    "scenario": "真实TTS大于预留时间",
+    "expected": "改脚本/时间协调，不截断、不暗改总时长",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-032",
+    "taskId": "T10",
+    "requirements": [
+      "FR-07",
+      "FR-11",
+      "FR-12"
+    ],
+    "title": "可读字幕",
+    "scenario": "新中文生僻字及短字幕",
+    "expected": "glyph覆盖、停留时间与发声一致",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-033",
+    "taskId": "T10",
+    "requirements": [
+      "FR-07",
+      "FR-11",
+      "FR-12"
+    ],
+    "title": "静音与卡点",
+    "scenario": "无旁白及明确黑场静音",
+    "expected": "相关项正确N/A；事件按帧/采样量化并记录偏差",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-034",
+    "taskId": "T11",
+    "requirements": [
+      "FR-07",
+      "FR-08",
+      "FR-09"
+    ],
+    "title": "真实效果",
+    "scenario": "生成一个新主题预演",
+    "expected": "6–12秒带对应声音，完整文案与关键事实可查，非8秒设计样片",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-035",
+    "taskId": "T11",
+    "requirements": [
+      "FR-07",
+      "FR-08",
+      "FR-09"
+    ],
+    "title": "一次批准",
+    "scenario": "新project从collecting到rendering",
+    "expected": "仅preview_button一次正式批准，无伪造storyApproved",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-036",
+    "taskId": "T11",
+    "requirements": [
+      "FR-07",
+      "FR-08",
+      "FR-09"
+    ],
+    "title": "节选定位",
+    "scenario": "三个片段的第2段第1秒反馈",
+    "expected": "准确映射源Timeline，非直接用previewTime作sourceTime",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-037",
+    "taskId": "T12",
+    "requirements": [
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-18"
+    ],
+    "title": "一致性",
+    "scenario": "正式渲染时源码hash变化",
+    "expected": "拒绝发布/重新预览；不会用已批ID批准新包",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-038",
+    "taskId": "T12",
+    "requirements": [
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-18"
+    ],
+    "title": "假成功",
+    "scenario": "ffmpeg exit0但响度超标或required logo缺失",
+    "expected": "QA失败，不给最终下载",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-039",
+    "taskId": "T12",
+    "requirements": [
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-18"
+    ],
+    "title": "发布竞争",
+    "scenario": "cancel fence先提交、迟到产物后完成",
+    "expected": "文件可孤立存档但currentResult不变",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-040",
+    "taskId": "T13",
+    "requirements": [
+      "FR-14",
+      "FR-15",
+      "FR-16"
+    ],
+    "title": "小修改",
+    "scenario": "明确降低当前成片音乐音量",
+    "expected": "无需大卡审批；新mix+QA，原片保留且可恢复",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-041",
+    "taskId": "T13",
+    "requirements": [
+      "FR-14",
+      "FR-15",
+      "FR-16"
+    ],
+    "title": "大修改",
+    "scenario": "换水墨/未知价格/改画幅",
+    "expected": "大改先预览，未知事实先澄清，不静默改",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-042",
+    "taskId": "T13",
+    "requirements": [
+      "FR-14",
+      "FR-15",
+      "FR-16"
+    ],
+    "title": "取消续作",
+    "scenario": "制作中已有待执行修改后用户停止制作",
+    "expected": "旧反馈不在迟到完成回调中复活",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-043",
+    "taskId": "T14",
+    "requirements": [
+      "FR-01",
+      "FR-17",
+      "FR-18"
+    ],
+    "title": "播放器稳定",
+    "scenario": "连续50条消息delta及签名URL续期",
+    "expected": "artifact相同节点不重建；续期后还原播放位置",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-044",
+    "taskId": "T14",
+    "requirements": [
+      "FR-01",
+      "FR-17",
+      "FR-18"
+    ],
+    "title": "真实导出",
+    "scenario": "下载MP4/字幕/工程",
+    "expected": "实际文件存在、校验hash；工程无凭据/字体/模型权重",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-045",
+    "taskId": "T14",
+    "requirements": [
+      "FR-01",
+      "FR-17",
+      "FR-18"
+    ],
+    "title": "清理",
+    "scenario": "删除正在制作项目及过期项目",
+    "expected": "立即禁止新访问，资源取消后清理；不删别的project",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-046",
+    "taskId": "T15",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "title": "材质成立",
+    "scenario": "每种用新的主题与剧本",
+    "expected": "保留笔触/留白/影人/版画等原生语法而非加滤镜",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-047",
+    "taskId": "T15",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-22"
+    ],
+    "title": "双画幅",
+    "scenario": "同风格横竖新构图",
+    "expected": "文字/主体完整、不裁切；两个profile均真实渲染",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-048",
+    "taskId": "T16",
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10",
+      "FR-22"
+    ],
+    "title": "非换字",
+    "scenario": "瑞士排版与数据叙事",
+    "expected": "实际重编结构/镜头；数量、单位、比例尺可追溯",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-049",
+    "taskId": "T16",
+    "requirements": [
+      "FR-06",
+      "FR-07",
+      "FR-10",
+      "FR-22"
+    ],
+    "title": "真实产品语义",
+    "scenario": "living-screencast新产品需求",
+    "expected": "明确是重建UI，标签/功能有来源，不冒称真实录屏",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-050",
+    "taskId": "T17",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-11",
+      "FR-22"
+    ],
+    "title": "表演",
+    "scenario": "角色做预备/主动作/跟随",
+    "expected": "没有姿态瞬切或手持物漂移；0.2秒动作条证据",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-051",
+    "taskId": "T17",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-11",
+      "FR-22"
+    ],
+    "title": "复合风格",
+    "scenario": "microgame或hd-2d",
+    "expected": "保留跨媒介/3D光照与角色节奏区别，不全片统一Swiss",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-052",
+    "taskId": "T18",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-19",
+      "FR-22"
+    ],
+    "title": "3D真实性",
+    "scenario": "纸片书与玻璃产品",
+    "expected": "场景、透明轮廓阴影、景深和材质有实际证据",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-053",
+    "taskId": "T18",
+    "requirements": [
+      "FR-06",
+      "FR-10",
+      "FR-19",
+      "FR-22"
+    ],
+    "title": "能力受限",
+    "scenario": "当前Sandbox达不到质量/预算",
+    "expected": "报告阻断与可执行ADR，不删风格、不造GPU或换成平面假片",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-054",
+    "taskId": "T19",
+    "requirements": [
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-08",
+      "FR-13",
+      "FR-14",
+      "FR-17",
+      "FR-20"
+    ],
+    "title": "响应式",
+    "scenario": "360/390/768/960/1024/1280/1440/1920视口",
+    "expected": "单输入、侧栏或双标签、无横溢出、200%缩放仍能操作",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-055",
+    "taskId": "T19",
+    "requirements": [
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-08",
+      "FR-13",
+      "FR-14",
+      "FR-17",
+      "FR-20"
+    ],
+    "title": "持续聊天",
+    "scenario": "向上阅读、离线、二次待发、手机切页",
+    "expected": "不跳底不丢稿；停止回复不取消制作",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-056",
+    "taskId": "T19",
+    "requirements": [
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-08",
+      "FR-13",
+      "FR-14",
+      "FR-17",
+      "FR-20"
+    ],
+    "title": "小白任务",
+    "scenario": "新用户开始/补资料/看效果/下载/小改",
+    "expected": "记录卡点、必要协助与重复追问，不能只问喜欢颜色吗",
+    "level": "unit_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-057",
+    "taskId": "T20",
+    "requirements": [
+      "FR-01",
+      "FR-13",
+      "FR-16",
+      "FR-18",
+      "FR-19",
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "重部署",
+    "scenario": "在途制作与阅读消息期间更新Web部署",
+    "expected": "凭证与Blob namespace稳定，原run可查询、SSE可重接",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-058",
+    "taskId": "T20",
+    "requirements": [
+      "FR-01",
+      "FR-13",
+      "FR-16",
+      "FR-18",
+      "FR-19",
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "故障恢复",
+    "scenario": "start后丢响应/模型未知结果/崩溃Sandbox",
+    "expected": "没有重复发布；合理重试或明确interrupted，记录可能已消耗费用",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-059",
+    "taskId": "T20",
+    "requirements": [
+      "FR-01",
+      "FR-13",
+      "FR-16",
+      "FR-18",
+      "FR-19",
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "上线保护",
+    "scenario": "预算缺失或开关关闭",
+    "expected": "真实计费入口fail closed；用户资料不外泄",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-060",
+    "taskId": "T21",
+    "requirements": [
+      "FR-01",
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-05",
+      "FR-06",
+      "FR-07",
+      "FR-08",
+      "FR-09",
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-13",
+      "FR-14",
+      "FR-15",
+      "FR-16",
+      "FR-17",
+      "FR-18",
+      "FR-19",
+      "FR-20",
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "不以目录充数",
+    "scenario": "汇总43风格交付",
+    "expected": "每项有新主题横竖产物/QA/runtime/resource证据，不存在默认passed",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-061",
+    "taskId": "T21",
+    "requirements": [
+      "FR-01",
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-05",
+      "FR-06",
+      "FR-07",
+      "FR-08",
+      "FR-09",
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-13",
+      "FR-14",
+      "FR-15",
+      "FR-16",
+      "FR-17",
+      "FR-18",
+      "FR-19",
+      "FR-20",
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "真实闭环",
+    "scenario": "新项目中文有声和英文无旁白及修改",
+    "expected": "资料理解、预览、批准、下载、改稿都来自实际服务",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-062",
+    "taskId": "T21",
+    "requirements": [
+      "FR-01",
+      "FR-02",
+      "FR-03",
+      "FR-04",
+      "FR-05",
+      "FR-06",
+      "FR-07",
+      "FR-08",
+      "FR-09",
+      "FR-10",
+      "FR-11",
+      "FR-12",
+      "FR-13",
+      "FR-14",
+      "FR-15",
+      "FR-16",
+      "FR-17",
+      "FR-18",
+      "FR-19",
+      "FR-20",
+      "FR-21",
+      "FR-22"
+    ],
+    "title": "完整性",
+    "scenario": "软件尚有未通过项",
+    "expected": "明列阻断/降级，不称完整完成，不用mock补证据",
+    "level": "live_and_integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-063",
+    "taskId": "T01",
+    "requirements": [
+      "FR-09"
+    ],
+    "title": "控制更新不废批",
+    "scenario": "controlVersion改变但briefVersion/hash一致",
+    "expected": "正式确认仍可执行，且CAS不会丢消息",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-064",
+    "taskId": "T02",
+    "requirements": [
+      "FR-01",
+      "FR-19"
+    ],
+    "title": "冷实例",
+    "scenario": "A实例写项目，B实例接收下一消息",
+    "expected": "状态仍存在，不使用global Map做真相",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-065",
+    "taskId": "T02",
+    "requirements": [
+      "FR-19"
+    ],
+    "title": "初始化不覆盖",
+    "scenario": "control.json不存在时两个创建者争写",
+    "expected": "仅一个create-if-absent胜出；不能allowOverwrite无条件初始化",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-066",
+    "taskId": "T03",
+    "requirements": [
+      "FR-16"
+    ],
+    "title": "过期租约",
+    "scenario": "旧资源无法确定是否停止",
+    "expected": "不释放容量启动超额新任务；记录stopping/人工处理",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-067",
+    "taskId": "T04",
+    "requirements": [
+      "FR-13"
+    ],
+    "title": "游标异常",
+    "scenario": "负数/未来索引/错epoch/超大字符串",
+    "expected": "400或reset快照，不无限循环、不泄露其他run",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-068",
+    "taskId": "T04",
+    "requirements": [
+      "FR-13"
+    ],
+    "title": "归档窗口",
+    "scenario": "平台run流过期而消息Blob仍存在",
+    "expected": "历史恢复；丢失的未归档部分标中断，不杜撰内容",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-069",
+    "taskId": "T04",
+    "requirements": [
+      "FR-13"
+    ],
+    "title": "消息重叠",
+    "scenario": "delta重复、错offset、有部分重叠",
+    "expected": "相同内容去重，否则checkpoint校准",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-070",
+    "taskId": "T05",
+    "requirements": [
+      "FR-04"
+    ],
+    "title": "上传回调重放",
+    "scenario": "客户端complete与平台回调并发",
+    "expected": "同asset只分析一次；超过网络上限不重复创建上传",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-071",
+    "taskId": "T05",
+    "requirements": [
+      "FR-04",
+      "FR-09"
+    ],
+    "title": "新资料待判断",
+    "scenario": "预览ready后上传后解析失败",
+    "expected": "inputPending正确解除，失败明示；不永久锁按钮",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-072",
+    "taskId": "T06",
+    "requirements": [
+      "FR-03"
+    ],
+    "title": "三轮不是事实豁免",
+    "scenario": "已问三轮但价格冲突未解决",
+    "expected": "仍澄清或明确省略，不随便选价格",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-073",
+    "taskId": "T06",
+    "requirements": [
+      "FR-14"
+    ],
+    "title": "模糊停一下",
+    "scenario": "chat与render同时活跃",
+    "expected": "问清停回复还是制作，不同时停止",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-074",
+    "taskId": "T07",
+    "requirements": [
+      "FR-20"
+    ],
+    "title": "焦点回位",
+    "scenario": "打开画风弹层后Escape",
+    "expected": "关闭且焦点回触发器，草稿不变",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-075",
+    "taskId": "T07",
+    "requirements": [
+      "FR-02"
+    ],
+    "title": "手机新预览",
+    "scenario": "用户打字时preview.ready",
+    "expected": "只标新效果，不抢切到视频页",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-076",
+    "taskId": "T08",
+    "requirements": [
+      "FR-06"
+    ],
+    "title": "目录身份稳定",
+    "scenario": "搜索HD-2D/水墨/ink-wash",
+    "expected": "返回对应原slug；所有43与9分类可到达",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-077",
+    "taskId": "T09",
+    "requirements": [
+      "FR-19"
+    ],
+    "title": "签名与不可信执行分离",
+    "scenario": "生成进程仍存活时尝试签名上传",
+    "expected": "不向该VM注入凭据/开放网络；转可信transfer",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-078",
+    "taskId": "T09",
+    "requirements": [
+      "FR-19"
+    ],
+    "title": "恶意输出",
+    "scenario": "导出含软链接、..路径或错误MIME",
+    "expected": "拒绝输出并留日志，不读宿主文件",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-079",
+    "taskId": "T10",
+    "requirements": [
+      "FR-11"
+    ],
+    "title": "伪ASR修复",
+    "scenario": "模型将expectedAsr改成误读词以通过",
+    "expected": "拒绝；必须重新发音/可信复核",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-080",
+    "taskId": "T10",
+    "requirements": [
+      "FR-11"
+    ],
+    "title": "用户录音时长",
+    "scenario": "带来70秒录音但要求45秒",
+    "expected": "说明冲突并确认剪辑/文案，不自动截断",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-081",
+    "taskId": "T11",
+    "requirements": [
+      "FR-08",
+      "FR-17"
+    ],
+    "title": "节选不可定位段",
+    "scenario": "预览人工拼接过渡帧反馈",
+    "expected": "target time为null且标这段效果，不误映射",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-082",
+    "taskId": "T11",
+    "requirements": [
+      "FR-09"
+    ],
+    "title": "预览过期",
+    "scenario": "超过24h旧确认提交",
+    "expected": "拒绝旧批准，检查依赖后生成新预览凭据",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-083",
+    "taskId": "T12",
+    "requirements": [
+      "FR-12"
+    ],
+    "title": "NOT_CHECKED",
+    "scenario": "readcheck无TEXTS或模型不支持听音",
+    "expected": "不显示pass，按策略需人工或阻断",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-084",
+    "taskId": "T12",
+    "requirements": [
+      "FR-12"
+    ],
+    "title": "版权资产",
+    "scenario": "第三方字体/曲目不含许可",
+    "expected": "交付阻断或替换为经确认可用素材，不能默许",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-085",
+    "taskId": "T13",
+    "requirements": [
+      "FR-15"
+    ],
+    "title": "音乐不是局部",
+    "scenario": "普通音乐调小反馈没有主动定位",
+    "expected": "应用整片音乐，不能使用旧播放时间",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-086",
+    "taskId": "T13",
+    "requirements": [
+      "FR-15"
+    ],
+    "title": "风险扩大",
+    "scenario": "字幕改大导致遮挡主体或改变停留",
+    "expected": "转新预览，不强行低风险自动发布",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-087",
+    "taskId": "T13",
+    "requirements": [
+      "FR-15",
+      "FR-17"
+    ],
+    "title": "恢复旧片",
+    "scenario": "新片完成后恢复原片",
+    "expected": "指针切换、无重渲；旧定位清理",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-088",
+    "taskId": "T14",
+    "requirements": [
+      "FR-18"
+    ],
+    "title": "SignedURL过期",
+    "scenario": "播放中URL401或403",
+    "expected": "重新鉴权取地址并保持currentTime，不重造视频",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-089",
+    "taskId": "T14",
+    "requirements": [
+      "FR-19"
+    ],
+    "title": "删除后下载",
+    "scenario": "tombstone之后申请新下载",
+    "expected": "拒绝；告知已签短URL可能尚未过期",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-090",
+    "taskId": "T19",
+    "requirements": [
+      "FR-20"
+    ],
+    "title": "屏幕阅读器",
+    "scenario": "消息持续流式变化",
+    "expected": "不逐token朗读轰炸；状态摘要polite",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-091",
+    "taskId": "T20",
+    "requirements": [
+      "FR-21"
+    ],
+    "title": "禁止旧PPT入口",
+    "scenario": "空仓库构建或参考迁入后检查旧analyze/preview接口",
+    "expected": "空仓库不创建旧接口；若误引入则移除或隔离，不只隐藏菜单",
+    "level": "integration",
+    "status": "not_run"
+  },
+  {
+    "id": "AT-092",
+    "taskId": "T21",
+    "requirements": [
+      "FR-22"
+    ],
+    "title": "边界profile",
+    "scenario": "20/120秒、中英、有声无声、24/30/60已发布组合",
+    "expected": "所有声明能力有执行证据；未测不得标支持",
+    "level": "integration",
+    "status": "not_run"
+  }
+]

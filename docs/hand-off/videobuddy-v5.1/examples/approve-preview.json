@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 5,
+  "clientCommandId": "a0000000-0000-4000-8000-000000000008",
+  "previewId": "a0000000-0000-4000-8000-000000000009",
+  "revisionId": "a0000000-0000-4000-8000-000000000010",
+  "expectedBriefVersion": 3,
+  "bundleHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "scriptHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "factsHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+}

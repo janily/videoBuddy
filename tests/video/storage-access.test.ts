@@ -31,8 +31,9 @@ describe('T02 durable conditional store',()=>{
  });
  it('AT-009 retains uncertain expired reservations; stale release cannot free a new one',async()=>{
   const store=new FileStore(dir);const a=new Admission(store,'admission');
-  const requests=await Promise.allSettled([a.reserve('A','op-a'),a.reserve('A','op-b'),a.reserve('B','op-c'),a.reserve('C','op-d')]);
-  const grants=requests.flatMap(r=>r.status==='fulfilled'?[r.value]:[]);
+  const first=await a.reserve('A','op-a');
+  const requests=await Promise.allSettled([a.reserve('A','op-b'),a.reserve('B','op-c'),a.reserve('C','op-d')]);
+  const grants=[first,...requests.flatMap(r=>r.status==='fulfilled'?[r.value]:[])];
   expect(grants).toHaveLength(2);expect(grants.filter(g=>g.owner==='A')).toHaveLength(1);
   await expect(a.reserve('D','op-e')).rejects.toThrow('CAPACITY_LIMIT');
   await a.release(grants[0].id,'wrong-reservation',true);

@@ -11,12 +11,15 @@ const server=createServer(async(req,res)=>{try{const pathname=decodeURIComponent
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;
 let browser;
 try{
- browser=await chromium.launch({headless:true});const context=await browser.newContext({viewport:{width:job.logicalWidth,height:job.logicalHeight},deviceScaleFactor:1,serviceWorkers:'block'});
+ browser=await chromium.launch({headless:true,executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});const context=await browser.newContext({viewport:{width:job.logicalWidth,height:job.logicalHeight},deviceScaleFactor:1,serviceWorkers:'block'});
  await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
  const page=await context.newPage();let runtimeError;page.on('pageerror',e=>runtimeError=e);page.on('response',r=>{if(r.status()>=400)runtimeError=Error('RESOURCE_MISSING')});
  await page.goto(origin+'/scene.html',{waitUntil:'load'});await page.waitForFunction(()=>window.READY===true,{},{timeout:30000});await page.evaluate(()=>document.fonts.ready);
  const output=join(root,'output'),frames=join(root,'frames');await mkdir(output,{recursive:true});await mkdir(frames,{recursive:true});
- // Absolute time calls; random-seeking equality is checked separately by trusted QA.
+ const samples=[...new Set([job.startFrame,Math.floor((job.startFrame+job.endFrame)/2),job.endFrame-1])],baseline=new Map();
+ for(const frame of samples){await page.evaluate(t=>window.render(t),frame/job.fps);if(runtimeError)throw runtimeError;baseline.set(frame,await page.screenshot({animations:'disabled'}))}
+ for(const frame of samples.toReversed()){await page.evaluate(t=>window.render(t),frame/job.fps);if(runtimeError)throw runtimeError;if(!baseline.get(frame).equals(await page.screenshot({animations:'disabled'})))throw Error('NONDETERMINISTIC_SCENE')}
  for(let f=job.startFrame;f<job.endFrame;f++){await page.evaluate(t=>window.render(t),f/job.fps);if(runtimeError)throw runtimeError;await page.screenshot({path:join(frames,`${String(f-job.startFrame).padStart(6,'0')}.png`),animations:'disabled'})}
- await new Promise((resolve,reject)=>{const ff=spawn('ffmpeg',['-v','error','-framerate',String(job.fps),'-i',join(frames,'%06d.png'),'-vf',`scale=${job.outputWidth}:${job.outputHeight}:flags=lanczos`,'-c:v','libx264','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-movflags','+faststart','-y',join(output,'picture.mp4')],{stdio:'inherit'});ff.on('error',reject);ff.on('exit',code=>code===0?resolve():reject(Error('ENCODE_FAILED')))});
+ await browser.close();browser=null;
+ await new Promise((resolve,reject)=>{const ff=spawn('ffmpeg',['-v','error','-threads','2','-filter_threads','2','-framerate',String(job.fps),'-i',join(frames,'%06d.png'),'-vf',`scale=${job.outputWidth}:${job.outputHeight}:flags=lanczos`,'-c:v','libx264','-threads','2','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-movflags','+faststart','-y',join(output,'picture.mp4')],{stdio:'inherit'});ff.on('error',reject);ff.on('exit',code=>code===0?resolve():reject(Error('ENCODE_FAILED')))});
 }finally{await browser?.close();await new Promise(resolve=>server.close(resolve))}

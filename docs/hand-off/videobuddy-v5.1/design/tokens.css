@@ -1,0 +1,53 @@
+/* Easy Companion 2.1 · scope only to the application UI, never to a film */
+.vb-easy {
+  --vb-canvas: #FAFBF8;
+  --vb-surface: #FFFFFF;
+  --vb-soft: #F0F3EC;
+  --vb-hover: #E8EDE3;
+  --vb-ink: #252C25;
+  --vb-secondary: #566151;
+  --vb-muted: #66705F;
+  --vb-line: #DFE5DA;
+  --vb-control-line: #87917E;
+  --vb-action: #2E402C;
+  --vb-action-hover: #42563D;
+  --vb-on-action: #FFFFFF;
+  --vb-accent: #49633F;
+  --vb-focus: #49633F;
+  --vb-error: #9B3F34;
+  --vb-error-bg: #FBEFEA;
+  --vb-warning: #785718;
+  --vb-warning-bg: #FAF3E3;
+  --vb-success: #396139;
+  --vb-success-bg: #EDF5EA;
+  --vb-font: Inter, "Noto Sans CJK SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --vb-header: 64px;
+  --vb-sidebar: 388px;
+  --vb-content: 816px;
+  --vb-hit: 44px;
+  --vb-radius-control: 10px;
+  --vb-radius-card: 16px;
+  --vb-radius-media: 14px;
+  --vb-radius-dialog: 20px;
+  --vb-space-1: 4px;
+  --vb-space-2: 8px;
+  --vb-space-3: 12px;
+  --vb-space-4: 16px;
+  --vb-space-5: 20px;
+  --vb-space-6: 24px;
+  --vb-space-8: 32px;
+  --vb-space-12: 48px;
+  --vb-space-16: 64px;
+  --vb-fast: 140ms;
+  --vb-normal: 200ms;
+  --vb-ease: cubic-bezier(.2,0,0,1);
+  --vb-shadow-overlay: 0 20px 72px rgba(37,44,37,.13);
+}
+.vb-easy :focus-visible { outline: 2px solid var(--vb-focus); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .vb-easy *, .vb-easy *::before, .vb-easy *::after {
+    animation-duration: .001ms !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

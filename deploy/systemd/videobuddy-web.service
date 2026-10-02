@@ -1,0 +1,25 @@
+[Unit]
+Description=VideoBuddy web server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=videobuddy
+Group=videobuddy
+WorkingDirectory=/opt/videobuddy/current
+EnvironmentFile=/etc/videobuddy/video.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000
+Restart=on-failure
+RestartSec=5
+StateDirectory=videobuddy
+StateDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ReadWritePaths=/var/lib/videobuddy
+
+[Install]
+WantedBy=multi-user.target

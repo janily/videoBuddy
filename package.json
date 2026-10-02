@@ -15,21 +15,21 @@
     "test:video": "vitest run",
     "test:video:e2e": "playwright test",
     "doctor": "tsx scripts/video/doctor.ts",
-    "test:video:cloud": "tsx scripts/video/cloud.ts",
-    "test:video:styles": "tsx scripts/video/styles.ts"
+    "test:video:styles": "tsx scripts/video/styles.ts",
+    "worker": "tsx scripts/video/worker.ts",
+    "probe:video:media": "tsx scripts/video/probe-media.ts",
+    "test:video:platform": "vitest run tests/video/self-hosted-storage.test.ts tests/video/local-stream.test.ts tests/video/local-worker.test.ts tests/video/worker-lease.test.ts tests/video/local-director.test.ts tests/video/artifact-token.test.ts tests/video/local-artifact.test.ts tests/video/media-executor.test.ts"
   },
   "dependencies": {
     "@mastra/core": "1.74.0",
     "@opentelemetry/api": "1.9.1",
     "@tailwindcss/postcss": "4.3.3",
-    "@vercel/blob": "2.8.0",
-    "@vercel/sandbox": "3.5.1",
     "next": "16.3.8",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "tailwindcss": "4.3.3",
-    "workflow": "5.0.1",
-    "zod": "4.6.5"
+    "zod": "4.6.5",
+    "tsx": "4.23.15"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
@@ -40,7 +40,6 @@
     "ajv-formats": "3.0.1",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.8",
-    "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vitest": "5.0.3"
   },

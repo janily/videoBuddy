@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 5,
+  "clientCommandId": "a0000000-0000-4000-8000-000000000014",
+  "clientMessageId": "a0000000-0000-4000-8000-000000000015",
+  "text": "这里文字停留太短了。",
+  "attachmentIds": [],
+  "target": {
+    "artifactId": "a0000000-0000-4000-8000-000000000016",
+    "revisionId": "a0000000-0000-4000-8000-000000000010",
+    "sourceTimeMs": 24000,
+    "previewTimeMs": 4000
+  }
+}

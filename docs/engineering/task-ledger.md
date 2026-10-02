@@ -1,5 +1,7 @@
 # 开发任务与证据
 
+> 2026-10-02 架构变更：以下早期 Vercel/Blob/Workflow/Sandbox 记录仅保留为历史证据，已由 [自托管架构](self-hosted-architecture.md) 与 [执行计划](self-hosted-plan.md) 替代，不再是待索取的凭据。当前仍按原 T00–T21 产品范围验收；C0/C1/C2 未完成。最新本地结果：`npm ci --ignore-scripts --no-audit` 退出0、`npm test` 29文件131项通过、`npm run typecheck` 退出0、`npm run lint` 退出0、`npm run build` 退出0、Playwright 14项通过、Python runner 3项通过；原交付包独立校验通过，22任务/22需求/92验收/43风格/86基线目标和60份未改设计文件均匹配。T09 最小 Docker 2D/中文探针通过，真实1秒H.264/320×180/9,249字节、无网络、运行中停止、随机画面拒绝及独立 ffprobe/全解码技术QA证据见 [media-probe.json](evidence/media-probe.json) 和首帧；完整声音、合成、语义/字幕QA、WebGL仍未通过。付费模型评估、T05 全模态分析、43风格86基线未运行。自托管存储、队列/Worker、SSE、私有下载、本地素材字节 API 已开发并各有局部测试；不能据此标整项 T05/T09/T21 完成。
+
 唯一规格：docs/hand-off/videobuddy-v5.1。依赖按 T00–T21 执行。
 
 Pre-flight：T01→T02 的控制态由 project CAS 发布；T02→T03 重试纯变更不放宽语义基线；T03→T04 committed 必须在归档提交后；T04→T05 pending 上传不能永久锁审批；T05→T06 来源决定 patch 授权；T06→T07 服务端 action 决定主操作；T08→T15–18 43 slug 与分类不可变；T09→T10–12 媒体隔离/统一时钟/bundleHash/fence 不可弱化；T12→T13–14 不变产物与恢复只切指针；T15–20→T21 真实证据决定支持，不允许默认通过。

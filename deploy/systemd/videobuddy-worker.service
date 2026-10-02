@@ -1,0 +1,27 @@
+[Unit]
+Description=VideoBuddy durable worker
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=videobuddy
+Group=videobuddy
+SupplementaryGroups=docker
+WorkingDirectory=/opt/videobuddy/current
+EnvironmentFile=/etc/videobuddy/video.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node node_modules/tsx/dist/cli.mjs scripts/video/worker.ts
+Restart=on-failure
+RestartSec=5
+StateDirectory=videobuddy
+StateDirectoryMode=0700
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+ReadWritePaths=/var/lib/videobuddy
+
+[Install]
+WantedBy=multi-user.target

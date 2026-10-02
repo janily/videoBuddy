@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 5,
+  "projectId": "a0000000-0000-4000-8000-000000000018",
+  "operationId": "a0000000-0000-4000-8000-000000000024",
+  "epoch": 0,
+  "eventId": "a0000000-0000-4000-8000-000000000031",
+  "type": "message.delta",
+  "createdAt": "2026-10-02T10:00:00.000Z",
+  "payload": {
+    "messageId": "a0000000-0000-4000-8000-000000000023",
+    "contentVersion": 1,
+    "offset": 0,
+    "text": "我先整理"
+  }
+}

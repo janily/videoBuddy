@@ -1,0 +1,36 @@
+{
+  "status": "succeeded",
+  "containerId": "c814d04e8cb4374370ff2499bf5594048541f693e2cbfbed0492697ae188f11c",
+  "image": "sha256:f416c1f30abf8552e0f8fbe8f5490fe48e8694d84dec13a3b1c560523f2fb8c4",
+  "bytes": 9249,
+  "ffprobe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "h264",
+        "width": 320,
+        "height": 180
+      }
+    ],
+    "format": {
+      "duration": "1.000000"
+    }
+  },
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "ef2af8be3e62719de4e4e8daa71aa46540972cfb1d78f42ab7b4f2e83d667918",
+    "bytes": 9249,
+    "width": 320,
+    "height": 180,
+    "durationSec": 1,
+    "fps": 24,
+    "audio": false
+  },
+  "stopProbe": {
+    "status": "cancelled"
+  },
+  "determinismProbe": {
+    "status": "rejected"
+  },
+  "temporaryDirectory": "/var/folders/qq/4qmvt9v50450pz196btl6n300000gn/T/vb-media-probe-CUiUxe"
+}

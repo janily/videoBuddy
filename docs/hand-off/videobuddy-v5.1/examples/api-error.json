@@ -1,0 +1,8 @@
+{
+  "error": {
+    "code": "PREVIEW_STALE",
+    "message": "新资料已记下，先更新效果。",
+    "retryable": false,
+    "requestId": "req-example-1"
+  }
+}

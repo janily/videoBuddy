@@ -55,7 +55,8 @@ def cli():
         return
     def effect():
         subprocess.run(['node', '/opt/videobuddy/render.mjs', str(root / 'job.json')],
-                       cwd=root, env={'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': '/tmp'}, check=True)
+                       cwd=root, env={'PATH': '/usr/local/bin:/usr/bin:/bin', 'HOME': '/tmp'},
+                       timeout=int(os.environ.get('VIDEO_RENDER_TIMEOUT_SECONDS', '600')), check=True)
         output = root / 'output' / 'picture.mp4'
         if output.is_symlink() or not output.is_file() or output.stat().st_nlink != 1:
             raise ValueError('OUTPUT_INVALID')

@@ -1,0 +1,351 @@
+{
+  "count": 43,
+  "note": "设计目录；缩略图为本地视觉示意，非上游样片或生产能力证明。",
+  "upstreamCommit": "c4bc370eb15d36c88e074fdba1b0248b62a8e419",
+  "styles": [
+    {
+      "id": "crayon-book",
+      "nameZh": "蜡笔儿童绘本",
+      "nameEn": "Crayon Picture Book",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "蜡笔颗粒、线条抖动与童书表演",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/crayon-book/STYLE.md"
+    },
+    {
+      "id": "watercolor",
+      "nameZh": "水彩笔刷",
+      "nameEn": "Watercolor Brush",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "真实笔触/透明叠色/纸张水痕",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/watercolor/STYLE.md"
+    },
+    {
+      "id": "ink-wash",
+      "nameZh": "中国水墨",
+      "nameEn": "Chinese Ink Wash",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "墨色、留白、飞白与渗化转场",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/ink-wash/STYLE.md"
+    },
+    {
+      "id": "impasto",
+      "nameZh": "油画厚涂",
+      "nameEn": "Impasto Oil Painting",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "厚涂笔触、色块与材料感",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/impasto/STYLE.md"
+    },
+    {
+      "id": "one-line",
+      "nameZh": "一笔画",
+      "nameEn": "One-line Drawing",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "连续笔线及线的因果转化",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/one-line/STYLE.md"
+    },
+    {
+      "id": "whiteboard",
+      "nameZh": "白板讲解",
+      "nameEn": "Whiteboard Explainer",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "笔顺、讲解词和笔画的时间对应",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/whiteboard/STYLE.md"
+    },
+    {
+      "id": "urban-sketch",
+      "nameZh": "钢笔淡彩",
+      "nameEn": "Urban Sketch · Pen & Wash",
+      "categoryZh": "手绘与绘画",
+      "technicalReviewFocus": "笔线/透明淡彩错位与渐染",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/urban-sketch/STYLE.md"
+    },
+    {
+      "id": "shadow-puppet",
+      "nameZh": "皮影戏",
+      "nameEn": "Shadow Puppetry",
+      "categoryZh": "东方传统",
+      "technicalReviewFocus": "铆钉、背光、半透明皮影、材料音",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/shadow-puppet/STYLE.md"
+    },
+    {
+      "id": "ukiyoe",
+      "nameZh": "浮世绘",
+      "nameEn": "Ukiyo-e",
+      "categoryZh": "东方传统",
+      "technicalReviewFocus": "版画平面构成、波浪/云纹语法",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/ukiyoe/STYLE.md"
+    },
+    {
+      "id": "papercut-red",
+      "nameZh": "红色窗花剪纸",
+      "nameEn": "Red Paper-cut",
+      "categoryZh": "东方传统",
+      "technicalReviewFocus": "镂空轮廓、剪刻与剪纸转场",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/papercut-red/STYLE.md"
+    },
+    {
+      "id": "paper-lantern",
+      "nameZh": "纸雕灯影",
+      "nameEn": "Paper-cut Lightbox",
+      "categoryZh": "东方传统",
+      "technicalReviewFocus": "多层纸雕、背光与层间运动",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/paper-lantern/STYLE.md"
+    },
+    {
+      "id": "risograph",
+      "nameZh": "Risograph 丝网印刷",
+      "nameEn": "Risograph Print",
+      "categoryZh": "印刷与版画",
+      "technicalReviewFocus": "色版、叠印、套印偏移",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/risograph/STYLE.md"
+    },
+    {
+      "id": "halftone-dossier",
+      "nameZh": "复古半调案卷",
+      "nameEn": "Halftone Dossier",
+      "categoryZh": "印刷与版画",
+      "technicalReviewFocus": "半调、案卷信息、阅读层级",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/halftone-dossier/STYLE.md"
+    },
+    {
+      "id": "woodcut",
+      "nameZh": "木刻版画",
+      "nameEn": "Woodcut Print",
+      "categoryZh": "印刷与版画",
+      "technicalReviewFocus": "刀刻、木纹、黑白块面",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/woodcut/STYLE.md"
+    },
+    {
+      "id": "engraving",
+      "nameZh": "铜版画",
+      "nameEn": "Copperplate Engraving",
+      "categoryZh": "印刷与版画",
+      "technicalReviewFocus": "排线、雕刻纹理与信息板",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/engraving/STYLE.md"
+    },
+    {
+      "id": "silkscreen-poster",
+      "nameZh": "丝印旅行海报",
+      "nameEn": "Silkscreen Travel Poster",
+      "categoryZh": "印刷与版画",
+      "technicalReviewFocus": "丝印色版、旅行信息表达",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/silkscreen-poster/STYLE.md"
+    },
+    {
+      "id": "swiss-motion",
+      "nameZh": "瑞士动态排版",
+      "nameEn": "Swiss Motion Graphics",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "网格、精准卡点、单一强调色",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/swiss-motion/STYLE.md"
+    },
+    {
+      "id": "spy-titles",
+      "nameZh": "60s 间谍片头",
+      "nameEn": "60s Spy Title Sequence",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "剪影、图形匹配、片头节奏",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/spy-titles/STYLE.md"
+    },
+    {
+      "id": "art-deco",
+      "nameZh": "装饰艺术",
+      "nameEn": "Art Deco",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "几何装饰、金属/时代感、爵士语法",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/art-deco/STYLE.md"
+    },
+    {
+      "id": "blueprint",
+      "nameZh": "蓝图 / 工程制图",
+      "nameEn": "Blueprint",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "工程线型、尺寸、绘图顺序",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/blueprint/STYLE.md"
+    },
+    {
+      "id": "stained-glass",
+      "nameZh": "彩色玻璃窗",
+      "nameEn": "Stained Glass",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "玻璃分块、铅线、透光逻辑",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/stained-glass/STYLE.md"
+    },
+    {
+      "id": "pictogram-motion",
+      "nameZh": "象形运动图形",
+      "nameEn": "Pictogram Motion",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "象形动作可辨认、赛事节奏与真实项目",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/pictogram-motion/STYLE.md"
+    },
+    {
+      "id": "ascii-crt",
+      "nameZh": "ASCII / CRT 终端",
+      "nameEn": "ASCII / CRT Terminal",
+      "categoryZh": "图形与排版",
+      "technicalReviewFocus": "可读字符、CRT效果、像素与镜头一致",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/ascii-crt/STYLE.md"
+    },
+    {
+      "id": "dataviz",
+      "nameZh": "数据叙事",
+      "nameEn": "Data Storytelling",
+      "categoryZh": "信息与发布",
+      "technicalReviewFocus": "来源、单位、比例、事实可追溯",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/dataviz/STYLE.md"
+    },
+    {
+      "id": "iso-infographic",
+      "nameZh": "等距信息图",
+      "nameEn": "Isometric Infographic",
+      "categoryZh": "信息与发布",
+      "technicalReviewFocus": "等距空间、信息到达顺序",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/iso-infographic/STYLE.md"
+    },
+    {
+      "id": "dark-keynote",
+      "nameZh": "暗色科技发布",
+      "nameEn": "Dark Tech Keynote",
+      "categoryZh": "信息与发布",
+      "technicalReviewFocus": "暗场可读性、产品叙述与尺度",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/dark-keynote/STYLE.md"
+    },
+    {
+      "id": "living-screencast",
+      "nameZh": "活体实机录屏",
+      "nameEn": "Living Screencast",
+      "categoryZh": "信息与发布",
+      "technicalReviewFocus": "DOM测量、真实产品状态、游标与角色",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/living-screencast/STYLE.md"
+    },
+    {
+      "id": "hologram-hud",
+      "nameZh": "科幻全息界面",
+      "nameEn": "Sci-fi Hologram HUD",
+      "categoryZh": "信息与发布",
+      "technicalReviewFocus": "界面层次、规格事实与光效限制",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/hologram-hud/STYLE.md"
+    },
+    {
+      "id": "rubber-hose",
+      "nameZh": "1930s 橡皮管卡通",
+      "nameEn": "1930s Rubber Hose Cartoon",
+      "categoryZh": "卡通与动画",
+      "technicalReviewFocus": "橡皮管动作、表情和喜剧节拍",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/rubber-hose/STYLE.md"
+    },
+    {
+      "id": "cel-anime-80s",
+      "nameZh": "80 年代赛璐璐动画",
+      "nameEn": "80s Cel Anime",
+      "categoryZh": "卡通与动画",
+      "technicalReviewFocus": "赛璐璐图层、角色步进、摄影机流畅",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/cel-anime-80s/STYLE.md"
+    },
+    {
+      "id": "scifi-toon",
+      "nameZh": "科幻情景喜剧卡通",
+      "nameEn": "Sci-Fi Sitcom Toon",
+      "categoryZh": "卡通与动画",
+      "technicalReviewFocus": "角色反应、科幻转场、声音喜剧",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/scifi-toon/STYLE.md"
+    },
+    {
+      "id": "midcentury-toon",
+      "nameZh": "50s 扁平卡通",
+      "nameEn": "Mid-century Cartoon",
+      "categoryZh": "卡通与动画",
+      "technicalReviewFocus": "扁平造型、表演、时代色彩",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/midcentury-toon/STYLE.md"
+    },
+    {
+      "id": "pixel-rpg",
+      "nameZh": "16-bit 像素 RPG",
+      "nameEn": "16-bit Pixel RPG",
+      "categoryZh": "游戏",
+      "technicalReviewFocus": "像素网格、角色运动与RPG界面",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/pixel-rpg/STYLE.md"
+    },
+    {
+      "id": "hd-2d",
+      "nameZh": "HD-2D",
+      "nameEn": "HD-2D",
+      "categoryZh": "游戏",
+      "technicalReviewFocus": "像素角色/3D灯光/景深/不同更新频率",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/hd-2d/STYLE.md"
+    },
+    {
+      "id": "microgame",
+      "nameZh": "微游戏快闪（瓦里奥制造式）",
+      "nameEn": "Microgame Frenzy",
+      "categoryZh": "游戏",
+      "technicalReviewFocus": "多个媒介、统一角色识别、速度阶梯",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/microgame/STYLE.md"
+    },
+    {
+      "id": "game-show",
+      "nameZh": "综艺节奏扁平",
+      "nameEn": "Game Show Flat",
+      "categoryZh": "游戏",
+      "technicalReviewFocus": "舞台状态、知识/节奏、声音提示",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/game-show/STYLE.md"
+    },
+    {
+      "id": "silent-film",
+      "nameZh": "1920s 默片",
+      "nameEn": "1920s Silent Film",
+      "categoryZh": "电影与时代",
+      "technicalReviewFocus": "字幕卡、默片节奏、胶片效果",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/silent-film/STYLE.md"
+    },
+    {
+      "id": "backrooms",
+      "nameZh": "后室 / 新怪谈",
+      "nameEn": "Liminal Found Footage",
+      "categoryZh": "电影与时代",
+      "technicalReviewFocus": "空间/摄影机、故障感、暗场与听感",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/backrooms/STYLE.md"
+    },
+    {
+      "id": "brick-toy",
+      "nameZh": "积木玩具",
+      "nameEn": "Brick Toy",
+      "categoryZh": "材质与 3D",
+      "technicalReviewFocus": "积木材质、拼接结构、真实空间灯光",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/brick-toy/STYLE.md"
+    },
+    {
+      "id": "paper-popup",
+      "nameZh": "纸片立体书",
+      "nameEn": "Paper Pop-up Book",
+      "categoryZh": "材质与 3D",
+      "technicalReviewFocus": "纸片轮廓阴影、折叠翻页、宏微尺度",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/paper-popup/STYLE.md"
+    },
+    {
+      "id": "tilt-shift",
+      "nameZh": "移轴微缩",
+      "nameEn": "Tilt-Shift Miniature",
+      "categoryZh": "材质与 3D",
+      "technicalReviewFocus": "微缩景深、焦点路径、镜头尺度",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/tilt-shift/STYLE.md"
+    },
+    {
+      "id": "lowpoly-island",
+      "nameZh": "低多边形等距",
+      "nameEn": "Low-poly Isometric Island",
+      "categoryZh": "材质与 3D",
+      "technicalReviewFocus": "低多边形场景、等距构图与变化",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/lowpoly-island/STYLE.md"
+    },
+    {
+      "id": "glass-product",
+      "nameZh": "玻璃质感产品",
+      "nameEn": "Glass Product Render",
+      "categoryZh": "材质与 3D",
+      "technicalReviewFocus": "透明/折射、材质、产品光效与细节",
+      "styleSource": "https://github.com/lemomo-ai/lemo-opuscar/blob/c4bc370eb15d36c88e074fdba1b0248b62a8e419/styles/glass-product/STYLE.md"
+    }
+  ]
+}

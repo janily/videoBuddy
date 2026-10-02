@@ -1,0 +1,26 @@
+: heartbeat
+
+id: 0:0
+event: message.started
+data: {"schemaVersion":5,"projectId":"a0000000-0000-4000-8000-000000000018","operationId":"a0000000-0000-4000-8000-000000000024","epoch":0,"eventId":"a0000000-0000-4000-8000-000000000030","type":"message.started","createdAt":"2026-10-02T10:00:00.000Z","payload":{"messageId":"a0000000-0000-4000-8000-000000000023","contentVersion":1,"role":"assistant","ordinal":2}}
+
+id: 0:1
+event: message.delta
+data: {"schemaVersion":5,"projectId":"a0000000-0000-4000-8000-000000000018","operationId":"a0000000-0000-4000-8000-000000000024","epoch":0,"eventId":"a0000000-0000-4000-8000-000000000031","type":"message.delta","createdAt":"2026-10-02T10:00:00.000Z","payload":{"messageId":"a0000000-0000-4000-8000-000000000023","contentVersion":1,"offset":0,"text":"我先整理"}}
+
+id: 0:2
+event: message.reset
+data: {"schemaVersion":5,"projectId":"a0000000-0000-4000-8000-000000000018","operationId":"a0000000-0000-4000-8000-000000000024","epoch":0,"eventId":"a0000000-0000-4000-8000-000000000032","type":"message.reset","createdAt":"2026-10-02T10:00:00.000Z","payload":{"messageId":"a0000000-0000-4000-8000-000000000023","contentVersion":2,"text":""}}
+
+id: 0:3
+event: message.delta
+data: {"schemaVersion":5,"projectId":"a0000000-0000-4000-8000-000000000018","operationId":"a0000000-0000-4000-8000-000000000024","epoch":0,"eventId":"a0000000-0000-4000-8000-000000000033","type":"message.delta","createdAt":"2026-10-02T10:00:00.000Z","payload":{"messageId":"a0000000-0000-4000-8000-000000000023","contentVersion":2,"offset":0,"text":"我会先突出你的店名与特色。"}}
+
+id: 0:4
+event: message.committed
+data: {"schemaVersion":5,"projectId":"a0000000-0000-4000-8000-000000000018","operationId":"a0000000-0000-4000-8000-000000000024","epoch":0,"eventId":"a0000000-0000-4000-8000-000000000034","type":"message.committed","createdAt":"2026-10-02T10:00:00.000Z","payload":{"messageId":"a0000000-0000-4000-8000-000000000023","contentVersion":2,"archiveRevision":"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"}}
+
+id: 0:5
+event: operation.terminal
+data: {"schemaVersion":5,"projectId":"a0000000-0000-4000-8000-000000000018","operationId":"a0000000-0000-4000-8000-000000000024","epoch":0,"eventId":"a0000000-0000-4000-8000-000000000035","type":"operation.terminal","createdAt":"2026-10-02T10:00:00.000Z","payload":{"status":"succeeded","retryable":false}}
+

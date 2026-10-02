@@ -1,0 +1,23 @@
+{
+  "scope": "specification package only; not application, model, cloud, media or user tests",
+  "status": "passed",
+  "counts": {
+    "json_files_parsed": 33,
+    "markdown_files": 13,
+    "json_fences_parsed": 4,
+    "local_links_checked": 19,
+    "contract_definitions": 22,
+    "valid_examples": 16,
+    "rejected_examples": 3,
+    "tasks": 22,
+    "requirements": 22,
+    "acceptance_targets": 92,
+    "styles": 43,
+    "style_baseline_targets": 86,
+    "agent_eval_targets": 16,
+    "unchanged_design_files": 60,
+    "excerpt_mappings_checked": 3,
+    "empty_repository_acceptance_targets": 8
+  },
+  "errors": []
+}

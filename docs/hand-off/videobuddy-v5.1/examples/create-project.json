@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 5,
+  "clientCommandId": "a0000000-0000-4000-8000-000000000001",
+  "clientCreateId": "a0000000-0000-4000-8000-000000000002",
+  "preferences": {
+    "durationSec": 45,
+    "language": "zh-CN",
+    "aspect": "16:9"
+  }
+}
