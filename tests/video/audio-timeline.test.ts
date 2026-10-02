@@ -5,6 +5,7 @@ it('AT-031/080 narration or recording overflow never truncates or silently exten
 });
 it('AT-033 quantization derives audio from absolute time, with explicit visual error',()=>{
  expect(quantizeCue(100000,24,'audio')).toEqual({requestedTimeUs:100000,resolvedFrame:2,resolvedSample:4800,quantizationErrorUs:0});
+ expect(quantizeCue(1,24,'audio')).toEqual({requestedTimeUs:1,resolvedFrame:0,resolvedSample:0,quantizationErrorUs:-1});
  expect(quantizeCue(100000,24,'frame')).toEqual({requestedTimeUs:100000,resolvedFrame:2,resolvedSample:4000,quantizationErrorUs:-16666.66666666667});
 });
 it('AT-032 short Chinese subtitle duration and missing glyphs block output',()=>{

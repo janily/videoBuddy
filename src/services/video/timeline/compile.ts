@@ -3,8 +3,9 @@ export interface CaptionRange{text:string;startFrame:number;endFrame:number}
 export interface NarrationRange{lineId:string;durationMs:number;startMs:number}
 export function quantizeCue(requestedTimeUs:number,fps:24|30|60,policy:'audio'|'frame'){
  if(!Number.isSafeInteger(requestedTimeUs)||requestedTimeUs<0)throw Error('TIMELINE_INVALID');
- const resolvedFrame=Math.round(requestedTimeUs*fps/1e6),actualUs=policy==='frame'?resolvedFrame/fps*1e6:requestedTimeUs;
- return{requestedTimeUs,resolvedFrame,resolvedSample:Math.round(actualUs*48000/1e6),quantizationErrorUs:actualUs-requestedTimeUs};
+ const resolvedFrame=Math.round(requestedTimeUs*fps/1e6);
+ const resolvedSample=policy==='frame'?resolvedFrame*48000/fps:Math.round(requestedTimeUs*48000/1e6);
+ return{requestedTimeUs,resolvedFrame,resolvedSample,quantizationErrorUs:resolvedSample*1e6/48000-requestedTimeUs};
 }
 export function validateCaptions(captions:CaptionRange[],fps:24|30|60,glyphs:Set<string>){
  for(const caption of captions){for(const char of caption.text)if(!/\s/.test(char)&&!glyphs.has(char))throw Error('FONT_GLYPH_MISSING');
