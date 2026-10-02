@@ -1,0 +1,16 @@
+{
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "sourceSha256": "95c00ec0070df0b1629f837d2b8e2d304090f41ebd5d53aeeebec8f9ab35d0a6",
+  "bytes": 13446,
+  "pageCount": 1,
+  "assetStatus": "ready",
+  "briefVersion": 1,
+  "inputPending": false,
+  "containsShanghai": true,
+  "scannedPdf": {
+    "bytes": 11247,
+    "status": "failed",
+    "errorCode": "PDF_TEXT_UNAVAILABLE",
+    "inputPending": false
+  }
+}

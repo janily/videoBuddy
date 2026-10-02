@@ -1,6 +1,6 @@
 # 开发任务与证据
 
-> 2026-10-02 架构变更：以下早期 Vercel/Blob/Workflow/Sandbox 记录仅保留为历史证据，已由 [自托管架构](self-hosted-architecture.md) 与 [执行计划](self-hosted-plan.md) 替代，不再是待索取的凭据。当前仍按原 T00–T21 产品范围验收；C0/C1/C2 未完成。最新本地结果：`npm ci --ignore-scripts --no-audit` 退出0、`npm test` 29文件133项通过、`npm run typecheck` 退出0、`npm run lint` 退出0、`npm run build` 退出0、Playwright 16项通过、Python runner 3项通过；原交付包独立校验通过，22任务/22需求/92验收/43风格/86基线目标和60份未改设计文件均匹配。T09 最小 Docker 2D/中文探针通过，真实1秒H.264/320×180/9,249字节、无网络、运行中停止、随机画面拒绝及独立 ffprobe/全解码技术QA证据见 [media-probe.json](evidence/media-probe.json) 和首帧；完整声音、合成、语义/字幕QA、WebGL仍未通过。付费模型评估、T05 全模态分析、43风格86基线未运行。自托管存储、队列/Worker、SSE、私有下载、本地素材字节 API 与 Markdown 解析/附件消息已开发并各有局部测试；不能据此标整项 T05/T09/T21 完成。
+> 2026-10-02 架构变更：以下早期 Vercel/Blob/Workflow/Sandbox 记录仅保留为历史证据，已由 [自托管架构](self-hosted-architecture.md) 与 [执行计划](self-hosted-plan.md) 替代，不再是待索取的凭据。当前仍按原 T00–T21 产品范围验收；C0/C1/C2 未完成。最新本地结果：`npm ci --ignore-scripts --no-audit` 退出0、`npm test` 30文件138项通过、`npm run typecheck` 退出0、`npm run lint` 退出0、`npm run build` 退出0、Playwright 17项通过、Python runner 3项通过；原交付包独立校验通过，22任务/22需求/92验收/43风格/86基线目标和60份未改设计文件均匹配。T09 最小 Docker 2D/中文探针通过，真实1秒H.264/320×180/9,249字节、无网络、运行中停止、随机画面拒绝及独立 ffprobe/全解码技术QA证据见 [media-probe.json](evidence/media-probe.json) 和首帧；完整声音、合成、语义/字幕QA、WebGL仍未通过。付费模型评估、T05 全模态分析、43风格86基线未运行。自托管存储、队列/Worker、SSE、私有下载、本地素材字节 API 与 Markdown/文本 PDF 解析及附件消息已开发并各有局部测试；不能据此标整项 T05/T09/T21 完成。
 
 唯一规格：docs/hand-off/videobuddy-v5.1。依赖按 T00–T21 执行。
 
@@ -34,7 +34,7 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 | T02 | Private Blob fresh body/ETag同响应、CAS、匿名owner、不可变归档/分块索引、容量预约；storage-access 9项、project-api 6项 | 云冷实例测试、全模态/产物存储布局、完整清理未验收 |
 | T03 | durable receipt、canonical claim、effect ledger、聊天恢复端点；commands 9项、reconcile 2项 | 完整生产资源恢复/停止核实、云故障演练；reserved原请求仍可重试 |
 | T04 | UTF8/SSE/游标/reducer、Workflow真实流端点、已归档回复保护、启动重连；stream 8项 | 真实跨云请求续流/流过期修复/中文长流未验收；当前Director结构化完成后发delta，并非原生token流 |
-| T05 | 预约容量/幂等/UTF8 Markdown实际探测；本地直传及完成 API；Markdown 不可变原文、ready、消息附件、Director 来源引文验证与浏览器上传流程；本地路由和 E2E 局部通过 | PDF/图片/音频真实解读、超长 Markdown 分段检索、完整来源 UI 和全模态验收尚未接通 |
+| T05 | 预约容量/幂等/UTF8 Markdown探测、本地直传及完成 API；Markdown/文本 PDF 不可变原文、ready、消息附件、行号/页码引文验证；受限容器 PDF 探针与扫描件失败解除 pending 实测通过 | 扫描 PDF/图片/音频视觉或语音解读、超长资料分段检索与全模态验收尚未接通 |
 | T06 | 真实Mastra adapter、来源授权/逐轮引导/理解patch、持久聊天Workflow；guidance 6项、model-adapter 1项 | Visual/Audio/Critic代理、16项真实行为评估、材料来源授权；context超限明确失败而非偷删事实 |
 | T07 | 已确认布局、单输入、IME/草稿、聊天列表、手机标签、风格原生dialog；Playwright 14项 | 左侧目前欢迎/收集态；完整预览/制作/完成态、5条待发队列及进阶交互尚缺 |
 | T08 | 43原slug/9分类/固定版本STYLE规则与哈希、搜索/知识加载；styles 6项 | 推荐策略与完整StylePack执行适配尚缺；所有公开profiles为空，能力标not_run |
@@ -55,3 +55,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 模型预算是保守预约上界：输入按UTF8字节数+4096开销预留、输出2000tokens硬上限；daily先预约，project失败时不自动返还，未知计费不会重试。该行为可少用预算，不会放宽上限。媒体/TTS尚未接入收费入口，不能声称这两类预算已运行。
 
 审查修复：hot128 receipt淘汰仍按durable accepted重放；完成归档不得被空interrupted覆盖；SSE OPERATION_NOT_STARTED重试并可显式恢复；cancel在CAS内校验通道/终态，未claim取消立即终结；真实失败run可恢复为interrupted，unknown保留占用；用户新消息刷新30天activity期限。测试fixtures只用于本地测试，不进入生产返回值。
+
+2026-10-02 T05 增量：固定 `sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919` 镜像内 PDF.js 6.3.289 实际文本层读取；[pdf-probe.json](evidence/pdf-probe.json) 记录真实13,446字节中文PDF提取上海事实、1页、ready、briefVersion=1、pending=false，另有图片扫描PDF实际失败为 `PDF_TEXT_UNAVAILABLE`、pending=false。新镜像最小媒体探针复测通过；`npm test` 30文件138项、Playwright 17项、lint/typecheck/build均通过。此证据不代表扫描件OCR、模型事实质量或视频闭环通过。

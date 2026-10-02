@@ -21,8 +21,8 @@ function parseAttachments(raw:string):PendingAttachment[]{
 function readAttachments(projectId:string){try{return parseAttachments(localStorage.getItem(attachmentKey(projectId))||'[]')}catch{return []}}
 function saveAttachments(projectId:string,attachments:PendingAttachment[]){try{localStorage.setItem(attachmentKey(projectId),JSON.stringify(attachments));window.dispatchEvent(new Event('vb-attachments'))}catch{}}
 function subscribeAttachments(notify:()=>void){window.addEventListener('storage',notify);window.addEventListener('vb-attachments',notify);return()=>{window.removeEventListener('storage',notify);window.removeEventListener('vb-attachments',notify)}}
-async function uploadBytes(url:string,file:File){
- const response=await fetch(url,{method:'PUT',headers:{'Content-Type':'text/markdown'},body:file});
+async function uploadBytes(url:string,file:File,mime:'text/markdown'|'application/pdf'){
+ const response=await fetch(url,{method:'PUT',headers:{'Content-Type':mime},body:file});
  const value=await response.json();
  if(!response.ok)throw Error(value.error?.message||'资料上传失败，请重试。');
 }
@@ -37,6 +37,8 @@ export function useProject(initialProjectId?:string){
  useEffect(()=>{if(initialProjectId){void refresh()}},[initialProjectId,refresh]);
  const stream=useProjectEvents(projectId,view?.activeConversation?.id,view?.activeConversation?.streamEpoch||0,refresh);
  const productionStream=useProjectEvents(projectId,view?.activeProduction?.id,view?.activeProduction?.streamEpoch||0,refresh);
+ const pendingAnalysis=attachments.some(attachment=>!view?.assets.some(asset=>asset.id===attachment.id&&['ready','failed'].includes(asset.status)));
+ useEffect(()=>{if(!pendingAnalysis)return;const timer=window.setInterval(()=>void refresh(),2000);return()=>window.clearInterval(timer)},[pendingAnalysis,refresh]);
 
  async function ensureProject(){
   await ensureSession();
@@ -50,18 +52,19 @@ export function useProject(initialProjectId?:string){
   return idRef.current;
  }
 
- async function uploadMarkdown(file:File):Promise<boolean>{
+ async function uploadMaterial(file:File):Promise<boolean>{
   if(uploading)return false;
-  if(!/\.md$/i.test(file.name)||file.size<1||file.size>1024*1024){setError('请选择不超过 1 MiB 的 .md 文件。');return false}
+  const mime=/\.md$/i.test(file.name)?'text/markdown':/\.pdf$/i.test(file.name)?'application/pdf':null;
+  if(!mime||file.size<1||file.size>(mime==='text/markdown'?1024*1024:20*1024*1024)){setError('请选择不超过 1 MiB 的 .md 或不超过 20 MiB 的 .pdf 文件。');return false}
   setUploading(true);setError('');
   try{
    const id=await ensureProject();
    const reservation=await api<{assetId:string;reservationId:string;uploadUrl:string}>(`/api/video/projects/${id}/assets/reserve`,{
-    schemaVersion:5,clientCommandId:crypto.randomUUID(),filename:file.name,declaredBytes:file.size,declaredMime:'text/markdown',intendedUse:'reference',rightsConfirmed:true,
+    schemaVersion:5,clientCommandId:crypto.randomUUID(),filename:file.name,declaredBytes:file.size,declaredMime:mime,intendedUse:'reference',rightsConfirmed:true,
    });
-   await uploadBytes(reservation.uploadUrl,file);
+   await uploadBytes(reservation.uploadUrl,file,mime);
    const completed=await api<{status:string}>(`/api/video/projects/${id}/assets/${reservation.assetId}/complete`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),reservationId:reservation.reservationId});
-   if(completed.status!=='ready')throw Error('资料已上传，但尚未完成解读，请稍后重试。');
+   if(!['ready','uploaded'].includes(completed.status))throw Error('资料已上传，但尚未完成解读，请稍后重试。');
    const next=[...readAttachments(id).filter(a=>a.id!==reservation.assetId),{id:reservation.assetId,filename:file.name}];
    saveAttachments(id,next);await refresh();return true;
   }catch(e){setError(e instanceof Error?e.message:'资料上传失败，请重试。');return false}
@@ -76,6 +79,7 @@ export function useProject(initialProjectId?:string){
  async function send(){
   const text=readDraft(key),attachmentIds=attachments.map(a=>a.id);
   if((!text.trim()&&!attachmentIds.length)||sending||uploading)return;
+  if(attachmentIds.some(id=>!view?.assets.some(asset=>asset.id===id&&asset.status==='ready'))){setError('资料还在读取或读取失败，请等待或移除后发送。');return}
   setSending(true);setError('');
   const previous=commandRef.current;
   const command=previous?.text===text&&JSON.stringify(previous.attachmentIds)===JSON.stringify(attachmentIds)?previous:{text,attachmentIds,commandId:crypto.randomUUID(),messageId:crypto.randomUUID()};
@@ -93,5 +97,5 @@ export function useProject(initialProjectId?:string){
  }
  async function stopReply(){const op=view?.activeConversation;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'reply'});await refresh()}catch(e){setError(e instanceof Error?e.message:'无法停止回复。')}}
  const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMarkdown,removeAttachment,send,stopReply,messages,connection:stream.connection||productionStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send,stopReply,messages,connection:stream.connection||productionStream.connection,refresh};
 }

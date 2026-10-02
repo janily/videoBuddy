@@ -29,6 +29,14 @@ it('uploaded material facts require a ready attachment and a quote present in it
  expect(()=>applyUnderstandingPatch(initialUnderstanding(),{...patch,operations:[{...patch.operations[0],sourceMessageIds:[otherId]}]},[source,{id:otherId,role:'user',text:'无关消息'}])).toThrow('SOURCE_INVALID');
  expect(()=>applyUnderstandingPatch(initialUnderstanding(),{baseBriefVersion:0,operations:[{op:'set_asset_use',assetId:'50000000-0000-4000-8000-000000000005',purpose:'reference',required:false,sourceMessageIds:[id]}]},[source])).toThrow('SOURCE_INVALID');
 });
+it('text PDF citations require the quoted text on the stated page',()=>{
+ const assetId='60000000-0000-4000-8000-000000000006';
+ const source={...message,text:'',attachments:[{assetId,filename:'brief.pdf',mime:'application/pdf',sha256:'b'.repeat(64),text:'[page:1] 开业\n[page:2] 价格三十元',pages:['开业','价格三十元']}]};
+ const fact={id:'price',text:'价格三十元',sourceRefs:[{type:'uploaded_material',id:assetId,locator:'page:2',excerpt:'价格三十元'}],status:'provided',mustInclude:false,critical:false};
+ const patch={baseBriefVersion:0,operations:[{op:'add_fact',fact,sourceMessageIds:[id]}]};
+ expect(applyUnderstandingPatch(initialUnderstanding(),patch,[source]).facts).toHaveLength(1);
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),{...patch,operations:[{...patch.operations[0],fact:{...fact,sourceRefs:[{...fact.sourceRefs[0],locator:'page:1'}]}}]},[source])).toThrow('SOURCE_INVALID');
+});
 it('AT-019 skipped optional questions remain remembered and duplicate questioning is rejected',()=>{
  const base=initialUnderstanding();const skipped=applyUnderstandingPatch(base,{baseBriefVersion:0,operations:[{op:'mark_topic_skipped',topic:'photos',sourceMessageIds:[id]}]},[message]);
  expect(skipped.skippedTopics).toEqual(['photos']);

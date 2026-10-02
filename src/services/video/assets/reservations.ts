@@ -17,7 +17,7 @@ export async function reserveAsset(store:AtomicStore,key:string,input:UploadInpu
   return{...c,...('controlVersion'in c&&typeof c.controlVersion==='number'?{controlVersion:c.controlVersion+1}:{}),assets:[...c.assets,asset],inputPending:true};
  });return next.assets.find(a=>a.commandId===commandId)!;
 }
-export async function failAsset(store:AtomicStore,key:string,id:string,errorCode:string){return updateJson(store,key,(c:AssetsControl)=>{const assets=c.assets.map(a=>a.id===id?{...a,status:'failed',errorCode,quotaReserved:!!a.sha256}:a);return{...c,...('controlVersion'in c&&typeof c.controlVersion==='number'?{controlVersion:c.controlVersion+1}:{}),assets,inputPending:pending(assets)}})}
+export async function failAsset(store:AtomicStore,key:string,id:string,errorCode:string){return updateJson(store,key,(c:AssetsControl)=>{const assets=c.assets.map(a=>a.id===id&&!['ready','removed'].includes(a.status)?{...a,status:'failed',errorCode,quotaReserved:!!a.sha256}:a);if(assets.every((asset,index)=>asset===c.assets[index]))return c;return{...c,...('controlVersion'in c&&typeof c.controlVersion==='number'?{controlVersion:c.controlVersion+1}:{}),assets,inputPending:pending(assets)}})}
 export async function markUploaded(store:AtomicStore,key:string,id:string,sha256:string,bytes:number){return updateJson(store,key,(c:AssetsControl)=>{
  const existing=c.assets.find(a=>a.id===id);if(!existing)throw Error('ACCESS_NOT_FOUND');
  if(existing.sha256){if(existing.sha256!==sha256)throw Error('ASSET_HASH_CONFLICT');return c}
@@ -26,9 +26,10 @@ export async function markUploaded(store:AtomicStore,key:string,id:string,sha256
 })}
 export async function expireReservations(store:AtomicStore,key:string,now=Date.now()){
  const current=(await store.readFresh<AssetsControl>(key)).value;
- if(!current.assets.some(asset=>asset.status==='reserved'&&Date.parse(asset.expiresAt)<=now))return current;
+ const expired=(asset:AssetReservation)=>(asset.status==='reserved'&&Date.parse(asset.expiresAt)<=now)||(['uploaded','analyzing'].includes(asset.status)&&Date.parse(asset.expiresAt)+300000<=now);
+ if(!current.assets.some(expired))return current;
  return updateJson(store,key,(c:AssetsControl)=>{
- const assets=c.assets.map(asset=>asset.status==='reserved'&&Date.parse(asset.expiresAt)<=now?{...asset,status:'failed',errorCode:'UPLOAD_EXPIRED',quotaReserved:false}:asset);
+ const assets=c.assets.map(asset=>expired(asset)?{...asset,status:'failed',errorCode:asset.status==='reserved'?'UPLOAD_EXPIRED':'ANALYSIS_TIMEOUT',quotaReserved:!!asset.sha256}:asset);
  if(assets.every((asset,index)=>asset===c.assets[index]))return c;
  return{...c,...('controlVersion'in c&&typeof c.controlVersion==='number'?{controlVersion:c.controlVersion+1}:{}),assets,inputPending:pending(assets)};
 })}

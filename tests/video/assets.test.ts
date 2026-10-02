@@ -34,3 +34,10 @@ it('an abandoned reservation expires and releases approval pending state',async(
  const {value}=await store.readFresh<{inputPending:boolean;assets:{status:string;errorCode:string;quotaReserved:boolean}[]}>('assets');
  expect(value.inputPending).toBe(false);expect(value.assets[0]).toMatchObject({status:'failed',errorCode:'UPLOAD_EXPIRED',quotaReserved:false});
 });
+it('an uploaded asset whose analysis never completes becomes a visible timeout',async()=>{
+ const store=new FileStore(dir);await store.create('assets',{assets:[],inputPending:false});const asset=await reserveAsset(store,'assets',input,'c1');
+ await markUploaded(store,'assets',asset.id,'a'.repeat(64),100);
+ await expireReservations(store,'assets',Date.parse(asset.expiresAt)+300001);
+ const {value}=await store.readFresh<{inputPending:boolean;assets:{status:string;errorCode:string;quotaReserved:boolean}[]}>('assets');
+ expect(value.inputPending).toBe(false);expect(value.assets[0]).toMatchObject({status:'failed',errorCode:'ANALYSIS_TIMEOUT',quotaReserved:true});
+});

@@ -11,8 +11,8 @@ RUN if [ -n "$APT_PROXY" ]; then printf 'Acquire::http::Proxy "%s";\n' "$APT_PRO
     && rm -rf /var/lib/apt/lists/* /etc/apt/apt.conf.d/99proxy
 
 WORKDIR /opt/videobuddy
-COPY package.json ./
-RUN npm install --omit=dev --ignore-scripts --no-audit --no-fund
-COPY render.mjs runner.py ./
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+COPY render.mjs runner.py analyze-pdf.mjs ./
 
 CMD ["python3", "/opt/videobuddy/runner.py"]

@@ -6,3 +6,8 @@ it('only one process may execute paid effects; release permits the next worker',
  try{await expect(acquireWorkerLease(dir)).rejects.toThrow('WORKER_BUSY')}finally{await first.release()}
  const second=await acquireWorkerLease(dir);await second.release();
 });
+it('source analysis has its own exclusive lease while the paid worker can run',async()=>{
+ const worker=await acquireWorkerLease(dir),source=await acquireWorkerLease(dir,'source-worker');
+ try{await expect(acquireWorkerLease(dir,'source-worker')).rejects.toThrow('WORKER_BUSY')}
+ finally{await source.release();await worker.release()}
+});

@@ -9,7 +9,7 @@ import {StreamEventSchema} from '@/contracts/video/commands';
 import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budget/model-budget';
 import {runDirector,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage} from '@/mastra/video/director';
-import {MarkdownAnalysis} from '@/services/video/assets/analysis';
+import {TextAnalysis} from '@/services/video/assets/analysis';
 
 type Decide=typeof runDirector;
 export async function runDirectorOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{decide?:Decide;limits?:ModelLimits}={}){
@@ -32,10 +32,10 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    id:message.id,role:message.role,text:message.text,
    ...(message.attachmentIds?.length?{attachments:await Promise.all(message.attachmentIds.map(async assetId=>{
     const asset=control.assets.find(item=>item.id===assetId);
-    if(!asset||asset.status!=='ready'||asset.declaredMime!=='text/markdown'||!asset.analysisRef)throw Error('SOURCE_INVALID');
-    const analysis=(await store.readFresh<MarkdownAnalysis>(asset.analysisRef.key)).value;
-    if(analysis.assetId!==assetId||analysis.sha256!==asset.sha256||analysis.trust!=='untrusted_material')throw Error('SOURCE_INVALID');
-    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text};
+    if(!asset||asset.status!=='ready'||!['text/markdown','application/pdf'].includes(asset.declaredMime)||!asset.analysisRef)throw Error('SOURCE_INVALID');
+    const analysis=(await store.readFresh<TextAnalysis>(asset.analysisRef.key)).value;
+    if(analysis.assetId!==assetId||analysis.sha256!==asset.sha256||analysis.mime!==asset.declaredMime||analysis.trust!=='untrusted_material'||(asset.declaredMime==='application/pdf'&&!analysis.pages?.length))throw Error('SOURCE_INVALID');
+    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(analysis.pages?{pages:analysis.pages}:{})};
    }))}:{}),
   })));
   const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{

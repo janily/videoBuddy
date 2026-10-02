@@ -17,7 +17,9 @@
     "doctor": "tsx scripts/video/doctor.ts",
     "test:video:styles": "tsx scripts/video/styles.ts",
     "worker": "tsx scripts/video/worker.ts",
+    "worker:sources": "tsx scripts/video/source-worker.ts",
     "probe:video:media": "tsx scripts/video/probe-media.ts",
+    "probe:video:pdf": "tsx scripts/video/probe-pdf.ts",
     "test:video:platform": "vitest run tests/video/self-hosted-storage.test.ts tests/video/local-stream.test.ts tests/video/local-worker.test.ts tests/video/worker-lease.test.ts tests/video/local-director.test.ts tests/video/artifact-token.test.ts tests/video/local-artifact.test.ts tests/video/media-executor.test.ts"
   },
   "dependencies": {

@@ -15,7 +15,7 @@ cp .env.local.example .env.local
 npm run dev
 ```
 
-打开 http://localhost:3000/video。缺服务配置时界面保留草稿并显示实际错误。不要将 `VIDEO_GENERATION_ENABLED` 打开视为验收通过；现有模型聊天需要真实配置，素材分析和完整媒体工作流尚未接通。
+打开 http://localhost:3000/video。缺服务配置时界面保留草稿并显示实际错误。Markdown 在上传完成时解析；文本层 PDF 需要单独运行 `npm run worker:sources` 和已固定的本地 Docker 镜像。扫描 PDF、图片和音频仍缺真实视觉或语音分析。不要将 `VIDEO_GENERATION_ENABLED` 打开视为验收通过；现有模型聊天需要真实配置，完整媒体工作流尚未接通。
 
 ```sh
 npm run typecheck
@@ -27,6 +27,6 @@ python3 -m unittest discover -s runtime/media -p 'test_*.py'
 npm run doctor
 ```
 
-默认测试不调用付费服务。开发机可运行 `docker build -t videobuddy-media:local -f runtime/media/Dockerfile runtime/media` 构建本地媒体镜像。将 `docker image inspect --format '{{.Id}}' videobuddy-media:local` 得到的不可变镜像 ID 填入 `VIDEO_MEDIA_IMAGE_REF`，并把 ID 的 64 位十六进制部分填入 `VIDEO_MEDIA_RUNTIME_DIGEST`，再运行 `npm run probe:video:media`。该探针只证明最小浏览器和编码链路；`test:video:styles` 当前明确返回阻断，不能把43份风格规则当作43种已运行风格。86条真实视听基线尚未运行。
+默认测试不调用付费服务。开发机可运行 `docker build -t videobuddy-media:local -f runtime/media/Dockerfile runtime/media` 构建本地媒体镜像。将 `docker image inspect --format '{{.Id}}' videobuddy-media:local` 得到的不可变镜像 ID 填入 `VIDEO_MEDIA_IMAGE_REF`，并把 ID 的 64 位十六进制部分填入 `VIDEO_MEDIA_RUNTIME_DIGEST`，再运行 `npm run probe:video:media` 与 `npm run probe:video:pdf`。这两个探针只证明最小媒体链路和文本 PDF 读取；`test:video:styles` 当前明确返回阻断，不能把43份风格规则当作43种已运行风格。86条真实视听基线尚未运行。
 
 当前未部署，未推送远程；`.git` 和 origin 保持原样。
