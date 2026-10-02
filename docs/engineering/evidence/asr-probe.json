@@ -1,0 +1,143 @@
+{
+  "model": "Systran/faster-whisper-small@2ec96c5472da50d38d40c0cfe0602af2e94b4c8a",
+  "network": "none",
+  "inputBlind": true,
+  "wrongDateRejected": true,
+  "outputs": [
+    {
+      "language": "zh-CN",
+      "spokenText": "上海的活动将在十月八日开始。",
+      "expectedAsrText": "上海的活动将在十月八日开始",
+      "recognizedText": "上海的活动将在10月8日开始。",
+      "wordCount": 12,
+      "words": [
+        {
+          "text": "上",
+          "startMs": 0,
+          "endMs": 480,
+          "probability": 0.9554223418235779
+        },
+        {
+          "text": "海",
+          "startMs": 480,
+          "endMs": 700,
+          "probability": 0.9995487332344055
+        },
+        {
+          "text": "的",
+          "startMs": 700,
+          "endMs": 820,
+          "probability": 0.9736367464065552
+        },
+        {
+          "text": "活",
+          "startMs": 820,
+          "endMs": 1020,
+          "probability": 0.9995747208595276
+        },
+        {
+          "text": "动",
+          "startMs": 1020,
+          "endMs": 1280,
+          "probability": 0.5107705593109131
+        },
+        {
+          "text": "将",
+          "startMs": 1280,
+          "endMs": 1700,
+          "probability": 0.9266935586929321
+        },
+        {
+          "text": "在",
+          "startMs": 1700,
+          "endMs": 1900,
+          "probability": 0.9974129796028137
+        },
+        {
+          "text": "10",
+          "startMs": 1900,
+          "endMs": 2180,
+          "probability": 0.9658721089363098
+        },
+        {
+          "text": "月",
+          "startMs": 2180,
+          "endMs": 2360,
+          "probability": 0.9751137495040894
+        },
+        {
+          "text": "8",
+          "startMs": 2360,
+          "endMs": 2600,
+          "probability": 0.9835794568061829
+        },
+        {
+          "text": "日",
+          "startMs": 2600,
+          "endMs": 2820,
+          "probability": 0.9989595413208008
+        },
+        {
+          "text": "开始。",
+          "startMs": 2820,
+          "endMs": 3100,
+          "probability": 0.9870890974998474
+        }
+      ],
+      "voiceSha256": "75dd6071fd3f99e2322ddca00f9256bb9274a7e47b44a01a8f7b8994d960eb8b",
+      "voiceDurationMs": 4100,
+      "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+      "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+      "status": "pass",
+      "wordTimingsStatus": "available",
+      "sameStageReplay": true
+    },
+    {
+      "language": "en",
+      "spokenText": "The event starts in Shanghai.",
+      "expectedAsrText": "The event starts in Shanghai",
+      "recognizedText": "The event starts in Shanghai.",
+      "wordCount": 5,
+      "words": [
+        {
+          "text": " The",
+          "startMs": 0,
+          "endMs": 320,
+          "probability": 0.9388185143470764
+        },
+        {
+          "text": " event",
+          "startMs": 320,
+          "endMs": 580,
+          "probability": 0.9723600149154663
+        },
+        {
+          "text": " starts",
+          "startMs": 580,
+          "endMs": 920,
+          "probability": 0.996634304523468
+        },
+        {
+          "text": " in",
+          "startMs": 920,
+          "endMs": 1180,
+          "probability": 0.9971844553947449
+        },
+        {
+          "text": " Shanghai.",
+          "startMs": 1180,
+          "endMs": 1420,
+          "probability": 0.9844014048576355
+        }
+      ],
+      "voiceSha256": "dceedf0c510f4a31840d310941d4a96fa4bb438515668cce5a4fee91602085ed",
+      "voiceDurationMs": 2500,
+      "asrRuntimeDigest": "c0238dfb63f981905ddd4a13d1658fc5e2915d339bc1ad25036fd2ca79ba5fa4",
+      "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+      "status": "pass",
+      "wordTimingsStatus": "available",
+      "sameStageReplay": true
+    }
+  ],
+  "limits": "Short clean synthetic speech only; model fallibility, unusual names, final mixed-audio ASR and listening QA remain unchecked"
+}

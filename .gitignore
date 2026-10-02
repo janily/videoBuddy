@@ -160,3 +160,5 @@ __pycache__/
 runtime/voice/voices/
 runtime/voice/model/
 runtime/voice/*.wav
+runtime/asr/model/
+runtime/asr/*.wav

@@ -15,6 +15,10 @@ it('AT-079 expected ASR text cannot be altered to match a mispronunciation',()=>
  expect(()=>assertAsrExpected('重庆','重青','重青')).toThrow('ASR_EXPECTATION_CHANGED');
  expect(()=>assertAsrExpected('重庆','重庆','重青')).toThrow('ASR_MISMATCH');
 });
+it('normalizes date numeral notation without hiding a wrong spoken date',()=>{
+ expect(()=>assertAsrExpected('上海的活动将在十月八日开始','上海的活动将在十月八日开始','上海的活动将在10月8日开始。')).not.toThrow();
+ expect(()=>assertAsrExpected('上海的活动将在十月八日开始','上海的活动将在十月八日开始','上海的活动将在10月9日开始。')).toThrow('ASR_MISMATCH');
+});
 it('half-open shot ranges cover the film without undeclared gaps or overlaps',()=>{
  expect(()=>compileTimeline({durationSec:20,fps:24,shots:[{id:'s',startFrame:1,endFrame:480}],narration:[],captions:[]})).toThrow('TIMELINE_COVERAGE');
  expect(compileTimeline({durationSec:20,fps:24,shots:[{id:'s',startFrame:0,endFrame:480}],narration:[],captions:[]}).totalFrames).toBe(480);
