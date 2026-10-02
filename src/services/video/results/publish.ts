@@ -2,7 +2,7 @@ import{z}from 'zod';
 import{canonicalHash}from '@/services/video/domain/hash';
 import{assertPublishable}from '@/services/video/quality/publish-gate';
 import{validateDelivery,mandatoryDeliveryRules}from '@/services/video/quality/delivery';
-import{resolveArtifact}from '@/services/video/exports/access';
+import{inspectArtifact}from '@/services/video/exports/access';
 import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{readPreviewBundle}from '@/services/video/preview/commit';
 import type{ApprovalRecord}from '@/services/video/preview/approve';
@@ -25,7 +25,7 @@ export async function publishResult(projects:ProjectStore,owner:string,projectId
  const approval=(await projects.store.readFresh<ApprovalRecord>(`${p}/approvals/${result.approvalId}`)).value;
  const preview=await readPreviewBundle(projects,projectId,result.previewId);
  if(approval.projectId!==projectId||approval.ownerKeyHash!==owner||approval.source!=='preview_button'||approval.approvalId!==result.approvalId||approval.previewId!==result.previewId||approval.revisionId!==result.revisionId||approval.bundleHash!==result.bundleHash||preview.bundleHash!==result.bundleHash||preview.revisionId!==result.revisionId||canonicalHash(result.qualityPolicy)!==preview.renderInputs.qualityPolicySha256)throw Error('PREVIEW_STALE');
- const artifact=await resolveArtifact(projects,owner,projectId,result.artifactId);
+ const artifact=await inspectArtifact(projects,owner,projectId,result.artifactId);
  if(artifact.revisionId!==result.revisionId||artifact.objectRef.sha256!==result.mp4Sha256||artifact.objectRef.bytes!==result.mp4Bytes||artifact.objectRef.mime!=='video/mp4')throw Error('ARTIFACT_INVALID');
  const actualFileSha256=await actualArtifactSha256(storageRoot,artifact.objectRef.key,result.mp4Bytes);
  validateDelivery({policy:result.qualityPolicy,expectedPolicySha256:preview.renderInputs.qualityPolicySha256,expectedFileSha256:result.mp4Sha256,actualFileSha256,checks:result.qualityChecks});

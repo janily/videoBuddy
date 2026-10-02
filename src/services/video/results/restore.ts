@@ -1,7 +1,7 @@
 import{RestoreResultRequestSchema,type RestoreResultRequest}from '@/contracts/video/commands';
 import type{ProjectControl}from '@/contracts/video/project';
 import{canonicalHash}from '@/services/video/domain/hash';
-import{resolveArtifact}from '@/services/video/exports/access';
+import{inspectArtifact}from '@/services/video/exports/access';
 import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomic-store';
 import type{ProjectStore}from '@/services/video/storage/project-store';
@@ -24,7 +24,7 @@ export async function restoreResult(projects:ProjectStore,owner:string,projectId
  }
  const target=await readResultManifest(projects,projectId,intent.toResultId);
  if(target.artifactId!==intent.artifactId)throw Error('RESULT_STALE');
- const artifact=await resolveArtifact(projects,owner,projectId,target.artifactId);
+ const artifact=await inspectArtifact(projects,owner,projectId,target.artifactId);
  if(artifact.revisionId!==target.revisionId||artifact.objectRef.sha256!==target.mp4Sha256||artifact.objectRef.bytes!==target.mp4Bytes||artifact.objectRef.mime!=='video/mp4'||await actualArtifactSha256(storageRoot,artifact.objectRef.key,target.mp4Bytes)!==target.mp4Sha256)throw Error('ARTIFACT_INVALID');
  await updateJson(projects.store,`${p}/control`,(current:ProjectControl)=>{
   if(current.lastRestoreCommandId===request.clientCommandId)return current;

@@ -87,3 +87,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T13/T14恢复上一版增量：`results/restore.ts` 缺模块测试先退出1；实现规范路径POST `/results/:artifactId/restore`，核对前版manifest、产物记录和磁盘真实字节hash后，CAS只交换current/previous指针并递增consentEpoch，不启动媒体任务。同command重试不再次翻转，错误artifact或篡改文件拒绝；`npm test` 40文件183项、lint、build、构建后typecheck退出0。测试仍使用合成文件作存储/CAS夹具，非真实成片；只支持上一版，历史多版本选择及UI/真实片验收未完成。
 
 2026-10-02 T11预览存储核验增量：`commitPreviewBundle` 不再信任调用方提供的实际hash；从同项目/同revision/已上传且QA通过的私有MP4记录读取实际字节再核对SHA。缺文件用例先实际返回STORE_NOT_FOUND并失败，映射为PREVIEW_ARTIFACT_MISMATCH后通过；篡改字节、换包、过期fence仍拒绝。`npm test` 40文件184项、lint、build、构建后typecheck退出0。夹具文件不是有效MP4，未冒充真实预演或风格证据。
+
+2026-10-02 T14公开产物授权增量：本地artifact测试先证实QA标记通过但尚未成为项目指针的文件也可签URL（测试退出1）；将内部发布前检查拆为inspectArtifact，公开resolveArtifact只放行当前预览、当前结果或保留上一版指针所引用的同revision文件。预览/正式结果提交前拒绝、提交后允许；`npm test` 40文件184项、lint、build、构建后typecheck退出0。未测试真实用户播放器和完整导出，T14仍partial。

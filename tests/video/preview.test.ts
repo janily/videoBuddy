@@ -9,6 +9,7 @@ import type{PreviewBundleInput}from'@/services/video/preview/bundle';
 import{commitPreviewBundle,readPreviewBundle}from'@/services/video/preview/commit';
 import{approvePreview}from'@/services/video/preview/approve';
 import{LocalOperationQueue}from'@/services/video/commands/local-queue';
+import{resolveArtifact}from'@/services/video/exports/access';
 import{ProjectStore}from'@/services/video/storage/project-store';
 import{FileStore}from'@/services/video/storage/file-store';
 import{updateJson}from'@/services/video/storage/atomic-store';
@@ -60,7 +61,9 @@ it('T11 commits one immutable preview only for the live brief and production slo
   const operationId=randomUUID();
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId}));
   const bundle=createPreviewBundle({...bundleInput,previewArtifactSha256:previewSha}),path=await storedPreviewArtifact(projects,dir,projectId,bundle);
+  await expect(resolveArtifact(projects,owner,projectId,bundle.previewArtifactId)).rejects.toThrow('ACCESS_NOT_FOUND');
   await commitPreviewBundle(projects,projectId,operationId,0,bundle,dir);
+  expect((await resolveArtifact(projects,owner,projectId,bundle.previewArtifactId)).objectRef.sha256).toBe(previewSha);
   const control=(await projects.access(owner,projectId));
   expect(control).toMatchObject({phase:'preview_ready',previewState:'ready',currentPreviewId:bundle.previewId,activeProduction:null});
   expect(await readPreviewBundle(projects,projectId,bundle.previewId)).toEqual(bundle);

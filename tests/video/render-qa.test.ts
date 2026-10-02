@@ -17,6 +17,7 @@ import{approvePreview}from'@/services/video/preview/approve';
 import{publishResult}from'@/services/video/results/publish';
 import type{ProjectControl}from'@/contracts/video/project';
 import{cancelProduction}from'@/services/video/commands/cancel';
+import{resolveArtifact}from'@/services/video/exports/access';
 
 const evidence=(ruleId:string):QualityCheck=>({ruleId,result:'pass',severity:'blocking',evidenceRefs:[`qa/${ruleId}/actual`]});
 const baseline=['decode','media_metadata','duration','file_hash','source_integrity','resource_ready','license','critical_facts','visual_review','listening_review','loudness','true_peak','subtitle_sync','font_coverage'];
@@ -79,11 +80,13 @@ it('a matching approved result becomes the current immutable result only after f
  const{dir,projects,owner,projectId,approved,result,media,objectKey}=await preparedRender();
  try{
   const path=join(dir,'objects',objectKey);
+  await expect(resolveArtifact(projects,owner,projectId,result.artifactId)).rejects.toThrow('ACCESS_NOT_FOUND');
   await writeFile(path,Buffer.alloc(media.length,1));
   await expect(publishResult(projects,owner,projectId,approved.operationId!,0,result,dir)).rejects.toThrow('QUALITY_BLOCKED');
   await writeFile(path,media);
   const view=await publishResult(projects,owner,projectId,approved.operationId!,0,result,dir);
   expect(view).toMatchObject({phase:'ready',currentResult:{resultId:result.resultId,artifactId:result.artifactId,bundleHash:result.bundleHash}});
+  expect((await resolveArtifact(projects,owner,projectId,result.artifactId)).objectRef.sha256).toBe(result.mp4Sha256);
   expect((await projects.access(owner,projectId)).currentResultId).toBe(result.resultId);
   expect((await publishResult(projects,owner,projectId,approved.operationId!,0,result,dir)).currentResult?.resultId).toBe(result.resultId);
  }finally{await rm(dir,{recursive:true,force:true})}

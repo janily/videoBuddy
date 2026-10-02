@@ -2,7 +2,7 @@ import type{ProjectControl}from '@/contracts/video/project';
 import{canonicalHash}from '@/services/video/domain/hash';
 import type{ProjectStore}from '@/services/video/storage/project-store';
 import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomic-store';
-import{resolveArtifact}from '@/services/video/exports/access';
+import{inspectArtifact}from '@/services/video/exports/access';
 import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{assertPreviewArtifact,verifyPreviewBundle,type PreviewBundle}from './bundle';
 
@@ -16,7 +16,7 @@ export async function readPreviewBundle(projects:ProjectStore,projectId:string,p
 
 export async function commitPreviewBundle(projects:ProjectStore,projectId:string,operationId:string,expectedConsentEpoch:number,bundle:PreviewBundle,storageRoot:string){
  const current=(await projects.store.readFresh<ProjectControl>(`projects/${projectId}/control`)).value;
- const artifact=await resolveArtifact(projects,current.ownerKeyHash,projectId,bundle.previewArtifactId).catch(error=>{if(error instanceof StoreMissing)throw Error('PREVIEW_ARTIFACT_MISMATCH');throw error});
+ const artifact=await inspectArtifact(projects,current.ownerKeyHash,projectId,bundle.previewArtifactId).catch(error=>{if(error instanceof StoreMissing)throw Error('PREVIEW_ARTIFACT_MISMATCH');throw error});
  if(artifact.revisionId!==bundle.revisionId||artifact.objectRef.mime!=='video/mp4'||artifact.objectRef.sha256!==bundle.previewArtifactSha256)throw Error('PREVIEW_ARTIFACT_MISMATCH');
  const actual=await actualArtifactSha256(storageRoot,artifact.objectRef.key,artifact.objectRef.bytes).catch(()=>{throw Error('PREVIEW_ARTIFACT_MISMATCH')});
  assertPreviewArtifact(bundle,actual);
