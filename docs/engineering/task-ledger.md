@@ -77,3 +77,5 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 2026-10-02 T09/T10媒体QA增量：独立ffprobe要求H.264 `yuv420p` 与 `color_primaries`/`color_transfer`/`color_space` 全为BT.709；MP4顶层原子解析要求`moov`早于`mdat`。1秒320×180媒体探针再次通过完整解码、运行中停止、随机画面拒绝；20秒合成技术片通过中英文成片ASR、-14.44 LUFS/-1.49 dBTP，已知背景输入RGB(24,48,74)经实际解码得到(20,45,74)，最大通道误差4，见 [composition-probe.json](evidence/composition-probe.json)。这一像素技术探针不覆盖1080p或43风格的全片色彩/视觉QA；完整 `npm test` 39文件168项、lint/build/顺序typecheck和两个媒体探针均退出0，T09/T10仍partial。
 
 2026-10-02 T11预览包增量：`tests/video/preview.test.ts` 对缺失 `bundle.ts`/`commit.ts` 先实测退出1；实现严格预览包、内容哈希/独立预览媒体摘要、24小时有效期、节选映射校验、不可变存储与 ProjectControl CAS 提交后7项通过。测试覆盖改变音轨/脚本拒绝、换预览文件不改创作哈希但须单独核验、旧 brief/pending/取消 fence 不发布、同 previewId 不可换包。ProjectView 现可返回已提交预览的文案/事实/哈希，内部对象路径不暴露；没有真正预览制作，动作仍禁用。`npm test` 39文件172项、lint、build、构建后typecheck均退出0。T11仍partial，AT-034/035/082等真实闭环未验收。
+
+2026-10-02 T11正式批准边界增量：`approve.ts` 缺模块测试先退出1；实现对已存且未过期预览包的严格请求校验、唯一 `preview_button` 批准记录、控制态CAS占用制作槽、持久render intent和同命令重放补队列。两个不同命令并发仅1个占槽；相同命令重复点击复用operation；错误hash/过期均拒绝。局部10项及全套39文件175项通过，build/typecheck通过；lint曾提示测试中未用变量（退出0），随后移除并复核。生产预览、对外批准route、render Worker/预算/真实QA仍缺，T11不能标完成。

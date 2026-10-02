@@ -7,6 +7,8 @@ import{mapPreviewTime,validateExcerptMap}from'@/services/video/preview/excerpt';
 import{assertPreviewArtifact,createPreviewBundle,verifyPreviewBundle}from'@/services/video/preview/bundle';
 import type{PreviewBundleInput}from'@/services/video/preview/bundle';
 import{commitPreviewBundle,readPreviewBundle}from'@/services/video/preview/commit';
+import{approvePreview}from'@/services/video/preview/approve';
+import{LocalOperationQueue}from'@/services/video/commands/local-queue';
 import{ProjectStore}from'@/services/video/storage/project-store';
 import{FileStore}from'@/services/video/storage/file-store';
 import{updateJson}from'@/services/video/storage/atomic-store';
@@ -70,5 +72,56 @@ it('T11 rejects a completed render after new input or cancellation fenced the sl
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,inputPending:false,consentEpoch:1,activeProduction:null}));
   await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,sha('4'))).rejects.toThrow('PREVIEW_STALE');
   expect((await projects.access(owner,projectId)).currentPreviewId).toBeUndefined();
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
+it('AT-035 one preview button approval creates one durable render intent and replays',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vb-preview-'));
+ try{
+  const projects=new ProjectStore(new FileStore(dir)),queue=new LocalOperationQueue(projects.store,dir),owner='owner';
+  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
+  const prepareId=randomUUID(),bundle=createPreviewBundle(bundleInput);
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:prepareId}));
+  await commitPreviewBundle(projects,projectId,prepareId,0,bundle,sha('4'));
+  const request={schemaVersion:5 as const,clientCommandId:randomUUID(),previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
+  await expect(approvePreview(projects,queue,owner,projectId,{...request,clientCommandId:randomUUID(),bundleHash:sha('9')})).rejects.toThrow('PREVIEW_STALE');
+  const [a,b]=await Promise.all([approvePreview(projects,queue,owner,projectId,request),approvePreview(projects,queue,owner,projectId,request)]);
+  expect(a.operationId).toBe(b.operationId);
+  const control=await projects.access(owner,projectId);
+  expect(control).toMatchObject({phase:'rendering',activeProduction:a.operationId});
+  expect(control.receipts.filter(item=>item.commandId===request.clientCommandId)).toHaveLength(1);
+  expect(await queue.pending()).toEqual([{projectId,operationId:a.operationId,kind:'render'}]);
+  const approval=(await projects.store.readFresh<{source:string;bundleHash:string;ownerKeyHash:string}>(`projects/${projectId}/approvals/${control.currentApprovalId}`)).value;
+  expect(approval).toMatchObject({source:'preview_button',bundleHash:bundle.bundleHash,ownerKeyHash:owner});
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,receipts:[]}));
+  expect((await approvePreview(projects,queue,owner,projectId,request)).operationId).toBe(a.operationId);
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
+it('AT-082 rejects approval after preview expiry without silently refreshing the token',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vb-preview-'));
+ try{
+  const projects=new ProjectStore(new FileStore(dir)),queue=new LocalOperationQueue(projects.store,dir),owner='owner';
+  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
+  const bundle=createPreviewBundle(bundleInput,Date.now()-2*86400000);
+  await projects.store.create(`projects/${projectId}/previews/${bundle.previewId}/manifest`,bundle);
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preview_ready' as const,previewState:'ready' as const,currentPreviewId:bundle.previewId,activeProduction:null}));
+  const request={schemaVersion:5 as const,clientCommandId:randomUUID(),previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
+  await expect(approvePreview(projects,queue,owner,projectId,request)).rejects.toThrow('PREVIEW_STALE');
+  expect((await projects.access(owner,projectId)).phase).toBe('preview_ready');
+  expect(await queue.pending()).toEqual([]);
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
+it('AT-035 two distinct approval commands cannot reserve two render slots',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vb-preview-'));
+ try{
+  const projects=new ProjectStore(new FileStore(dir)),queue=new LocalOperationQueue(projects.store,dir),owner='owner';
+  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
+  const prepareId=randomUUID(),bundle=createPreviewBundle(bundleInput);
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:prepareId}));
+  await commitPreviewBundle(projects,projectId,prepareId,0,bundle,sha('4'));
+  const body={schemaVersion:5 as const,previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
+  const results=await Promise.allSettled([approvePreview(projects,queue,owner,projectId,{...body,clientCommandId:randomUUID()}),approvePreview(projects,queue,owner,projectId,{...body,clientCommandId:randomUUID()})]);
+  expect(results.filter(item=>item.status==='fulfilled')).toHaveLength(1);
+  expect(await queue.pending()).toHaveLength(1);
+  expect((await projects.access(owner,projectId)).receipts.filter(item=>item.status==='accepted')).toHaveLength(1);
  }finally{await rm(dir,{recursive:true,force:true})}
 });
