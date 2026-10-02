@@ -1,7 +1,8 @@
 import {randomUUID} from 'node:crypto';
 import {AtomicStore,updateJson} from '@/services/video/storage/atomic-store';
 import {canonicalHash} from '@/services/video/domain/hash';
-export interface AssetReservation{id:string;commandId:string;bodyHash:string;reservationId:string;filename:string;declaredBytes:number;declaredMime:string;intendedUse:string;rightsConfirmed:boolean;status:string;expiresAt:string;sha256?:string;bytes?:number;errorCode?:string;quotaReserved:boolean}
+import type {ObjectRef} from '@/contracts/video/domain';
+export interface AssetReservation{id:string;commandId:string;bodyHash:string;reservationId:string;filename:string;declaredBytes:number;declaredMime:string;intendedUse:string;rightsConfirmed:boolean;status:string;expiresAt:string;sha256?:string;bytes?:number;analysisRef?:ObjectRef;errorCode?:string;quotaReserved:boolean}
 export interface AssetsControl{assets:AssetReservation[];inputPending:boolean}
 export interface UploadInput{filename:string;declaredBytes:number;declaredMime:string;intendedUse:string;rightsConfirmed:boolean}
 const limits:Record<string,number>={'text/markdown':1024*1024,'image/png':20*1024*1024,'image/jpeg':20*1024*1024,'image/webp':20*1024*1024,'application/pdf':20*1024*1024,'audio/wav':50*1024*1024,'audio/mpeg':50*1024*1024,'audio/mp4':50*1024*1024};

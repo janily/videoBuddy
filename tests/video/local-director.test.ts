@@ -17,3 +17,18 @@ it('a queued Director job archives the real decision before committed SSE, and a
  const stream=await events.readFrom(projectId,operationId,0);expect(stream.some(x=>x.event.type==='message.committed')).toBe(true);
  expect(stream.at(-1)?.event.type).toBe('operation.terminal');
 });
+it('attachment-only input gives the Director actual saved Markdown bytes with asset identity',async()=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir),owner='owner';
+ const{projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
+ const operationId=crypto.randomUUID(),userId=crypto.randomUUID(),assetId=crypto.randomUUID(),sha256='a'.repeat(64);
+ const analysisRef=await projects.index.immutable(`projects/${projectId}/assets/${assetId}/analysis/${sha256}`,{schemaVersion:5,assetId,mime:'text/markdown',sha256,text:'活动日期：10月8日',trust:'untrusted_material'});
+ await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,activeConversation:operationId,assets:[{id:assetId,commandId:crypto.randomUUID(),bodyHash:sha256,reservationId:crypto.randomUUID(),filename:'资料.md',declaredBytes:100,declaredMime:'text/markdown',intendedUse:'reference',rightsConfirmed:true,status:'ready',expiresAt:new Date(Date.now()+60000).toISOString(),sha256,bytes:30,analysisRef,quotaReserved:true}],ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ await projects.archiveMessage(projectId,{id:userId,ordinal:1,role:'user',text:'',attachmentIds:[assetId],status:'completed',contentVersion:1,operationId});
+ const decide=async(_understanding:unknown,messages:{attachments?:{assetId:string;text:string}[]}[])=>{
+  expect(messages[0].attachments?.[0]).toMatchObject({assetId,text:'活动日期：10月8日'});
+  return{action:'acknowledge' as const,reply:'资料写着活动日期是10月8日。',effect:'no_change' as const,executionIntent:'none' as const,evidenceMessageIds:[userId]};
+ };
+ await runDirectorOperation(store,events,projectId,operationId,{decide,limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ expect((await projects.view(owner,projectId)).messages.at(-1)?.text).toBe('资料写着活动日期是10月8日。');
+});

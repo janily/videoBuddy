@@ -8,7 +8,8 @@ import {Understanding} from '@/contracts/video/domain';
 import {StreamEventSchema} from '@/contracts/video/commands';
 import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budget/model-budget';
-import {runDirector,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance} from '@/mastra/video/director';
+import {runDirector,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage} from '@/mastra/video/director';
+import {MarkdownAnalysis} from '@/services/video/assets/analysis';
 
 type Decide=typeof runDirector;
 export async function runDirectorOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{decide?:Decide;limits?:ModelLimits}={}){
@@ -27,8 +28,17 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
  try{
   await emit('message.started',{messageId:assistantId,contentVersion:1,role:'assistant',ordinal});
   await emit('activity.updated',{stage:'understanding',label:'正在整理你的想法'});
+  const context:SourceMessage[]=await Promise.all(messages.map(async message=>({
+   id:message.id,role:message.role,text:message.text,
+   ...(message.attachmentIds?.length?{attachments:await Promise.all(message.attachmentIds.map(async assetId=>{
+    const asset=control.assets.find(item=>item.id===assetId);
+    if(!asset||asset.status!=='ready'||asset.declaredMime!=='text/markdown'||!asset.analysisRef)throw Error('SOURCE_INVALID');
+    const analysis=(await store.readFresh<MarkdownAnalysis>(asset.analysisRef.key)).value;
+    if(analysis.assetId!==assetId||analysis.sha256!==asset.sha256||analysis.trust!=='untrusted_material')throw Error('SOURCE_INVALID');
+    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text};
+   }))}:{}),
+  })));
   const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
-   const context=messages.map(m=>({id:m.id,role:m.role,text:m.text}));
    const bytes=Buffer.byteLength(JSON.stringify({understanding,messages:context}));if(bytes>60000)throw Error('CONTEXT_LIMIT');
    const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
    const result=GuidanceDecisionSchema.parse(await (options.decide||runDirector)(understanding,context,reservation.maxOutputTokens));
@@ -46,7 +56,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
   await updateJson(store,`${p}/control`,async(value:ProjectControl)=>{
    if(value.deletedAt||(value as ProjectControl&{replyCancelOperationIds?:string[]}).replyCancelOperationIds?.includes(operationId)||value.activeConversation!==operationId)throw Error('ACCESS_NOT_FOUND');
    const latest=(await store.readFresh<Understanding>(value.understandingRef.key)).value;
-   const next=decision.understandingPatch?applyUnderstandingPatch(latest,decision.understandingPatch,messages.map(m=>({id:m.id,role:m.role,text:m.text}))):latest;
+   const next=decision.understandingPatch?applyUnderstandingPatch(latest,decision.understandingPatch,context):latest;
    return{...value,controlVersion:value.controlVersion+1,briefVersion:next.briefVersion,previewState:next.briefVersion!==value.briefVersion&&value.previewState==='ready'?'stale':value.previewState,understandingRef:await projects.index.immutable(`${p}/understanding/${next.briefVersion}`,next),messagesIndexRef:await projects.index.append(`${p}/indexes/messages`,value.messagesIndexRef,{id:assistantId,ordinal,ref:messageRef}),activeConversation:null};
   });
   for(let offset=0;offset<decision.reply.length;){let end=Math.min(offset+1024,decision.reply.length);if(/[\uD800-\uDBFF]/.test(decision.reply[end-1])&&end<decision.reply.length)end--;await emit('message.delta',{messageId:assistantId,contentVersion:1,offset,text:decision.reply.slice(offset,end)});offset=end;}

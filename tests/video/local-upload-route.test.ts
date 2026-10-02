@@ -8,12 +8,14 @@ import {issueSession,ownerHash} from '@/services/video/access/session';
 import {POST as reserve} from '@/app/api/video/projects/[projectId]/assets/reserve/route';
 import {PUT as upload} from '@/app/api/video/projects/[projectId]/assets/[assetId]/file/route';
 import {POST as complete} from '@/app/api/video/projects/[projectId]/assets/[assetId]/complete/route';
+import {POST as sendMessage} from '@/app/api/video/projects/[projectId]/messages/route';
+import {writeWorkerHeartbeat} from '@/services/video/commands/worker-heartbeat';
 
 let root:string;
 const keys={current:'a'.repeat(64),keyId:'v1',environment:'test'};
 const origin='https://video.test';
 beforeEach(async()=>{root=await mkdtemp(join(tmpdir(),'vb-upload-route-'));process.env.VIDEO_DATA_DIR=root;process.env.VIDEO_APP_ORIGIN=origin;process.env.VIDEO_SESSION_SIGNING_KEY=keys.current;process.env.VIDEO_SESSION_KEY_ID=keys.keyId;process.env.VIDEO_ENVIRONMENT=keys.environment});
-afterEach(async()=>{await rm(root,{recursive:true,force:true});delete process.env.VIDEO_DATA_DIR;delete process.env.VIDEO_APP_ORIGIN;delete process.env.VIDEO_SESSION_SIGNING_KEY;delete process.env.VIDEO_SESSION_KEY_ID;delete process.env.VIDEO_ENVIRONMENT});
+afterEach(async()=>{await rm(root,{recursive:true,force:true});for(const key of ['VIDEO_DATA_DIR','VIDEO_APP_ORIGIN','VIDEO_SESSION_SIGNING_KEY','VIDEO_SESSION_KEY_ID','VIDEO_ENVIRONMENT','VIDEO_GENERATION_ENABLED','MODEL_API_KEY','VIDEO_DIRECTOR_MODEL','VIDEO_PROJECT_MAX_MODEL_CALLS','VIDEO_PROJECT_MAX_INPUT_TOKENS','VIDEO_PROJECT_MAX_OUTPUT_TOKENS','VIDEO_PROJECT_MAX_TTS_CHARACTERS','VIDEO_PROJECT_MAX_MEDIA_SECONDS','VIDEO_DAILY_MAX_MODEL_CALLS','VIDEO_DAILY_MAX_MEDIA_SECONDS'])delete process.env[key]});
 function headers(token:string,type='application/json'){return{origin,'content-type':type,cookie:`vb-session=${token}`}}
 
 it('reserves, writes and completes private bytes idempotently while denying another owner',async()=>{
@@ -34,7 +36,17 @@ it('reserves, writes and completes private bytes idempotently while denying anot
  const finish=()=>complete(new Request(`${origin}/api/video/projects/${projectId}/assets/${assetId}/complete`,{method:'POST',headers:headers(token),body:JSON.stringify({schemaVersion:5,clientCommandId:crypto.randomUUID(),reservationId})}),fileContext);
  expect((await finish()).status).toBe(202);expect((await finish()).status).toBe(202);
  const view=await new ProjectStore(new FileStore(root)).view(ownerHash(sid,keys),projectId);
- expect(view.assets).toMatchObject([{id:assetId,status:'uploaded'}]);
+ expect(view.assets).toMatchObject([{id:assetId,status:'ready'}]);
+ const control=(await new FileStore(root).readFresh<{inputPending:boolean;briefVersion:number;assets:{analysisRef?:{key:string}}[]}>(`projects/${projectId}/control`)).value;
+ expect(control.inputPending).toBe(false);expect(control.briefVersion).toBe(1);
+ const analysis=(await new FileStore(root).readFresh<{text:string;trust:string}>(control.assets[0].analysisRef!.key)).value;
+ expect(analysis.text).toContain('活动日期：10月8日');expect(analysis.trust).toBe('untrusted_material');
+ for(const key of ['VIDEO_PROJECT_MAX_MODEL_CALLS','VIDEO_PROJECT_MAX_INPUT_TOKENS','VIDEO_PROJECT_MAX_OUTPUT_TOKENS','VIDEO_PROJECT_MAX_TTS_CHARACTERS','VIDEO_PROJECT_MAX_MEDIA_SECONDS','VIDEO_DAILY_MAX_MODEL_CALLS','VIDEO_DAILY_MAX_MEDIA_SECONDS'])process.env[key]='100000';
+ process.env.VIDEO_GENERATION_ENABLED='true';process.env.MODEL_API_KEY='test-key';process.env.VIDEO_DIRECTOR_MODEL='test-model';await writeWorkerHeartbeat(root);
+ const message=await sendMessage(new Request(`${origin}/api/video/projects/${projectId}/messages`,{method:'POST',headers:headers(token),body:JSON.stringify({schemaVersion:5,clientCommandId:crypto.randomUUID(),clientMessageId:crypto.randomUUID(),text:'',attachmentIds:[assetId]})}),context);
+ expect(message.status).toBe(202);
+ const messages=(await new ProjectStore(new FileStore(root)).view(ownerHash(sid,keys),projectId)).messages;
+ expect(messages[0]).toMatchObject({role:'user',text:'',attachmentIds:[assetId]});
 });
 it('a missing upload fails visibly and releases the pending state',async()=>{
  const sid='3'.repeat(64),token=issueSession(keys,Date.now(),sid).token;

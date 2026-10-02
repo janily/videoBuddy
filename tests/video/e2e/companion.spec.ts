@@ -27,3 +27,45 @@ test('recent projects list uses only server-authorized project summaries',async(
  await expect(page.getByRole('dialog',{name:'我的视频'})).toBeVisible();await expect(page.getByRole('link',{name:'我的真实项目'})).toHaveAttribute('href',`/video/${projectId}`);
  await page.keyboard.press('Escape');await expect(trigger).toBeFocused();
 });
+test('Markdown material is uploaded, confirmed, and sent without text after reload',async({page})=>{
+ const assetId='20000000-0000-4000-8000-000000000002',reservationId='30000000-0000-4000-8000-000000000003';
+ let uploaded='';let sent:{text:string;attachmentIds:string[]}|undefined;
+ await page.route('**/api/video/session',r=>r.fulfill({json:{expiresAt:'2030-01-01'}}));
+ await page.route('**/api/video/projects',r=>r.fulfill({json:{projectId,controlVersion:1}}));
+ await page.route(`**/api/video/projects/${projectId}`,r=>r.fulfill({json:{...view,assets:uploaded?[{id:assetId,filename:'brief.md',status:'ready',intendedUse:'reference'}]:[]}}));
+ await page.route(`**/api/video/projects/${projectId}/assets/reserve`,async r=>{
+  const body=r.request().postDataJSON();expect(body.rightsConfirmed).toBe(true);expect(body.declaredMime).toBe('text/markdown');
+  await r.fulfill({json:{assetId,reservationId,uploadUrl:`/api/video/projects/${projectId}/assets/${assetId}/file`}});
+ });
+ await page.route(`**/api/video/projects/${projectId}/assets/${assetId}/file`,async r=>{uploaded=r.request().postData()||'';await r.fulfill({json:{assetId,status:'uploaded_bytes'}})});
+ await page.route(`**/api/video/projects/${projectId}/assets/${assetId}/complete`,r=>r.fulfill({status:202,json:{assetId,status:'ready'}}));
+ await page.route(`**/api/video/projects/${projectId}/messages`,async r=>{sent=r.request().postDataJSON();await r.fulfill({status:202,json:{operationId:'40000000-0000-4000-8000-000000000004'}})});
+ await page.goto('/video');
+ await page.getByRole('button',{name:/添加资料/}).click();
+ await page.getByLabel('选择 Markdown 资料').setInputFiles({name:'brief.md',mimeType:'text/markdown',buffer:Buffer.from('# 真实资料\n价格是 30 元')});
+ await expect(page.getByRole('button',{name:'确认并添加'})).toBeDisabled();
+ await page.getByRole('checkbox',{name:'我有权使用这份资料'}).check();
+ await page.getByRole('button',{name:'确认并添加'}).click();
+ await expect(page.getByText('brief.md · 已读取，待发送')).toBeVisible();
+ expect(uploaded).toContain('价格是 30 元');
+ await page.reload();
+ await expect(page.getByText('brief.md · 已读取，待发送')).toBeVisible();
+ await page.getByRole('button',{name:'发送'}).click();
+ await expect.poll(()=>sent).toMatchObject({text:'',attachmentIds:[assetId]});
+ await expect(page.getByText('brief.md · 已读取，待发送')).not.toBeVisible();
+});
+test('a failed material reservation keeps the chosen file for retry',async({page})=>{
+ let attempts=0;
+ await page.route('**/api/video/session',r=>r.fulfill({json:{expiresAt:'2030-01-01'}}));
+ await page.route('**/api/video/projects',r=>r.fulfill({json:{projectId,controlVersion:1}}));
+ await page.route(`**/api/video/projects/${projectId}/assets/reserve`,r=>{attempts++;return r.fulfill({status:503,json:{error:{message:'暂时无法预约资料'}}})});
+ await page.goto('/video');
+ await page.getByRole('button',{name:/添加资料/}).click();
+ await page.getByLabel('选择 Markdown 资料').setInputFiles({name:'notes.md',mimeType:'text/markdown',buffer:Buffer.from('# 内容')});
+ await page.getByRole('checkbox',{name:'我有权使用这份资料'}).check();
+ await page.getByRole('button',{name:'确认并添加'}).click();
+ await expect(page.getByRole('status')).toContainText('暂时无法预约资料');
+ await expect(page.getByText('notes.md')).toBeVisible();
+ await page.getByRole('button',{name:'确认并添加'}).click();
+ await expect.poll(()=>attempts).toBe(2);
+});

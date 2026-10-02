@@ -1,31 +1,97 @@
 'use client';
-import {useCallback,useEffect,useRef,useState}from 'react';
-import {ProjectView}from '@/contracts/video/project';
-import {draftKey,readDraft,saveDraft,useDraft}from './use-draft';
+import {useCallback,useEffect,useRef,useState,useSyncExternalStore} from 'react';
+import {ProjectView} from '@/contracts/video/project';
+import {draftKey,readDraft,saveDraft,useDraft} from './use-draft';
 import {rememberProject} from './recent-projects';
-import {useProjectEvents}from './use-project-events';
-async function api<T>(path:string,body?:unknown):Promise<T>{const response=await fetch(path,body===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const value=await response.json();if(!response.ok)throw Error(value.error?.message||'服务暂时不可用，内容已保留。');return value as T}
+import {useProjectEvents} from './use-project-events';
+
+async function api<T>(path:string,body?:unknown):Promise<T>{
+ const response=await fetch(path,body===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+ const value=await response.json();
+ if(!response.ok)throw Error(value.error?.message||'服务暂时不可用，内容已保留。');
+ return value as T;
+}
 async function ensureSession(){const create=()=>api('/api/video/session',{});if(navigator.locks)return navigator.locks.request('vb-session',create);return create()}
+type PendingAttachment={id:string;filename:string};
+function attachmentKey(projectId:string){return `vb-pending-attachments:${projectId}`}
+function parseAttachments(raw:string):PendingAttachment[]{
+ try{const value=JSON.parse(raw);return Array.isArray(value)?value.filter(item=>typeof item.id==='string'&&typeof item.filename==='string'):[]}
+ catch{return []}
+}
+function readAttachments(projectId:string){try{return parseAttachments(localStorage.getItem(attachmentKey(projectId))||'[]')}catch{return []}}
+function saveAttachments(projectId:string,attachments:PendingAttachment[]){try{localStorage.setItem(attachmentKey(projectId),JSON.stringify(attachments));window.dispatchEvent(new Event('vb-attachments'))}catch{}}
+function subscribeAttachments(notify:()=>void){window.addEventListener('storage',notify);window.addEventListener('vb-attachments',notify);return()=>{window.removeEventListener('storage',notify);window.removeEventListener('vb-attachments',notify)}}
+async function uploadBytes(url:string,file:File){
+ const response=await fetch(url,{method:'PUT',headers:{'Content-Type':'text/markdown'},body:file});
+ const value=await response.json();
+ if(!response.ok)throw Error(value.error?.message||'资料上传失败，请重试。');
+}
+
 export function useProject(initialProjectId?:string){
- const [projectId,setProjectId]=useState(initialProjectId),[view,setView]=useState<ProjectView|null>(null),[error,setError]=useState(''),[sending,setSending]=useState(false);
- const idRef=useRef(initialProjectId),createId=useRef<string|undefined>(undefined),commandRef=useRef<{text:string;commandId:string;messageId:string}|undefined>(undefined);
+ const [projectId,setProjectId]=useState(initialProjectId),[view,setView]=useState<ProjectView|null>(null),[error,setError]=useState(''),[sending,setSending]=useState(false),[uploading,setUploading]=useState(false);
+ const idRef=useRef(initialProjectId),createId=useRef<string|undefined>(undefined),commandRef=useRef<{text:string;attachmentIds:string[];commandId:string;messageId:string}|undefined>(undefined);
  const key=draftKey(projectId),[draft,setDraft]=useDraft(key);
+ const attachmentSnapshot=useCallback(()=>projectId?localStorage.getItem(attachmentKey(projectId))||'[]':'[]',[projectId]);
+ const attachments=parseAttachments(useSyncExternalStore(subscribeAttachments,attachmentSnapshot,()=> '[]'));
  const refresh=useCallback(async()=>{if(!idRef.current)return;try{const next=await api<ProjectView>(`/api/video/projects/${idRef.current}`);rememberProject(next.projectId);setView(old=>old&&old.controlVersion>next.controlVersion?old:next)}catch(e){setError(e instanceof Error?e.message:'无法恢复项目。')}},[]);
  useEffect(()=>{if(initialProjectId){void refresh()}},[initialProjectId,refresh]);
  const stream=useProjectEvents(projectId,view?.activeConversation?.id,view?.activeConversation?.streamEpoch||0,refresh);
  const productionStream=useProjectEvents(projectId,view?.activeProduction?.id,view?.activeProduction?.streamEpoch||0,refresh);
- async function send(){const text=readDraft(key);if(!text.trim()||sending)return;setSending(true);setError('');
-  const command=commandRef.current?.text===text?commandRef.current:{text,commandId:crypto.randomUUID(),messageId:crypto.randomUUID()};commandRef.current=command;
+
+ async function ensureProject(){
+  await ensureSession();
+  if(!idRef.current){
+   createId.current ||= crypto.randomUUID();
+   const created=await api<{projectId:string}>('/api/video/projects',{schemaVersion:5,clientCommandId:createId.current,clientCreateId:createId.current});
+   idRef.current=created.projectId;rememberProject(created.projectId);
+   saveDraft(draftKey(created.projectId),readDraft(key));setProjectId(created.projectId);
+   window.history.replaceState(null,'',`/video/${created.projectId}`);
+  }
+  return idRef.current;
+ }
+
+ async function uploadMarkdown(file:File):Promise<boolean>{
+  if(uploading)return false;
+  if(!/\.md$/i.test(file.name)||file.size<1||file.size>1024*1024){setError('请选择不超过 1 MiB 的 .md 文件。');return false}
+  setUploading(true);setError('');
   try{
-   await ensureSession();
-   if(!idRef.current){createId.current ||= crypto.randomUUID();const created=await api<{projectId:string}>('/api/video/projects',{schemaVersion:5,clientCommandId:createId.current,clientCreateId:createId.current});idRef.current=created.projectId;rememberProject(created.projectId);saveDraft(draftKey(created.projectId),readDraft(key));setProjectId(created.projectId)}
-   await api(`/api/video/projects/${idRef.current}/messages`,{schemaVersion:5,clientCommandId:command.commandId,clientMessageId:command.messageId,text,attachmentIds:[],target:null});
-   if(readDraft(key)===text)saveDraft(key,'');if(readDraft(draftKey(idRef.current))===text)saveDraft(draftKey(idRef.current),'');commandRef.current=undefined;
+   const id=await ensureProject();
+   const reservation=await api<{assetId:string;reservationId:string;uploadUrl:string}>(`/api/video/projects/${id}/assets/reserve`,{
+    schemaVersion:5,clientCommandId:crypto.randomUUID(),filename:file.name,declaredBytes:file.size,declaredMime:'text/markdown',intendedUse:'reference',rightsConfirmed:true,
+   });
+   await uploadBytes(reservation.uploadUrl,file);
+   const completed=await api<{status:string}>(`/api/video/projects/${id}/assets/${reservation.assetId}/complete`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),reservationId:reservation.reservationId});
+   if(completed.status!=='ready')throw Error('资料已上传，但尚未完成解读，请稍后重试。');
+   const next=[...readAttachments(id).filter(a=>a.id!==reservation.assetId),{id:reservation.assetId,filename:file.name}];
+   saveAttachments(id,next);await refresh();return true;
+  }catch(e){setError(e instanceof Error?e.message:'资料上传失败，请重试。');return false}
+  finally{setUploading(false)}
+ }
+
+ function removeAttachment(id:string){
+  if(!idRef.current)return;
+  const next=attachments.filter(a=>a.id!==id);saveAttachments(idRef.current,next);
+ }
+
+ async function send(){
+  const text=readDraft(key),attachmentIds=attachments.map(a=>a.id);
+  if((!text.trim()&&!attachmentIds.length)||sending||uploading)return;
+  setSending(true);setError('');
+  const previous=commandRef.current;
+  const command=previous?.text===text&&JSON.stringify(previous.attachmentIds)===JSON.stringify(attachmentIds)?previous:{text,attachmentIds,commandId:crypto.randomUUID(),messageId:crypto.randomUUID()};
+  commandRef.current=command;
+  try{
+   const id=await ensureProject();
+   await api(`/api/video/projects/${id}/messages`,{schemaVersion:5,clientCommandId:command.commandId,clientMessageId:command.messageId,text,attachmentIds,target:null});
+   if(readDraft(key)===text)saveDraft(key,'');
+   if(readDraft(draftKey(id))===text)saveDraft(draftKey(id),'');
+   const remaining=readAttachments(id).filter(a=>!attachmentIds.includes(a.id));saveAttachments(id,remaining);
+   commandRef.current=undefined;
    await refresh();
   }catch(e){setError(e instanceof Error?e.message:'连接失败，草稿已保留。')}
-  finally{if(idRef.current&&idRef.current!==initialProjectId){window.history.replaceState(null,'',`/video/${idRef.current}`)}setSending(false)}
+  finally{setSending(false)}
  }
  async function stopReply(){const op=view?.activeConversation;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'reply'});await refresh()}catch(e){setError(e instanceof Error?e.message:'无法停止回复。')}}
- const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,send,stopReply,messages,connection:stream.connection||productionStream.connection,refresh};
+ const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMarkdown,removeAttachment,send,stopReply,messages,connection:stream.connection||productionStream.connection,refresh};
 }

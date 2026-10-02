@@ -17,6 +17,18 @@ it('facts need exact user source; stale patches cannot silently overwrite',()=>{
  expect(()=>applyUnderstandingPatch(changed,patch,[message])).toThrow('BRIEF_CONFLICT');
  expect(()=>applyUnderstandingPatch(base,{...patch,operations:[{...patch.operations[0],sourceMessageIds:['20000000-0000-4000-8000-000000000001']}]},[message])).toThrow('SOURCE_INVALID');
 });
+it('uploaded material facts require a ready attachment and a quote present in its real text',()=>{
+ const assetId='30000000-0000-4000-8000-000000000003';
+ const source={...message,text:'',attachments:[{assetId,filename:'资料.md',mime:'text/markdown',sha256:'a'.repeat(64),text:'活动日期：10月8日\n地点：上海'}]};
+ const fact={id:'event-date',text:'活动日期10月8日',sourceRefs:[{type:'uploaded_material',id:assetId,locator:'line:1',excerpt:'活动日期：10月8日'}],status:'provided',mustInclude:false,critical:false};
+ const patch={baseBriefVersion:0,operations:[{op:'add_fact',fact,sourceMessageIds:[id]}]};
+ expect(applyUnderstandingPatch(initialUnderstanding(),patch,[source]).facts[0].sourceRefs[0].id).toBe(assetId);
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),{...patch,operations:[{...patch.operations[0],fact:{...fact,sourceRefs:[{...fact.sourceRefs[0],excerpt:'不存在的日期'}]}}]},[source])).toThrow('SOURCE_INVALID');
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),patch,[message])).toThrow('SOURCE_INVALID');
+ const otherId='40000000-0000-4000-8000-000000000004';
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),{...patch,operations:[{...patch.operations[0],sourceMessageIds:[otherId]}]},[source,{id:otherId,role:'user',text:'无关消息'}])).toThrow('SOURCE_INVALID');
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),{baseBriefVersion:0,operations:[{op:'set_asset_use',assetId:'50000000-0000-4000-8000-000000000005',purpose:'reference',required:false,sourceMessageIds:[id]}]},[source])).toThrow('SOURCE_INVALID');
+});
 it('AT-019 skipped optional questions remain remembered and duplicate questioning is rejected',()=>{
  const base=initialUnderstanding();const skipped=applyUnderstandingPatch(base,{baseBriefVersion:0,operations:[{op:'mark_topic_skipped',topic:'photos',sourceMessageIds:[id]}]},[message]);
  expect(skipped.skippedTopics).toEqual(['photos']);
