@@ -18,6 +18,8 @@ T05 语音素材增量：固定 ASR 镜像更新为 `sha256:67786e6dbdd6b00f6177
 
 媒体技术 QA 增量：独立 ffprobe 现在硬性核对 H.264/yuv420p 与 BT.709 色彩三元组，MP4 顶层原子扫描确认 `moov` 在 `mdat` 前；1秒媒体探针、停止与随机画面拒绝仍通过。20秒320×180技术场景第7秒左上角已知背景 RGB (24,48,74) 解码实测 (20,45,74)，最大通道误差4，见更新的 [composition-probe.json](evidence/composition-probe.json)。这些检查只覆盖一个已知颜色和容器格式，不能替代全片色彩/视觉/字幕检查。最新完整 `npm test` 39文件168项、lint、build、构建后typecheck、1秒媒体探针与20秒合成探针均退出0。
 
+T11 预览基础设施增量：`createPreviewBundle` 将 FilmSpec、完整脚本与事实、源码/时间轴/音轨/素材/字体摘要、输出 profile、运行时和质量策略锁入规范 JSON 的 `bundleHash`；预览文件摘要单独校验，过期时间与预览文件不参与内容哈希。`commitPreviewBundle` 先持久化不可变 manifest，再通过 ProjectControl CAS 核对 briefVersion、inputPending、consentEpoch、制作槽和阶段，旧任务不能将过期预览发布为当前预览。ProjectView 只暴露用户需看的文案、关键事实与预览标识，不暴露内部存储引用。预览包/持久化测试先因模块缺失退出1，随后7项通过；全套 `npm test` 39文件172项、lint、build、构建后typecheck均退出0。当前仍没有真实创作预览、批准入口或正式渲染；UI主按钮继续禁用，T11仍partial。
+
 主要缺项：T05 扫描 PDF、图片、配乐/环境声及长音频用户实录的可靠解读，超长 Markdown/PDF 的分段检索；Visual/Audio/Critic 及16行为评估；T10 的特殊词发音复核、可靠字幕对齐、配乐音效与完整声音 QA；真实预览、审批、正式制作、独立QA与发布；修改/取消/导出完整闭环；43风格86条真实视听基线；备份恢复、安全/故障演练和5名新用户观察。图片仍仅到 `uploaded`，不会被当作已分析的事实；语音只有真实ASR与有声覆盖检查通过才会 `ready`。精确现状见 [阻断记录](blockers.md) 和 [任务记录](task-ledger.md)。
 
 下一步继续 T05 素材分析，并将真实媒体执行器接入预览与正式制作，完成音频、独立 QA 和取消清理。生产总开关默认关闭。不要把最小探针、单测、目录规则或交付原型视频当作完整媒体验收。
