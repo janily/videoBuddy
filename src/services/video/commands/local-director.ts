@@ -18,6 +18,11 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
  const p=`projects/${projectId}`,opKey=`${p}/operations/${operationId}`;
  const claim=await claimOperation(store,opKey,operationId);
  if(!claim.claimed)return;
+ const finishDeleted=async()=>{
+  const current=await updateJson(store,opKey,(value:{status:string;streamEpoch:number})=>['succeeded','failed','cancelled','interrupted','superseded'].includes(value.status)?value:{...value,status:'cancelled'});
+  if(current.status==='cancelled'&&!(await events.readFrom(projectId,operationId,0)).some(({event})=>event.epoch===current.streamEpoch&&event.type==='operation.terminal'&&event.payload.status==='cancelled'))await events.append(StreamEventSchema.parse({schemaVersion:5,projectId,operationId,epoch:current.streamEpoch,eventId:randomUUID(),type:'operation.terminal',createdAt:new Date().toISOString(),payload:{status:'cancelled',retryable:false}}));
+ };
+ if((await store.readFresh<ProjectControl>(`${p}/control`)).value.deletedAt){await finishDeleted();return}
  const projects=new ProjectStore(store),candidateId=randomUUID();
  const op=await updateJson(store,opKey,(value:{assistantMessageId?:string;streamEpoch:number;status:string})=>({...value,assistantMessageId:value.assistantMessageId||candidateId}));
  const control=(await store.readFresh<ProjectControl>(`${p}/control`)).value;
@@ -63,12 +68,16 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    }))}:{}),
   })));
   const bytes=Buffer.byteLength(JSON.stringify(directorContext(understanding,context)));if(bytes>60000)throw Error('CONTEXT_LIMIT');
+  const assertActive=async()=>{const latest=(await store.readFresh<ProjectControl>(`${p}/control`)).value,current=(await store.readFresh<{status:string}>(opKey)).value;if(latest.deletedAt||latest.activeConversation!==operationId||current.status!=='running')throw Error('ACCESS_NOT_FOUND')};
+  await assertActive();
   const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
   const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
-   const raw=options.decide?await options.decide(understanding,context,reservation.maxOutputTokens):options.decideStream?await options.decideStream(understanding,context,reservation.maxOutputTokens,onDelta):await withAccountedModel(store,reservation.reservation,()=>runDirectorStream(understanding,context,reservation.maxOutputTokens,onDelta));
+   await assertActive();
+   const raw=options.decide?await options.decide(understanding,context,reservation.maxOutputTokens):options.decideStream?await options.decideStream(understanding,context,reservation.maxOutputTokens,onDelta,process.env,{assertActive}):await withAccountedModel(store,reservation.reservation,()=>runDirectorStream(understanding,context,reservation.maxOutputTokens,onDelta,process.env,{assertActive}));
    const result=GuidanceDecisionSchema.parse(raw);
    guardGuidance(result,context,false,understanding);return result;
   });
+  if((await store.readFresh<ProjectControl>(`${p}/control`)).value.deletedAt){await finishDeleted();return}
   const currentOp=(await store.readFresh<{status:string}>(opKey)).value;
   if(currentOp.status==='cancelling'||currentOp.status==='cancelled'){
    await projects.archiveMessage(projectId,{id:assistantId,ordinal,role:'assistant',text:streamedText,status:'stopped',contentVersion:1,operationId});
@@ -90,6 +99,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
   await updateJson(store,opKey,(value:typeof op)=>({...value,status:'succeeded'}));
   await emit('operation.terminal',{status:'succeeded',retryable:false});
  }catch(error){
+  if((await store.readFresh<ProjectControl>(`${p}/control`)).value.deletedAt){await finishDeleted();return}
   // append can fsync successfully and lose its acknowledgement; the log wins.
   // If the log cannot be read, leave the operation recoverable instead of
   // committing an empty terminal archive over an unknown durable fragment.

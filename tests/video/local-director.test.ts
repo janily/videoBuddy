@@ -93,3 +93,15 @@ it('recovers a fragment fsynced to the log when its append acknowledgement is lo
  await runDirectorOperation(store,events,projectId,operationId,{decideStream:async(_u,_m,_max,onDelta)=>{await onDelta!('持久片段🌱');throw Error('UNREACHABLE')},limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
  expect((await projects.view('owner',projectId)).messages.at(-1)).toMatchObject({text:'持久片段🌱',status:'interrupted'});
 });
+it.each(['before_call','during_success','during_failure'] as const)('deletion %s prevents new reply archival and leaves unknown effects untouched',async when=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir),operationId=crypto.randomUUID();
+ const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
+ await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,activeConversation:operationId}));
+ await store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ if(when==='before_call')await projects.tombstone('owner',projectId);
+ let calls=0;const decide=async()=>{calls++;await projects.tombstone('owner',projectId);if(when==='during_failure')throw Error('NETWORK_UNKNOWN');return{action:'acknowledge' as const,reply:'不应保存到已删除项目',effect:'no_change' as const,executionIntent:'none' as const,evidenceMessageIds:[]}};
+ await runDirectorOperation(store,events,projectId,operationId,{decide,limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ expect(calls).toBe(when==='before_call'?0:1);expect((await store.readFresh<{status:string}>(`projects/${projectId}/operations/${operationId}`)).value.status).toBe('cancelled');
+ expect(await projects.messages((await store.readFresh<ProjectControl>(`projects/${projectId}/control`)).value)).toEqual([]);
+ if(when==='during_failure')expect((await store.readFresh(`projects/${projectId}/operations/${operationId}/effects/director`)).value).toMatchObject({status:'started'});
+});

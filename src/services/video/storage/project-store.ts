@@ -59,5 +59,5 @@ export class ProjectStore{
   const projects=await Promise.all([...new Set(ids)].map(async id=>{try{const c=await this.access(owner,id),meta=(await this.store.readFresh<{title:string}>(`projects/${id}/metadata`)).value;return{projectId:id,title:meta.title,phase:c.phase,lastUserActivityAt:c.lastUserActivityAt,expiresAt:c.expiresAt}}catch(error){if(error instanceof Error&&['ACCESS_NOT_FOUND','PROJECT_EXPIRED'].includes(error.message))return null;throw error}}));
   return projects.filter(p=>p!==null).sort((a,b)=>b.lastUserActivityAt.localeCompare(a.lastUserActivityAt));
  }
- async tombstone(owner:string,id:string){await this.access(owner,id);await updateJson(this.store,`projects/${id}/control`,(c:ProjectControl)=>({...c,controlVersion:c.controlVersion+1,deletedAt:new Date().toISOString(),consentEpoch:c.consentEpoch+1}));return{status:'cancelling'}}
+ async tombstone(owner:string,id:string){await updateJson(this.store,`projects/${id}/control`,(c:ProjectControl)=>{if(c.ownerKeyHash!==owner)throw Error('ACCESS_NOT_FOUND');if(c.deletedAt)return c;if(Date.parse(c.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');return{...c,controlVersion:c.controlVersion+1,deletedAt:new Date().toISOString(),consentEpoch:c.consentEpoch+1}});return{status:'cancelling'}}
 }

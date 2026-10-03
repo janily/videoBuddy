@@ -40,3 +40,17 @@ it.each(['known','overrun','missing','invalid_style'] as const)('records actual 
   await expect(invoke()).rejects.toThrow('MODEL_ATTEMPT_ALREADY_STARTED');expect(calls).toBe(1);
  }finally{vi.unstubAllEnvs();await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
 });
+it.each(['generate','stream'] as const)('rechecks Director authorization after accounting starts and before %s HTTP',async mode=>{
+ const {runDirectorStream}=await import('@/mastra/video/director');let calls=0,checks=0;
+ const server=createServer(async(req,res)=>{calls++;for await(const part of req){void part}res.writeHead(400,{'content-type':'application/json'});res.end(JSON.stringify({error:{message:'must not reach provider'}}))});
+ await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));const address=server.address();if(!address||typeof address==='string')throw Error('LOCAL_SERVER_FAILED');
+ const root=await mkdtemp(join(tmpdir(),'vb-director-fence-'));
+ const env={MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:'http://127.0.0.1:'+address.port+'/v1',MODEL_API_KEY:'unit-only',VIDEO_DIRECTOR_MODEL:'local-unit'};
+ try{
+  for(const [k,v] of Object.entries(env))vi.stubEnv(k,v);
+  const store=new FileStore(root),r=(await reserveModelBudget(store,'project','one',{inputTokens:100,outputTokens:50},{projectCalls:10,projectInputTokens:10000,projectOutputTokens:10000,dailyCalls:20})).reservation;
+  const hooks={assertActive:async()=>{checks++;if(checks===2)throw Error('ACCESS_NOT_FOUND')}};
+  await expect(withAccountedModel(store,r,()=>mode==='generate'?runDirector(initialUnderstanding(),[],50,hooks):runDirectorStream(initialUnderstanding(),[],50,async()=>{},env,hooks))).rejects.toThrow('ACCESS_NOT_FOUND');
+  expect(calls).toBe(0);expect(checks).toBe(2);expect((await store.readFresh<{accounting:Record<string,{state:string}>}>('projects/project/budget')).value.accounting[r.id].state).toBe('unknown');
+ }finally{vi.unstubAllEnvs();await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
+});

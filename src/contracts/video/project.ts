@@ -3,6 +3,7 @@ import type {AssetReservation} from '@/services/video/assets/reservations';
 import type {Receipt} from '@/services/video/commands/submit';
 export interface ArchivedMessage{id:string;ordinal:number;role:'user'|'assistant';text:string;attachmentIds?:string[];status:'completed'|'stopped'|'interrupted';contentVersion:number;operationId?:string;clientMessageId?:string}
 export interface ProjectControl{
+ deletion?:{schemaVersion:5;commandId:string;projectId:string;controlVersion:number;status:'cancelling'};
  latestRenderOutcome?:{operationId:string;briefVersion:number;consentEpoch:number;controlVersion?:number};
  renderOutcomes?:Record<string,{status:'succeeded'|'failed'|'cancelled'|'superseded';errorCode?:string;resultId?:string;resultHash?:string}>;
  publishedExports?:Record<string,string>;

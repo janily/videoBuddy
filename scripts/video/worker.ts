@@ -9,6 +9,7 @@ import {runPreviewOperation} from '../../src/services/video/commands/local-previ
 import {runApprovedRenderOperation} from '../../src/services/video/commands/local-render';
 import {runExportOperation} from '../../src/services/video/exports/operation';
 import {requireGeneration} from '../../src/services/video/config/environment';
+import {reconcileDeletedProjects} from '../../src/services/video/commands/delete-project';
 import {isAbsolute} from 'node:path';
 async function main(){
  const root=process.env.VIDEO_DATA_DIR;if(!root||!isAbsolute(root))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
@@ -17,13 +18,13 @@ async function main(){
  let heartbeatPending=Promise.resolve();
  const heartbeat=setInterval(()=>{heartbeatPending=heartbeatPending.then(async()=>{if(!lease.alive()){stop=true;return}await writeWorkerHeartbeat(root)}).catch(()=>{stop=true})},5000);
  try{while(!stop){if(!lease.alive())throw Error('WORKER_LOCK_LOST');await writeWorkerHeartbeat(root);
+  if(Date.now()-lastExpirySweep>=60000){const deletion=await reconcileDeletedProjects(store);if(deletion.failed)console.error('WORKER_DELETION_NEEDS_RECONCILIATION');await expirePendingUploads(root,store);lastExpirySweep=Date.now()}
   try{await runQueuedOnce(queue,store,async job=>{
    if(job.kind==='export'){await runExportOperation(store,events,job.projectId,job.operationId,{root});return}
    if(job.kind==='render'){await runApprovedRenderOperation(store,events,job.projectId,job.operationId,{root});return}
    requireGeneration();
    if(job.kind==='preview')await runPreviewOperation(store,events,job.projectId,job.operationId,{root});else await runDirectorOperation(store,events,job.projectId,job.operationId);
   })}catch{console.error('WORKER_JOB_NEEDS_RECONCILIATION')}
-  if(Date.now()-lastExpirySweep>=60000){await expirePendingUploads(root,store);lastExpirySweep=Date.now()}
   await new Promise(resolve=>setTimeout(resolve,2000));
  }}finally{clearInterval(heartbeat);await heartbeatPending;await lease.release()}
 }

@@ -79,3 +79,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 无上限验证策略已实现并实测迁移：项目/全部历史日完整清单、不可变原快照/计划、historical真实来源、只加正超预约、同计划冷恢复、未知冻结仍生效；诊断副本七次历史project/daily已完整保留，原源账本/control未改。用户追加测试次数/费用无限授权已落地，不是缺凭据。实际全片第一批gemini-3.8-flash多模态调用120秒超时，没返回可核usage，计为unknown，不自动重试，29批未完成、仍无QA通过/结果发布。超时和未知effect恢复是当前独立阻断，见 evidence/approved-whole-critic-probe.json 与 unlimited-validation.md。默认生成开关关闭，未push/部署。
 
 2026-10-03 恢复入口缺口关闭：更多可显式查看历史并调用已有restore，原命令持久重连、确认后视图最低版本、跨标签/focus/visible刷新已实现。396单元与37浏览器通过，截图保留已确认视觉；仍没有真实合格成片可用于完整恢复媒体验收，协议夹具不代替QA。模型第一批超时unknown、自然语言修改/清理及43风格86真实基线仍待完成，0新增模型，本增量未改真实control/ledger，未push/部署。见 evidence/restore-ui-validation.md。
+
+2026-10-03 T14 删除增量：原命令持久回执、即时授权撤销、操作取消、冷Worker扫描及Director付费启动期间删除竞态已验证。85文件411项单测及构建/lint/typecheck通过，0新收费调用。物理文件/全局缓存/容器停止证明、未知effect处理和30天过期清理仍缺；接口明确保持 cancelling，不能把 AT-045 计为整体通过。详见 [删除验证](evidence/project-deletion-validation.md)。无限费用授权已持久保存，不再是缺少额度授权；真实全片请求超时unknown仍保留原门闩。
