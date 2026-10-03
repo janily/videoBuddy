@@ -9,11 +9,11 @@ import sys
 import uuid
 
 def execute(root, key, digest, expected):
-    if not os.path.isabs(root) or not re.fullmatch(r'projects/[a-f0-9-]{36}/artifacts/[a-f0-9-]{36}/files/(source\.zip|captions\.srt|treatment\.txt|credits\.json|quality\.json)', key) or not re.fullmatch(r'[a-f0-9]{64}', digest):
+    if not os.path.isabs(root) or not re.fullmatch(r'projects/[a-f0-9-]{36}/artifacts/[a-f0-9-]{36}/files/(source\.zip|final\.mp4|captions\.srt|treatment\.txt|credits\.json|quality\.json)', key) or not re.fullmatch(r'[a-f0-9]{64}', digest):
         raise ValueError()
     name = key.split('/')[-1]
-    limit = 150 * 1024 * 1024 if name == 'source.zip' else 2 * 1024 * 1024
-    minimum = 22 if name == 'source.zip' else 1
+    limit = 150 * 1024 * 1024 if name in ('source.zip', 'final.mp4') else 2 * 1024 * 1024
+    minimum = 1024 if name == 'final.mp4' else 22 if name == 'source.zip' else 1
     if not minimum <= expected <= limit:
         raise ValueError()
     raw = sys.stdin.buffer.read(limit + 1)

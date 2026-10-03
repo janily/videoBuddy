@@ -9,6 +9,7 @@ import type{Receipt}from '@/services/video/commands/submit';
 import{createOrRead,updateJson}from '@/services/video/storage/atomic-store';
 import type{ProjectStore}from '@/services/video/storage/project-store';
 import{readPreviewBundle}from './commit';
+import {StartFailed} from '@/services/video/commands/submit';
 
 export interface ApprovalRecord{approvalId:string;projectId:string;previewId:string;revisionId:string;bundleHash:string;scriptHash:string;factsHash:string;briefVersion:number;clientCommandId:string;source:'preview_button';ownerKeyHash:string;approvedAt:string;consentEpoch:number}
 interface ApprovalIntent{hash:string;approvalId:string;approvedAt:string;receipt:Receipt}
@@ -25,7 +26,7 @@ export async function approvePreview(projects:ProjectStore,queue:LocalOperationQ
   const control=(await projects.store.readFresh<ProjectControl>(`${p}/control`)).value;
   if(control.activeProduction===receipt.operationId){
    const op=(await projects.store.readFresh<{status:string}>(`${p}/operations/${receipt.operationId}`)).value;
-   if(!terminal.has(op.status))await queue.enqueue(projectId,receipt.operationId,'render');
+   if(!terminal.has(op.status))try{await queue.enqueue(projectId,receipt.operationId,'render')}catch{throw new StartFailed(receipt)}
   }
  };
  if(intent.receipt.status!=='reserved'){await enqueueLive(intent.receipt);return{...intent.receipt,status:'replayed'}};
@@ -37,6 +38,7 @@ export async function approvePreview(projects:ProjectStore,queue:LocalOperationQ
  const initialControl=await projects.access(owner,projectId);
  assertPreviewBaseline({...initialControl,activeProduction:initialControl.activeProduction?{status:'running'}:null},preview,request);
  if(initialControl.phase!=='preview_ready'||initialControl.activeProduction)throw Error('PREVIEW_STALE');
+ if(Object.keys(initialControl.renderOutcomes||{}).length>=16)throw Error('RECOVERY_REQUIRED');
  const approval:ApprovalRecord={approvalId:intent.approvalId,projectId,previewId:preview.previewId,revisionId:preview.revisionId,bundleHash:preview.bundleHash,scriptHash:preview.scriptHash,factsHash:preview.factsHash,briefVersion:preview.briefVersion,clientCommandId:request.clientCommandId,source:'preview_button',ownerKeyHash:owner,approvedAt:intent.approvedAt,consentEpoch:initialControl.consentEpoch};
  const existing=await createOrRead(projects.store,`${p}/approvals/${approval.approvalId}`,approval);
  if(canonicalHash(existing)!==canonicalHash(approval))throw Error('IDEMPOTENCY_CONFLICT');
@@ -45,6 +47,7 @@ export async function approvePreview(projects:ProjectStore,queue:LocalOperationQ
   if(current.receipts.some(item=>item.commandId===request.clientCommandId))return current;
   assertPreviewBaseline({...current,activeProduction:current.activeProduction?{status:'running'}:null},preview,request);
   if(current.phase!=='preview_ready'||current.activeProduction||current.ownerKeyHash!==owner||current.consentEpoch!==approval.consentEpoch)throw Error('PREVIEW_STALE');
+  if(Object.keys(current.renderOutcomes||{}).length>=16)throw Error('RECOVERY_REQUIRED');
   const receipt:Receipt={...intent.receipt,status:'accepted',controlVersion:current.controlVersion+1};
   return{...current,controlVersion:receipt.controlVersion,phase:'rendering' as const,currentApprovalId:approval.approvalId,activeProduction:receipt.operationId,receipts:[...current.receipts.slice(-127),receipt]};
  });

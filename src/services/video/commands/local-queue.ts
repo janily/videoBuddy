@@ -42,6 +42,27 @@ export class LocalOperationQueue{
   return failure;
  }
  async pending():Promise<QueuedOperation[]>{const value=await this.pendingWithFailures();if(value.failure)throw value.failure;return value.jobs}
+ async reconcileRenders(){
+  let failure:unknown;
+  const dirs=await readdir(join(this.root,'projects'),{withFileTypes:true}).catch(error=>{if((error as NodeJS.ErrnoException).code==='ENOENT')return[];throw error});
+  for(const dir of dirs){if(!dir.isDirectory()||!/^[a-f0-9-]{36}$/.test(dir.name))continue;
+   try{
+    let c:ProjectControl;try{c=(await this.store.readFresh<ProjectControl>(`projects/${dir.name}/control`)).value}catch(error){if(error instanceof StoreMissing)continue;throw error}
+    if(!this.store.listKeys)throw Error('QUEUE_INVENTORY_UNAVAILABLE');
+    const live=new Set([c.activeProduction,c.cancelRequestedProductionId,...Object.keys(c.renderOutcomes||{})].filter(Boolean));
+    for(const key of await this.store.listKeys(`projects/${dir.name}/operations`,1)){
+     try{
+      const id=key.split('/').at(-1)!;if(!/^[a-f0-9-]{36}$/.test(id))continue;
+      const op=(await this.store.readFresh<{id:string;projectId:string;kind:string;status:string}>(key)).value;
+      if(op.kind!=='render')continue;if(op.id!==id||op.projectId!==dir.name)throw Error('QUEUE_RECORD_INVALID');
+      // Never dispatch an orphan reservation before its approval CAS commits.
+      if(live.has(id)||['succeeded','failed','cancelled','cancelling','superseded'].includes(op.status))await this.enqueue(dir.name,id,'render');
+     }catch(error){failure ||= error}
+    }
+   }catch(error){failure ||= error}
+  }
+  return failure;
+ }
  async reconcileExports(){
   let failure:unknown;
   const dirs=await readdir(join(this.root,'projects'),{withFileTypes:true}).catch(error=>{if((error as NodeJS.ErrnoException).code==='ENOENT')return[];throw error});

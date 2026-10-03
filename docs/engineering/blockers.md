@@ -67,3 +67,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T20 依赖复核：npm audit仍11 high（两个根包及传播依赖）；npm registry最新braces=3.0.3、http-cache-semantics=4.2.0。对应 [braces公告](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) 与 [缓存公告](https://github.com/advisories/GHSA-ch52-4w7c-c8xp) 均列Patched versions=None，当前没有可直接锁定的官方修复版本。未force修复或降级Next14；安全验收继续blocked，需要受控补丁/替代及兼容性验证，而非伪造0漏洞。
 
 2026-10-03 T12全片QA更新：两轮全片抽帧与正式Critic执行/聚合代码已接通；真实104+124帧、29批及只读冷复核通过，未调用模型、不算视觉质量通过。原批准诊断项目预算calls=7、accountingVersion缺失、无部署门闩；精确占用副本确认MODEL_ACCOUNTING_MIGRATION_REQUIRED，原ledger未改。实际历史用量/原外部响应仍需审计，不能靠空新账本或改阈值继续付费。仍缺真正全片Critic结论、连续运动/听验、正式旁白字幕实测和发布/修改/导出/清理/全部风格验收。详见 evidence/approved-visual-validation.md 与 approved-visual-budget-probe.json。
+
+2026-10-03 T12正式任务更新：批准HTTP API、冷render队列/实际Worker、冻结生产者与原生Critic、完整质量候选、私有MP4与原子结果发布生命周期已接通并通过协议/恢复测试，之前“render Worker/对外批准入口尚无”限制在服务层关闭。正式UI仍disabled：运动/听验/字体/许可缺独立证据时默认完整报告保持not_checked，严格QA拒绝正式交付；缺真实最终新主题/含旁白字幕完整链。0新增模型，旧账本阻断不变；不以合成正向QA/非视频fixture作为真实质量证据。详见 evidence/render-operation-validation.md。

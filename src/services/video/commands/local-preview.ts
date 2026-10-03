@@ -53,7 +53,7 @@ export async function runPreviewOperation(store:AtomicStore,events:LocalEventLog
   const completed=await updateJson(store,prefix+'/control',(c:ProjectControl)=>{
    if(c.previewOutcomes?.[operationId])return c;
    if(c.currentPreviewId!==op.previewId||c.consentEpoch!==op.consentEpoch||c.briefVersion!==op.briefVersion)throw Error('PREVIEW_STALE');
-   return{...c,controlVersion:c.controlVersion+1,latestPreviewOutcome:{operationId,briefVersion:op.briefVersion,consentEpoch:op.consentEpoch},previewOutcomes:{...c.previewOutcomes,[operationId]:{status:'succeeded' as const}}};
+   return{...c,controlVersion:c.controlVersion+1,latestPreviewOutcome:{operationId,briefVersion:op.briefVersion,consentEpoch:op.consentEpoch,controlVersion:c.controlVersion+1},previewOutcomes:{...c.previewOutcomes,[operationId]:{status:'succeeded' as const}}};
   });
   await finish(completed.previewOutcomes![operationId]);
  }catch(error){
@@ -70,7 +70,7 @@ export async function runPreviewOperation(store:AtomicStore,events:LocalEventLog
    const published=current.currentPreviewId===op.previewId&&current.consentEpoch===op.consentEpoch&&current.briefVersion===op.briefVersion&&!current.activeProduction;
    const status=current.cancelRequestedProductionId===operationId?'cancelled' as const:published&&corrupt?'failed' as const:current.activeProduction!==operationId||current.consentEpoch!==op.consentEpoch?'superseded' as const:'failed' as const;
    const owned=current.activeProduction===operationId||published;
-   return{...current,controlVersion:current.controlVersion+1,previewOutcomes:{...current.previewOutcomes,[operationId]:{status,errorCode}},...(owned?{latestPreviewOutcome:{operationId,briefVersion:op.briefVersion,consentEpoch:op.consentEpoch},activeProduction:null,phase:status==='failed'?'attention' as const:current.phase,...(published&&corrupt?{previewState:'stale' as const}:{})}:{})};
+   return{...current,controlVersion:current.controlVersion+1,previewOutcomes:{...current.previewOutcomes,[operationId]:{status,errorCode}},...(owned?{latestPreviewOutcome:{operationId,briefVersion:op.briefVersion,consentEpoch:op.consentEpoch,controlVersion:current.controlVersion+1},activeProduction:null,phase:status==='failed'?'attention' as const:current.phase,...(published&&corrupt?{previewState:'stale' as const}:{})}:{})};
   });
   await finish(failed.previewOutcomes![operationId]);
  }

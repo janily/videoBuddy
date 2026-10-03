@@ -39,13 +39,16 @@ export class ProjectStore{
   const currentPreview=preview?{previewId:preview.previewId,revisionId:preview.revisionId,briefVersion:preview.briefVersion,previewArtifactId:preview.previewArtifactId,bundleHash:preview.bundleHash,scriptHash:preview.scriptHash,factsHash:preview.factsHash,script:preview.script,criticalFacts:preview.criticalFacts,summary:preview.summary,expiresAt:preview.expiresAt,state:c.previewState}:null;
   const publicResult=async(resultId?:string)=>{if(!resultId)return null;const result=await readResultManifest(this,id,resultId);return{resultId:result.resultId,artifactId:result.artifactId,revisionId:result.revisionId,bundleHash:result.bundleHash,createdAt:result.createdAt}};
   let productionFailure:ProjectView['productionFailure'];
-  const last=c.latestPreviewOutcome;
+  const renderLast=c.latestRenderOutcome,previewLast=c.latestPreviewOutcome;
+  const order=(marker:typeof renderLast)=>marker?.controlVersion??c.receipts.filter(r=>r.operationId===marker?.operationId).at(-1)?.controlVersion??-1;
+  const matches=(marker:typeof renderLast)=>marker?.briefVersion===c.briefVersion&&marker.consentEpoch===c.consentEpoch;
+  const last=matches(renderLast)&&(!matches(previewLast)||order(renderLast)>=order(previewLast))?renderLast:previewLast,isRender=last===renderLast;
   if(last&&!c.activeProduction&&last.briefVersion===c.briefVersion&&last.consentEpoch===c.consentEpoch){
-   let outcome=c.previewOutcomes?.[last.operationId];
-   if(!outcome)try{outcome=(await this.store.readFresh<NonNullable<ProjectControl['previewOutcomes']>[string]>(`projects/${id}/operations/${last.operationId}/preview-outcome`)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
+   let outcome=(isRender?c.renderOutcomes:c.previewOutcomes)?.[last.operationId];
+   if(!outcome)try{outcome=(await this.store.readFresh<NonNullable<ProjectControl['previewOutcomes']>[string]>(`projects/${id}/operations/${last.operationId}/${isRender?'render':'preview'}-outcome`)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
    if(outcome?.status==='failed'){
     const code=outcome.errorCode||'PROVIDER_UNAVAILABLE';
-    const message=code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':code==='ASR_MISMATCH'?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':'本次效果制作未完成，资料和已有内容已保留。';
+    const message=code==='QUALITY_BLOCKED'?'完整视频的视听质量或许可证据尚未通过，效果片段和已有结果已保留。':code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':['ASR_MISMATCH','POSTMIX_ASR_MISMATCH'].includes(code)?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':isRender?'本次完整视频制作未完成，效果片段和已有结果已保留。':'本次效果制作未完成，资料和已有内容已保留。';
     productionFailure={operationId:last.operationId,errorCode:code,message};
    }
   }

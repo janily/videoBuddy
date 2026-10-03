@@ -36,12 +36,15 @@ export async function publishResult(projects:ProjectStore,owner:string,projectId
  const stored=await createOrRead(projects.store,key(projectId,result.resultId),result);
  if(canonicalHash(stored)!==canonicalHash(result))throw Error('RESULT_ID_CONFLICT');
  await updateJson(projects.store,`${p}/control`,async(control:ProjectControl)=>{
+  const outcome={status:'succeeded' as const,resultId:result.resultId,resultHash:canonicalHash(result)};
+  if(control.renderOutcomes?.[operationId]&&canonicalHash(control.renderOutcomes[operationId])!==canonicalHash(outcome))throw Error('PUBLISH_FENCED');
   if(control.currentResultId===result.resultId)return control;
   const latest=(await projects.store.readFresh<typeof operation>(operationKey)).value;
   if(latest.status!=='running'||latest.fence!==expectedFence)throw Error('PUBLISH_FENCED');
   assertPublishable({bundleHash:preview.bundleHash,consentEpoch:control.consentEpoch,owner:control.ownerKeyHash,activeOperationId:control.activeProduction||'',deletedAt:control.deletedAt},{bundleHash:approval.bundleHash,consentEpoch:approval.consentEpoch,owner:approval.ownerKeyHash,operationId});
   if(control.phase!=='rendering'||control.currentApprovalId!==approval.approvalId||control.currentPreviewId!==preview.previewId||control.briefVersion!==approval.briefVersion)throw Error('PUBLISH_FENCED');
-  return{...control,controlVersion:control.controlVersion+1,phase:'ready' as const,previousResultId:control.currentResultId,currentResultId:result.resultId,activeProduction:null};
+  if(Object.keys(control.renderOutcomes||{}).length>=16)throw Error('RECOVERY_REQUIRED');
+  return{...control,controlVersion:control.controlVersion+1,phase:'ready' as const,previousResultId:control.currentResultId,currentResultId:result.resultId,activeProduction:null,renderOutcomes:{...control.renderOutcomes,[operationId]:outcome},latestRenderOutcome:{operationId,briefVersion:approval.briefVersion,consentEpoch:approval.consentEpoch,controlVersion:control.controlVersion+1}};
  });
  return projects.view(owner,projectId);
 }
