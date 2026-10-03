@@ -95,3 +95,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T13 浏览器实际target:null缺口已关闭：播放器/历史/预览选择和草稿绑定、完整原命令持久重发、跨标签身份保护经449单元/45浏览器与两轴复核通过。见 [UI反馈目标验证](evidence/feedback-target-ui-validation.md)。截图是404媒体协议夹具，不是合格成片；ChangePlan授权→真实新revision/QA/发布继续缺，旧unknown账目门闩未改，0新模型调用，费用授权不限且继续有效。
 
 2026-10-03 T13 修改候选可冻结真实来源/基线并冷核验，455单元及构建等检查通过，见 [候选验证](evidence/music-change-draft-validation.md)。此候选无已批准语义、无预算预约、无执行权限，不解决正式改稿；待接模型分类、原音乐证明、幂等准入/混音/完整QA发布。0新模型/真实control账目未改，旧unknown门闩保留、不限费用授权有效。
+
+2026-10-03 Director/Worker音乐候选接入缺口已关闭：本轮原话、当前整片目标、冻结分类上下文、固定server计划ID与op指针、relative/absolute意图保持及冷恢复经465单元/构建等检查验证；本地真实SDK协议不是远端语义验收，0provider。见 [Director候选验证](evidence/director-music-change-validation.md)。候选not_started/nullbudget，正式语义/原音乐增益/操作准入/混音完整QA发布未完成；旧unknown用量门闩保留，费用授权不限继续有效。

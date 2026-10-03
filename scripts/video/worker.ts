@@ -24,7 +24,7 @@ async function main(){
    if(job.kind==='export'){await runExportOperation(store,events,job.projectId,job.operationId,{root});return}
    if(job.kind==='render'){await runApprovedRenderOperation(store,events,job.projectId,job.operationId,{root});return}
    requireGeneration();
-   if(job.kind==='preview')await runPreviewOperation(store,events,job.projectId,job.operationId,{root});else await runDirectorOperation(store,events,job.projectId,job.operationId);
+   if(job.kind==='preview')await runPreviewOperation(store,events,job.projectId,job.operationId,{root});else await runDirectorOperation(store,events,job.projectId,job.operationId,{root});
   })}catch{console.error('WORKER_JOB_NEEDS_RECONCILIATION')}
   await new Promise(resolve=>setTimeout(resolve,2000));
  }}finally{clearInterval(heartbeat);await heartbeatPending;await lease.release()}

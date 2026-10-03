@@ -58,3 +58,8 @@ it('T13 revalidation rejects cancellation that occurs while reading baseline med
  const store={readFresh:async<T>(key:string)=>{if(!changed&&key.includes('/previews/')&&key.endsWith('/manifest')){changed=true;await updateJson(f.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,consentEpoch:c.consentEpoch+1}))}return f.store.readFresh<T>(key)},create:f.store.create.bind(f.store),cas:f.store.cas.bind(f.store)};
  await expect(revalidateMusicChangeDraft(new ProjectStore(store),owner,f.projectId,ref,root)).rejects.toThrow('CHANGE_STALE');expect(changed).toBe(true);
 });
+it('T13 preserves relative gain intent separately from absolute master gain and rejects a zero reduction',async()=>{
+ const f=await fixture(),proposal={...f.proposal,operations:[{field:'musicGainDb',value:-3,valueMode:'relative'}]};
+ const ref=await prepareMusicChangeDraft(f.projects,owner,f.projectId,proposal,root),draft=await revalidateMusicChangeDraft(f.projects,owner,f.projectId,ref,root);expect(draft.operations[0]).toEqual({field:'musicGainDb',value:-3,valueMode:'relative'});
+ await expect(prepareMusicChangeDraft(f.projects,owner,f.projectId,{...proposal,changePlanId:crypto.randomUUID(),operations:[{field:'musicGainDb',value:0,valueMode:'relative'}]},root)).rejects.toThrow('CHANGE_PLAN_INVALID');
+});

@@ -8,13 +8,15 @@ import {Understanding} from '@/contracts/video/domain';
 import {StreamEventSchema} from '@/contracts/video/commands';
 import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budget/model-budget';
-import {runDirector,runDirectorStream,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext} from '@/mastra/video/director';
+import {runDirector,runDirectorStream,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext,type DirectorProjectContext} from '@/mastra/video/director';
 import {TextAnalysis} from '@/services/video/assets/analysis';
 
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import {deferDirectorFeedback} from '@/services/video/revisions/pending-feedback';
 import {canonicalHash} from '@/services/video/domain/hash';
-interface FrozenDirectorInput{control:ProjectControl;messages:ArchivedMessage[];understanding:Understanding;context:SourceMessage[]}
+import {readResultManifest} from '@/services/video/results/publish';
+import {prepareMusicChangeDraft,revalidateMusicChangeDraft} from '@/services/video/revisions/music-change-plan';
+interface FrozenDirectorInput{control:ProjectControl;messages:ArchivedMessage[];understanding:Understanding;context:SourceMessage[];classificationContext?:Pick<DirectorProjectContext,'currentTurnUserMessageIds'|'currentResult'>}
 interface DirectorInputRecord{schemaVersion:5;input:FrozenDirectorInput;sha256:string}
 function verifyInput(record:DirectorInputRecord,projectId:string,operationId:string){
  if(record.schemaVersion!==5||canonicalHash(record.input)!==record.sha256||record.input.control.projectId!==projectId||record.input.control.activeConversation!==operationId||record.input.understanding.briefVersion!==record.input.control.briefVersion)throw Error('DIRECTOR_INPUT_CHANGED');
@@ -22,7 +24,7 @@ function verifyInput(record:DirectorInputRecord,projectId:string,operationId:str
 }
 
 type Decide=typeof runDirector;
-export async function runDirectorOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{decide?:Decide;decideStream?:typeof runDirectorStream;limits?:ModelLimits}={}){
+export async function runDirectorOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{decide?:Decide;decideStream?:typeof runDirectorStream;limits?:ModelLimits;root?:string}={}){
  const p=`projects/${projectId}`,opKey=`${p}/operations/${operationId}`;
  const claim=await claimOperation(store,opKey,operationId);
  if(!claim.claimed)return;
@@ -32,7 +34,8 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
  };
  if((await store.readFresh<ProjectControl>(`${p}/control`)).value.deletedAt){await finishDeleted();return}
  const projects=new ProjectStore(store),candidateId=randomUUID();
- const op=await updateJson(store,opKey,(value:{assistantMessageId?:string;streamEpoch:number;status:string})=>({...value,assistantMessageId:value.assistantMessageId||candidateId}));
+ const planId=randomUUID();
+ const op=await updateJson(store,opKey,(value:{assistantMessageId?:string;musicChangePlanId?:string;streamEpoch:number;status:string})=>({...value,assistantMessageId:value.assistantMessageId||candidateId,musicChangePlanId:value.musicChangePlanId||planId}));
  let control=(await store.readFresh<ProjectControl>(`${p}/control`)).value;
  let messages=await projects.messages(control),understanding=(await store.readFresh<Understanding>(control.understandingRef.key)).value;
  const assistantId=op.assistantMessageId!,ordinal=control.ordinalReservations[operationId]?.assistant||control.nextOrdinal;
@@ -84,20 +87,26 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
     return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(analysis.pages?{pages:analysis.pages}:{}),...(analysis.segments?{segments:analysis.segments}:{})};
    }))}:{}),
   })));
-  const input:FrozenDirectorInput={control,messages,understanding,context};
+  let classificationContext=savedInput?.classificationContext;
+  if(!savedInput){
+   const result=control.currentResultId?await readResultManifest(projects,projectId,control.currentResultId):null;
+   classificationContext={currentTurnUserMessageIds:messages.filter(message=>message.role==='user'&&message.operationId===operationId&&message.status==='completed').map(message=>message.id),currentResult:result?{artifactId:result.artifactId,revisionId:result.revisionId}:null};
+  }
+  const input:FrozenDirectorInput={control,messages,understanding,context,...(classificationContext?{classificationContext}:{})};
   const frozen=verifyInput(await createOrRead(store,`${opKey}/director-input`,{schemaVersion:5 as const,input,sha256:canonicalHash(input)}),projectId,operationId);
   control=frozen.control;messages=frozen.messages;understanding=frozen.understanding;context=frozen.context;
-  const projectContext={phase:control.phase,activeProductionId:control.activeProduction??null,briefVersion:control.briefVersion,consentEpoch:control.consentEpoch};
+  const projectContext={phase:control.phase,activeProductionId:control.activeProduction??null,briefVersion:control.briefVersion,consentEpoch:control.consentEpoch,...frozen.classificationContext};
   const bytes=Buffer.byteLength(JSON.stringify(directorContext(understanding,context,projectContext)));if(bytes>60000)throw Error('CONTEXT_LIMIT');
   const assertActive=async()=>{const latest=(await store.readFresh<ProjectControl>(`${p}/control`)).value,current=(await store.readFresh<{status:string}>(opKey)).value;if(latest.deletedAt||latest.activeConversation!==operationId||current.status!=='running')throw Error('ACCESS_NOT_FOUND');if(!Number.isFinite(Date.parse(latest.expiresAt))||Date.parse(latest.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED')};
   await assertActive();
   const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
-  const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
+  const decision=GuidanceDecisionSchema.parse(await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
    await assertActive();
    const raw=options.decide?await options.decide(understanding,context,reservation.maxOutputTokens,{assertActive,projectContext}):options.decideStream?await options.decideStream(understanding,context,reservation.maxOutputTokens,onDelta,process.env,{assertActive,projectContext}):await withAccountedModel(store,reservation.reservation,()=>runDirectorStream(understanding,context,reservation.maxOutputTokens,onDelta,process.env,{assertActive,projectContext}));
    const result=GuidanceDecisionSchema.parse(raw);
-   guardGuidance(result,context,false,understanding);return result;
-  });
+   guardGuidance(result,context,false,understanding,projectContext);return result;
+  }));
+  guardGuidance(decision,context,false,understanding,projectContext);
   if((await store.readFresh<ProjectControl>(`${p}/control`)).value.deletedAt){await finishDeleted();return}
   const currentOp=(await store.readFresh<{status:string}>(opKey)).value;
   if(currentOp.status==='cancelling'||currentOp.status==='cancelled'){
@@ -106,12 +115,26 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    await updateJson(store,`${p}/control`,(value:ProjectControl)=>({...value,activeConversation:value.activeConversation===operationId?null:value.activeConversation,controlVersion:value.controlVersion+1}));
    await emit('message.stopped',{messageId:assistantId,contentVersion:1});await emit('operation.terminal',{status:'cancelled',retryable:false});return;
   }
+  if(decision.musicChange){
+   const latest=await projects.access(control.ownerKeyHash,projectId);
+   if(latest.consentEpoch!==control.consentEpoch||latest.briefVersion!==control.briefVersion||latest.currentResultId!==control.currentResultId||latest.activeProduction)throw Error('CHANGE_STALE');
+   const root=options.root??process.env.VIDEO_DATA_DIR;if(!root)throw Error('CONFIGURATION_REQUIRED');
+   const change=decision.musicChange,original=messages.find(message=>message.id===change.sourceMessageId)!;
+   const ref=await prepareMusicChangeDraft(projects,control.ownerKeyHash,projectId,{schemaVersion:5,changePlanId:op.musicChangePlanId,sourceMessageId:change.sourceMessageId,targetArtifactId:change.targetArtifactId,revisionId:change.revisionId,operations:[{field:'musicGainDb',value:change.musicGainDb,valueMode:change.gainMode}],factsChanged:false,reason:change.reason},root);
+   const draft=await revalidateMusicChangeDraft(projects,control.ownerKeyHash,projectId,ref,root);
+   if(draft.sourceMessageSha256!==canonicalHash(original)||draft.baseline.consentEpoch!==control.consentEpoch||draft.baseline.briefVersion!==control.briefVersion||draft.baseline.resultId!==control.currentResultId)throw Error('CHANGE_STALE');
+   await updateJson(store,opKey,(value:typeof op&{musicChangeDraftRef?:typeof ref})=>{
+    if(value.status!=='running')throw Error('CHANGE_STALE');
+    if(value.musicChangeDraftRef&&canonicalHash(value.musicChangeDraftRef)!==canonicalHash(ref))throw Error('CHANGE_STALE');return{...value,musicChangeDraftRef:ref};
+   });
+  }
   if(!decision.reply.startsWith(streamedText))throw Error('DIRECTOR_STREAM_CHANGED');
   if(decision.reply.length>streamedText.length)await onDelta(decision.reply.slice(streamedText.length));
   const message:ArchivedMessage={id:assistantId,ordinal,role:'assistant',text:decision.reply,status:'completed',contentVersion:1,operationId};
   const messageRef=await projects.index.immutable(`${p}/messages/${assistantId}/1`,message);
   await updateJson(store,`${p}/control`,async(value:ProjectControl)=>{
    if(value.deletedAt||(value as ProjectControl&{replyCancelOperationIds?:string[]}).replyCancelOperationIds?.includes(operationId)||value.activeConversation!==operationId)throw Error('ACCESS_NOT_FOUND');
+   if(decision.musicChange&&(value.consentEpoch!==control.consentEpoch||value.briefVersion!==control.briefVersion||value.currentResultId!==control.currentResultId||value.activeProduction))throw Error('CHANGE_STALE');
    const latest=(await store.readFresh<Understanding>(value.understandingRef.key)).value;
    if(decision.understandingPatch&&!control.activeProduction&&value.consentEpoch!==control.consentEpoch)throw Error('CHANGE_STALE');
    const deferred=Boolean((decision.understandingPatch||decision.effect==='pending_followup')&&(control.activeProduction||value.activeProduction));
