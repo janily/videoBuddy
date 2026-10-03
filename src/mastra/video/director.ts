@@ -5,10 +5,11 @@ import {createVideoAgent} from './model-adapter';
 import {getStyle,listStyles} from '@/services/video/styles/registry';
 import {noopLogger} from '@mastra/core/logger';
 import type {Environment} from '@/services/video/config/environment';
+import type {FeedbackTarget} from '@/contracts/video/commands';
 export const GuidanceDecisionSchema=z.strictObject({action:z.enum(['ask','suggest_preview','acknowledge','status','change']),reply:z.string().min(1).max(8000),effect:z.enum(['no_change','update_brief','pending_followup','clarify_conflict']),question:z.strictObject({topic:z.string(),text:z.string(),required:z.boolean(),reason:z.string()}).optional(),understandingPatch:UnderstandingPatchSchema.optional(),recommendedStyleId:z.string().optional(),executionIntent:z.enum(['prepare_preview','classify_change','none']),evidenceMessageIds:z.array(z.string().uuid())});
 export type GuidanceDecision=z.infer<typeof GuidanceDecisionSchema>;
 export interface SourceAttachment{assetId:string;filename:string;mime:string;sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string;language?:'zh-CN'|'en'}>}
-export interface SourceMessage{id:string;role:'user'|'assistant';text:string;attachments?:SourceAttachment[]}
+export interface SourceMessage{id:string;role:'user'|'assistant';text:string;target?:FeedbackTarget|null;attachments?:SourceAttachment[]}
 export interface DirectorProjectContext{phase:string;activeProductionId:string|null;briefVersion:number;consentEpoch:number}
 interface DirectorOptions{assertActive?:()=>Promise<void>;projectContext?:DirectorProjectContext}
 function requireStyle(id:string){try{getStyle(id)}catch{throw Error('STYLE_INVALID')}}

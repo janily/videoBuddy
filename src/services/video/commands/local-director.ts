@@ -75,6 +75,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
   await emit('activity.updated',{stage:'understanding',label:'正在整理你的想法'});
   let context:SourceMessage[]=savedInput?.context??await Promise.all(messages.map(async message=>({
    id:message.id,role:message.role,text:message.text,
+   ...(message.role==='user'&&message.target!==undefined?{target:message.target}:{}),
    ...(message.attachmentIds?.length?{attachments:await Promise.all(message.attachmentIds.map(async assetId=>{
     const asset=control.assets.find(item=>item.id===assetId);
     if(!asset||asset.status!=='ready'||!['text/markdown','application/pdf','audio/wav','audio/mpeg','audio/mp4'].includes(asset.declaredMime)||!asset.analysisRef)throw Error('SOURCE_INVALID');

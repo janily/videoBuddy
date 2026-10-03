@@ -1,7 +1,8 @@
 import type {Understanding,ObjectRef} from './domain';
 import type {AssetReservation} from '@/services/video/assets/reservations';
 import type {Receipt} from '@/services/video/commands/submit';
-export interface ArchivedMessage{id:string;ordinal:number;role:'user'|'assistant';text:string;attachmentIds?:string[];status:'completed'|'stopped'|'interrupted';contentVersion:number;operationId?:string;clientMessageId?:string}
+import type {FeedbackTarget} from './commands';
+export interface ArchivedMessage{id:string;ordinal:number;role:'user'|'assistant';text:string;attachmentIds?:string[];target?:FeedbackTarget|null;status:'completed'|'stopped'|'interrupted';contentVersion:number;operationId?:string;clientMessageId?:string}
 export interface ProjectControl{
  pendingFeedbackIndexRef?:ObjectRef;
  deletion?:{schemaVersion:5;commandId:string;projectId:string;controlVersion:number;status:'cancelling'};
