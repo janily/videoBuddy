@@ -4,6 +4,7 @@ import {StoreMissing} from '@/services/video/storage/atomic-store';
 import type {ProjectControl} from '@/contracts/video/project';
 import type {PreviewOperation} from '@/services/video/preview/prepare';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {clearUnstartedMediaStop} from '@/services/video/media/stop-state';
 import {bindReservedExportCommand} from '@/services/video/exports/intent';
 import {DurableExportFormatSchema} from '@/services/video/exports/formats';
 import type {ExportOperation} from '@/services/video/exports/operation';
@@ -24,7 +25,7 @@ export class LocalOperationQueue{
    const removable=[] as string[];
    for(const [id,outcome] of Object.entries(c.previewOutcomes||{})){
     const key=`projects/${dir.name}/operations/${id}`,op=(await this.store.readFresh<{status:string}>(key)).value;
-    if(!['succeeded','failed','cancelled','superseded'].includes(op.status))continue;
+    if(!['succeeded','failed','cancelled','interrupted','superseded'].includes(op.status))continue;
     const saved=(await this.store.readFresh(key+'/preview-outcome')).value;
     if(canonicalHash(saved)===canonicalHash(outcome))removable.push(id);
    }
@@ -35,6 +36,7 @@ export class LocalOperationQueue{
    const id=c.activeProduction||c.cancelRequestedProductionId;
    if(c.deletedAt||Date.parse(c.expiresAt)<=Date.now()||!id)continue;
    const op=(await this.store.readFresh<PreviewOperation>(`projects/${dir.name}/operations/${id}`)).value;
+   if(op.kind==='preview'&&op.id===id&&op.projectId===dir.name&&op.status==='cancelled')await clearUnstartedMediaStop(this.store,dir.name,id);
    if(op.kind!=='preview'||op.id!==id||op.projectId!==dir.name||!['reserved','running','cancelling'].includes(op.status))continue;
    const live=c.phase==='preparing_preview'&&c.activeProduction===id&&c.briefVersion===op.briefVersion&&c.consentEpoch===op.consentEpoch&&canonicalHash(c.understandingRef)===canonicalHash(op.understandingRef);
    if(live||c.cancelRequestedProductionId===id)await this.enqueue(dir.name,id,'preview');
@@ -57,7 +59,7 @@ export class LocalOperationQueue{
       const op=(await this.store.readFresh<{id:string;projectId:string;kind:string;status:string}>(key)).value;
       if(op.kind!=='render')continue;if(op.id!==id||op.projectId!==dir.name)throw Error('QUEUE_RECORD_INVALID');
       // Never dispatch an orphan reservation before its approval CAS commits.
-      if(live.has(id)||['succeeded','failed','cancelled','cancelling','superseded'].includes(op.status))await this.enqueue(dir.name,id,'render');
+      if(live.has(id)||['succeeded','failed','cancelled','interrupted','cancelling','superseded'].includes(op.status))await this.enqueue(dir.name,id,'render');
      }catch(error){failure ||= error}
     }
    }catch(error){failure ||= error}

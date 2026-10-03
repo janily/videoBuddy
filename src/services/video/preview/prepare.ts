@@ -9,10 +9,12 @@ import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {getStyle} from '@/services/video/styles/registry';
 import type {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {StartFailed,type Receipt} from '@/services/video/commands/submit';
+import {assertMediaStopsResolved} from '@/services/video/media/stop-state';
 interface Intent{hash:string;revisionId:string;previewId:string;receipt:Receipt}
 export interface PreviewOperation{
  id:string;projectId:string;commandId:string;kind:'preview';status:string;canonicalRunId:string|null;streamEpoch:number;fence:number;
  revisionId:string;previewId:string;briefVersion:number;consentEpoch:number;understandingRef:ObjectRef;
+ mediaAttemptStarted?:boolean;
 }
 const terminal=new Set(['succeeded','failed','cancelled','interrupted','superseded']);
 export async function preparePreview(projects:ProjectStore,queue:LocalOperationQueue,owner:string,projectId:string,untrusted:PreparePreviewRequest):Promise<Receipt>{
@@ -33,12 +35,14 @@ export async function preparePreview(projects:ProjectStore,queue:LocalOperationQ
   const receipt=previous||intent.receipt;if(receipt.operationId!==intent.receipt.operationId)throw Error('IDEMPOTENCY_CONFLICT');
   await updateJson(projects.store,intentKey,(value:Intent)=>({...value,receipt}));await dispatch(receipt);return{...receipt,status:'replayed'};
  }
+ assertMediaStopsResolved(control);
  const understanding=UnderstandingSchema.parse((await projects.store.readFresh(control.understandingRef.key)).value);
  if(canonicalHash(understanding)!==control.understandingRef.sha256||Buffer.byteLength(canonicalJson(understanding))!==control.understandingRef.bytes||understanding.briefVersion!==request.expectedBriefVersion||control.briefVersion!==request.expectedBriefVersion)throw Error('BRIEF_CONFLICT');
  if(!understanding.subject.trim()||!understanding.preferences.styleSlug||understanding.unresolvedConflictIds.length)throw Error('PREVIEW_INPUT_INCOMPLETE');getStyle(understanding.preferences.styleSlug);
  if(request.sourceMessageId&&!(await projects.messages(control)).some(message=>message.id===request.sourceMessageId&&message.role==='user'&&message.status==='completed'))throw Error('AUTHORIZATION_REQUIRED');
  const assertBaseline=(current:ProjectControl)=>{
   if(current.deletedAt||current.ownerKeyHash!==owner||Date.parse(current.expiresAt)<=Date.now())throw Error('ACCESS_NOT_FOUND');
+  assertMediaStopsResolved(current);
   if(current.activeProduction||current.activeConversation)throw Error('BUSY');
   if(Object.keys(current.previewOutcomes||{}).length>=16)throw Error('RECOVERY_REQUIRED');
   if(current.inputPending||understanding.assetUses.some(use=>use.required&&!current.assets.some(asset=>asset.id===use.assetId&&asset.status==='ready')))throw Error('INPUT_PENDING');

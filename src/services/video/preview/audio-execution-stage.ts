@@ -50,9 +50,9 @@ export async function prepareAudioExecutionStage(projects:ProjectStore,projectId
  if(wav.sha256!==timing.track.sha256)throw Error('AUDIO_EXECUTION_CHANGED');
  const voice={outputPath:timing.track.outputPath,runtimeDigest:timing.track.runtimeDigest,wav,kind:'narration_only' as const,qaStatus:'not_checked' as const};
  await fence();
- const stems=await buildSoundStems(root,plan,timing.durationMs,timing.fps,env);
+ const stems=await buildSoundStems(root,plan,timing.durationMs,timing.fps,env,{assertActive:fence});
  await fence();
- const master=await buildAudioMaster(root,plan,voice,stems,timing.durationMs,timing.fps,env);
+ const master=await buildAudioMaster(root,plan,voice,stems,timing.durationMs,timing.fps,env,{assertActive:fence});
  await fence();
  const packageRef=await archiveAudioExecution(projects,root,projectId,revisionId,audio.planRef,timingRecord.draftRef,voice,stems,master);
  await fence();

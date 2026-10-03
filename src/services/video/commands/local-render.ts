@@ -19,7 +19,7 @@ import {persistArchiveObject} from '@/services/video/exports/archive-object';
 import type {ArtifactRecord} from '@/services/video/exports/access';
 import {actualArtifactSha256} from '@/services/video/exports/verified-file';
 import {claimOperation} from './claim';
-interface RenderOperation{id:string;projectId:string;commandId:string;kind:'render';status:string;canonicalRunId:string|null;streamEpoch:number;fence:number;approvalId:string;bundleHash:string;consentEpoch:number}
+interface RenderOperation{id:string;projectId:string;commandId:string;kind:'render';status:string;canonicalRunId:string|null;streamEpoch:number;fence:number;approvalId:string;bundleHash:string;consentEpoch:number;mediaAttemptStarted?:boolean}
 type Outcome=NonNullable<ProjectControl['renderOutcomes']>[string];
 const safe=new Set(['QUALITY_BLOCKED','EFFECT_UNKNOWN','BUDGET_EXCEEDED','MODEL_BUDGET_OVERRUN','MODEL_USAGE_UNCERTAIN','MODEL_ACCOUNTING_MIGRATION_REQUIRED','GENERATION_DISABLED','CONFIGURATION_REQUIRED','QA_FAILED','RENDER_OUTPUT_CHANGED','RENDER_STAGE_CONFLICT','STAGE_UNKNOWN','COMPOSITION_STAGE_UNKNOWN','CRITIC_REVIEW_INVALID','ASR_MISMATCH','POSTMIX_ASR_MISMATCH','VISUAL_ASSET_RUNTIME_UNAVAILABLE','APPROVED_AUDIO_NOT_READY']);
 export async function runApprovedRenderOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:Parameters<typeof renderApproved>[6]&{build?:typeof renderApproved}){
@@ -40,9 +40,10 @@ export async function runApprovedRenderOperation(store:AtomicStore,events:LocalE
   await emit('operation.terminal',{status:outcome.status,...(outcome.errorCode?{errorCode:outcome.errorCode}:{}),retryable:false});
   await updateJson(store,key,(op:RenderOperation)=>({...op,status:outcome.status,...(outcome.errorCode?{errorCode:outcome.errorCode}:{})}));
   await updateJson(store,prefix+'/control',(c:ProjectControl)=>{
-   if(!c.renderOutcomes?.[operationId])return c;
-   if(canonicalHash(c.renderOutcomes[operationId])!==canonicalHash(outcome))throw Error('RENDER_OUTCOME_CHANGED');
-   const remaining={...c.renderOutcomes};delete remaining[operationId];return{...c,controlVersion:c.controlVersion+1,renderOutcomes:remaining};
+   const clearStop=outcome.status==='cancelled'&&c.unresolvedMediaStops?.[operationId];
+   if(!c.renderOutcomes?.[operationId]&&!clearStop)return c;
+   if(c.renderOutcomes?.[operationId]&&canonicalHash(c.renderOutcomes[operationId])!==canonicalHash(outcome))throw Error('RENDER_OUTCOME_CHANGED');
+   const remaining={...c.renderOutcomes},unresolvedMediaStops={...c.unresolvedMediaStops};delete remaining[operationId];if(clearStop)delete unresolvedMediaStops[operationId];return{...c,controlVersion:c.controlVersion+1,renderOutcomes:remaining,...(clearStop?{unresolvedMediaStops}:{})};
   });
  }
  async function knownOutcome(){
@@ -57,20 +58,26 @@ export async function runApprovedRenderOperation(store:AtomicStore,events:LocalE
   const c=await updateJson(store,prefix+'/control',(current:ProjectControl)=>{
    if(current.renderOutcomes?.[operationId])return current;
    const cancelled=current.cancelRequestedProductionId===operationId||before.status==='cancelled'||before.status==='cancelling';
-   const owned=current.activeProduction===operationId;
-   const status=cancelled?'cancelled' as const:!owned||current.consentEpoch!==before.consentEpoch||current.deletedAt||Date.parse(current.expiresAt)<=Date.now()?'superseded' as const:'failed' as const;
-   const outcome:Outcome={status,...(cancelled?{}:{errorCode:safe.has(raw)?raw:'RENDER_FAILED'})};
-   return{...current,controlVersion:current.controlVersion+1,renderOutcomes:{...current.renderOutcomes,[operationId]:outcome},...(owned?{activeProduction:null,phase:status==='failed'?'attention' as const:current.phase,latestRenderOutcome:{operationId,briefVersion:approval.briefVersion,consentEpoch:approval.consentEpoch,controlVersion:current.controlVersion+1}}:{})};
+   const owned=current.activeProduction===operationId,stopUnknown=raw==='MEDIA_STOP_UNKNOWN';
+   const affected=owned||stopUnknown&&!current.activeProduction&&current.cancelRequestedProductionId===operationId;
+   const status=stopUnknown?'interrupted' as const:cancelled?'cancelled' as const:!owned||current.consentEpoch!==before.consentEpoch||current.deletedAt||Date.parse(current.expiresAt)<=Date.now()?'superseded' as const:'failed' as const;
+   const outcome:Outcome={status,...(stopUnknown?{errorCode:'MEDIA_STOP_UNKNOWN'}:cancelled?{}:{errorCode:safe.has(raw)?raw:'RENDER_FAILED'})};
+   return{...current,controlVersion:current.controlVersion+1,renderOutcomes:{...current.renderOutcomes,[operationId]:outcome},...(stopUnknown?{unresolvedMediaStops:{...current.unresolvedMediaStops,[operationId]:'render' as const}}:{}),...(affected?{activeProduction:null,phase:status==='failed'||stopUnknown?'attention' as const:current.phase,latestRenderOutcome:{operationId,briefVersion:stopUnknown?current.briefVersion:approval.briefVersion,consentEpoch:stopUnknown?current.consentEpoch:approval.consentEpoch,controlVersion:current.controlVersion+1}}:{})};
   });
   await finish(c.renderOutcomes![operationId]);
  }
- if(['cancelled','cancelling','failed','superseded'].includes(before.status)){await fail(before.status==='failed'?'RENDER_FAILED':'RENDER_FENCED');return}
+ // A cold worker has no process-local proof that previously started media stopped.
+ // Cancellation may have persisted its control fence but lost the operation ACK.
+ const entryControl=(await store.readFresh<ProjectControl>(prefix+'/control')).value;
+ if(before.status==='cancelling'||before.status==='interrupted'||before.mediaAttemptStarted&&before.status==='running'||before.canonicalRunId&&before.status==='running'&&(entryControl.activeProduction!==operationId||entryControl.consentEpoch!==before.consentEpoch||entryControl.deletedAt||Date.parse(entryControl.expiresAt)<=Date.now())){await fail('MEDIA_STOP_UNKNOWN');return}
+ if(['cancelled','failed','superseded'].includes(before.status)){await fail(before.status==='failed'?'RENDER_FAILED':'RENDER_FENCED');return}
  if(!(await claimOperation(store,key,operationId)).claimed)return;
  const op=(await store.readFresh<RenderOperation>(key)).value;
  try{
   const inputs=await loadApprovedRenderInputs(projects,owner,projectId,operationId,op.fence,options);
   const targets=await createOrRead<RenderTargets>(store,key+'/render-targets',{resultId:randomUUID(),artifactId:randomUUID(),createdAt:new Date().toISOString()});
   async function activity(stage:string,label:string){await assertApprovedRenderFence(projects,inputs);await updateJson(store,key,(current:RenderOperation)=>{if(current.status!=='running'||current.fence!==op.fence)throw Error('RENDER_FENCED');return{...current,stage}});await emit('activity.updated',{stage,label})}
+  await updateJson(store,key,(current:RenderOperation)=>{if(current.status!=='running'||current.fence!==op.fence||current.mediaAttemptStarted)throw Error('MEDIA_STOP_UNKNOWN');return{...current,mediaAttemptStarted:true}});
   const built=await(options.build||renderApproved)(projects,owner,projectId,operationId,op.fence,targets,options,activity),result=built.result;
   if(result.resultId!==targets.resultId||result.artifactId!==targets.artifactId||result.createdAt!==targets.createdAt||result.approvalId!==op.approvalId||result.bundleHash!==op.bundleHash||result.revisionId!==approval.revisionId||result.previewId!==approval.previewId)throw Error('RENDER_OUTPUT_CHANGED');
   if(!/^\/[A-Za-z0-9_./-]+$/.test(built.outputPath)||!built.outputPath.startsWith(join(options.root,'composition')+'/')||!/^[a-f0-9]{64}\/output\/final\.mp4$/.test(built.outputPath.slice(join(options.root,'composition').length+1)))throw Error('RENDER_OUTPUT_CHANGED');

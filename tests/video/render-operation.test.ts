@@ -17,6 +17,27 @@ import {preparePreview} from '@/services/video/preview/prepare';
 import {runPreviewOperation} from '@/services/video/commands/local-preview';
 import {approvePreview} from '@/services/video/preview/approve';
 import {spawn} from 'node:child_process';
+import {FileStore} from '@/services/video/storage/file-store';
+import {ProjectStore} from '@/services/video/storage/project-store';
+
+it.each(['outcome','operation','timeout'])('cold cancellation retains unknown physical stop after power loss before %s persistence',async boundary=>{
+ const f=await seedApprovedProject();let dead=false,calls=0;
+ const original=f.projects.store;
+ const store={create:original.create.bind(original),cas:original.cas.bind(original),readFresh:async<T>(key:string)=>{if(dead)throw Error('POWER_LOSS');return original.readFresh<T>(key)}};
+ const build:typeof renderApproved=async()=>{
+  calls++;
+  if(boundary==='operation'){const cas=original.cas.bind(original);original.cas=async(key,etag,value)=>{if(key===`projects/${f.projectId}/operations/${f.operationId}`){dead=true;throw Error('POWER_LOSS')}return cas(key,etag,value)}}
+  if(boundary!=='timeout')await cancelProduction(original,f.projectId,f.operationId);dead=true;throw Error('MEDIA_STOP_UNKNOWN');
+ };
+ try{
+  await expect(runApprovedRenderOperation(store,new LocalEventLog(f.root),f.projectId,f.operationId,{root:f.root,env:f.env,build})).rejects.toThrow('POWER_LOSS');
+  const cold=new ProjectStore(new FileStore(f.root));
+  if(boundary!=='timeout')expect((await cold.access('owner',f.projectId)).unresolvedMediaStops).toEqual({[f.operationId]:'render'});
+  await runApprovedRenderOperation(cold.store,new LocalEventLog(f.root),f.projectId,f.operationId,{root:f.root,env:f.env,build});
+  expect(calls).toBe(1);expect((await cold.operation(f.projectId,f.operationId))?.status).toBe('interrupted');
+  expect((await cold.access('owner',f.projectId)).unresolvedMediaStops).toEqual({[f.operationId]:'render'});
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
 
 async function protocolDelivery(f:Awaited<ReturnType<typeof seedApprovedProject>>,targets:Parameters<typeof renderApproved>[5]){
  // Synthetic QA/non-video bytes verify lifecycle, never real media quality.
@@ -66,6 +87,28 @@ it('T12 cancellation during media completion prevents copying or publishing a la
   const build:typeof renderApproved=async(_p,_o,_id,_op,_fence,targets)=>{const delivered=await protocolDelivery(f,targets);await cancelProduction(f.projects.store,f.projectId,f.operationId);return delivered};
   await runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build});
   expect((await f.projects.operation(f.projectId,f.operationId))?.status).toBe('cancelled');expect((await f.projects.access('owner',f.projectId)).currentResultId).toBeUndefined();
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('T12 an unknown container stop is never reported as successful cancellation or silently retried',async()=>{
+ const f=await seedApprovedProject(),events=new LocalEventLog(f.root);let builds=0;
+ try{
+  const build:typeof renderApproved=async()=>{builds++;await cancelProduction(f.projects.store,f.projectId,f.operationId);throw Error('MEDIA_STOP_UNKNOWN')};
+  await runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build});
+  const outcome=(await f.projects.store.readFresh(`projects/${f.projectId}/operations/${f.operationId}/render-outcome`)).value;
+  expect(outcome).toEqual({status:'interrupted',errorCode:'MEDIA_STOP_UNKNOWN'});
+  expect((await f.projects.view('owner',f.projectId)).productionFailure).toMatchObject({operationId:f.operationId,errorCode:'MEDIA_STOP_UNKNOWN'});
+  await runApprovedRenderOperation(f.projects.store,new LocalEventLog(f.root),f.projectId,f.operationId,{root:f.root,env:f.env,build});expect(builds).toBe(1);
+  expect((await events.readFrom(f.projectId,f.operationId,0)).filter(({event})=>event.type==='operation.terminal')).toHaveLength(1);
+  expect((await f.projects.access('owner',f.projectId)).currentResultId).toBeUndefined();
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('T12 a retained unknown physical stop blocks approval even after the logical preview state changes',async()=>{
+ const f=await seedApprovedProject(),events=new LocalEventLog(f.root);
+ try{
+  await runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build:async()=>{await cancelProduction(f.projects.store,f.projectId,f.operationId);throw Error('MEDIA_STOP_UNKNOWN')}});
+  await updateJson(f.projects.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,phase:'preview_ready' as const,previewState:'ready' as const}));
+  const queue=new LocalOperationQueue(f.projects.store,f.root),b=f.bundle;
+  await expect(approvePreview(f.projects,queue,'owner',f.projectId,{schemaVersion:5,clientCommandId:randomUUID(),previewId:b.previewId,revisionId:b.revisionId,bundleHash:b.bundleHash,scriptHash:b.scriptHash,factsHash:b.factsHash,expectedBriefVersion:b.briefVersion})).rejects.toThrow('MEDIA_STOP_UNKNOWN');expect(await queue.pending()).toEqual([]);
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
 it('T12 cold queue never dispatches an orphan render reservation before approval is committed',async()=>{

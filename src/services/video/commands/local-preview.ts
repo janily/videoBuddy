@@ -17,7 +17,6 @@ export async function runPreviewOperation(store:AtomicStore,events:LocalEventLog
  const prefix=`projects/${projectId}`,key=prefix+'/operations/'+operationId,projects=new ProjectStore(store);
  const before=(await store.readFresh<PreviewOperation>(key)).value;
  if(before.id!==operationId||before.projectId!==projectId||before.kind!=='preview')throw Error('PREVIEW_OPERATION_CHANGED');
- if(before.status!=='cancelling'&&!(await claimOperation(store,key,operationId)).claimed)return;
  const op=(await store.readFresh<PreviewOperation>(key)).value,input={projectId,operationId,revisionId:op.revisionId,previewId:op.previewId,expectedConsentEpoch:op.consentEpoch};
  async function emit(type:string,payload:object){
   const existing=await events.readFrom(projectId,operationId,0);
@@ -36,19 +35,28 @@ export async function runPreviewOperation(store:AtomicStore,events:LocalEventLog
   await emit('operation.terminal',{...outcome,retryable:false});
   await updateJson(store,key,(value:PreviewOperation)=>({...value,...outcome}));
   await updateJson(store,prefix+'/control',(c:ProjectControl)=>{
-   if(!c.previewOutcomes?.[operationId])return c;
-   if(canonicalHash(c.previewOutcomes[operationId])!==canonicalHash(outcome))throw Error('PREVIEW_OUTCOME_CHANGED');
-   const remaining={...c.previewOutcomes};delete remaining[operationId];return{...c,controlVersion:c.controlVersion+1,previewOutcomes:remaining};
+   const clearStop=outcome.status==='cancelled'&&c.unresolvedMediaStops?.[operationId];
+   if(!c.previewOutcomes?.[operationId]&&!clearStop)return c;
+   if(c.previewOutcomes?.[operationId]&&canonicalHash(c.previewOutcomes[operationId])!==canonicalHash(outcome))throw Error('PREVIEW_OUTCOME_CHANGED');
+   const remaining={...c.previewOutcomes},unresolvedMediaStops={...c.unresolvedMediaStops};delete remaining[operationId];if(clearStop)delete unresolvedMediaStops[operationId];return{...c,controlVersion:c.controlVersion+1,previewOutcomes:remaining,...(clearStop?{unresolvedMediaStops}:{})};
   });
  }
  let resumed=(await store.readFresh<ProjectControl>(prefix+'/control')).value.previewOutcomes?.[operationId];
  if(!resumed)try{resumed=(await store.readFresh<Outcome>(key+'/preview-outcome')).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(resumed){await finish(resumed);return}
+ // A persisted fence alone cannot prove that a previous worker stopped media.
+ const entryControl=(await store.readFresh<ProjectControl>(prefix+'/control')).value;
+ const published=entryControl.currentPreviewId===op.previewId&&entryControl.briefVersion===op.briefVersion&&entryControl.consentEpoch===op.consentEpoch&&!entryControl.deletedAt&&Date.parse(entryControl.expiresAt)>Date.now();
+ const coldStopUnknown=before.status==='cancelling'||before.status==='interrupted'||Boolean(before.status==='running'&&!published&&(before.mediaAttemptStarted||before.canonicalRunId&&(entryControl.activeProduction!==operationId||entryControl.consentEpoch!==op.consentEpoch||entryControl.deletedAt||Date.parse(entryControl.expiresAt)<=Date.now())));
+ if(!coldStopUnknown&&!(await claimOperation(store,key,operationId)).claimed)return;
  try{
-  if(before.status==='cancelling')throw Error('PREVIEW_STALE');
+  if(coldStopUnknown)throw Error('MEDIA_STOP_UNKNOWN');
   const control=(await store.readFresh<ProjectControl>(prefix+'/control')).value;
   await assertPreviewOperation(projects,control,operationId,op.revisionId,op.previewId,op.consentEpoch);
-  if(control.currentPreviewId!==op.previewId)await (options.build||buildPreviewPipeline)(projects,input,options,activity);
+  if(control.currentPreviewId!==op.previewId){
+   await updateJson(store,key,(current:PreviewOperation)=>{if(current.status!=='running'||current.fence!==op.fence||current.mediaAttemptStarted)throw Error('MEDIA_STOP_UNKNOWN');return{...current,mediaAttemptStarted:true}});
+   await (options.build||buildPreviewPipeline)(projects,input,options,activity);
+  }
   await readPublishedPreview(projects,projectId,operationId,op.consentEpoch,op.previewId,options.root);
   const completed=await updateJson(store,prefix+'/control',(c:ProjectControl)=>{
    if(c.previewOutcomes?.[operationId])return c;
@@ -63,14 +71,15 @@ export async function runPreviewOperation(store:AtomicStore,events:LocalEventLog
   if(c.previewOutcomes?.[operationId]||frozenOutcome)throw error;
   const rawCode=error instanceof Error?error.message.split(':')[0]:'';
   const corrupt=['PREVIEW_ARTIFACT_MISMATCH','PREVIEW_PACKAGE_INVALID','PREVIEW_OPERATION_CHANGED'].includes(rawCode);
-  if(c.currentPreviewId===op.previewId&&c.briefVersion===op.briefVersion&&c.consentEpoch===op.consentEpoch&&!corrupt)throw error;
-  const code=error instanceof Error?error.message.split(':')[0]:'PROVIDER_UNAVAILABLE',errorCode=safeCodes.has(code)?code:'PROVIDER_UNAVAILABLE';
+  if(c.currentPreviewId===op.previewId&&c.briefVersion===op.briefVersion&&c.consentEpoch===op.consentEpoch&&!corrupt&&rawCode!=='MEDIA_STOP_UNKNOWN')throw error;
+  const code=error instanceof Error?error.message.split(':')[0]:'PROVIDER_UNAVAILABLE',errorCode=code==='MEDIA_STOP_UNKNOWN'?code:safeCodes.has(code)?code:'PROVIDER_UNAVAILABLE';
   const failed=await updateJson(store,prefix+'/control',(current:ProjectControl)=>{
    if(current.previewOutcomes?.[operationId])return current;
    const published=current.currentPreviewId===op.previewId&&current.consentEpoch===op.consentEpoch&&current.briefVersion===op.briefVersion&&!current.activeProduction;
-   const status=current.cancelRequestedProductionId===operationId?'cancelled' as const:published&&corrupt?'failed' as const:current.activeProduction!==operationId||current.consentEpoch!==op.consentEpoch?'superseded' as const:'failed' as const;
-   const owned=current.activeProduction===operationId||published;
-   return{...current,controlVersion:current.controlVersion+1,previewOutcomes:{...current.previewOutcomes,[operationId]:{status,errorCode}},...(owned?{latestPreviewOutcome:{operationId,briefVersion:op.briefVersion,consentEpoch:op.consentEpoch,controlVersion:current.controlVersion+1},activeProduction:null,phase:status==='failed'?'attention' as const:current.phase,...(published&&corrupt?{previewState:'stale' as const}:{})}:{})};
+   const stopUnknown=code==='MEDIA_STOP_UNKNOWN';
+   const status=stopUnknown?'interrupted' as const:current.cancelRequestedProductionId===operationId?'cancelled' as const:published&&corrupt?'failed' as const:current.activeProduction!==operationId||current.consentEpoch!==op.consentEpoch?'superseded' as const:'failed' as const;
+   const owned=current.activeProduction===operationId||published||stopUnknown&&!current.activeProduction&&current.cancelRequestedProductionId===operationId;
+   return{...current,controlVersion:current.controlVersion+1,previewOutcomes:{...current.previewOutcomes,[operationId]:{status,errorCode}},...(stopUnknown?{unresolvedMediaStops:{...current.unresolvedMediaStops,[operationId]:'preview' as const}}:{}),...(owned?{latestPreviewOutcome:{operationId,briefVersion:stopUnknown?current.briefVersion:op.briefVersion,consentEpoch:stopUnknown?current.consentEpoch:op.consentEpoch,controlVersion:current.controlVersion+1},activeProduction:null,phase:status==='failed'||stopUnknown?'attention' as const:current.phase,...(published&&corrupt?{previewState:'stale' as const}:{})}:{})};
   });
   await finish(failed.previewOutcomes![operationId]);
  }

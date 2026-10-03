@@ -1,6 +1,8 @@
-# 当前工程交接（2026-10-02）
+# 当前工程交接（更新至2026-10-04）
 
-videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付文档保留；未 push、未生产部署、未运行付费模型。当前仍是阶段工程，C0/C1/C2 均未达到。用户已将 Vercel 方案改为完全自托管；以 [自托管架构](self-hosted-architecture.md) 和 [执行计划](self-hosted-plan.md) 为当前部署依据，原规格的产品功能、SSE、持久消息、43 风格及验收范围继续有效。
+videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付文档保留；未 push、未生产部署。真实模型已调用并保留历史对账与未知调用记录，费用授权不限次数/上限。当前仍是阶段工程，C0/C1/C2 均未达到。用户已将 Vercel 方案改为完全自托管；以 [自托管架构](self-hosted-architecture.md) 和 [执行计划](self-hosted-plan.md) 为当前部署依据，原规格的产品功能、SSE、持久消息、43 风格及验收范围继续有效。
+
+最新 T13/T14：音频阶段向 sound/master 传递真实授权检查，未知停止固定 interrupted/SSE/准入阻断；取消与超时断电不会重进 producer，未启动取消与已发布预览可核证冷恢复。99 文件505单元、lint/build/构建后typecheck通过，两轴复审 clean；实际断网音频 SHA 与旧归档相同，撤销39ms不返回stems，0新增模型。详见 [验证与限制](evidence/audio-production-cancellation-validation.md)。本次没有真实运行中停止或完整清理证明。下一增量应持久记录媒体 invocation/handle，按实际资源与完成回执核实恢复；不能靠重置 started/unknown 标记继续制作。修改准入、新 revision、完整 QA/发布、全部43风格86基线与最终验收继续未完成。下文按日期保留历史，不把旧通过计作本次验证。
 
 已替换 Blob/Workflow/Sandbox：生产 `FileStore` 使用 Python `fcntl` 跨进程 CAS、原子写入和持久卷；本地持久操作队列与独占 Worker 执行 Director；事件日志支撑 SSE 续流；私有产物使用短期签名下载；Docker 媒体执行器使用固定镜像 ID、无网络和资源约束。本地素材 API 验证实际字节、MIME 签名和同内容重放；Markdown 与文本层 PDF 发布不可变真实文本分析，附件消息持久归档，Director 读取原文并以实际行号/页码引文验证材料来源。独立资料 Worker 在受限容器中解析 PDF；扫描件无文本层时明确失败并解除 pending。现有“添加资料”支持 Markdown/PDF 直传、明确权利确认、失败重试、刷新恢复待发附件和空文本发送。原设计与布局未重做。
 

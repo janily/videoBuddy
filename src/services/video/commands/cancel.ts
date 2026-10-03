@@ -1,6 +1,7 @@
 import {userActivity} from '@/services/video/commands/user-activity';
 import {AtomicStore,updateJson} from '@/services/video/storage/atomic-store';
 import {ProjectControl} from '@/contracts/video/project';
+import {clearUnstartedMediaStop} from '@/services/video/media/stop-state';
 const terminal=new Set(['succeeded','failed','cancelled','interrupted']);
 export async function cancelReply(store:AtomicStore,projectId:string,operationId:string){
  const p=`projects/${projectId}`;
@@ -16,17 +17,21 @@ export async function cancelReply(store:AtomicStore,projectId:string,operationId
 }
 export async function cancelProduction(store:AtomicStore,projectId:string,operationId:string){
  const p=`projects/${projectId}`;let owned=false;
+ const before=(await store.readFresh<{kind?:string}>(`${p}/operations/${operationId}`)).value;
  await updateJson(store,`${p}/control`,(control:ProjectControl)=>{
   if(control.deletedAt)throw Error('ACCESS_NOT_FOUND');
   owned=control.activeProduction===operationId;
   if(!owned)return control;
-  return{...control,...userActivity(control),controlVersion:control.controlVersion+1,consentEpoch:control.consentEpoch+1,activeProduction:null,cancelRequestedProductionId:operationId,phase:'cancelled' as const,previewState:control.previewState==='ready'?'stale' as const:control.previewState};
+  return{...control,...userActivity(control),controlVersion:control.controlVersion+1,consentEpoch:control.consentEpoch+1,activeProduction:null,cancelRequestedProductionId:operationId,unresolvedMediaStops:{...control.unresolvedMediaStops,[operationId]:before.kind==='preview'?'preview' as const:'render' as const},phase:'cancelled' as const,previewState:control.previewState==='ready'?'stale' as const:control.previewState};
  });
  const key=`${p}/operations/${operationId}`;
- if(!owned){const operation=(await store.readFresh<{status:string}>(key)).value;return operation.status==='cancelled'?'cancelled':operation.status==='cancelling'?'cancelling':'already_completed'}
+ if(!owned){const operation=(await store.readFresh<{status:string;canonicalRunId?:string|null}>(key)).value;if(operation.status==='cancelled'&&!operation.canonicalRunId)await clearUnstartedMediaStop(store,projectId,operationId);return operation.status==='cancelled'?'cancelled':operation.status==='cancelling'?'cancelling':'already_completed'}
  const operation=await updateJson(store,key,(current:{status:string;fence:number;canonicalRunId?:string|null})=>{
   if(terminal.has(current.status)||current.status==='cancelling')return current;
   return{...current,status:(current.status==='reserved'||current.status==='queued')&&!current.canonicalRunId?'cancelled':'cancelling',fence:current.fence+1};
  });
+ // An unclaimed reservation is proof that no producer was started. Running
+ // operations retain their blocker until the worker commits a verified outcome.
+ if(operation.status==='cancelled')await clearUnstartedMediaStop(store,projectId,operationId);
  return operation.status==='cancelled'?'cancelled':operation.status==='cancelling'?'cancelling':'already_completed';
 }

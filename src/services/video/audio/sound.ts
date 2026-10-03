@@ -1,4 +1,4 @@
-import {spawn} from 'node:child_process';
+import {runOwnedDocker} from '@/services/video/media/owned-docker';
 import {lstat,mkdir,readFile,open} from 'node:fs/promises';
 import {isAbsolute,join,resolve} from 'node:path';
 import {AudioPlanSchema,compileAudioCues,type AudioPlan} from '@/contracts/video/audio-plan';
@@ -28,7 +28,8 @@ export async function frozenAudioInput(path:string,bytes:Buffer){
  try{const file=await open(path,'wx',0o600);try{await file.writeFile(bytes);await file.sync()}finally{await file.close()}}
  catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||!bytes.equals(await readFile(path)))throw Error('AUDIO_STAGE_CHANGED')}
 }
-export async function buildSoundStems(root:string,plan:AudioPlan,durationMs:number,fps:24|30|60,env:Environment=process.env){
+export async function buildSoundStems(root:string,plan:AudioPlan,durationMs:number,fps:24|30|60,env:Environment=process.env,options:{assertActive?:()=>Promise<void>}={}){
+ await options.assertActive?.();
  if(!isAbsolute(root)||!/^\/[A-Za-z0-9_./-]+$/.test(root))throw Error('AUDIO_JOB_INVALID');
  const config=dockerConfiguration(env,'sound'),job=compileSoundJob(plan,durationMs,fps),toolPath=resolve('runtime/media/sound.py'),info=await lstat(toolPath);
  if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1)throw Error('AUDIO_TOOL_INVALID');
@@ -38,12 +39,11 @@ export async function buildSoundStems(root:string,plan:AudioPlan,durationMs:numb
  await frozenAudioInput(join(stageDir,'sound.py'),toolBytes);await frozenAudioInput(join(stageDir,'job.json'),Buffer.from(canonicalJson(job)));
  const dir=await open(stageDir,'r');try{await dir.sync()}finally{await dir.close()}
  const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--memory-swap','1g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=64m','--mount','type=bind,src='+outputDir+',dst=/output','--mount','type=bind,src='+join(stageDir,'sound.py')+',dst=/input/sound.py,readonly','--mount','type=bind,src='+join(stageDir,'job.json')+',dst=/input/job.json,readonly',config.image,'python3','/input/sound.py','--job','/input/job.json','--output','/output'];
- const child=spawn('docker',args,{stdio:['ignore','ignore','pipe'],signal:AbortSignal.timeout(180000)}),errors:Buffer[]=[];let length=0;
- child.stderr.on('data',(part:Buffer)=>{length+=part.length;if(length<4096)errors.push(part)});
- const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
- if(code!==0)throw Error('AUDIO_SYNTHESIS_FAILED: '+Buffer.concat(errors).toString('utf8').slice(-300));
+ await runOwnedDocker(args,config.timeoutSeconds*1000,config.image,options.assertActive);
+ await options.assertActive?.();
  const musicPath=join(outputDir,'music.wav'),foleyPath=join(outputDir,'foley.wav'),music=await inspectStereoTrackWav(musicPath,job.samples,plan.music.length===0),foley=await inspectStereoTrackWav(foleyPath,job.samples,plan.foley.length===0);
  const state=JSON.parse(await readFile(join(outputDir,'state.json'),'utf8'));
  if(state.jobSha256!==canonicalHash(job)||state.outputs?.music!==music.sha256||state.outputs?.foley!==foley.sha256)throw Error('AUDIO_SYNTHESIS_CHANGED');
+ await options.assertActive?.();
  return{stageKey,planSha256:job.planSha256,runtimeDigest:config.runtimeDigest,toolSha256,music:{outputPath:musicPath,wav:music},foley:{outputPath:foleyPath,wav:foley},qualityStatus:'listening_not_checked' as const};
 }

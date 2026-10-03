@@ -49,6 +49,23 @@ it('the final publication CAS rechecks Understanding after a concurrent baseline
 });
 const previewBytes=Buffer.alloc(100);previewBytes.write('ftyp',4);
 const previewSha=createHash('sha256').update(previewBytes).digest('hex');
+it('cold recovery verifies committed preview bytes before resolving its started media marker',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vb-published-recovery-'));
+ try{
+  const projects=new ProjectStore(new FileStore(dir)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),operationId=randomUUID();
+  const bundle=await storedBundle(projects,projectId);await storedPreviewArtifact(projects,dir,projectId,bundle);
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId}));
+  await seedPreviewOperation(projects,operationId,bundle);
+  await updateJson(projects.store,`projects/${projectId}/operations/${operationId}`,(op:object)=>({...op,mediaAttemptStarted:true}));
+  await commitPreviewBundle(projects,projectId,operationId,0,bundle,dir);
+  // Synthetic bytes test archive verification/recovery only, never media QA.
+  const {runPreviewOperation}=await import('@/services/video/commands/local-preview'),{LocalEventLog}=await import('@/services/video/stream/local-event-log');let calls=0;
+  const cold=new ProjectStore(new FileStore(dir));
+  await runPreviewOperation(cold.store,new LocalEventLog(dir),projectId,operationId,{root:dir,build:async()=>{calls++;throw Error('UNEXPECTED_BUILD')}});
+  expect(calls).toBe(0);expect((await cold.operation(projectId,operationId))?.status).toBe('succeeded');
+  expect((await cold.access('owner',projectId)).unresolvedMediaStops).toBeUndefined();
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
 async function storedPreviewArtifact(projects:ProjectStore,dir:string,projectId:string,bundle:{previewArtifactId:string;revisionId:string}){
  const key=`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files/preview.mp4`,path=join(dir,'objects',key);
  await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files`),{recursive:true});await writeFile(path,previewBytes);

@@ -10,6 +10,7 @@ import {readResultManifest}from '@/services/video/results/publish';
 import {previewAction}from '@/services/video/preview/action';
 import {assertLiveProject}from '@/services/video/commands/user-activity';
 import {pendingFeedbackMessageIds}from '@/services/video/revisions/pending-feedback';
+import {unknownMediaStopMessage} from '@/services/video/media/stop-state';
 export class ProjectStore{
  readonly index:IndexStore;constructor(readonly store:AtomicStore){this.index=new IndexStore(store)}
  async create(owner:string,input:CreateProjectRequest){
@@ -48,12 +49,14 @@ export class ProjectStore{
   if(last&&!c.activeProduction&&last.briefVersion===c.briefVersion&&last.consentEpoch===c.consentEpoch){
    let outcome=(isRender?c.renderOutcomes:c.previewOutcomes)?.[last.operationId];
    if(!outcome)try{outcome=(await this.store.readFresh<NonNullable<ProjectControl['previewOutcomes']>[string]>(`projects/${id}/operations/${last.operationId}/${isRender?'render':'preview'}-outcome`)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
-   if(outcome?.status==='failed'){
+   if(outcome?.status==='failed'||outcome?.status==='interrupted'){
     const code=outcome.errorCode||'PROVIDER_UNAVAILABLE';
     const message=code==='QUALITY_BLOCKED'?'完整视频的视听质量或许可证据尚未通过，效果片段和已有结果已保留。':code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':['ASR_MISMATCH','POSTMIX_ASR_MISMATCH'].includes(code)?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':isRender?'本次完整视频制作未完成，效果片段和已有结果已保留。':'本次效果制作未完成，资料和已有内容已保留。';
     productionFailure={operationId:last.operationId,errorCode:code,message};
    }
   }
+  const unresolved=Object.keys(c.unresolvedMediaStops||{})[0];
+  if(unresolved&&!c.activeProduction)productionFailure={operationId:unresolved,errorCode:'MEDIA_STOP_UNKNOWN',message:unknownMediaStopMessage};
   return{productionFailure,projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:await pendingFeedbackMessageIds(this,c),actions:[previewAction(c,u),...(preview?[{kind:'approve_preview',enabled:false,disabledReason:'完整视频制作尚未开放，效果片段和资料已保留。'}]:[])],expiresAt:c.expiresAt};
  }
  async lookup(owner:string,ids:string[]){
