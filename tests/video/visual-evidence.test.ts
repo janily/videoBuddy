@@ -31,3 +31,13 @@ it('only decodes fixed numeric frames in a pinned non-network container with a r
  for(const frames of [[1,1],[-1],[0.5],Array.from({length:25},(_,i)=>i)])expect(()=>frameExtractionArguments('/private/film.mp4','/private/output','sha256:'+'a'.repeat(64),frames)).toThrow('VISUAL_SAMPLE_INVALID');
  expect(()=>frameExtractionArguments('/private/film,extra.mp4','/private/output','latest',[0])).toThrow('VISUAL_SAMPLE_INVALID');
 });
+it('published frame input is opt-in and bound to one exact private artifact path',async()=>{
+ const temporary=await mkdtemp(join(tmpdir(),'vb-published-frame-')),root=await realpath(temporary),projectId='10000000-0000-4000-8000-000000000001',artifactId='20000000-0000-4000-8000-000000000002';
+ try{
+  const directory=join(root,'objects',`projects/${projectId}/artifacts/${artifactId}/files`);await mkdir(directory,{recursive:true});const bytes=Buffer.from('protocol fixture; no docker decoding expected'),outputPath=join(directory,'final.mp4');await writeFile(outputPath,bytes);
+  const film={outputPath,sha256:createHash('sha256').update(bytes).digest('hex'),width:1920,height:1080,totalFrames:480},image='sha256:'+'a'.repeat(64);
+  await expect(extractVisualFrames(root,film,[239],image)).rejects.toThrow('VISUAL_FILM_CHANGED');
+  await expect(extractVisualFrames(root,film,[239],image,{publishedArtifact:{projectId,artifactId:projectId}})).rejects.toThrow('VISUAL_FILM_CHANGED');
+  await expect(extractVisualFrames(root,film,[239],image,{publishedArtifact:{projectId:'invalid',artifactId}})).rejects.toThrow('VISUAL_FILM_CHANGED');
+ }finally{await rm(root,{recursive:true,force:true})}
+});

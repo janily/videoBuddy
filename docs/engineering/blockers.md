@@ -71,3 +71,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T12正式任务更新：批准HTTP API、冷render队列/实际Worker、冻结生产者与原生Critic、完整质量候选、私有MP4与原子结果发布生命周期已接通并通过协议/恢复测试，之前“render Worker/对外批准入口尚无”限制在服务层关闭。正式UI仍disabled：运动/听验/字体/许可缺独立证据时默认完整报告保持not_checked，严格QA拒绝正式交付；缺真实最终新主题/含旁白字幕完整链。0新增模型，旧账本阻断不变；不以合成正向QA/非视频fixture作为真实质量证据。详见 evidence/render-operation-validation.md。
 
 2026-10-03 下载界面已接通已发布currentResult的MP4/五种异步导出、同命令恢复与独立取消，373单元及26浏览器通过；真实原项目仍没有通过所有mandatory checks的published currentResult。UI协议夹具不能替代该媒体验收，不放开正式按钮/质量门槛。poster继续CAPABILITY_UNAVAILABLE并明确禁用；修改/恢复产品入口、清理与43风格86实测仍待完成。原模型对账门闩不变；本增量0模型调用、原control未改，未push/部署。证据：evidence/download-ui-validation.md。
+
+2026-10-03 封面阻断更新：poster能力已接入统一Worker/SSE/私有PNG和产品入口，原CAPABILITY_UNAVAILABLE/按钮禁用缺口关闭；真实1920x1080第59帧PNG提取/独立CRC及像素行检查、600/nlink1/拒覆盖与冷恢复通过，源项目仍无qualified final result，公开导出仍RESULT_STALE。379单元/27浏览器通过不替代真实全片QA/公开用户下载闭环；旧模型账本、修改/恢复UI、清理、竖屏媒体与43风格86实测继续待完成。0模型/0付费、原control/ledger未改，未push/部署。证据：evidence/poster-validation.md。

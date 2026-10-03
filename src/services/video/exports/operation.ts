@@ -14,6 +14,7 @@ import {exportBaseline,exportKey,type ExportPublication} from './publication';
 import type {ArtifactRecord} from './access';
 import {actualArtifactSha256} from './verified-file';
 import {DurableExportFormatSchema,exportFiles,type DurableExportFormat} from './formats';
+import {prepareExportPoster} from './poster';
 import {prepareExportDocument} from './documents';
 
 export interface ExportOperation{id:string;projectId:string;commandId:string;kind:'export';status:string;errorCode?:string;canonicalRunId:string|null;streamEpoch:number;fence:number;controlVersion:number;ownerKeyHash:string;resultId:string;resultHash:string;sourceArtifactId:string;revisionId:string;previewId:string;bundleHash:string;artifactId:string;format:DurableExportFormat}
@@ -37,7 +38,7 @@ export async function cancelExport(projects:ProjectStore,owner:string,projectId:
  if(cancelled.status==='cancelled'&&events){await createOrRead(projects.store,key+'/export-outcome',{status:'cancelled'});await emitTerminal(events,cancelled,{status:'cancelled'})}
  return cancelled.status==='cancelled'?'cancelled':terminal.has(cancelled.status)?'already_completed':'cancelling';
 }
-export async function runExportOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{root:string;build?:typeof prepareFrozenSourceArchive}){
+export async function runExportOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{root:string;build?:typeof prepareFrozenSourceArchive;poster?:typeof prepareExportPoster}){
  if(![projectId,operationId].every(id=>z.uuid().safeParse(id).success))throw Error('VALIDATION_FAILED');
  const key=`projects/${projectId}/operations/${operationId}`,projects=new ProjectStore(store),before=(await store.readFresh<ExportOperation>(key)).value;
  if(before.id!==operationId||before.projectId!==projectId||before.kind!=='export'||!DurableExportFormatSchema.safeParse(before.format).success)throw Error('EXPORT_FENCED');
@@ -69,7 +70,7 @@ export async function runExportOperation(store:AtomicStore,events:LocalEventLog,
    await finish({status:'succeeded'});return;
   }
   await assertActive();
-  const built=op.format==='source_zip'?await (options.build||prepareFrozenSourceArchive)(projects,op.ownerKeyHash,projectId,op.previewId,options.root):await prepareExportDocument(projects,op.ownerKeyHash,projectId,op.sourceArtifactId,op.format,options.root);
+  const built=op.format==='source_zip'?await (options.build||prepareFrozenSourceArchive)(projects,op.ownerKeyHash,projectId,op.previewId,options.root):op.format==='poster'?await (options.poster||prepareExportPoster)(projects,op.ownerKeyHash,projectId,op.sourceArtifactId,options.root,{assertActive:async()=>{await assertActive()}}):await prepareExportDocument(projects,op.ownerKeyHash,projectId,op.sourceArtifactId,op.format,options.root);
   if(createHash('sha256').update(built.bytes).digest('hex')!==built.sha256||built.manifest.bundleHash!==op.bundleHash||built.manifest.revisionId!==op.revisionId)throw Error('ARTIFACT_INVALID');
   await assertActive();
   const file=exportFiles[op.format],objectRef={key:`projects/${projectId}/artifacts/${op.artifactId}/files/${file.file}`,sha256:built.sha256,bytes:built.bytes.length,mime:file.mime};
@@ -102,7 +103,7 @@ export async function runExportOperation(store:AtomicStore,events:LocalEventLog,
   // A lost acknowledgement after publication/outcome must resume, never overwrite success.
   if(c.publishedExports?.[op.artifactId])throw error;
   try{await store.readFresh(key+'/export-outcome');throw error}catch(missing){if(!(missing instanceof StoreMissing))throw missing}
-  const raw=error instanceof Error?error.message.split(':')[0]:'',safe=new Set(['QUALITY_BLOCKED','ARTIFACT_INVALID','ARCHIVE_INVALID','ARCHIVE_PRIVATE_DATA','ARCHIVE_SOURCE_CHANGED','ARCHIVE_ASSET_REDISTRIBUTION_REQUIRED','PREVIEW_PACKAGE_INVALID','EXPORT_LIMIT','EXPORT_NOT_APPLICABLE','EXPORT_DOCUMENT_INVALID']);
+  const raw=error instanceof Error?error.message.split(':')[0]:'',safe=new Set(['QUALITY_BLOCKED','ARTIFACT_INVALID','ARCHIVE_INVALID','ARCHIVE_PRIVATE_DATA','ARCHIVE_SOURCE_CHANGED','ARCHIVE_ASSET_REDISTRIBUTION_REQUIRED','PREVIEW_PACKAGE_INVALID','EXPORT_LIMIT','EXPORT_NOT_APPLICABLE','EXPORT_DOCUMENT_INVALID','EXPORT_POSTER_INVALID']);
   const cancelled=c.exportCancellations?.includes(operationId),outcome:Outcome={status:cancelled?'cancelled':raw==='EXPORT_FENCED'||raw==='RESULT_STALE'||raw==='ACCESS_NOT_FOUND'||raw==='PROJECT_EXPIRED'?'superseded':'failed',...(cancelled?{}:{errorCode:safe.has(raw)?raw:'EXPORT_FAILED'})};
   await finish(outcome);
  }

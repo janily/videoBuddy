@@ -53,11 +53,13 @@ export async function readVisualEvidence(root:string,expected:VisualEvidence){
  if(canonicalHash(manifest)!==canonicalHash(evidence))throw Error('VISUAL_EVIDENCE_CHANGED');
  const images=new Map<string,Uint8Array>();for(const frame of evidence.frames){const data=await pngBytes(join(directory,frame.filename),evidence.width,evidence.height);if(data.length!==frame.bytes||createHash('sha256').update(data).digest('hex')!==frame.sha256)throw Error('VISUAL_EVIDENCE_CHANGED');images.set(frame.id,data)}return images;
 }
-export async function extractVisualFrames(root:string,rawFilm:z.input<typeof filmSchema>,frames:number[],image:string,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}):Promise<VisualEvidence>{
+export async function extractVisualFrames(root:string,rawFilm:z.input<typeof filmSchema>,frames:number[],image:string,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;publishedArtifact?:{projectId:string;artifactId:string}}={}):Promise<VisualEvidence>{
  await options.assertActive?.();
  const parsed=filmSchema.safeParse(rawFilm);if(!parsed.success||!validFrames(frames)||frames.at(-1)!>=parsed.data.totalFrames||!isAbsolute(root)||!/^sha256:[a-f0-9]{64}$/.test(image))throw Error('VISUAL_SAMPLE_INVALID');const film=parsed.data;
  const rootReal=await realpath(root),fileReal=await realpath(film.outputPath);
- if(!fileReal.startsWith(rootReal+'/composition/')||fileReal!==film.outputPath||await fileHash(fileReal)!==film.sha256)throw Error('VISUAL_FILM_CHANGED');
+ const published=options.publishedArtifact;
+ const allowed=published?z.uuid().safeParse(published.projectId).success&&z.uuid().safeParse(published.artifactId).success&&fileReal===join(rootReal,'objects',`projects/${published.projectId}/artifacts/${published.artifactId}/files/final.mp4`):fileReal.startsWith(rootReal+'/composition/');
+ if(!allowed||fileReal!==film.outputPath||await fileHash(fileReal)!==film.sha256)throw Error('VISUAL_FILM_CHANGED');
  const runtimeDigest=image.slice(7),stageKey=canonicalHash({extractor:'ffmpeg-select-v2',filmSha256:film.sha256,runtimeDigest,width:film.width,height:film.height,frames}),parent=join(rootReal,'visual-evidence'),destination=join(parent,stageKey);
  if(!options.mustExist)await mkdir(parent,{recursive:true,mode:0o700});
  if(await realpath(parent)!==parent)throw Error('VISUAL_EVIDENCE_CHANGED');

@@ -5,6 +5,7 @@ import type {ProjectControl} from '@/contracts/video/project';
 import type {PreviewOperation} from '@/services/video/preview/prepare';
 import {canonicalHash} from '@/services/video/domain/hash';
 import {bindReservedExportCommand} from '@/services/video/exports/intent';
+import {DurableExportFormatSchema} from '@/services/video/exports/formats';
 import type {ExportOperation} from '@/services/video/exports/operation';
 export type QueuedOperation={projectId:string;operationId:string;kind:string};
 interface RecordValue extends QueuedOperation{status:'queued'|'done'}
@@ -73,7 +74,8 @@ export class LocalOperationQueue{
     // operation file/enqueue. The slot already binds the authorized frozen input.
     for(const key of await this.store.listKeys(`projects/${dir.name}/results`,3)){
      try{
-     if(!/\/results\/[a-f0-9-]{36}\/export-requests\/(source_zip|srt|treatment|credits|quality)$/.test(key))continue;
+     const slot=key.match(/\/results\/[a-f0-9-]{36}\/export-requests\/([^/]+)$/);
+     if(!slot||!DurableExportFormatSchema.safeParse(slot[1]).success)continue;
      const reserved=(await this.store.readFresh<ExportOperation>(key)).value;
      if(reserved.projectId!==dir.name||reserved.resultId!==key.split('/')[3]||reserved.format!==key.split('/').at(-1)||reserved.kind!=='export'||!/^[a-f0-9-]{36}$/.test(reserved.id))throw Error('QUEUE_RECORD_INVALID');
      await bindReservedExportCommand(this.store,reserved);

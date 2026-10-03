@@ -18,7 +18,6 @@ export async function requestExport(projects:ProjectStore,queue:LocalOperationQu
  const hash=canonicalHash({kind:'export',body:request}),prefix=`projects/${projectId}`;
  const intentKey=prefix+'/commands/'+request.clientCommandId,intent=await createOrRead<ExportIntent>(projects.store,intentKey,{kind:'export',hash});
  if(intent.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');
- if(request.format==='poster')throw Error('CAPABILITY_UNAVAILABLE');
  const baseline=await exportBaseline(projects,owner,projectId,request.artifactId,root);
  if(request.format==='mp4')return{status:200 as const,artifactId:request.artifactId,access:await getArtifactAccess(projects,owner,projectId,request.artifactId,'download')};
  const format=DurableExportFormatSchema.parse(request.format),publicationKey=exportKey(projectId,baseline.result.resultId,format);

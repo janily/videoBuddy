@@ -23,7 +23,7 @@ export function encodeSubtitles(timeline:{fps:number;totalFrames:number;captions
   return `${index+1}\r\n${timestamp(Math.floor(caption.startFrame*1000/timeline.fps))} --> ${timestamp(Math.ceil(caption.endFrame*1000/timeline.fps))}\r\n${text.split('\n').join('\r\n')}\r\n\r\n`;
  }).join('');
 }
-export async function prepareExportDocument(projects:ProjectStore,owner:string,projectId:string,sourceArtifactId:string,format:Exclude<DurableExportFormat,'source_zip'>,root:string){
+export async function prepareExportDocument(projects:ProjectStore,owner:string,projectId:string,sourceArtifactId:string,format:Exclude<DurableExportFormat,'source_zip'|'poster'>,root:string){
  const baseline=await exportBaseline(projects,owner,projectId,sourceArtifactId,root),frozen=await verifyPreviewPackage(projects,projectId,baseline.bundle,root);
  let text:string;
  if(format==='srt')text=encodeSubtitles(frozen.timeline);

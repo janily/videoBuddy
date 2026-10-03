@@ -92,3 +92,8 @@ test('a late failure from an old export cannot replace a newly started operation
  const response=page.waitForResponse(r=>r.url().endsWith(`/operations/${op}`));releaseInspect();await (await response).finished();await page.evaluate(()=>new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve()))));
  await expect(page.getByRole('status').filter({hasText:'私密资料'})).toHaveCount(0);await expect(button).toBeDisabled();await expect(page.getByRole('button',{name:'停止导出'})).toBeVisible();
 });
+test('poster is an enabled real export action with a fresh private PNG download grant',async({page})=>{
+ await setup(page);await page.route(`**/api/video/projects/${pid}/exports`,r=>{expect(r.request().postDataJSON().format).toBe('poster');return r.fulfill({json:{...access(),access:{...access().access,mime:'image/png',filename:'poster.png'}}})});
+ await page.route('**/file?purpose=download&token=*',r=>r.fulfill({body:Buffer.from('poster protocol download fixture'),headers:{'Content-Type':'image/png','Content-Disposition':'attachment; filename="poster.png"'}}));
+ await page.goto(`/video/${pid}`);await page.getByText('更多',{exact:true}).click();const button=page.getByRole('button',{name:'下载封面',exact:true});await expect(button).toBeEnabled();const download=page.waitForEvent('download');await button.click();expect((await download).suggestedFilename()).toBe('poster.png');
+});

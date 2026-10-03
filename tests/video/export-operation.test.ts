@@ -230,3 +230,29 @@ it('T14 the real worker boots with generation disabled and no model credentials 
   expect(ready,errors).toBe(true);worker.kill('SIGTERM');expect(await exited,errors).toBe(0);
  }finally{if(worker.exitCode===null)worker.kill('SIGKILL');await exited}
 },15000);
+it('T14 poster uses a durable private PNG export, survives cold replay and cannot be played as video',async()=>{
+ const f=await fixture(),request={...f.request,format:'poster' as const},started=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(started.status!==202)throw Error('TEST');
+ const {prepareExportPoster}=await import('@/services/video/exports/poster'),{protocolPng}=await import('./fixtures/png');const png=protocolPng(),sha256=createHash('sha256').update(png).digest('hex');let calls=0;
+ const poster:typeof prepareExportPoster=async(projects,owner,pid,aid,root,options)=>prepareExportPoster(projects,owner,pid,aid,root,{...options,extract:async(_root,film,frames,image,input)=>{calls++;expect(input?.publishedArtifact).toEqual({projectId:pid,artifactId:aid});expect(frames).toEqual([239]);return{schemaVersion:2,extractor:'ffmpeg-select-v2',stageKey:'f'.repeat(64),filmSha256:film.sha256,runtimeDigest:image.slice(7),width:film.width,height:film.height,frames:[{id:'frame-239',frame:239,sha256,bytes:png.length,filename:'frame-0001.png'}]}},readImages:async()=>new Map([['frame-239',png]])});
+ await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,poster});
+ await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,started.operationId,{root,poster});expect(calls).toBe(1);
+ const completed=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(completed.status!==200)throw Error('TEST');expect(completed.access).toMatchObject({mime:'image/png',filename:'VideoBuddy-poster.png',purpose:'download'});
+ const artifact=(await f.store.readFresh<{objectRef:{key:string}}>(`projects/${f.projectId}/artifacts/${completed.artifactId}/manifest`)).value;expect(await readFile(join(root,'objects',artifact.objectRef.key))).toEqual(png);
+ expect((await f.events.readFrom(f.projectId,started.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
+ await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'play')).rejects.toThrow('ACCESS_NOT_FOUND');
+ await f.projects.tombstone(owner,f.projectId);await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
+});
+it('T14 rejects a poster extracted from a different film without publishing it',async()=>{
+ const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'poster'},root);if(started.status!==202)throw Error('TEST');
+ const {prepareExportPoster}=await import('@/services/video/exports/poster');
+ const poster:typeof prepareExportPoster=async(projects,owner,pid,aid,root,options)=>prepareExportPoster(projects,owner,pid,aid,root,{...options,extract:async(_root,film)=>({schemaVersion:2,extractor:'ffmpeg-select-v2',stageKey:'f'.repeat(64),filmSha256:'0'.repeat(64),runtimeDigest:'a'.repeat(64),width:film.width,height:film.height,frames:[{id:'frame-239',frame:239,sha256:'1'.repeat(64),bytes:100,filename:'frame-0001.png'}]}),readImages:async()=>{throw Error('MUST_NOT_READ_WRONG_FILM')}});
+ await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,poster});expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'EXPORT_POSTER_INVALID'});expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
+});
+it('T14 poster cold recovery repairs a slot committed before the operation and enqueue ACK',async()=>{
+ const f=await fixture(),request={...f.request,format:'poster' as const},create=f.store.create.bind(f.store);let lost=false;
+ f.store.create=async(key,value)=>{await create(key,value);if(key.endsWith('/export-requests/poster')&&!lost){lost=true;throw Error('POSTER_SLOT_ACK_LOST')}};
+ await expect(requestExport(f.projects,f.queue,owner,f.projectId,request,root)).rejects.toThrow('POSTER_SLOT_ACK_LOST');f.store.create=create;
+ const slot=(await f.store.readFresh<{id:string}>(`projects/${f.projectId}/results/${f.resultId}/export-requests/poster`)).value,coldStore=new FileStore(root),cold=new LocalOperationQueue(coldStore,root);
+ expect(await cold.reconcileExports()).toBeUndefined();expect(await cold.pending()).toEqual([{projectId:f.projectId,operationId:slot.id,kind:'export'}]);
+ const replay=await requestExport(new ProjectStore(coldStore),cold,owner,f.projectId,request,root);expect(replay.operationId).toBe(slot.id);expect(await cold.pending()).toHaveLength(1);
+});
