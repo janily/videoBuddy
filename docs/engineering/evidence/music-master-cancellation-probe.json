@@ -1,0 +1,31 @@
+{
+  "executedAt": "2026-10-03T15:45:59.910Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/music-master-cancel-JG8JBU",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "packageRef": {
+    "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/audio-execution/9a546c855a4619a5ada91507c2872262d23cb2596ae90eedacf8187c47671d65",
+    "sha256": "9a546c855a4619a5ada91507c2872262d23cb2596ae90eedacf8187c47671d65",
+    "bytes": 4279,
+    "mime": "application/json"
+  },
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "baselineMatchesArchivedMix": true,
+  "baselineChecks": 5,
+  "checks": 3,
+  "errorCode": "RENDER_FENCED",
+  "containerId": null,
+  "name": null,
+  "invocation": null,
+  "cancellationPhase": "completed_before_return",
+  "containerRemoved": null,
+  "durationMs": 20000,
+  "loadTestInput": "original_archived_buses",
+  "elapsedMs": 351,
+  "afterRevocationMs": 41,
+  "networkCalls": 0,
+  "sourceControlAndBudgetUnchanged": true,
+  "mixReturned": false,
+  "resultPublished": false,
+  "limits": "Actual archived model music/foley and zero voice run through the pinned offline master producer. Optional 120-second mode is a producer load test using six repeated copies of each archived bus, not an authored movie or valid film package. Diagnostic callback revokes only this invocation, not the original project. Running-container cancellation is claimed only if a live container with exact image/label/job mount was observed. Not a public change operation, full movie QA or new result."
+}
