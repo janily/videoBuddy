@@ -13,7 +13,7 @@ async function main(){
  const proof=JSON.parse(await readFile('docs/engineering/evidence/approved-composition-probe.json','utf8')),evidence=JSON.parse(await readFile('docs/engineering/evidence/approved-visual-evidence-probe.json','utf8'));
  if(proof.root!==evidence.root||proof.projectId!==evidence.projectId||proof.operationId!==evidence.operationId)throw Error('CRITIC_BASELINE_CHANGED');
  const store=new FileStore(proof.root),projects=new ProjectStore(store),key='projects/'+proof.projectId+'/control',before=(await store.readFresh<ProjectControl>(key)).value,authorization=await requireUnlimitedValidation(store);
- const env:Environment={...probeEnvironment(proof.root),VIDEO_MODEL_BUDGET_MODE:'unlimited_validation'},transport=recordModelRequests(env,proof.root,evidence.record.batches.length);
+ const env:Environment={...probeEnvironment(proof.root),VIDEO_MODEL_BUDGET_MODE:'unlimited_validation'},transport=recordModelRequests(env,proof.root,evidence.record.batches.length,{timeoutMs:Number(process.env.VIDEO_CRITIC_PROBE_TIMEOUT_MS??600000)});
  let result:Awaited<ReturnType<typeof reviewApprovedWholeFilm>>|undefined,errorCode:string|undefined;
  const progress=setInterval(()=>console.log(JSON.stringify({stage:'whole_visual_critic',providerCallsStarted:transport.requests.length,plannedBatches:evidence.record.batches.length})),30000);
  try{result=await reviewApprovedWholeFilm(projects,before.ownerKeyHash,proof.projectId,proof.operationId,0,{root:proof.root,env})}catch(error){errorCode=String((error as Error).message).replaceAll(env.MODEL_API_KEY||'missing-key','[redacted]').slice(0,200)}finally{clearInterval(progress);try{await transport.flush()}finally{transport.restore()}}

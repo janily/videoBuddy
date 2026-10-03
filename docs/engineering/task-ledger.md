@@ -202,3 +202,5 @@ Audio补明确采样/包络/source/cue约束，显式新operation的一次付费
 
 2026-10-03 T14 过期与活动增量：每页100 control/持久冷游标、expiry tombstone/CAS活动竞态/本人410外人404/恢复相同协调已实现。后台三类资料分析不再延寿；首次用户chat/preview/approve/restore/upload/cancel/export/recover准入记录活动，冷重放不续期，当前期限CAS内复核。独立两轴P2先后发现并关闭：预览新命令旧期限、recover retained仍410、取消/消息到期复活、冷消息归档二次延寿。归档现仅持久化并核live，活动由首次chat admission负责。目标5文件53项通过，完整验证记录见 [过期验证](evidence/project-retention-validation.md)。0新收费调用，真实项目不变；物理文件/缓存/容器清理及长期运行取消仍缺，T14/AT045/C0/C1/C2仍未整体通过，deployed=false，无push或生产部署。
 T14 过期增量最终验证补记：86文件433项完整单测通过，目标53项、lint/build/构建后typecheck/diffcheck通过。全部新增回归包含于433项，两个轴最终clean。
+
+2026-10-03 T12 模型验证诊断增量：全片探针默认600秒/显式有效期限，保留通用120秒、caller取消与零重试；逐尝试记录开始/正文完成/错误类型。两轴独立发现正文超时导致未处理Promise/flush吞掉原报告的P2，已修复并回归。87文件437单元、目标6项、lint/build/构建后typecheck/diffcheck通过。0真实模型调用，未知原账目保持冻结；官方结果查询需供应商任务ID，原请求没有取得，不能用本地哈希代替。证据：[超时诊断验证](evidence/model-probe-recovery-validation.md)。完整项目及43风格86基线仍未完成，目标继续，未push/部署。
