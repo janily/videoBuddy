@@ -1,0 +1,132 @@
+{
+  "executedAt": "2026-10-03T09:46:35.446Z",
+  "status": "pass",
+  "stateRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/preview-publication-8F2HPj",
+  "mediaRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "input": {
+    "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+    "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+    "operationId": "bd519de6-34ef-4d45-9a7a-115871d5f354",
+    "previewId": "00d38077-3195-4590-a361-8bbc31f86081",
+    "expectedConsentEpoch": 0
+  },
+  "bundle": {
+    "previewId": "00d38077-3195-4590-a361-8bbc31f86081",
+    "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+    "briefVersion": 2,
+    "filmSpecRef": {
+      "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/film/50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+      "sha256": "50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+      "bytes": 2612,
+      "mime": "application/json"
+    },
+    "renderInputs": {
+      "sourceCodeSha256": "8baaee1a23f2d96e988db325c6a0a40bb23dc124797aeb6b2fa2fbc5b51adc92",
+      "timelineSha256": "47595902b52cedd3be48de435a6d8b05de1c14760383f990ea52edcba0aece9d",
+      "audioSha256": "483faea4f095c880ec6e1b09e4256623c822f7bdf855ee977db243bccd6815c9",
+      "assetSha256s": [],
+      "fontSha256s": [],
+      "profile": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 24
+      },
+      "runtimeDigests": {
+        "media": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919"
+      },
+      "qualityPolicySha256": "432fbd18d33d6bfe2bbc3dae4344402271009b75e733743448f0460352c9ef87"
+    },
+    "script": [
+      "带上一本你喜欢的故事书。",
+      "二零二六年十月八日。",
+      "相约上海青禾社区广场。",
+      "一起换书交朋友吧。"
+    ],
+    "facts": [
+      {
+        "text": "活动时间为2026年10月8日",
+        "source": "用户提供"
+      },
+      {
+        "text": "活动地点为上海青禾社区广场",
+        "source": "用户提供"
+      }
+    ],
+    "criticalFacts": [
+      {
+        "text": "活动时间为2026年10月8日",
+        "source": "用户提供"
+      },
+      {
+        "text": "活动地点为上海青禾社区广场",
+        "source": "用户提供"
+      }
+    ],
+    "summary": "以手绘蜡笔绘本风格展开一段温暖的邻里换书旅程。通过粗颗粒纸面、稚拙蜡笔线条与水彩浸润，逐步描绘出居民携书相聚青禾社区广场的生动场景，清晰传递2026年10月8日换书活动的核心信息与邻里温情。",
+    "previewArtifactId": "754dbc52-1e2f-4839-95b2-d50a817ebf16",
+    "previewArtifactSha256": "693795d7d8919187ca8fb2ee6bb0d6c38dcb5481ca04d1fa02ead33fc4b0226e",
+    "excerptMap": [
+      {
+        "previewStartMs": 0,
+        "previewEndMs": 6000,
+        "sourceStartMs": 5000,
+        "sourceEndMs": 11000,
+        "shotId": "shot-2-date-reveal"
+      },
+      {
+        "previewStartMs": 6000,
+        "previewEndMs": 11000,
+        "sourceStartMs": 11000,
+        "sourceEndMs": 16000,
+        "shotId": "shot-3-plaza-gathering"
+      }
+    ],
+    "sourceDurationMs": 20000,
+    "qualityEvidenceRefs": [
+      "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/preview-quality-evidence/600a1297f584e0d909e54092d1701c119c1c8d0e7f9082648498546e454e2ccd"
+    ],
+    "scriptHash": "f2c85a5b7426c435073aab6ed3b0ff67c65db213b4cee57d5c6835b5e0b000e8",
+    "factsHash": "9c51e53a63cfeee9728158adc1ee6d7bc4eeb21f976feaa2491125fec7ab89f2",
+    "bundleHash": "81217548f2dc2e01322e1609167d684727c0b57c77c5b2a21258d83f12d30d4b",
+    "expiresAt": "2026-10-04T09:46:34.152Z"
+  },
+  "artifact": {
+    "id": "754dbc52-1e2f-4839-95b2-d50a817ebf16",
+    "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+    "objectRef": {
+      "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/artifacts/754dbc52-1e2f-4839-95b2-d50a817ebf16/files/preview.mp4",
+      "sha256": "693795d7d8919187ca8fb2ee6bb0d6c38dcb5481ca04d1fa02ead33fc4b0226e",
+      "bytes": 3562048,
+      "mime": "video/mp4"
+    },
+    "qaPassed": true,
+    "uploaded": true,
+    "filename": "preview.mp4",
+    "sourceFilmSha256": "c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790",
+    "excerptStageKey": "0f9fbfdefc3bec37b951c2e23176ed3193115782096eb2bc8a2839e2f8178d49"
+  },
+  "beforePublishAccessRejected": true,
+  "mismatchedIntentRejected": true,
+  "replayIdentical": true,
+  "coldWorkerRecovered": true,
+  "durableEvents": [
+    {
+      "type": "preview.ready",
+      "payload": {
+        "previewId": "00d38077-3195-4590-a361-8bbc31f86081",
+        "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+        "briefVersion": 2
+      }
+    },
+    {
+      "type": "operation.terminal",
+      "payload": {
+        "status": "succeeded",
+        "retryable": false
+      }
+    }
+  ],
+  "originalControlUnchanged": true,
+  "additionalModelCalls": 0,
+  "limits": "Actual native 11-second stereo artifact published to an isolated durable control store and recovered by a cold preview Worker without producer re-execution. Model/style/readability failures remain unresolved; technical evidence is explicitly ineligible for delivery. This is a storage/media integration test, not end-to-end user creation or final delivery acceptance."
+}

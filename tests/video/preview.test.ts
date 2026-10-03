@@ -12,9 +12,9 @@ import{LocalOperationQueue}from'@/services/video/commands/local-queue';
 import{resolveArtifact}from'@/services/video/exports/access';
 import{ProjectStore}from'@/services/video/storage/project-store';
 import{FileStore}from'@/services/video/storage/file-store';
-import{updateJson}from'@/services/video/storage/atomic-store';
+import{updateJson,StoreConflict}from'@/services/video/storage/atomic-store';
 import type{ProjectControl}from'@/contracts/video/project';
-import{seedPreviewBundle}from'./fixtures/preview-package';
+import{seedPreviewBundle,seedPreviewOperation}from'./fixtures/preview-package';
 import{canonicalHash}from'@/services/video/domain/hash';
 const preview={previewArtifactId:'artifact',revisionId:'revision',excerptMap:[{previewStartMs:0,previewEndMs:3000,sourceStartMs:0,sourceEndMs:3000,shotId:'one'},{previewStartMs:3000,previewEndMs:6000,sourceStartMs:18000,sourceEndMs:21000,shotId:'two'},{previewStartMs:6000,previewEndMs:9000,sourceStartMs:40000,sourceEndMs:43000,shotId:'three'}]};
 it('AT-036 second preview segment maps to actual source time',()=>expect(mapPreviewTime(preview,4000)).toEqual({artifactId:'artifact',revisionId:'revision',previewTimeMs:4000,sourceTimeMs:19000}));
@@ -24,6 +24,29 @@ it('an excerpt is six to twelve seconds and source intervals retain equal durati
  expect(()=>validateExcerptMap([{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:4000,shotId:'bad'}],45000)).toThrow('EXCERPT_INVALID');
 });
 const sha=(letter:string)=>letter.repeat(64);
+it('the final publication CAS rechecks Understanding after a concurrent baseline replacement',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vb-preview-race-'));
+ class RacingStore extends FileStore{
+  armed=false;
+  async cas<T>(key:string,etag:string,value:T){
+   if(this.armed&&key.endsWith('/control')){
+    this.armed=false;
+    const old=(await this.readFresh<ProjectControl>(key)).value;
+    await super.cas(key,etag,{...old,understandingRef:{...old.understandingRef,sha256:'9'.repeat(64)}});
+    throw new StoreConflict();
+   }
+   return super.cas(key,etag,value);
+  }
+ }
+ try{
+  const store=new RacingStore(dir),projects=new ProjectStore(store),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),operationId=randomUUID();
+  const bundle=await storedBundle(projects,projectId);await storedPreviewArtifact(projects,dir,projectId,bundle);
+  await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId}));
+  await seedPreviewOperation(projects,operationId,bundle);store.armed=true;
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,dir)).rejects.toThrow('PREVIEW_STALE');
+  expect((await projects.access('owner',projectId)).currentPreviewId).toBeUndefined();
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
 const previewBytes=Buffer.alloc(100);previewBytes.write('ftyp',4);
 const previewSha=createHash('sha256').update(previewBytes).digest('hex');
 async function storedPreviewArtifact(projects:ProjectStore,dir:string,projectId:string,bundle:{previewArtifactId:string;revisionId:string}){
@@ -64,13 +87,22 @@ it('T11 commits one immutable preview only for the live brief and production slo
   const operationId=randomUUID();
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:operationId}));
   const bundle=await storedBundle(projects,projectId),path=await storedPreviewArtifact(projects,dir,projectId,bundle);
+  await seedPreviewOperation(projects,operationId,bundle);
+  const changedInputs={...bundle.renderInputs,qualityPolicySha256:'0'.repeat(64)};
+  const unboundPolicy={...bundle,renderInputs:changedInputs,bundleHash:canonicalHash({filmSpecSha256:bundle.filmSpecRef.sha256,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash,...changedInputs})};
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,unboundPolicy,dir)).rejects.toThrow('PREVIEW_PACKAGE_INVALID');
   await expect(resolveArtifact(projects,owner,projectId,bundle.previewArtifactId)).rejects.toThrow('ACCESS_NOT_FOUND');
   const fakeRef={...bundle.filmSpecRef,sha256:sha('9')},forged={...bundle,filmSpecRef:fakeRef,bundleHash:canonicalHash({filmSpecSha256:fakeRef.sha256,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash,...bundle.renderInputs})};
   await expect(commitPreviewBundle(projects,projectId,operationId,0,forged,dir)).rejects.toThrow('PREVIEW_PACKAGE_INVALID');
   const changedScript=['活动将在十月九日开始。'],changedScriptHash=canonicalHash(changedScript),forgedScript={...bundle,script:changedScript,scriptHash:changedScriptHash,bundleHash:canonicalHash({filmSpecSha256:bundle.filmSpecRef.sha256,scriptHash:changedScriptHash,factsHash:bundle.factsHash,...bundle.renderInputs})};
   await expect(commitPreviewBundle(projects,projectId,operationId,0,forgedScript,dir)).rejects.toThrow('PREVIEW_PACKAGE_INVALID');
   await expect(commitPreviewBundle(projects,projectId,operationId,0,{...bundle,excerptMap:[{...bundle.excerptMap[0],shotId:'missing'}]},dir)).rejects.toThrow('PREVIEW_PACKAGE_INVALID');
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,{...bundle,previewId:randomUUID()},dir)).rejects.toThrow('PREVIEW_OPERATION_CHANGED');
   await commitPreviewBundle(projects,projectId,operationId,0,bundle,dir);
+  const published=await projects.access(owner,projectId);
+  await expect(commitPreviewBundle(projects,projectId,operationId,0,bundle,dir)).resolves.toEqual(published);
+  expect((await projects.access(owner,projectId)).controlVersion).toBe(published.controlVersion);
+  await expect(commitPreviewBundle(projects,projectId,randomUUID(),0,bundle,dir)).rejects.toThrow('PREVIEW_STALE');
   expect((await resolveArtifact(projects,owner,projectId,bundle.previewArtifactId)).objectRef.sha256).toBe(previewSha);
   const control=(await projects.access(owner,projectId));
   expect(control).toMatchObject({phase:'preview_ready',previewState:'ready',currentPreviewId:bundle.previewId,activeProduction:null});
@@ -118,6 +150,7 @@ it('AT-035 one preview button approval creates one durable render intent and rep
   const prepareId=randomUUID(),bundle=await storedBundle(projects,projectId);
   await storedPreviewArtifact(projects,dir,projectId,bundle);
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:prepareId}));
+  await seedPreviewOperation(projects,prepareId,bundle);
   await commitPreviewBundle(projects,projectId,prepareId,0,bundle,dir);
   const request={schemaVersion:5 as const,clientCommandId:randomUUID(),previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
   await expect(approvePreview(projects,queue,owner,projectId,{...request,clientCommandId:randomUUID(),bundleHash:sha('9')})).rejects.toThrow('PREVIEW_STALE');
@@ -155,6 +188,7 @@ it('AT-035 two distinct approval commands cannot reserve two render slots',async
   const prepareId=randomUUID(),bundle=await storedBundle(projects,projectId);
   await storedPreviewArtifact(projects,dir,projectId,bundle);
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:3,phase:'preparing_preview' as const,activeProduction:prepareId}));
+  await seedPreviewOperation(projects,prepareId,bundle);
   await commitPreviewBundle(projects,projectId,prepareId,0,bundle,dir);
   const body={schemaVersion:5 as const,previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:3,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
   const results=await Promise.allSettled([approvePreview(projects,queue,owner,projectId,{...body,clientCommandId:randomUUID()}),approvePreview(projects,queue,owner,projectId,{...body,clientCommandId:randomUUID()})]);

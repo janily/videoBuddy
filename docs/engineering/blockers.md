@@ -57,3 +57,6 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 prepare_preview持久命令与真实自动6–12s节选已独立实现/测试，尚未公开API/UI或接入production Worker。真实11s private artifact已生成，质量仅technical，既有renderer仍强制-ac1导致立体声源变单声道，接通发布前须将声道数纳入stage key并保存实际声道。自然语言修改/正式render/export及43风格86基线继续开发。
 
 2026-10-03 stereo节选限制已关闭：新v2真实节选保持源2ch，旧mono按2ch实际QA拒绝，stage key/record/artifact均固定channels。当前未完成的关键通道仍是preview Worker/API/UI发布→一次正式批准→render/独立完整QA→结果/下载/修改/export，以及43风格86基线和完整验收；现有字体/readability Critic失败仍保留。
+
+
+2026-10-03 预览入口更新：预览Worker/API/UI不再是未实现项，但尚未跑新主题完整模型Worker。技术诊断片实际播放通过，不代表Critic质量通过；历史风格/可读性失败仍保留。正式制作仍缺批准后只消费冻结素材的1080p渲染器、完整QA及最终发布；不得放宽preparing_preview阶段fence来伪装正式流程。云Blob/Sandbox无需凭据（已自托管）；实际仍需配置固定VIDEO_MEDIA_IMAGE_REF/runtime/timeout，以及有旁白时voice/asr镜像。预检现在在模型前拒绝缺失配置。GRSAI实测忽略输出token上限，不能声称硬费用封顶；旧usage未结算/未知结果必须审计后才能继续付费，不能重置原ledger。43风格86真实基线、全片听验/视觉QA、16行为评估和五名用户观察尚未完成；生产开关关闭，未部署。

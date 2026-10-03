@@ -39,6 +39,7 @@ export async function preparePreview(projects:ProjectStore,queue:LocalOperationQ
  const assertBaseline=(current:ProjectControl)=>{
   if(current.deletedAt||current.ownerKeyHash!==owner||Date.parse(current.expiresAt)<=Date.now())throw Error('ACCESS_NOT_FOUND');
   if(current.activeProduction||current.activeConversation)throw Error('BUSY');
+  if(Object.keys(current.previewOutcomes||{}).length>=16)throw Error('RECOVERY_REQUIRED');
   if(current.inputPending||understanding.assetUses.some(use=>use.required&&!current.assets.some(asset=>asset.id===use.assetId&&asset.status==='ready')))throw Error('INPUT_PENDING');
   if(!['collecting','preview_ready','ready','attention','cancelled'].includes(current.phase)||current.briefVersion!==request.expectedBriefVersion||canonicalHash(current.understandingRef)!==canonicalHash(control.understandingRef)||current.consentEpoch!==control.consentEpoch)throw Error('PREVIEW_STALE');
  };

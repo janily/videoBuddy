@@ -7,6 +7,7 @@ import {CreateProjectRequest}from '@/contracts/video/commands';
 import {canonicalHash}from '@/services/video/domain/hash';
 import {readPreviewBundle}from '@/services/video/preview/commit';
 import {readResultManifest}from '@/services/video/results/publish';
+import {previewAction}from '@/services/video/preview/action';
 export class ProjectStore{
  readonly index:IndexStore;constructor(readonly store:AtomicStore){this.index=new IndexStore(store)}
  async create(owner:string,input:CreateProjectRequest){
@@ -37,7 +38,18 @@ export class ProjectStore{
   const preview=c.currentPreviewId?await readPreviewBundle(this,id,c.currentPreviewId):null;
   const currentPreview=preview?{previewId:preview.previewId,revisionId:preview.revisionId,briefVersion:preview.briefVersion,previewArtifactId:preview.previewArtifactId,bundleHash:preview.bundleHash,scriptHash:preview.scriptHash,factsHash:preview.factsHash,script:preview.script,criticalFacts:preview.criticalFacts,summary:preview.summary,expiresAt:preview.expiresAt,state:c.previewState}:null;
   const publicResult=async(resultId?:string)=>{if(!resultId)return null;const result=await readResultManifest(this,id,resultId);return{resultId:result.resultId,artifactId:result.artifactId,revisionId:result.revisionId,bundleHash:result.bundleHash,createdAt:result.createdAt}};
-  return{projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:[],actions:[{kind:'prepare_preview',enabled:false,disabledReason:'真实创作预览尚未就绪。'}],expiresAt:c.expiresAt};
+  let productionFailure:ProjectView['productionFailure'];
+  const last=c.latestPreviewOutcome;
+  if(last&&!c.activeProduction&&last.briefVersion===c.briefVersion&&last.consentEpoch===c.consentEpoch){
+   let outcome=c.previewOutcomes?.[last.operationId];
+   if(!outcome)try{outcome=(await this.store.readFresh<NonNullable<ProjectControl['previewOutcomes']>[string]>(`projects/${id}/operations/${last.operationId}/preview-outcome`)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
+   if(outcome?.status==='failed'){
+    const code=outcome.errorCode||'PROVIDER_UNAVAILABLE';
+    const message=code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':code==='ASR_MISMATCH'?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':'本次效果制作未完成，资料和已有内容已保留。';
+    productionFailure={operationId:last.operationId,errorCode:code,message};
+   }
+  }
+  return{productionFailure,projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:[],actions:[previewAction(c,u),...(preview?[{kind:'approve_preview',enabled:false,disabledReason:'完整视频制作尚未开放，效果片段和资料已保留。'}]:[])],expiresAt:c.expiresAt};
  }
  async lookup(owner:string,ids:string[]){
   if(ids.length>20)throw Error('VALIDATION_FAILED');

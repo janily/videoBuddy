@@ -9,8 +9,17 @@ import{revisionSeed}from'@/services/video/timeline/seed';
 import{filmPackagePolicyVersion,narrationSilence}from'@/services/video/timeline/package';
 import type{archiveVerifiedNarration}from'@/services/video/audio/narration-package';
 import type{TimingDraft}from'@/services/video/preview/timing-draft';
+import type{ProjectControl}from'@/contracts/video/project';
+import{updateJson}from'@/services/video/storage/atomic-store';
+import{mandatoryDeliveryRules}from'@/services/video/quality/delivery';
 
-export async function seedPreviewBundle(projects:ProjectStore,input:{projectId:string;previewArtifactSha256:string;briefVersion?:number;revisionId?:string;previewId?:string;previewArtifactId?:string;durationSec?:number;script?:string[];factTexts?:string[];summary?:string;qualityPolicySha256?:string;excerptMap?:ExcerptSegment[];createdAt?:number;narration?:Awaited<ReturnType<typeof archiveVerifiedNarration>>;voiceMetadata?:TimingDraft['narration']}):Promise<PreviewBundle>{
+export async function seedPreviewOperation(projects:ProjectStore,operationId:string,bundle:PreviewBundle){
+ const spec=(await projects.store.readFresh<{understandingRef:ProjectControl['understandingRef']}>(bundle.filmSpecRef.key)).value;
+ const c=await updateJson(projects.store,`projects/${bundle.filmSpecRef.key.split('/')[1]}/control`,(c:ProjectControl)=>({...c,understandingRef:spec.understandingRef}));
+ await projects.store.create(`projects/${c.projectId}/operations/${operationId}`,{id:operationId,projectId:c.projectId,commandId:randomUUID(),kind:'preview',revisionId:bundle.revisionId,previewId:bundle.previewId,briefVersion:bundle.briefVersion,consentEpoch:c.consentEpoch,understandingRef:spec.understandingRef,status:'running',canonicalRunId:operationId,streamEpoch:0,fence:0});
+}
+
+export async function seedPreviewBundle(projects:ProjectStore,input:{projectId:string;previewArtifactSha256:string;briefVersion?:number;revisionId?:string;previewId?:string;previewArtifactId?:string;durationSec?:number;script?:string[];factTexts?:string[];summary?:string;excerptMap?:ExcerptSegment[];createdAt?:number;narration?:Awaited<ReturnType<typeof archiveVerifiedNarration>>;voiceMetadata?:TimingDraft['narration']}):Promise<PreviewBundle>{
  const{projectId}=input,revisionId=input.revisionId||randomUUID(),briefVersion=input.briefVersion??3,durationSec=input.durationSec??45,style=getStyle('crayon-book'),prefix=`projects/${projectId}/revisions/${revisionId}`,messageId=randomUUID();
  const script=input.script||['上海的活动将在十月八日开始。'],summary=input.summary||'活动预告';
  const facts=(input.factTexts||['活动在十月八日开始']).map((text,index)=>({id:`fact-${index}`,text,sourceRefs:[{type:'user_message' as const,id:messageId}],status:'confirmed' as const,mustInclude:true,critical:true}));
@@ -27,8 +36,9 @@ export async function seedPreviewBundle(projects:ProjectStore,input:{projectId:s
  const treatmentRef=await index.immutable(`${prefix}/treatment`,{schemaVersion:1,summary,script,factIds:facts.map(f=>f.id),planRef}),factsRef=await index.immutable(`${prefix}/facts`,{schemaVersion:1,facts}),timelineRef=await index.immutable(`${prefix}/timeline`,timeline),assetManifestRef=await index.immutable(`${prefix}/assets`,{schemaVersion:1,assets:[]}),sourceManifestRef=await index.immutable(`${prefix}/sources`,sourceManifest),audioManifestRef=await index.immutable(`${prefix}/audio`,{schemaVersion:1,sources:input.narration?.sources||[],buses:[{id:'voice'},{id:'music'},{id:'foley'}],planRef:audioPlanRef,timingDraftRef});
  const filmSpec={schemaVersion:5,projectId,revisionId,briefVersion,style:{slug:style.slug,packVersion:style.packVersion,upstreamCommit:style.upstreamCommit},output:{width:1920,height:1080,fps:24,totalFrames:durationSec*24,sampleRate:48000},seed,understandingRef,treatmentRef,factsRef,timelineRef,assetManifestRef,sourceManifestRef,audioManifestRef,runtimeDigest:mediaDigest,qualityPolicyVersion:filmPackagePolicyVersion};
  const filmSpecRef=await index.immutable(`${prefix}/film`,filmSpec);
+ const qualityPolicyRef=await index.immutable(`${prefix}/quality-policy`,{schemaVersion:1,audioIntent:input.narration?'voiced':'silent',captions:false,requiredRules:[...mandatoryDeliveryRules]});
  return createPreviewBundle({previewId:input.previewId||randomUUID(),revisionId,briefVersion,filmSpecRef:{...filmSpecRef,mime:'application/json'},
-  renderInputs:{sourceCodeSha256:canonicalHash(sourceManifest.modules.map(item=>({id:item.id,sha256:item.sourceRef.sha256}))),timelineSha256:timelineRef.sha256,audioSha256:audioManifestRef.sha256,assetSha256s:[],fontSha256s:[],profile:{width:1920,height:1080,fps:24},runtimeDigests:{media:mediaDigest},qualityPolicySha256:input.qualityPolicySha256||'3'.repeat(64)},
+  renderInputs:{sourceCodeSha256:canonicalHash(sourceManifest.modules.map(item=>({id:item.id,sha256:item.sourceRef.sha256}))),timelineSha256:timelineRef.sha256,audioSha256:audioManifestRef.sha256,assetSha256s:[],fontSha256s:[],profile:{width:1920,height:1080,fps:24},runtimeDigests:{media:mediaDigest},qualityPolicySha256:qualityPolicyRef.sha256},
   script,facts:facts.map(f=>({text:f.text,source:'用户确认'})),criticalFacts:facts.map(f=>({text:f.text,source:'用户确认'})),summary,previewArtifactId:input.previewArtifactId||randomUUID(),previewArtifactSha256:input.previewArtifactSha256,
   excerptMap:input.excerptMap||[{previewStartMs:0,previewEndMs:8000,sourceStartMs:0,sourceEndMs:8000,shotId:'shot'}],sourceDurationMs:durationSec*1000,qualityEvidenceRefs:[`${prefix}/qa/preview`]},input.createdAt);
 }

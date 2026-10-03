@@ -1,0 +1,33 @@
+{
+  "executedAt": "2026-10-03T09:46:48.297Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/preview-browser-EOIMoS",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "previewId": "00d38077-3195-4590-a361-8bbc31f86081",
+  "artifactSha256": "693795d7d8919187ca8fb2ee6bb0d6c38dcb5481ca04d1fa02ead33fc4b0226e",
+  "media": {
+    "duration": 11,
+    "width": 1280,
+    "height": 720,
+    "currentTime": 0.259754,
+    "readyState": 4,
+    "error": null
+  },
+  "pausedRecovery": {
+    "sameElement": true,
+    "time": 6,
+    "paused": true,
+    "playsInline": true
+  },
+  "playingRecovery": {
+    "sameElement": true,
+    "time": 6.251233,
+    "paused": false
+  },
+  "accessRequests": 4,
+  "providerCalls": 0,
+  "singleComposer": true,
+  "mobileTabs": true,
+  "formalProductionDisabled": true,
+  "limits": "Real copied native movie served through actual anonymous access and signed private byte route, decoded and advanced by Chromium. Injected media error events test automatic/manual re-signing with the same video DOM and preserved paused/playing position; all access requests and movie bytes use actual HTTP. Generation disabled and provider key excluded from web; no API mocks or example movie. Diagnostic publication fixture, not fresh whole model creation, approved formal rendering, style or final QA acceptance."
+}

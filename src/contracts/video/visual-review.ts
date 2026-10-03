@@ -11,6 +11,9 @@ export const VisualReviewSchema=z.strictObject({
  facts:z.array(assessment.extend({factId:id})).max(100),style:assessment,readability:assessment,
 });
 export type VisualReview=z.infer<typeof VisualReviewSchema>;
+export function assertPreviewReviewEligible(review:VisualReview){
+ if(review.style.result!=='pass'||review.readability.result!=='pass'||review.facts.some(f=>f.result==='fail')||review.observations.some(o=>o.issues.some(i=>i.severity==='blocking')))throw Error('PREVIEW_QUALITY_BLOCKED');
+}
 export type VisualReviewContext=z.infer<typeof input>&{frameSetSha256:string};
 function unique(values:string[]){return new Set(values).size===values.length}
 export function visualReviewContext(raw:z.input<typeof input>):VisualReviewContext{

@@ -30,6 +30,8 @@ async function uploadBytes(url:string,file:File,mime:'text/markdown'|'applicatio
 export function useProject(initialProjectId?:string){
  const [projectId,setProjectId]=useState(initialProjectId),[view,setView]=useState<ProjectView|null>(null),[error,setError]=useState(''),[sending,setSending]=useState(false),[uploading,setUploading]=useState(false);
  const idRef=useRef(initialProjectId),createId=useRef<string|undefined>(undefined),commandRef=useRef<{text:string;attachmentIds:string[];commandId:string;messageId:string}|undefined>(undefined);
+ const previewCommand=useRef<{briefVersion:number;commandId:string}|undefined>(undefined),previewBusy=useRef(false);
+ const [preparingPreview,setPreparingPreview]=useState(false);
  const key=draftKey(projectId),[draft,setDraft]=useDraft(key);
  const attachmentSnapshot=useCallback(()=>projectId?localStorage.getItem(attachmentKey(projectId))||'[]':'[]',[projectId]);
  const attachments=parseAttachments(useSyncExternalStore(subscribeAttachments,attachmentSnapshot,()=> '[]'));
@@ -96,6 +98,14 @@ export function useProject(initialProjectId?:string){
   finally{setSending(false)}
  }
  async function stopReply(){const op=view?.activeConversation;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'reply'});await refresh()}catch(e){setError(e instanceof Error?e.message:'无法停止回复。')}}
+ async function preparePreview(){
+  if(!projectId||!view||previewBusy.current||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled))return;
+  previewBusy.current=true;setPreparingPreview(true);setError('');
+  const command=previewCommand.current?.briefVersion===view.briefVersion?previewCommand.current:{briefVersion:view.briefVersion,commandId:crypto.randomUUID()};previewCommand.current=command;
+  try{await api(`/api/video/projects/${projectId}/preview`,{schemaVersion:5,clientCommandId:command.commandId,expectedBriefVersion:command.briefVersion});previewCommand.current=undefined;await refresh()}
+  catch(e){setError(e instanceof Error?e.message:'效果请求未完成，资料和草稿已保留。');await refresh()}
+  finally{previewBusy.current=false;setPreparingPreview(false)}
+ }
  const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send,stopReply,messages,connection:stream.connection||productionStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send,stopReply,preparePreview,preparingPreview,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
 }

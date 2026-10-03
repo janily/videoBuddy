@@ -1,7 +1,13 @@
 import {expect,it} from 'vitest';
-import {guardVisualReview,visualReviewContext,type VisualReviewContext,type VisualReview} from '@/contracts/video/visual-review';
+import {assertPreviewReviewEligible,guardVisualReview,visualReviewContext,type VisualReviewContext,type VisualReview} from '@/contracts/video/visual-review';
 import {canonicalHash} from '@/services/video/domain/hash';
 const d='a'.repeat(64),film='b'.repeat(64),rules='c'.repeat(64);
+it('an actual failed sampled review blocks preview publication while retaining its evidence',()=>{
+ expect(()=>assertPreviewReviewEligible(report())).not.toThrow();
+ for(const field of ['style','readability'] as const){const failed=report();failed[field].result='fail';expect(()=>assertPreviewReviewEligible(failed)).toThrow('PREVIEW_QUALITY_BLOCKED')}
+ const failed=report();failed.facts[0].result='fail';expect(()=>assertPreviewReviewEligible(failed)).toThrow('PREVIEW_QUALITY_BLOCKED');
+ const unknown=report();unknown.style.result='not_checked';expect(()=>assertPreviewReviewEligible(unknown)).toThrow('PREVIEW_QUALITY_BLOCKED');
+});
 const context=visualReviewContext({filmSha256:film,filmSpecSha256:d,styleSlug:'crayon-book',styleRulesHash:rules,frames:[{id:'frame-24',frame:24,sha256:d,bytes:1000},{id:'frame-48',frame:48,sha256:rules,bytes:1200}],facts:[{id:'date',text:'2026年10月8日'},{id:'place',text:'上海青禾社区'}],round:1});
 function report(c:VisualReviewContext=context):VisualReview{return{schemaVersion:1,filmSha256:c.filmSha256,filmSpecSha256:c.filmSpecSha256,frameSetSha256:c.frameSetSha256,styleSlug:c.styleSlug,styleRulesHash:c.styleRulesHash,round:c.round,scope:'sampled_frames',observations:c.frames.map(frame=>({frameId:frame.id,visibleText:['2026年10月8日','上海青禾社区'],issues:[]})),facts:c.facts.map(fact=>({factId:fact.id,result:'pass',frameIds:[c.frames[0].id],reason:'该帧可见完整文字'})),style:{result:'pass',frameIds:c.frames.map(f=>f.id),reason:'所示帧可见蜡笔材质'},readability:{result:'pass',frameIds:c.frames.map(f=>f.id),reason:'所示文字清晰完整'}}}
 it('binds an independent read-only review to exact film/spec/frame bytes, chosen rules and round',()=>{

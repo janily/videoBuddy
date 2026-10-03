@@ -1,6 +1,17 @@
 import{test,expect}from'@playwright/test';
 const projectId='10000000-0000-4000-8000-000000000001';
 const view={projectId,title:'测试项目',controlVersion:1,briefVersion:0,phase:'collecting',understanding:{summary:['这是经过整理的想法'],subject:'测试'},preferences:{durationSec:45,aspect:'16:9',language:'zh-CN',styleSlug:null,voiceMode:'tts',musicMode:'composed',captions:'auto'},assets:[],messages:[],currentPreview:null,currentResult:null,previousResult:null,activeConversation:null,activeProduction:null,pendingInputs:[],actions:[],expiresAt:'2030-01-01T00:00:00Z'};
+test('the explicit preview button submits the current brief without clearing the chat draft',async({page})=>{
+ const baseline={...view,briefVersion:7,preferences:{...view.preferences,styleSlug:'crayon-book'},actions:[{kind:'prepare_preview',enabled:true}]};
+ await page.route(`**/api/video/projects/${projectId}`,r=>r.fulfill({json:baseline}));
+ let submitted:{clientCommandId:string;expectedBriefVersion:number}|undefined;
+ await page.route(`**/api/video/projects/${projectId}/preview`,async r=>{submitted=r.request().postDataJSON();await r.fulfill({status:202,json:{operationId:crypto.randomUUID()}})});
+ await page.goto(`/video/${projectId}`);await page.getByRole('textbox').fill('继续补充的资料');
+ await page.getByRole('button',{name:'先看效果 →'}).click();
+ await expect.poll(()=>submitted?.expectedBriefVersion).toBe(7);
+ expect(submitted!.clientCommandId).toMatch(/^[a-f0-9-]{36}$/);
+ await expect(page.getByRole('textbox')).toHaveValue('继续补充的资料');
+});
 test('AT-023 submitting one draft never clears typing made while request is pending',async({page})=>{
  await page.route('**/api/video/session',r=>r.fulfill({json:{expiresAt:'2030-01-01'}}));
  await page.route('**/api/video/projects',r=>r.fulfill({json:{projectId,controlVersion:1}}));

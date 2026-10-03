@@ -36,6 +36,17 @@ export async function readPinnedSubtitleFont(env:Environment=process.env){
  const charset=raw.slice(split+1);
  return{family:'Noto Sans CJK SC' as const,runtimeDigest:config.runtimeDigest,charsetSha256:createHash('sha256').update(charset).digest('hex'),glyphs:parseFontCharset(charset)};
 }
+export async function readPinnedSubtitleFontFileHash(runtimeDigest:string){
+ if(!/^[a-f0-9]{64}$/.test(runtimeDigest))throw Error('FONT_RUNTIME_UNAVAILABLE');
+ const path='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc';
+ const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','1','--memory','256m','--user',`${process.getuid?.()??10001}:${process.getgid?.()??10001}`,'sha256:'+runtimeDigest,'sha256sum',path];
+ const child=spawn('docker',args,{stdio:['ignore','pipe','ignore'],signal:AbortSignal.timeout(15000)}),output:Buffer[]=[];let size=0;
+ child.stdout.on('data',(part:Buffer)=>{size+=part.length;if(size<=512)output.push(part);else child.kill()});
+ const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
+ const raw=Buffer.concat(output).toString('utf8');
+ if(code!==0||size>512||!new RegExp('^[a-f0-9]{64}  '+path+'\\n$').test(raw))throw Error('FONT_RUNTIME_UNAVAILABLE');
+ return raw.slice(0,64);
+}
 export function compileSubtitles(manifest:VerifiedNarrationManifest,fps:24|30|60,glyphs:Set<string>):SubtitleCue[]{
  if(!Number.isSafeInteger(manifest.durationMs)||manifest.durationMs<20000||manifest.durationMs>120000||![24,30,60].includes(fps)||manifest.lines.length>120)throw Error('CAPTION_PLAN_INVALID');
  const ordered=[...manifest.lines].sort((a,b)=>a.startMs-b.startMs),totalFrames=manifest.durationMs*fps/1000,cues:SubtitleCue[]=[];

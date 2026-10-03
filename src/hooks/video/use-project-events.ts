@@ -6,6 +6,7 @@ import {SseParser,parseCursor}from '@/services/video/stream/sse-parser';
 import {initialStreamState,reduceEvent,StreamMessage}from '@/services/video/stream/reducer';
 export function useProjectEvents(projectId:string|undefined,operationId:string|undefined,epoch:number,onRefresh:()=>Promise<void>){
  const[streamed,setStreamed]=useState<StreamMessage[]>([]);const[connection,setConnection]=useState('');
+ const[activity,setActivity]=useState<{operationId:string;label:string}>();
  useEffect(()=>{
   if(!projectId||!operationId)return;
   const abort=new AbortController();let state=initialStreamState(operationId,epoch),stopped=false,retries=0,startupRetries=0,recoveryRequested=false;
@@ -22,6 +23,8 @@ export function useProjectEvents(projectId:string|undefined,operationId:string|u
       const event=StreamEventSchema.parse(JSON.parse(record.data)),cursor=parseCursor(record.id);const next=reduceEvent(state,event,cursor.index);
       if(next.needsCheckpoint){await onRefresh();stopped=true;break}
       state=next;setStreamed(Object.values(state.messages));
+      if(event.type==='activity.updated')setActivity({operationId:event.operationId,label:event.payload.label});
+      if(event.type==='operation.terminal'&&['failed','interrupted'].includes(event.payload.status))setConnection(event.payload.errorCode==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':event.payload.errorCode==='EFFECT_UNKNOWN'?'上次调用结果尚待核实，资料已保留。':event.payload.errorCode==='ASR_MISMATCH'?'声音核验未通过，资料和已有片段已保留。':'本次任务未完成，资料和已有内容已保留。');
       if(['message.committed','understanding.updated','preview.ready','result.ready','operation.terminal'].includes(event.type))await onRefresh();
       if(event.type==='operation.terminal')stopped=true;
      }if(stopped)break}}finally{await reader.cancel()}
@@ -31,5 +34,5 @@ export function useProjectEvents(projectId:string|undefined,operationId:string|u
   }
   void connect();return()=>abort.abort();
  },[projectId,operationId,epoch,onRefresh]);
- return{messages:streamed.filter(m=>m.status==='streaming'),connection};
+ return{messages:streamed.filter(m=>m.status==='streaming'),connection,activity:activity?.operationId===operationId?activity:undefined};
 }

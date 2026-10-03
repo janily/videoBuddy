@@ -5,15 +5,20 @@ import {expireReservations} from '@/services/video/assets/reservations';
 import {LocalOperationQueue,QueuedOperation} from './local-queue';
 const terminal=new Set(['succeeded','failed','cancelled','interrupted','superseded']);
 export async function runQueuedOnce(queue:LocalOperationQueue,store:AtomicStore,execute:(job:QueuedOperation)=>Promise<void>){
- for(const job of await queue.pending()){
+ let failure=await queue.reconcilePreviews();
+ const inventory=await queue.pendingWithFailures();failure ||= inventory.failure;
+ for(const job of inventory.jobs){
+  try{
   const key=`projects/${job.projectId}/operations/${job.operationId}`;
   const before=(await store.readFresh<{status:string}>(key)).value;
   if(terminal.has(before.status)){await queue.complete(job.projectId,job.operationId);continue}
-  if(job.kind!=='chat')throw Error('CAPABILITY_UNAVAILABLE');
+  if(!['chat','preview'].includes(job.kind))throw Error('CAPABILITY_UNAVAILABLE');
   await execute(job);
   const after=(await store.readFresh<{status:string}>(key)).value;
   if(terminal.has(after.status))await queue.complete(job.projectId,job.operationId);
+  }catch(error){failure ||= error}
  }
+ if(failure)throw failure;
 }
 export async function expirePendingUploads(root:string,store:AtomicStore){
  const dirs=await readdir(join(root,'projects'),{withFileTypes:true}).catch(error=>{if((error as NodeJS.ErrnoException).code==='ENOENT')return[];throw error});

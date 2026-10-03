@@ -11,7 +11,7 @@ import{FileStore}from'@/services/video/storage/file-store';
 import{ProjectStore}from'@/services/video/storage/project-store';
 import{LocalOperationQueue}from'@/services/video/commands/local-queue';
 import{updateJson}from'@/services/video/storage/atomic-store';
-import{seedPreviewBundle}from'./fixtures/preview-package';
+import{seedPreviewBundle,seedPreviewOperation}from'./fixtures/preview-package';
 import{commitPreviewBundle}from'@/services/video/preview/commit';
 import{approvePreview}from'@/services/video/preview/approve';
 import{publishResult}from'@/services/video/results/publish';
@@ -46,11 +46,12 @@ async function preparedRender(){
   const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
   const prepareId=randomUUID();
   const previewMedia=Buffer.alloc(100);previewMedia.write('ftyp',4);const previewSha=createHash('sha256').update(previewMedia).digest('hex');
-  const bundle=await seedPreviewBundle(projects,{projectId,briefVersion:1,durationSec:20,script:['真实创作内容'],factTexts:[],summary:'预览',previewArtifactSha256:previewSha,qualityPolicySha256:canonicalHash(policy)});
+  const bundle=await seedPreviewBundle(projects,{projectId,briefVersion:1,durationSec:20,script:['真实创作内容'],factTexts:[],summary:'预览',previewArtifactSha256:previewSha});
   const previewKey=`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files/preview.mp4`;
   await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${bundle.previewArtifactId}/files`),{recursive:true});await writeFile(join(dir,'objects',previewKey),previewMedia);
   await projects.store.create(`projects/${projectId}/artifacts/${bundle.previewArtifactId}/manifest`,{id:bundle.previewArtifactId,revisionId:bundle.revisionId,objectRef:{key:previewKey,sha256:previewSha,bytes:previewMedia.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'preview.mp4'});
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:1,phase:'preparing_preview' as const,activeProduction:prepareId}));
+  await seedPreviewOperation(projects,prepareId,bundle);
   await commitPreviewBundle(projects,projectId,prepareId,0,bundle,dir);
   const request={schemaVersion:5 as const,clientCommandId:randomUUID(),previewId:bundle.previewId,revisionId:bundle.revisionId,expectedBriefVersion:1,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash};
   const approved=await approvePreview(projects,queue,owner,projectId,request),approvalId=(await projects.access(owner,projectId)).currentApprovalId!;
@@ -60,7 +61,7 @@ async function preparedRender(){
   const objectKey=`projects/${projectId}/artifacts/${artifactId}/files/final.mp4`;
   await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${artifactId}/files`),{recursive:true});await writeFile(join(dir,'objects',objectKey),media);
   await projects.store.create(`projects/${projectId}/artifacts/${artifactId}/manifest`,{id:artifactId,revisionId:bundle.revisionId,objectRef:{key:objectKey,sha256:actualSha,bytes:media.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'final.mp4'});
-  const result={resultId,artifactId,revisionId:bundle.revisionId,previewId:bundle.previewId,approvalId,bundleHash:bundle.bundleHash,mp4Sha256:actualSha,mp4Bytes:media.length,qualityPolicy:policy,qualityChecks:checks,createdAt:new Date().toISOString()};
+  const result={resultId,artifactId,revisionId:bundle.revisionId,previewId:bundle.previewId,approvalId,bundleHash:bundle.bundleHash,mp4Sha256:actualSha,mp4Bytes:media.length,qualityPolicy:{...policy,audioIntent:'silent' as const,captions:false},qualityChecks:[...checks,evidence('decoded_silence')],createdAt:new Date().toISOString()};
   return{dir,projects,owner,projectId,approved,result,media,objectKey};
 }
 it('AT-037/039 publishes only the approved bundle and rejects a late result after cancellation',async()=>{
