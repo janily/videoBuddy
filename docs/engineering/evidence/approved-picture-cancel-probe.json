@@ -1,0 +1,13 @@
+{
+  "executedAt": "2026-10-03T09:58:01.731Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo",
+  "containerId": "06fbc5bf63c6",
+  "checks": 3,
+  "errorCode": "RENDER_FENCED",
+  "containerState": "removed",
+  "elapsedMs": 5822,
+  "additionalModelCalls": 0,
+  "resultPublished": false,
+  "limits": "Actual isolated 1080p picture concatenation interrupted via an injected approval-fence failure during Docker execution. Matching owned container identity verified before stop; inspect afterwards confirms stopped/removed. Not full composition, provider creation or final quality acceptance."
+}

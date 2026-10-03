@@ -60,3 +60,8 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 
 
 2026-10-03 预览入口更新：预览Worker/API/UI不再是未实现项，但尚未跑新主题完整模型Worker。技术诊断片实际播放通过，不代表Critic质量通过；历史风格/可读性失败仍保留。正式制作仍缺批准后只消费冻结素材的1080p渲染器、完整QA及最终发布；不得放宽preparing_preview阶段fence来伪装正式流程。云Blob/Sandbox无需凭据（已自托管）；实际仍需配置固定VIDEO_MEDIA_IMAGE_REF/runtime/timeout，以及有旁白时voice/asr镜像。预检现在在模型前拒绝缺失配置。GRSAI实测忽略输出token上限，不能声称硬费用封顶；旧usage未结算/未知结果必须审计后才能继续付费，不能重置原ledger。43风格86真实基线、全片听验/视觉QA、16行为评估和五名用户观察尚未完成；生产开关关闭，未部署。
+
+
+2026-10-03 T12：批准后冻结源码的1080p picture-only已实现并真实全解码/冷重放；取消/超时/inspect错误停止边界已修。仍缺冻结音轨与字幕正式合成、全片后ASR、至少两轮完整视觉检查与真实听验、最终发布/清理。技术画面无音轨且旧Critic仍fail，不能当作最终视频。
+
+2026-10-03 T20 依赖复核：npm audit仍11 high（两个根包及传播依赖）；npm registry最新braces=3.0.3、http-cache-semantics=4.2.0。对应 [braces公告](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) 与 [缓存公告](https://github.com/advisories/GHSA-ch52-4w7c-c8xp) 均列Patched versions=None，当前没有可直接锁定的官方修复版本。未force修复或降级Next14；安全验收继续blocked，需要受控补丁/替代及兼容性验证，而非伪造0漏洞。

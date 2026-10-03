@@ -172,3 +172,6 @@ Audio补明确采样/包络/source/cue约束，显式新operation的一次付费
 
 
 2026-10-03 T11/T07/T14 预览入口增量：页面按钮→幂等POST→持久preview队列→Worker实际阶段→Critic阻断门槛→冻结包/真实字节发布→私有播放器已接通。配置预检先于付费；失败结果先控制态CAS再固定归档/持久SSE，可承受fsync前后ACK丢失而不重跑模型。冷队列恢复遗失enqueue，损坏队列记录不阻塞健康任务；冷页面按brief/consent读取最新失败说明。播放续签保留同一DOM及暂停/播放位置，playsInline已验证。完整单测67文件295项，浏览器18项，lint/build/构建后typecheck通过，两项独立审查无剩余实质发现；证据见 [预览验证](evidence/preview-publication-validation.md)。真实11秒/720p/双声道MP4通过桌面与手机实际HTTP解码播放；续签错误事件为明确注入，媒体/授权仍走实际服务。新增模型调用0，原真实项目control未修改。此诊断发布为technical_only、deliveryEligible=false，不能算新主题完整模型闭环或历史Critic失败通过。正式制作按钮仍disabled；T12正式1080p渲染/全片QA、T13修改、T14导出/清理、T15–18全部43风格86基线及T21验收继续未完成；C0/C1/C2未达到。未push/部署。
+
+
+2026-10-03 T12 冻结批准画面增量：新增独立approved-inputs与pictures阶段，正式running operation逐项绑定owner/approval/command/revision/bundle/Understanding/fence/consent；只编译冻结HTML为1080p任务，不放宽preparing_preview fence、不重新调用创作模型。真实隔离项目完整画面1920×1080/20秒/480帧/16,695,765字节/SHA c2a7ff0d…，独立全解码与冷重放通过，0新增模型调用，currentResult未发布。单镜timeout/inspect/fence错误均尝试停止同handle并保留unknown；拼接每500ms核授权，先核唯一容器label/image/ID再stop。实际拼接取消容器removed，5822ms。完整68文件300测试通过，两项审查无剩余实质问题；详见 [批准画面验证](evidence/approved-pictures-validation.md)。产物无音轨、technical_only；正式1080p音画/字幕、全片QA、真实听验和最终发布未完成，页面正式按钮继续disabled；后续导出/修改/清理/43风格86基线继续未完成，C0/C1/C2未达到。

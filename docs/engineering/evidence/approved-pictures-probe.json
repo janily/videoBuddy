@@ -1,0 +1,110 @@
+{
+  "executedAt": "2026-10-03T09:56:18.982Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "operationId": "00059b52-be2a-4089-a4b4-e3b1cc47dc7c",
+  "approvalId": "e9d3250b-65c0-4948-baf1-3ecd193d84a7",
+  "bundleHash": "81217548f2dc2e01322e1609167d684727c0b57c77c5b2a21258d83f12d30d4b",
+  "inputHash": "516869fedbd120c5ec70f316e388f65528bb968b3efb9578385ecb38350f2c5d",
+  "record": {
+    "schemaVersion": 1,
+    "inputHash": "516869fedbd120c5ec70f316e388f65528bb968b3efb9578385ecb38350f2c5d",
+    "shots": [
+      {
+        "shotId": "shot-1-pick-book",
+        "startFrame": 0,
+        "endFrame": 120,
+        "stageKey": "04b48614cb2f95bc500be4ddcf2f25d39e9bb1296d0e73aa3bb3dbb1eb3fde00",
+        "sha256": "30e27cf43a9891d2ca03e801c2ca10deee239b9eb31f8e7b2e496a3fc0c3e8f6",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "30e27cf43a9891d2ca03e801c2ca10deee239b9eb31f8e7b2e496a3fc0c3e8f6",
+          "bytes": 3740601,
+          "width": 1920,
+          "height": 1080,
+          "durationSec": 5,
+          "fps": 24,
+          "frames": 120,
+          "audio": false
+        }
+      },
+      {
+        "shotId": "shot-2-date-reveal",
+        "startFrame": 120,
+        "endFrame": 264,
+        "stageKey": "d85fa382817374b5ac3c36b52ac6613546d02e0c4a88f3c0f03cc3b92484c598",
+        "sha256": "8688d5827a80b5ab96f8ce106a08e5bf43dc9f369984b075a0c65e814c7f93a6",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "8688d5827a80b5ab96f8ce106a08e5bf43dc9f369984b075a0c65e814c7f93a6",
+          "bytes": 3143635,
+          "width": 1920,
+          "height": 1080,
+          "durationSec": 6,
+          "fps": 24,
+          "frames": 144,
+          "audio": false
+        }
+      },
+      {
+        "shotId": "shot-3-plaza-gathering",
+        "startFrame": 264,
+        "endFrame": 384,
+        "stageKey": "a1e46d5464fe63901e647592af719de60bed15a663fa71e47702c428675aa755",
+        "sha256": "1f92eeb94ff097d9695a3a0dd62e401cad2d2ed0d4e4d55439353e74c871f0d7",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "1f92eeb94ff097d9695a3a0dd62e401cad2d2ed0d4e4d55439353e74c871f0d7",
+          "bytes": 1976485,
+          "width": 1920,
+          "height": 1080,
+          "durationSec": 5,
+          "fps": 24,
+          "frames": 120,
+          "audio": false
+        }
+      },
+      {
+        "shotId": "shot-4-invitation-end",
+        "startFrame": 384,
+        "endFrame": 480,
+        "stageKey": "b98bc65fd6a3233341a2eb482281595bd7349a036bd99ecf97933ef6717d62f0",
+        "sha256": "ac1698d97681c9eb4f4a973258a7177c317ad42da2e205ad349a0329fcfe6b19",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "ac1698d97681c9eb4f4a973258a7177c317ad42da2e205ad349a0329fcfe6b19",
+          "bytes": 1864289,
+          "width": 1920,
+          "height": 1080,
+          "durationSec": 4,
+          "fps": 24,
+          "frames": 96,
+          "audio": false
+        }
+      }
+    ],
+    "sequence": {
+      "stageKey": "7a1c593ea3fbf9afb073b4ffb6404c22dbcbf14f88f1f40c590c507c8e920501",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo/picture-sequence/7a1c593ea3fbf9afb073b4ffb6404c22dbcbf14f88f1f40c590c507c8e920501/output/picture.mp4",
+      "technicalQa": {
+        "result": "pass",
+        "sha256": "c2a7ff0d79a797b16e88199700b5fc7ca125d9c0e68226646b95eb65f7dee3d9",
+        "bytes": 16695765,
+        "width": 1920,
+        "height": 1080,
+        "durationSec": 20,
+        "fps": 24,
+        "frames": 480,
+        "audio": false
+      },
+      "totalFrames": 480
+    },
+    "qualityStatus": "technical_only"
+  },
+  "replayIdentical": true,
+  "additionalModelCalls": 0,
+  "resultPublished": false,
+  "limits": "Isolated diagnostic approval of existing technical preview; real frozen source rendered at approved 1080p and independently decoded, then cold-replayed. No regeneration, original state mutation or model calls. Picture-only technical evidence; known style/readability failures remain, audio composition/full QA/delivery not passed.",
+  "coldReplayExecutedAt": "2026-10-03T09:59:29.960Z"
+}
