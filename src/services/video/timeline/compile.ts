@@ -24,8 +24,19 @@ function chineseNumber(value:string){
  return String(total+section+current);
 }
 const traditionalToSimplified=OpenCC.Converter({from:'t',to:'cn'});
+const englishOrdinalDays=new Map('first,second,third,fourth,fifth,sixth,seventh,eighth,ninth,tenth,eleventh,twelfth,thirteenth,fourteenth,fifteenth,sixteenth,seventeenth,eighteenth,nineteenth,twentieth,twenty-first,twenty-second,twenty-third,twenty-fourth,twenty-fifth,twenty-sixth,twenty-seventh,twenty-eighth,twenty-ninth,thirtieth,thirty-first'.split(',').map((word,index)=>[word,index+1]));
+const englishDatePattern=new RegExp(`\\b(January|February|March|April|May|June|July|August|September|October|November|December)\\s+(${[...englishOrdinalDays.keys()].sort((a,b)=>b.length-a.length).map(word=>word.replace(/-/g,'[ -]+')).join('|')}|\\d{1,2}(?:st|nd|rd|th)?)\\b`,'gi');
+function normalizeEnglishDate(value:string){
+ return value.replace(englishDatePattern,(match,month:string,ordinal:string)=>{
+  const word=ordinal.toLowerCase().replace(/[ -]+/g,'-'),numeric=/^(\d{1,2})(st|nd|rd|th)?$/.exec(word),day=englishOrdinalDays.get(word)??(numeric?Number(numeric[1]):undefined);
+  if(day===undefined||day<1||day>31)return match;
+  const suffix=day>=11&&day<=13?'th':['th','st','nd','rd'][day%10]??'th';
+  if(numeric?.[2]&&numeric[2]!==suffix)return match;
+  return `${month} ${day}`;
+ });
+}
 function normalizeAsr(value:string){
- return traditionalToSimplified(value.normalize('NFKC')).replace(/([零〇一二三四五六七八九十百千万两]+)(?=年|月|日|号|点|分|秒|个|次|元|米|公里|倍|层|页|天|小时|分钟|%|％)/gu,match=>chineseNumber(match)).replace(/[\p{P}\s]/gu,'').toLowerCase();
+ return normalizeEnglishDate(traditionalToSimplified(value.normalize('NFKC'))).replace(/([零〇一二三四五六七八九十百千万两]+)(?=年|月|日|号|点|分|秒|个|次|元|米|公里|倍|层|页|天|小时|分钟|%|％)/gu,match=>chineseNumber(match)).replace(/[\p{P}\s]/gu,'').toLowerCase();
 }
 export function assertAsrExpected(originalExpected:string,proposedExpected:string,asr:string){if(originalExpected!==proposedExpected)throw Error('ASR_EXPECTATION_CHANGED');if(normalizeAsr(originalExpected)!==normalizeAsr(asr))throw Error('ASR_MISMATCH')}
 export function compileTimeline(input:{durationSec:number;fps:24|30|60;shots:ShotRange[];narration:NarrationRange[];captions:CaptionRange[]}){

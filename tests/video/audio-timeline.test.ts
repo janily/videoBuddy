@@ -22,6 +22,21 @@ it('normalizes date numeral notation without hiding a wrong spoken date',()=>{
  expect(()=>assertAsrExpected('上海的活动将在十月八日开始','上海的活动将在十月八日开始','上海的活動將在10月9日開始')).toThrow('ASR_MISMATCH');
  expect(()=>assertAsrExpected('上海的活动将在十月八日开始','上海的活动将在十月八日开始','上海的活动将在10月9日开始。')).toThrow('ASR_MISMATCH');
 });
+it('normalizes English calendar ordinals while preserving the unchanged source',()=>{
+ for(const [original,recognized] of [['October eighth','October 8th'],['January twenty-first','January 21st'],['March thirty first','March 31'],['February eleventh','February 11th']]){
+  expect(()=>assertAsrExpected(original,original,recognized)).not.toThrow();
+ }
+ expect(()=>assertAsrExpected('October eighth','October 8th','October 8th')).toThrow('ASR_EXPECTATION_CHANGED');
+});
+it('English calendar normalization rejects different dates and malformed ordinals',()=>{
+ for(const recognized of ['October 9th','October 18th','September 8th','October 8nd','October 08nd'])expect(()=>assertAsrExpected('October eighth','October eighth',recognized)).toThrow('ASR_MISMATCH');
+ expect(()=>assertAsrExpected('February eleventh','February eleventh','February 11st')).toThrow('ASR_MISMATCH');
+});
+it('does not normalize ordinal names or Chinese homophones outside calendar notation',()=>{
+ expect(()=>assertAsrExpected('The eighth chapter','The eighth chapter','The 8th chapter')).toThrow('ASR_MISMATCH');
+ expect(()=>assertAsrExpected('种子醒来了，探出绿芽。','种子醒来了，探出绿芽。','種子醒來了 探出綠牙')).toThrow('ASR_MISMATCH');
+ expect(()=>assertAsrExpected('青禾社区','青禾社区','清和社区')).toThrow('ASR_MISMATCH');
+});
 it('half-open shot ranges cover the film without undeclared gaps or overlaps',()=>{
  expect(()=>compileTimeline({durationSec:20,fps:24,shots:[{id:'s',startFrame:1,endFrame:480}],narration:[],captions:[]})).toThrow('TIMELINE_COVERAGE');
  expect(compileTimeline({durationSec:20,fps:24,shots:[{id:'s',startFrame:0,endFrame:480}],narration:[],captions:[]}).totalFrames).toBe(480);

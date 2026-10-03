@@ -1,0 +1,62 @@
+{
+  "executedAt": "2026-10-03T17:54:42.092Z",
+  "sourceEvidenceHash": "6a98f9838a9109c309cc33ae495b7bb2c7c61dacb2509322eb562ed4f12696b0",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ",
+  "status": "blocked",
+  "lines": [
+    {
+      "lineId": "line_1",
+      "scenario": "frozen_new_theme",
+      "expectedAsrText": "把种子轻轻埋进泥土。",
+      "recognizedText": "把種子輕輕埋進泥土",
+      "sourceWavSha256": "24598eed5d50b1d4d2ebc7a441fcddcf91ceb01c3cf88db6f4e643972531276e",
+      "status": "pass"
+    },
+    {
+      "lineId": "line_2",
+      "scenario": "frozen_new_theme",
+      "expectedAsrText": "适量浇水，润湿大地。",
+      "recognizedText": "适量浇水,润湿大地。",
+      "sourceWavSha256": "f1c4fc819de1883db63d12613b98aef4589f141a81c39c811f9cd7225993630d",
+      "status": "pass"
+    },
+    {
+      "lineId": "line_3",
+      "scenario": "frozen_new_theme",
+      "expectedAsrText": "种子醒来了，探出绿芽。",
+      "recognizedText": "種子醒來了 探出綠牙",
+      "sourceWavSha256": "fc0ffd605a9034915c9f133eeb4971b513d8fcc89e7be4f105059d2524649e4c",
+      "status": "fail",
+      "errorCode": "ASR_MISMATCH"
+    },
+    {
+      "lineId": "line_4",
+      "scenario": "frozen_new_theme",
+      "expectedAsrText": "一起观察成长，耐心照料。",
+      "recognizedText": "一起觀察成長 耐心照料",
+      "sourceWavSha256": "13ee3d7c08032d28d857f48af4f5e8d621797a4218546a404b2424dec436f9e9",
+      "status": "pass"
+    },
+    {
+      "lineId": "frontend_date",
+      "scenario": "date_english_regression",
+      "expectedAsrText": "上海的活动将在十月八日开始",
+      "recognizedText": "上海的活动将在10月8日开始。",
+      "sourceWavSha256": "6676380a72030f3bf2fee6d99e1e0ea87fa32ce3a4998a762dbaf8384e4f46a0",
+      "status": "pass"
+    },
+    {
+      "lineId": "frontend_english",
+      "scenario": "date_english_regression",
+      "expectedAsrText": "The event in Shanghai begins on October eighth",
+      "recognizedText": "The event in Shanghai begins on October 8th.",
+      "sourceWavSha256": "4a6da566b07a5d13c8824e539c6b2b762e94677a2f3f35804559010fee4795e3",
+      "status": "pass"
+    }
+  ],
+  "networkCalls": 0,
+  "mediaExecutions": 0,
+  "providerCalls": 0,
+  "sourceControlAndBudgetUnchanged": true,
+  "limits": "Read-only recheck of existing independently generated WAV/transcript bytes. English month/day ordinal notation is normalized for comparison; frozen expectations and old failure report are unchanged. Chinese homophones/proper-name differences remain rejected. No new TTS, ASR execution, audio or preview publication."
+}

@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 最新英文日期表示修正：只对英文月名+1–31日合法序数规范化比较，原expected与音频不改；错误日期/月份/suffix及青禾清和、绿芽绿牙继续拒绝。3新增RED→GREEN、102文件536单元与lint/build/构建后types通过，双轴clean。原六WAV/原blind transcript只读mustExist复核5通过1失败，0producer/provider/network，原source control/预算不变；旧4/2报告原样保留。原四句仍3/4，绿芽→綠牙仍blocked，未发布预览。见 [英文日期验证](evidence/asr-date-normalization-validation.md)。下一步诊断原音频上下文，不自动降低门槛。
+
 2026-10-04 语音前端增量：复合词词典声调修正、实际规范化后英文片段发现与型号连接符/负数区分，实际9项前端测试通过；应用102文件533项与lint/build/构建后types通过。两个APT构建明确失败（直连80、主机代理拒绝），最终构建使用ASR同digest固定Python base和原Node stage，最终固定工具镜像b145374e…已构建，无网9tests/pipcheck通过。六条真实TTS生成后独立ASR四通过、原绿芽→绿牙与英文eighth→8th两失败，原大地句修复通过，原control/预算不变、0network，不能将前端音素测试计为发音或全片验收。见 [前端验证](evidence/voice-front-end-validation.json)。
 
 2026-10-04 新主题真实验证：2模型响应/用量已完整核证settled，无新增费用unknown。种子发芽四镜头TTS后第二句“润湿大地”识别成“润湿大的”，Worker保持failed/ASR_MISMATCH且不发布。旧固定镜像phonemizer实际确认“大地/土地”末字地错误de5；本轮新镜像已修复且原第二句ASR通过，但原失败Worker不重写，新剩余两项失败见上方最新记录；不是缺云凭据或额度，不能改预期文案掩盖。见 [新主题验证](evidence/new-theme-validation.md)。后续原特殊人名、全片质量/正式改稿/全部风格验收继续缺。

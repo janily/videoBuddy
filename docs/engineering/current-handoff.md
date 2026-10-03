@@ -1,5 +1,7 @@
 # 当前工程交接（更新至2026-10-04）
 
+2026-10-04 最新英文日期表示修正：只对英文月名+1–31日合法序数规范化比较，原expected与音频不改；错误日期/月份/suffix及青禾清和、绿芽绿牙继续拒绝。3新增RED→GREEN、102文件536单元与lint/build/构建后types通过，双轴clean。原六WAV/原blind transcript只读mustExist复核5通过1失败，0producer/provider/network，原source control/预算不变；旧4/2报告原样保留。原四句仍3/4，绿芽→綠牙仍blocked，未发布预览。见 [英文日期验证](evidence/asr-date-normalization-validation.md)。下一步诊断原音频上下文，不自动降低门槛。
+
 videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付文档保留；未 push、未生产部署。真实模型已调用并保留历史对账与未知调用记录，费用授权不限次数/上限。当前仍是阶段工程，C0/C1/C2 均未达到。用户已将 Vercel 方案改为完全自托管；以 [自托管架构](self-hosted-architecture.md) 和 [执行计划](self-hosted-plan.md) 为当前部署依据，原规格的产品功能、SSE、持久消息、43 风格及验收范围继续有效。
 
 最新真实新主题：独立种子发芽中文场景走实际 Director stream/原消息归档/preparePreview intent/队列/Worker/pipeline，2次远端调用两条settled，响应SHA与actual usage4992/1893及4290/4737核证。四实际TTS生成，第二句“大地”ASR成“大的”，保持ASR_MISMATCH/failed、无预览或结果。旧固定语音镜像实际phonemizer将名词“大地/土地”的地无条件转成de5。当前前端修正已完成实际RED→9个GREEN（另修GPT-4片段/连接符），应用533单元及lint/build/构建后types通过；最终镜像b145374e…构建/依赖检查/无网9tests已通过，六条真实TTS全部生成、独立ASR四通过两失败：原“大地”句修复通过；原第三句绿芽→绿牙和英文eighth→8th仍ASR_MISMATCH，不算整段旁白完成。两个APT构建失败及中间未固定构建工具的镜像记录保留。下一步处理剩余中文识别与英文序数表示差异，再继续完整新主题链路，不再只推进journal小切片。实际声音/失败记录见 [旁白验证](evidence/voice-front-end-validation.md)，最初模型链路见 [新主题验证](evidence/new-theme-validation.md)。原unknown和质量失败不变，费用不是阻断。
