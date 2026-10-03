@@ -1,6 +1,7 @@
 export class StoreConflict extends Error { constructor(){super('STORE_CONFLICT')} }
 export class StoreMissing extends Error { constructor(){super('STORE_NOT_FOUND')} }
 export interface AtomicStore {
+ listKeys?(prefix:string,maxDepth:number):Promise<string[]>;
  readFresh<T>(key:string):Promise<{value:T;etag:string}>;
  create<T>(key:string,value:T):Promise<void>;
  cas<T>(key:string,etag:string,value:T):Promise<void>;

@@ -11,6 +11,8 @@ import type {ProjectStore} from '@/services/video/storage/project-store';
 import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
 import {assertPreviewProductionFence} from './fence';
 
+import {withAccountedModel} from '@/services/video/budget/model-call';
+
 type Decide = (understanding:Understanding, maxOutputTokens:number, env:Environment)=>Promise<unknown>;
 interface StageOptions {decide?:Decide; limits?:ModelLimits; env?:Environment}
 
@@ -28,7 +30,8 @@ export async function prepareTreatmentStage(projects:ProjectStore, projectId:str
  const limits=options.limits||modelLimits(env);
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-treatment-${revisionId}`,{inputTokens:contextBytes+4096,outputTokens:5000},limits);
  const plan=await runEffect<TreatmentPlan>(projects.store,`${prefix}/operations/${operationId}/effects/treatment/${revisionId}`,async()=>{
-  return guardTreatment(await (options.decide||runTreatment)(understanding,reservation.maxOutputTokens,env),understanding,knowledge.sha256);
+  const raw=options.decide?await options.decide(understanding,reservation.maxOutputTokens,env):await withAccountedModel(projects.store,reservation.reservation,()=>runTreatment(understanding,reservation.maxOutputTokens,env));
+  return guardTreatment(raw,understanding,knowledge.sha256);
  });
  guardTreatment(plan,understanding,knowledge.sha256);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;

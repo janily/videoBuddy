@@ -45,3 +45,7 @@ MODEL_API_KEY、MODEL_BASE_URL 与四角色模型现已由用户提供并授权�
 可信stems和主混音已在固定无网Docker实跑；实际Native Treatment/Visual/Audio的20秒720p AAC立体声技术片通过全解码和响度。旧缺真实Visual/Audio调用的阻断已消除；AudioExecution schema2已归档四条实际PCM、冻结完成收据与固定输入寻址执行槽；FilmSpec producer/独立loader和Composite schema4已接入归档立体声master。未执行音乐、输出替换及弱旧schema1仍拒绝，不能用技术片绕过发布门槛。声音听验、逐镜事实/阅读时间与风格QA、1080p、真实预览/批准/渲染/导出、43风格86基线仍缺。
 
 Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工程>=22.13<23后安装Acorn8.15.0成功。当前npm audit实报11个high：braces/http-cache-semantics及传播依赖，主要经eslint-config-next/@swc工具链；不能用建议的Next14降级或force自动修复。后续需核实可用补丁/替代及生产依赖影响，安全验收未通过。
+
+模型对账更新：四个原生生成入口已接SDK实际usage、不可变receipt与跨日持久部署门闩；已知超限冻结，未知用量冻结，旧日未用预约拒绝。未知消费不因新UTC日/新项目消失；旧无版本计数必须审计，不自动迁移或清零。真实单次探针HTTP200/4103input/2716output/settled，见 [model-accounting-probe.json](evidence/model-accounting-probe.json)。此前缺实际usage对账的开发缺口已消除，但提供方仍不执行硬token限制，对账无法阻止单次已发请求的额外收费。生产生成默认仍关闭；独立Critic、完整预览和制作Worker/API/UI及剩余验收继续开发。
+
+历史迁移边界复审P2：旧日/其他项目无gate legacy账本可绕过首次初始化。新增精确旧数据fixture先成功（测试退出1），修复为首次必须取得有界、不跟随symlink的所有日账本及项目budget清单；已有calls>0且gate缺失即MODEL_ACCOUNTING_MIGRATION_REQUIRED，不建active:null，不自动迁移或清零。缺清单能力、symlink清单均阻断；只允许全空新作用域初始化。升级时须停止旧worker并先审计历史占用，不能与旧版本并行写账本。新格式跨日故障/重放规则保持不变。

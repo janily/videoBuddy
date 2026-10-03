@@ -11,6 +11,8 @@ import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budge
 import {runDirector,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext} from '@/mastra/video/director';
 import {TextAnalysis} from '@/services/video/assets/analysis';
 
+import {withAccountedModel} from '@/services/video/budget/model-call';
+
 type Decide=typeof runDirector;
 export async function runDirectorOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:{decide?:Decide;limits?:ModelLimits}={}){
  const p=`projects/${projectId}`,opKey=`${p}/operations/${operationId}`;
@@ -41,7 +43,8 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
   const bytes=Buffer.byteLength(JSON.stringify(directorContext(understanding,context)));if(bytes>60000)throw Error('CONTEXT_LIMIT');
   const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
   const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
-   const result=GuidanceDecisionSchema.parse(await (options.decide||runDirector)(understanding,context,reservation.maxOutputTokens));
+   const raw=options.decide?await options.decide(understanding,context,reservation.maxOutputTokens):await withAccountedModel(store,reservation.reservation,()=>runDirector(understanding,context,reservation.maxOutputTokens));
+   const result=GuidanceDecisionSchema.parse(raw);
    guardGuidance(result,context,false,understanding);return result;
   });
   const currentOp=(await store.readFresh<{status:string}>(opKey)).value;
@@ -71,6 +74,8 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
   if(!archived||archived.status!=='completed')await projects.archiveMessage(projectId,{id:assistantId,ordinal,role:'assistant',text:archived?.text||'',status:cancelled?'stopped':'interrupted',contentVersion:1,operationId});
   await updateJson(store,opKey,(value:typeof op)=>['succeeded','failed','cancelled','interrupted'].includes(value.status)?value:{...value,status});
   await updateJson(store,`${p}/control`,(value:ProjectControl)=>({...value,activeConversation:value.activeConversation===operationId?null:value.activeConversation,controlVersion:value.controlVersion+1}));
-  await emit('operation.terminal',{status,...(status==='interrupted'?{errorCode:error instanceof Error&&error.message==='BUDGET_EXCEEDED'?'BUDGET_LIMIT':'PROVIDER_UNAVAILABLE'}:{}),retryable:false});
+  const reason=error instanceof Error?error.message:'PROVIDER_UNAVAILABLE';
+  const budgetCode=['BUDGET_EXCEEDED','MODEL_BUDGET_OVERRUN'].includes(reason)?'BUDGET_LIMIT':['MODEL_USAGE_UNCERTAIN','MODEL_USAGE_INVALID','MODEL_ACCOUNTING_INVALID','MODEL_ATTEMPT_ALREADY_STARTED','MODEL_RESERVATION_EXPIRED','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(reason)?'MODEL_USAGE_UNCERTAIN':'PROVIDER_UNAVAILABLE';
+  await emit('operation.terminal',{status,...(status==='interrupted'?{errorCode:budgetCode}:{}),retryable:false});
  }
 }

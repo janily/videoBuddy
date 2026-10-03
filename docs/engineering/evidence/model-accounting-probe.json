@@ -1,0 +1,51 @@
+{
+  "executedAt": "2026-10-03T07:12:54.854Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/model-accounting/run-mEINda",
+  "projectId": "a68d76a9-8f8a-4f74-9feb-12a3a8edf959",
+  "reservationId": "f3ebfbc5b37b22c3367a6765647ddf12f0935fcb677248238981e6aace8d1ee9",
+  "providerOrigin": "https://grsaiapi.com",
+  "model": "gemini-3.8-flash",
+  "reserved": {
+    "inputTokens": 8053,
+    "outputTokens": 4000
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 4000,
+      "status": 200,
+      "responseSha256": "659b3e1ce05df2f3fb60d825bc9947b8ccdcdce3be744f79b99f4fe8ca70620a",
+      "responseFile": "model-diagnostics/659b3e1ce05df2f3fb60d825bc9947b8ccdcdce3be744f79b99f4fe8ca70620a.json",
+      "usage": {
+        "prompt_tokens": 4103,
+        "completion_tokens": 2716,
+        "total_tokens": 6819,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "actual": {
+    "state": "settled",
+    "startedAt": "2026-10-03T07:12:38.868Z",
+    "inputTokens": 4103,
+    "outputTokens": 2716
+  },
+  "gate": {
+    "schemaVersion": 1,
+    "active": null
+  },
+  "budget": {
+    "calls": 1,
+    "inputTokens": 8053,
+    "outputTokens": 4000
+  },
+  "status": "pass",
+  "semanticStatus": "validated",
+  "nextCallRejected": true,
+  "additionalModelCalls": 0,
+  "limits": "Explicit one-call paid native Mastra Director experiment in a new isolated technical experiment root, with zero retry, HTTP deadline and actual SDK usage ledger. Provider has empirically ignored token caps; no hard fee guarantee. Persistent deployment gate spans UTC midnight. Unknown/overrun freeze or configured call-limit denial is preserved, no refund/retry or production activation. Historical counters require audit, not automatic reset. Diagnostic response only in ignored private root."
+}

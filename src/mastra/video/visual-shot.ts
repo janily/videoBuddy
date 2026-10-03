@@ -1,3 +1,4 @@
+import {markModelCallStarted,recordModelUsage} from '@/services/video/budget/model-call';
 import type {Understanding} from '@/contracts/video/domain';
 import {guardTreatment} from '@/contracts/video/treatment';
 import {guardVisualShot,CompleteVisualShotSchema,type VisualShotSource} from '@/contracts/video/visual-shot';
@@ -20,6 +21,8 @@ export async function runVisualShot(understanding:Understanding,rawTreatment:unk
  const context=JSON.stringify({understanding,treatment:{summary:treatment.summary,selectedOptionId:treatment.selectedOptionId,selectionReason:treatment.selectionReason,shots:treatment.shots,script:treatment.script},timingDraftHash:expectedTimingHash,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},currentShot:shot,seed,style:{slug:style.slug,packVersion:style.packVersion,rulesHash:knowledge.sha256,rules:knowledge.rules},requirements:{logicalSize:understanding.preferences.aspect==='16:9'?[1920,1080]:[1080,1920],absoluteTime:true,offline:true,direction:'Declare actual shot purpose, framing, camera and actor IDs from this source; return the given seed unchanged.'}});
  if(Buffer.byteLength(context)>180000)throw Error('CONTEXT_LIMIT');
  const agent=createVideoAgent('visual',instructions,env);
+ await markModelCallStarted();
  const response=await agent.generate(context,{structuredOutput:{schema:CompleteVisualShotSchema,jsonPromptInjection:env.MODEL_PROVIDER==='openai-compatible',errorStrategy:'strict'},maxSteps:1,modelSettings:{maxOutputTokens,maxRetries:0}});
+ await recordModelUsage(response.usage);
  return guardVisualShot(response.object,understanding,treatment,timing,expectedTimingHash,seed);
 }

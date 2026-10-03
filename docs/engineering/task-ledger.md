@@ -151,3 +151,13 @@ Audio补明确采样/包络/source/cue约束，显式新operation的一次付费
 此增量尚未接预览Worker/API/UI批准，未完成语义/阅读/风格/听验，原青禾ASR失败及provider忽略token cap/缺实际用量对账仍为阻断。43风格86基线not_run，C0/C1/C2未达到，T10/T11仍partial、deployed=false。首次完整56文件223项/lint/typecheck通过，build退出0但出现master.ts动态路径追踪警告；纯滤镜编译拆为独立模块，包读取不再引入Docker执行模块，随后重新验证构建和回归。
 
 最终验证：纯滤镜模块分离后build退出0且无追踪警告；56文件223项、无警告lint、构建后typecheck和diff-check均退出0。两轴复审关闭P1、无剩余发现，容器清理完毕。仅本地提交，无push/部署，项目继续开发。
+
+2026-10-03 T03/T06 模型实际用量对账增量：四个真实 Mastra 生成入口在请求前持久标启动，返回后先按 SDK input/output 总量结算，再校验语义，不重复加 reasoning token。保守预留不退款；超限/未知用量/已启动调用不自动重试。旧无accountingVersion计数拒绝继续消费，需审计，不自动重置。
+
+失败→通过：对账首轮缺模块/本地HTTP协议case未标启动失败；实现后正常/超限/缺usage通过。非法风格先记实际消费再拒绝语义。旧账本断言先错误允许，修复fail-closed。Director预算中断映射及过期预约错误原为PROVIDER_UNAVAILABLE，断言失败后修正为BUDGET_LIMIT/MODEL_USAGE_UNCERTAIN并归档中断消息、SSE终态不可自动重试。两轴审查各自复现跨UTC午夜P1；三条跨日测试先失败，新增持久部署级单活跃门闩、过期预约拒绝后通过。请求前计数写失败保留占用，两份计数均已知正常结算后才解除，旧完成回执重放不清除新占用。
+
+真实验证：Node22 node --env-file=.env.grsai.local --import tsx scripts/video/probe-model-accounting.ts --accounting。仅1次HTTP200，gemini-3.8-flash实际4103 input/2716 output，账本settled、gate.active=null，下一调用因次数上限拒绝，见 [model-accounting-probe.json](evidence/model-accounting-probe.json)。新隔离技术实验未迁移/重置旧制作账本。提供方仍忽略token参数，不能保证单次硬计费上限。最终58文件240项/lint/无警告build/构建后typecheck/diff-check退出0。整个项目继续开发，C0/C1/C2均未达到，未push或部署。
+
+历史迁移边界复审P2：旧日/其他项目无gate legacy账本可绕过首次初始化。新增精确旧数据fixture先成功（测试退出1），修复为首次必须取得有界、不跟随symlink的所有日账本及项目budget清单；已有calls>0且gate缺失即MODEL_ACCOUNTING_MIGRATION_REQUIRED，不建active:null，不自动迁移或清零。缺清单能力、symlink清单均阻断；只允许全空新作用域初始化。升级时须停止旧worker并先审计历史占用，不能与旧版本并行写账本。新格式跨日故障/重放规则保持不变。
+
+迁移修复最终验证：两轴独立复审关闭P2，无剩余发现；58文件243项、lint、无警告build、构建后typecheck及diff-check退出0。真实单次用量证据保留（没有因只读初始化修复额外付费重跑）。该增量仅本地提交；继续下一阶段开发。

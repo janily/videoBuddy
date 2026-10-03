@@ -3,11 +3,13 @@ import {spawn} from 'node:child_process';
 import {readFile} from 'node:fs/promises';
 import {isAbsolute,join} from 'node:path';
 import {AtomicStore,StoreConflict,StoreMissing} from './atomic-store';
+import {listStateKeys} from './list-keys';
 
 interface Result {ok?:boolean;error?:string}
 export class FileStore implements AtomicStore {
  constructor(private readonly root:string){if(!isAbsolute(root))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR must be absolute')}
  path(key:string){if(!/^[A-Za-z0-9/_-]+$/.test(key)||key.split('/').some(part=>!part))throw Error('INVALID_KEY');return join(this.root,key+'.json')}
+ listKeys(prefix:string,maxDepth:number){return listStateKeys(this.root,prefix,maxDepth)}
  async readFresh<T>(key:string):Promise<{value:T;etag:string}>{
   let body:Buffer;try{body=await readFile(this.path(key))}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')throw new StoreMissing();throw error}
   return{value:JSON.parse(body.toString('utf8')) as T,etag:createHash('sha256').update(body).digest('hex')};

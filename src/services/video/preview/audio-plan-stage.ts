@@ -18,6 +18,8 @@ import {TimingDraftSchema,type TimingDraft} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {assertPreviewProductionFence} from './fence';
 
+import {withAccountedModel} from '@/services/video/budget/model-call';
+
 const digest=z.string().regex(/^[a-f0-9]{64}$/);
 const RecordSchema=z.strictObject({schemaVersion:z.literal(1),briefVersion:z.number().int().nonnegative(),understandingSha256:digest,treatmentSha256:digest,timingDraftSha256:digest,seed:z.number().int().min(0).max(0xffffffff),planRef:ObjectRefSchema,executionStatus:z.literal('not_started')});
 export type AudioPlanStageRecord=z.infer<typeof RecordSchema>;
@@ -56,7 +58,11 @@ export async function prepareAudioPlanStage(projects:ProjectStore,projectId:stri
  const contextBytes=Buffer.byteLength(canonicalJson({understanding,treatment,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},seed}))+Buffer.byteLength(knowledge.rules);
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-audio-${revisionId}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
- const plan=await runEffect<AudioPlan>(projects.store,`${prefix}/operations/${operationId}/effects/audio/${revisionId}`,async()=>guardAudioPlan(await (options.decide||runAudioPlan)(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,reservation.maxOutputTokens,env),understanding,treatment,timing,timingRecord.draftRef.sha256,seed));
+ const plan=await runEffect<AudioPlan>(projects.store,`${prefix}/operations/${operationId}/effects/audio/${revisionId}`,async()=>{
+  const invoke=()=>runAudioPlan(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,reservation.maxOutputTokens,env);
+  const raw=options.decide?await options.decide(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,reservation.maxOutputTokens,env):await withAccountedModel(projects.store,reservation.reservation,invoke);
+  return guardAudioPlan(raw,understanding,treatment,timing,timingRecord.draftRef.sha256,seed);
+ });
  guardAudioPlan(plan,understanding,treatment,timing,timingRecord.draftRef.sha256,seed);checkAssets(plan,control);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});checkAssets(plan,latest);

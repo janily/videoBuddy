@@ -32,3 +32,15 @@ it('attachment-only input gives the Director actual saved Markdown bytes with as
  await runDirectorOperation(store,events,projectId,operationId,{decide,limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
  expect((await projects.view(owner,projectId)).messages.at(-1)?.text).toBe('资料写着活动日期是10月8日。');
 });
+it.each(['MODEL_BUDGET_OVERRUN','MODEL_USAGE_UNCERTAIN','MODEL_RESERVATION_EXPIRED','MODEL_ACCOUNTING_MIGRATION_REQUIRED'])('archives interruption and emits the actual budget blocking reason (%s)',async code=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir);
+ const{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
+ const operationId=crypto.randomUUID();
+ await updateJson(store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,activeConversation:operationId,ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create('projects/'+projectId+'/operations/'+operationId,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ await runDirectorOperation(store,events,projectId,operationId,{decide:async()=>{throw Error(code)},limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ const stream=await events.readFrom(projectId,operationId,0),last=stream.at(-1)?.event;
+ expect(last?.type).toBe('operation.terminal');
+ expect(last?.payload).toMatchObject({status:'interrupted',errorCode:code==='MODEL_BUDGET_OVERRUN'?'BUDGET_LIMIT':'MODEL_USAGE_UNCERTAIN',retryable:false});
+ expect((await projects.view('owner',projectId)).messages.at(-1)?.status).toBe('interrupted');
+});

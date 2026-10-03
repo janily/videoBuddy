@@ -3,8 +3,10 @@ import {mkdir,readFile,writeFile,rename,unlink,open} from 'node:fs/promises';
 import {dirname,join} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
 import {AtomicStore,StoreConflict,StoreMissing} from '@/services/video/storage/atomic-store';
+import {listStateKeys} from '@/services/video/storage/list-keys';
 export class FileStore implements AtomicStore{
  constructor(private root:string){}
+ listKeys(prefix:string,maxDepth:number){return listStateKeys(this.root,prefix,maxDepth)}
  path(key:string){if(!/^[a-zA-Z0-9/_-]+$/.test(key))throw Error('INVALID_KEY');return join(this.root,key+'.json')}
  async readFresh<T>(key:string){try{const body=await readFile(this.path(key));return {value:JSON.parse(body.toString()) as T,etag:createHash('sha256').update(body).digest('hex')}}catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')throw new StoreMissing();throw e}}
  async locked(key:string,fn:()=>Promise<void>){const path=this.path(key);await mkdir(dirname(path),{recursive:true});let handle;for(let attempt=0;attempt<100;attempt++){try{handle=await open(path+'.lock','wx');break}catch(e){if((e as NodeJS.ErrnoException).code!=='EEXIST')throw e;await new Promise(resolve=>setTimeout(resolve,2))}}if(!handle)throw new StoreConflict();try{await fn()}finally{await handle.close();await unlink(path+'.lock')}}

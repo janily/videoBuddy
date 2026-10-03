@@ -1,3 +1,4 @@
+import {withAccountedModel} from '@/services/video/budget/model-call';
 import {createHash} from 'node:crypto';
 import {z} from 'zod';
 import type {ObjectRef,Understanding} from '@/contracts/video/domain';
@@ -60,7 +61,9 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-visual-${revisionId}-${shotKey}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
  const source=await runEffect<VisualShotSource>(projects.store,effectKey,async()=>{
-  return guardVisualShot(await (options.decide||runVisualShot)(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed),understanding,plan,timing,timingRecord.draftRef.sha256,seed);
+  const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed);
+  const raw=options.decide?await options.decide(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed):await withAccountedModel(projects.store,reservation.reservation,invoke);
+  return guardVisualShot(raw,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
  });
  guardVisualShot(source,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
  if(source.assetIds.some(id=>!control.assets.some(asset=>asset.id===id&&asset.status==='ready')))throw Error('VISUAL_ASSET_NOT_READY');
