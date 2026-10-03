@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "authorizationId": "6458a741-5124-45bc-8664-749b7e0c03ef",
+  "authorizedAt": "2026-10-03T12:50:50.362Z",
+  "source": "user_instruction",
+  "sourceSha256": "804cd72065836da15a4fc32c2685856b163cc1c4e6031cb6d10400e7cdb80486",
+  "mode": "unlimited_validation"
+}

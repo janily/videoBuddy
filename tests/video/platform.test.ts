@@ -22,3 +22,13 @@ it('self-hosted generation configuration accepts an absolute data volume without
  const config=readConfiguration({VIDEO_GENERATION_ENABLED:'true',VIDEO_ENVIRONMENT:'local',VIDEO_APP_ORIGIN:'http://127.0.0.1:3000',VIDEO_SESSION_SIGNING_KEY:'x'.repeat(64),VIDEO_DATA_DIR:'/tmp/videoBuddy-persistent',MODEL_API_KEY:'test-key',VIDEO_DIRECTOR_MODEL:'model',VIDEO_PROJECT_MAX_MODEL_CALLS:'10',VIDEO_PROJECT_MAX_INPUT_TOKENS:'10000',VIDEO_PROJECT_MAX_OUTPUT_TOKENS:'5000',VIDEO_PROJECT_MAX_TTS_CHARACTERS:'10000',VIDEO_PROJECT_MAX_MEDIA_SECONDS:'600',VIDEO_DAILY_MAX_MODEL_CALLS:'20',VIDEO_DAILY_MAX_MEDIA_SECONDS:'1200'});
  expect(config.missing).toEqual([]);expect(()=>requireGeneration(config)).not.toThrow();
 });
+it('unlimited model validation replaces only model budget requirements, retaining media and TTS budgets',()=>{
+ const config=readConfiguration({VIDEO_MODEL_BUDGET_MODE:'unlimited_validation'});
+ expect(config.missing).not.toContain('VIDEO_PROJECT_MAX_MODEL_CALLS');
+ expect(config.missing).not.toContain('VIDEO_PROJECT_MAX_INPUT_TOKENS');
+ expect(config.missing).not.toContain('VIDEO_PROJECT_MAX_OUTPUT_TOKENS');
+ expect(config.missing).not.toContain('VIDEO_DAILY_MAX_MODEL_CALLS');
+ expect(config.missing).toContain('VIDEO_PROJECT_MAX_TTS_CHARACTERS');
+ expect(config.missing).toContain('VIDEO_DAILY_MAX_MEDIA_SECONDS');
+ expect(readConfiguration({VIDEO_MODEL_BUDGET_MODE:'typo'}).missing).toContain('VIDEO_MODEL_BUDGET_MODE');
+});

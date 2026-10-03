@@ -30,5 +30,5 @@ export async function recordModelUsage(usage:unknown){
  const parsed=typeof usage==='object'&&usage!==null?usage as {inputTokens?:unknown;outputTokens?:unknown}:null;
  const result=await settleModelUsage(context.store,context.reservation,{inputTokens:parsed?.inputTokens,outputTokens:parsed?.outputTokens});
  context.settled=true;
- if(result.state==='overrun')throw Error('MODEL_BUDGET_OVERRUN');
+ if(result.state==='overrun'&&!context.reservation.mode)throw Error('MODEL_BUDGET_OVERRUN');
 }

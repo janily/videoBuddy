@@ -1,0 +1,107 @@
+{
+  "executedAt": "2026-10-03T12:53:32.032Z",
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "operationId": "00059b52-be2a-4089-a4b4-e3b1cc47dc7c",
+  "authorizationId": "6458a741-5124-45bc-8664-749b7e0c03ef",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000
+    }
+  ],
+  "budget": {
+    "calls": 8,
+    "inputTokens": 232883,
+    "outputTokens": 86879,
+    "reservations": {
+      "f4fd51c859c5eb6ad760b21818f480e7abc05a22cef1d612c7d74ba29a1e7236": "7197950de1c3c307247c517522f9f41eb48da4779ba7f5b2c38254f641737275",
+      "4f442b6043898fa611432c5b57d5c4f2bd40b5a4b2f23ea4c5dfc5540f4e5507": "190ce9e7caa99eb602ee310a5a0b4594eee803d28f363b06ab0e234303239018",
+      "da8e44dbcc9c1ed85b931fb640ebd8ae8f7f0b8066cb8aefd217413a53c981f1": "2359a100f9f34e2a1f18cdabd5380ae1c1719f049039e052ef0fe4db0ac0fbc7",
+      "5dae82690f86688025715d3fe050c8e32a099f558985853cbfb646e0f2a9ddc2": "21b5c29de525e3b5d192ed219a213b0d8dbb07e7fff5b873d53aea5cbafe2fc2",
+      "0bd15d78ae71ef9cd4845fc3e5816cd09a01f4e1994d0aaf283cf4ab5f307dc2": "ac92d2b5481487a18e5667edc9862fbf9a33a941f1fb29a3150787dac0be4ca2",
+      "e5ff3d2c08fdced621173f985267ccd74a171b18d56a38991dea0be438fac413": "0d4672351017647ef99f2073ed4e2b8d5c2f9c10c6e6548757498f397d5185e7",
+      "5e283afaf714458e3c66cdd14641f444ec23abd53cde601c24d2a5d950a34724": "190ce9e7caa99eb602ee310a5a0b4594eee803d28f363b06ab0e234303239018",
+      "b68a55d1a85545b0d232df0c1cc2c4aa9f078f9863110eb148ad913cf2f694e7": "a645c09a1f915f15515a3c9848e00b921ef44e5c254a1066e6facf12fc2925b9"
+    },
+    "accountingVersion": 2,
+    "accounting": {
+      "f4fd51c859c5eb6ad760b21818f480e7abc05a22cef1d612c7d74ba29a1e7236": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "historical_report",
+        "inputTokens": 4364,
+        "outputTokens": 3560
+      },
+      "4f442b6043898fa611432c5b57d5c4f2bd40b5a4b2f23ea4c5dfc5540f4e5507": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "historical_report",
+        "inputTokens": 7168,
+        "outputTokens": 8626
+      },
+      "da8e44dbcc9c1ed85b931fb640ebd8ae8f7f0b8066cb8aefd217413a53c981f1": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "raw_response",
+        "responseSha256": "d3c1842a8e88ddf18aeff8caed839a3877440a7708650b78dda3040749d6dae3",
+        "inputTokens": 5613,
+        "outputTokens": 9214
+      },
+      "5dae82690f86688025715d3fe050c8e32a099f558985853cbfb646e0f2a9ddc2": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "raw_response",
+        "responseSha256": "24d84271139ab6155d408d4a58de6d98c7540683cea9e0547b185a16bb62fc28",
+        "inputTokens": 5604,
+        "outputTokens": 10414
+      },
+      "0bd15d78ae71ef9cd4845fc3e5816cd09a01f4e1994d0aaf283cf4ab5f307dc2": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "raw_response",
+        "responseSha256": "a9ee636363519d33ec2c066abf29c4221a9e83fbfb2a893c7b9f9b8b45c19ecf",
+        "inputTokens": 5611,
+        "outputTokens": 12115
+      },
+      "e5ff3d2c08fdced621173f985267ccd74a171b18d56a38991dea0be438fac413": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "raw_response",
+        "responseSha256": "0efed88738d4965ffc7b07089d99ff56839fbbf152adebe3ebf704f963cfda08",
+        "inputTokens": 5609,
+        "outputTokens": 12307
+      },
+      "5e283afaf714458e3c66cdd14641f444ec23abd53cde601c24d2a5d950a34724": {
+        "state": "historical",
+        "recordedAt": "2026-10-03T12:50:50.362Z",
+        "evidence": "raw_response",
+        "responseSha256": "4d78547d0a46902efa9c5637153029e7ca5db4864e8afbc0eeb7bf9744611b7b",
+        "inputTokens": 7438,
+        "outputTokens": 13457
+      },
+      "b68a55d1a85545b0d232df0c1cc2c4aa9f078f9863110eb148ad913cf2f694e7": {
+        "state": "unknown",
+        "startedAt": "2026-10-03T12:51:31.011Z"
+      }
+    }
+  },
+  "gate": {
+    "schemaVersion": 1,
+    "active": {
+      "id": "b68a55d1a85545b0d232df0c1cc2c4aa9f078f9863110eb148ad913cf2f694e7",
+      "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+      "day": "2026-10-03",
+      "hash": "a645c09a1f915f15515a3c9848e00b921ef44e5c254a1066e6facf12fc2925b9",
+      "state": "unknown",
+      "startedAt": "2026-10-03T12:51:31.011Z"
+    }
+  },
+  "result": null,
+  "errorCode": "The operation was aborted due to timeout",
+  "controlUnchanged": true,
+  "resultPublished": false,
+  "visualQualityPassed": false,
+  "limits": "Actual native Mastra multimodal review of the frozen approved 1080p film and two whole-film sampled-frame rounds, using real PNG bytes. Unlimited future validation explicitly authorized; each call has durable usage/effect records, no automatic retry, all historical reservations preserved. Sampled judgments do not prove continuous motion/listening/licenses or full delivery eligibility. Historical failures remain recorded; no production deployment."
+}
