@@ -85,3 +85,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T14 过期增量：100 control页/冷游标与恢复协调、本人的410和跨owner404、后台不续期、用户首次准入活动、迟到取消/消息不复活、同UUID冷归档不续期已验证；两轴复审clean。详见 [过期验证](evidence/project-retention-validation.md)。保留50,000 entry库存上限和扫描时效限制；物理数据/缓存/容器清理、运行任务超时协调仍未完成，不能宣称完整留存运维已交付。
 
 2026-10-03 未知模型请求只读调查：官方 GET /v1/api/result 文档要求供应商任务ID，图片/视频分类，没有说明凭本地请求或时间查询文本聊天用量；现有全片超时没有响应ID，未发送猜测查询。全片诊断期限现默认600秒，并完整保留正文超时证据，437单测及构建等检查通过；本增量0真实模型调用，不绕过旧unknown门闩。无限额度授权继续有效。详见 [超时诊断验证](evidence/model-probe-recovery-validation.md)。
+
+2026-10-03 T13 制作期间反馈/冷恢复缺口关闭：更正不再改变正在制作的brief，持久原输入保留预算与授权基线，取消后只保留not_started旧反馈；442单元及构建等检查通过。safe_direct真正修改音乐gain并混音/QA/新result、preview_required 新效果闭环仍未实现，不将此次归档当作完成改稿。0真实模型请求、旧unknown门闩保留；见 [反馈验证](evidence/pending-feedback-validation.md)。

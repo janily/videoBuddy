@@ -204,3 +204,5 @@ Audio补明确采样/包络/source/cue约束，显式新operation的一次付费
 T14 过期增量最终验证补记：86文件433项完整单测通过，目标53项、lint/build/构建后typecheck/diffcheck通过。全部新增回归包含于433项，两个轴最终clean。
 
 2026-10-03 T12 模型验证诊断增量：全片探针默认600秒/显式有效期限，保留通用120秒、caller取消与零重试；逐尝试记录开始/正文完成/错误类型。两轴独立发现正文超时导致未处理Promise/flush吞掉原报告的P2，已修复并回归。87文件437单元、目标6项、lint/build/构建后typecheck/diffcheck通过。0真实模型调用，未知原账目保持冻结；官方结果查询需供应商任务ID，原请求没有取得，不能用本地哈希代替。证据：[超时诊断验证](evidence/model-probe-recovery-validation.md)。完整项目及43风格86基线仍未完成，目标继续，未push/部署。
+
+2026-10-03 T13 制作期间反馈增量：Director接服务端制作上下文，更正/音乐无Patch反馈保存本轮真实用户消息与原制作/brief/epoch/result，不改冻结理解；取消/恢复后旧反馈不eligible、不自动应用。持久director-input/hash先于预算/effect，冷恢复原成本/基线，旧completed无原输入证明拒推断。两轴发现并关闭旧Patch错绑新brief、掉电重算context预算冲突两P2；真实FileStore completedCAS→掉电→cancelProduction→冷恢复producer1/budget1/not_started，当前cancelled/brief0/epoch1。新5/相关19、完整88文件442项及lint/build/构建后types/diffcheck通过；0远端模型，未改真实control/未知账目。见 [反馈验证](evidence/pending-feedback-validation.md)。safe_direct真实混音QA发布和大改闭环仍缺，T13/C0/C1/C2未完成，无push/部署，目标继续。

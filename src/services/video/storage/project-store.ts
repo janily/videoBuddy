@@ -9,6 +9,7 @@ import {readPreviewBundle}from '@/services/video/preview/commit';
 import {readResultManifest}from '@/services/video/results/publish';
 import {previewAction}from '@/services/video/preview/action';
 import {assertLiveProject}from '@/services/video/commands/user-activity';
+import {pendingFeedbackMessageIds}from '@/services/video/revisions/pending-feedback';
 export class ProjectStore{
  readonly index:IndexStore;constructor(readonly store:AtomicStore){this.index=new IndexStore(store)}
  async create(owner:string,input:CreateProjectRequest){
@@ -53,7 +54,7 @@ export class ProjectStore{
     productionFailure={operationId:last.operationId,errorCode:code,message};
    }
   }
-  return{productionFailure,projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:[],actions:[previewAction(c,u),...(preview?[{kind:'approve_preview',enabled:false,disabledReason:'完整视频制作尚未开放，效果片段和资料已保留。'}]:[])],expiresAt:c.expiresAt};
+  return{productionFailure,projectId:id,title:meta.title,controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.messages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:await pendingFeedbackMessageIds(this,c),actions:[previewAction(c,u),...(preview?[{kind:'approve_preview',enabled:false,disabledReason:'完整视频制作尚未开放，效果片段和资料已保留。'}]:[])],expiresAt:c.expiresAt};
  }
  async lookup(owner:string,ids:string[]){
   if(ids.length>20)throw Error('VALIDATION_FAILED');
