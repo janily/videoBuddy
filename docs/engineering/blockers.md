@@ -87,3 +87,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 未知模型请求只读调查：官方 GET /v1/api/result 文档要求供应商任务ID，图片/视频分类，没有说明凭本地请求或时间查询文本聊天用量；现有全片超时没有响应ID，未发送猜测查询。全片诊断期限现默认600秒，并完整保留正文超时证据，437单测及构建等检查通过；本增量0真实模型调用，不绕过旧unknown门闩。无限额度授权继续有效。详见 [超时诊断验证](evidence/model-probe-recovery-validation.md)。
 
 2026-10-03 T13 制作期间反馈/冷恢复缺口关闭：更正不再改变正在制作的brief，持久原输入保留预算与授权基线，取消后只保留not_started旧反馈；442单元及构建等检查通过。safe_direct真正修改音乐gain并混音/QA/新result、preview_required 新效果闭环仍未实现，不将此次归档当作完成改稿。0真实模型请求、旧unknown门闩保留；见 [反馈验证](evidence/pending-feedback-validation.md)。
+
+2026-10-03 T13 音乐gain生产者已实际实现/验证：原真实归档音乐和音效独立重混音−3dB、全样本误差6.26e-9、冷重放/原预算control不变通过，444单元及构建等检查通过。仍缺含实际旁白变体/响度听验/ASR、授权改稿operation→新revision包→完整QA→新result发布；不能将内部音轨当用户完成的视频。见 [音乐重混音验证](evidence/music-remix-validation.md)，0模型/网络，旧unknown冻结保留。
