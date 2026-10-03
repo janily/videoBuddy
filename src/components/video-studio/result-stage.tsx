@@ -1,8 +1,18 @@
 'use client';
 import type{ProjectView}from '@/contracts/video/project';
 import {PreviewPlayer} from './preview-player';
+import {ResultDownloads} from './result-downloads';
 const examples=['给我的咖啡店做一支介绍视频','把这份资料讲成一个小故事','做一段让人看懂的知识科普'];
 export function ResultStage({view,onExample,extra,onPreview,preparing=false,activity}:{extra?:React.ReactNode;view:ProjectView|null;onExample:(text:string)=>void;onPreview?:()=>void;preparing?:boolean;activity?:string}){
+ if(view?.currentResult){
+  const result=view.currentResult;
+  return<section className="work" aria-label="视频结果"><div className="work-inner"><span className="eyebrow">把想法带给更多人</span><h1 className="result-title">视频已经准备好了。</h1><p className="intro">播放看看。想调整哪里，继续在右边告诉我。</p>
+   <PreviewPlayer key={`player:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} label="完整视频"/>
+   {view.productionFailure&&<p role="alert">{view.productionFailure.message}</p>}
+   {view.activeProduction&&<p role="status">{activity||'新版本正在制作，已有视频仍可观看和下载。'}</p>}
+   <ResultDownloads key={`downloads:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} productionActive={Boolean(view.activeProduction)}/>{extra}
+  </div></section>;
+ }
  if(view?.currentPreview){
   const preview=view.currentPreview,approval=view.actions.find(a=>a.kind==='approve_preview');
   return<section className="work" aria-label="视频结果"><div className="work-inner"><span className="eyebrow">先看一小段，不急着做整片</span><h1 className="result-title">先看看，这个感觉对不对？</h1><p className="intro">播放看看画面和节奏。想调整哪里，继续在右边告诉我。</p>

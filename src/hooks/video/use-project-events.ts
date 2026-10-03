@@ -1,10 +1,10 @@
 'use client';
 import {useEffect,useState}from 'react';
-import {StreamEventSchema}from '@/contracts/video/commands';
+import {StreamEventSchema,type StreamEvent}from '@/contracts/video/commands';
 import {streamHttpAction} from '@/services/video/stream/reconnect-policy';
 import {SseParser,parseCursor}from '@/services/video/stream/sse-parser';
 import {initialStreamState,reduceEvent,StreamMessage}from '@/services/video/stream/reducer';
-export function useProjectEvents(projectId:string|undefined,operationId:string|undefined,epoch:number,onRefresh:()=>Promise<void>){
+export function useProjectEvents(projectId:string|undefined,operationId:string|undefined,epoch:number,onRefresh:(event?:StreamEvent)=>Promise<void>,recoverConversation=true){
  const[streamed,setStreamed]=useState<StreamMessage[]>([]);const[connection,setConnection]=useState('');
  const[activity,setActivity]=useState<{operationId:string;label:string}>();
  useEffect(()=>{
@@ -16,16 +16,16 @@ export function useProjectEvents(projectId:string|undefined,operationId:string|u
     try{
      const cursor=state.cursor!==null?`${state.epoch}:${state.cursor}`:null;
      const response=await fetch(`/api/video/projects/${projectId}/operations/${operationId}/events`,{signal:abort.signal,headers:cursor?{'Last-Event-ID':cursor}:{}});
-     if(response.status===409||response.status===410){const error=await response.json().catch(()=>null);if(streamHttpAction(response.status,error?.error?.code)==='refresh_stop'){await onRefresh();stopped=true;break}if(++startupRetries>=3&&!recoveryRequested){recoveryRequested=true;await fetch(`/api/video/projects/${projectId}/recover`,{method:'POST',signal:abort.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({schemaVersion:5,clientCommandId:crypto.randomUUID()})});await onRefresh()}throw Error('OPERATION_NOT_STARTED')}
+     if(response.status===409||response.status===410){const error=await response.json().catch(()=>null);if(streamHttpAction(response.status,error?.error?.code)==='refresh_stop'){await onRefresh();stopped=true;break}if(++startupRetries>=3&&!recoveryRequested){recoveryRequested=true;if(recoverConversation)await fetch(`/api/video/projects/${projectId}/recover`,{method:'POST',signal:abort.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({schemaVersion:5,clientCommandId:crypto.randomUUID()})});await onRefresh()}throw Error('OPERATION_NOT_STARTED')}
      if(!response.ok||!response.body)throw Error('STREAM_UNAVAILABLE');
      setConnection('');retries=0;const reader=response.body.getReader(),parser=new SseParser();
      try{for(;;){const{done,value}=await reader.read();if(done)break;for(const record of parser.push(value)){
-      const event=StreamEventSchema.parse(JSON.parse(record.data)),cursor=parseCursor(record.id);const next=reduceEvent(state,event,cursor.index);
+      const event=StreamEventSchema.parse(JSON.parse(record.data));if(event.projectId!==projectId||event.operationId!==operationId)throw Error('STREAM_SCOPE_INVALID');const cursor=parseCursor(record.id);const next=reduceEvent(state,event,cursor.index);
       if(next.needsCheckpoint){await onRefresh();stopped=true;break}
       state=next;setStreamed(Object.values(state.messages));
       if(event.type==='activity.updated')setActivity({operationId:event.operationId,label:event.payload.label});
       if(event.type==='operation.terminal'&&['failed','interrupted'].includes(event.payload.status))setConnection(event.payload.errorCode==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':event.payload.errorCode==='EFFECT_UNKNOWN'?'上次调用结果尚待核实，资料已保留。':event.payload.errorCode==='ASR_MISMATCH'?'声音核验未通过，资料和已有片段已保留。':'本次任务未完成，资料和已有内容已保留。');
-      if(['message.committed','understanding.updated','preview.ready','result.ready','operation.terminal'].includes(event.type))await onRefresh();
+      if(['message.committed','understanding.updated','preview.ready','result.ready','operation.terminal'].includes(event.type))await onRefresh(event);
       if(event.type==='operation.terminal')stopped=true;
      }if(stopped)break}}finally{await reader.cancel()}
     }catch{if(abort.signal.aborted)break;setConnection('正在重新连接，制作不会因此停止')}
@@ -33,6 +33,6 @@ export function useProjectEvents(projectId:string|undefined,operationId:string|u
    }
   }
   void connect();return()=>abort.abort();
- },[projectId,operationId,epoch,onRefresh]);
+ },[projectId,operationId,epoch,onRefresh,recoverConversation]);
  return{messages:streamed.filter(m=>m.status==='streaming'),connection,activity:activity?.operationId===operationId?activity:undefined};
 }

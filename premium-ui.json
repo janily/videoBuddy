@@ -1,0 +1,9 @@
+{
+  "profile": "consumer-product",
+  "sourceRoots": ["src"],
+  "canonicalMap": "docs/engineering/ui-contract.md",
+  "ownership": {"Select/Listbox": "native"},
+  "requiredCommands": ["typecheck", "browser"],
+  "commands": {"typecheck": "npm run typecheck", "browser": "npm run test:video:e2e"},
+  "evidence": {"failurePaths": "tests/video/e2e/downloads.spec.ts"}
+}
