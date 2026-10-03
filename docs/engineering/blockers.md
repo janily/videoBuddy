@@ -93,3 +93,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T13 API反馈target丢失已修复：canonical原目标归档/Director/冻结输入、同消息ID不能改目标，447单元及构建检查通过。浏览器仍未提供实际当前/历史播放器目标，修改授权和正式执行不因UUID自动成立。完整改稿链未完成，0provider/原账目不变；见 [目标验证](evidence/message-target-validation.md)。
 
 2026-10-03 T13 浏览器实际target:null缺口已关闭：播放器/历史/预览选择和草稿绑定、完整原命令持久重发、跨标签身份保护经449单元/45浏览器与两轴复核通过。见 [UI反馈目标验证](evidence/feedback-target-ui-validation.md)。截图是404媒体协议夹具，不是合格成片；ChangePlan授权→真实新revision/QA/发布继续缺，旧unknown账目门闩未改，0新模型调用，费用授权不限且继续有效。
+
+2026-10-03 T13 修改候选可冻结真实来源/基线并冷核验，455单元及构建等检查通过，见 [候选验证](evidence/music-change-draft-validation.md)。此候选无已批准语义、无预算预约、无执行权限，不解决正式改稿；待接模型分类、原音乐证明、幂等准入/混音/完整QA发布。0新模型/真实control账目未改，旧unknown门闩保留、不限费用授权有效。
