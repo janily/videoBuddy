@@ -91,3 +91,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T13 音乐gain生产者已实际实现/验证：原真实归档音乐和音效独立重混音−3dB、全样本误差6.26e-9、冷重放/原预算control不变通过，444单元及构建等检查通过。仍缺含实际旁白变体/响度听验/ASR、授权改稿operation→新revision包→完整QA→新result发布；不能将内部音轨当用户完成的视频。见 [音乐重混音验证](evidence/music-remix-validation.md)，0模型/网络，旧unknown冻结保留。
 
 2026-10-03 T13 API反馈target丢失已修复：canonical原目标归档/Director/冻结输入、同消息ID不能改目标，447单元及构建检查通过。浏览器仍未提供实际当前/历史播放器目标，修改授权和正式执行不因UUID自动成立。完整改稿链未完成，0provider/原账目不变；见 [目标验证](evidence/message-target-validation.md)。
+
+2026-10-03 T13 浏览器实际target:null缺口已关闭：播放器/历史/预览选择和草稿绑定、完整原命令持久重发、跨标签身份保护经449单元/45浏览器与两轴复核通过。见 [UI反馈目标验证](evidence/feedback-target-ui-validation.md)。截图是404媒体协议夹具，不是合格成片；ChangePlan授权→真实新revision/QA/发布继续缺，旧unknown账目门闩未改，0新模型调用，费用授权不限且继续有效。

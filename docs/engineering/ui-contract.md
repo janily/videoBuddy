@@ -19,3 +19,7 @@
 上个结果由 ResultHistory 在既有“更多”中显式展开，复用 PreviewPlayer；只在展开历史时显示“这是上一个结果”，不常驻内部版本号。历史播放器展开后占满结果区可用宽度，恢复按钮沿用 text-button。只有 ready 且没有制作任务时可恢复；制作中仍可观看历史，不增加历史导出或第三条 SSE。
 
 恢复命令由 useRestoreResult 在 POST 前持久化 UUID/项目/目标；确认丢失、确认后 ProjectView 不可用或版本小于确认，均保留同一命令并显示重新连接。达到确认版本后才清除请求，ProjectView 接收保留更高 controlVersion，不覆盖草稿。聚焦、恢复可见和同项目严格 BroadcastChannel 提示只触发真实快照 GET；跨标签收到已恢复结果时提示“当前结果有更新”，不用完成轮询。验证归属 restore.spec.ts 和 restore-client-contract.test.ts。
+
+反馈对象由 useProject / revisions/client-contract.ts 管理，播放器显式聚焦、点击及打开/收起历史时选择对应 artifact/revision。自动续签和恢复播放不改变选择；输入提示只标“整片”，不自动使用旧播放时间。首次输入冻结默认对象，刷新后若对象已不可识别，保留草稿并要求重新选择。current/previous/preview 使用同一规则，不新增定位控件。
+
+发送前在 Web Locks 下持久保存完整原请求（两项 UUID、文字、附件、目标）；存储失败不派发。未知请求显示既有 text-button“重发上一条”，只重放捕获的原身份。普通发送选择不同目标时要求明确重发，另一标签页已清除/替换记录时旧重发不得新建身份。确认只删除匹配的命令；同文字草稿也要目标一致且可识别才清除。协议验证归属 feedback-target.spec.ts 与 feedback-target-client.test.ts；不增加 SSE、媒体权限或修改授权。

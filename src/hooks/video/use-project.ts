@@ -6,6 +6,27 @@ import {rememberProject} from './recent-projects';
 import {useProjectEvents} from './use-project-events';
 import {useRestoreResult} from './use-restore-result';
 import {useProjectRevalidation} from './use-project-revalidation';
+import {feedbackTarget,FeedbackSelectionSchema,parseMessageIntent,type MessageIntent} from '@/services/video/revisions/client-contract';
+import type {FeedbackTarget} from '@/contracts/video/commands';
+function feedbackKey(projectId:string){return `vb-feedback:${projectId}`}
+function pendingMessageKey(projectId:string){return `vb-message:${projectId}`}
+function sameTarget(a:FeedbackTarget|null|undefined,b:FeedbackTarget|null|undefined){return a?.artifactId===b?.artifactId&&a?.revisionId===b?.revisionId&&a?.sourceTimeMs===b?.sourceTimeMs&&a?.previewTimeMs===b?.previewTimeMs}
+async function messageLock<T>(projectId:string,action:()=>T):Promise<T>{
+ if(!navigator.locks)throw Error('此浏览器暂不支持消息恢复，草稿已保留。');
+ return navigator.locks.request(pendingMessageKey(projectId),action);
+}
+async function clearMessageIntent(projectId:string,expected:MessageIntent){
+ return messageLock(projectId,()=>{
+  const raw=localStorage.getItem(pendingMessageKey(projectId)),current=raw?parseMessageIntent(raw,projectId):null;
+  if(current?.request.clientCommandId===expected.request.clientCommandId&&current.request.clientMessageId===expected.request.clientMessageId){localStorage.removeItem(pendingMessageKey(projectId));return null}
+  return current;
+ });
+}
+function parseSelection(raw:string,projectId?:string):FeedbackTarget|null|undefined{
+ if(!raw)return undefined;
+ try{const value=FeedbackSelectionSchema.safeParse(JSON.parse(raw));return value.success&&value.data.projectId===projectId?value.data.target:null}catch{return null}
+}
+function subscribeFeedback(notify:()=>void){window.addEventListener('storage',notify);window.addEventListener('vb-feedback',notify);return()=>{window.removeEventListener('storage',notify);window.removeEventListener('vb-feedback',notify)}}
 
 async function api<T>(path:string,body?:unknown):Promise<T>{
  const response=await fetch(path,body===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -31,10 +52,19 @@ async function uploadBytes(url:string,file:File,mime:'text/markdown'|'applicatio
 
 export function useProject(initialProjectId?:string){
  const [projectId,setProjectId]=useState(initialProjectId),[view,setView]=useState<ProjectView|null>(null),[error,setError]=useState(''),[sending,setSending]=useState(false),[uploading,setUploading]=useState(false);
- const idRef=useRef(initialProjectId),createId=useRef<string|undefined>(undefined),commandRef=useRef<{text:string;attachmentIds:string[];commandId:string;messageId:string}|undefined>(undefined);
+ const idRef=useRef(initialProjectId),createId=useRef<string|undefined>(undefined);
+ const [pendingMessage,setPendingMessage]=useState<MessageIntent|null>(null);
+ const feedbackSnapshot=useCallback(()=>{if(!projectId)return'';try{return localStorage.getItem(feedbackKey(projectId))||''}catch{return'invalid'}},[projectId]);
+ const selection=parseSelection(useSyncExternalStore(subscribeFeedback,feedbackSnapshot,()=>''),projectId);
  const previewCommand=useRef<{briefVersion:number;commandId:string}|undefined>(undefined),previewBusy=useRef(false);
  const [preparingPreview,setPreparingPreview]=useState(false);
- const key=draftKey(projectId),[draft,setDraft]=useDraft(key);
+ const key=draftKey(projectId),[draft,saveCurrentDraft]=useDraft(key);
+ const feedback=feedbackTarget(view,selection);
+ function selectFeedback(artifactId:string,revisionId:string){
+  const id=idRef.current;if(!id)return;
+  try{const value=FeedbackSelectionSchema.parse({version:1,projectId:id,target:{artifactId,revisionId,sourceTimeMs:null}});localStorage.setItem(feedbackKey(id),JSON.stringify(value));window.dispatchEvent(new Event('vb-feedback'))}catch{setError('无法保存反馈对象，请检查浏览器存储后重试。')}
+ }
+ function setDraft(text:string){if(selection===undefined&&feedback.target)selectFeedback(feedback.target.artifactId,feedback.target.revisionId);saveCurrentDraft(text)}
  const attachmentSnapshot=useCallback(()=>projectId?localStorage.getItem(attachmentKey(projectId))||'[]':'[]',[projectId]);
  const attachments=parseAttachments(useSyncExternalStore(subscribeAttachments,attachmentSnapshot,()=> '[]'));
  const readProject=useCallback(async(minimumControlVersion=0)=>{
@@ -42,6 +72,8 @@ export function useProject(initialProjectId?:string){
   const next=await api<ProjectView>(`/api/video/projects/${id}`);
   if(next.projectId!==id||!Number.isSafeInteger(next.controlVersion)||next.controlVersion<minimumControlVersion)throw Error('最新视频暂时无法读取，请重新连接。');
   rememberProject(next.projectId);setView(old=>old&&old.controlVersion>next.controlVersion?old:next);
+  const raw=localStorage.getItem(pendingMessageKey(id)),pending=raw?parseMessageIntent(raw,id):null;
+  if(pending&&!next.activeConversation&&next.messages.some(message=>message.role==='user'&&message.clientMessageId===pending.request.clientMessageId)){setPendingMessage(await clearMessageIntent(id,pending))}else setPendingMessage(pending);
  },[]);
  const refresh=useCallback(async()=>{if(!idRef.current)return;try{await readProject()}catch(e){setError(e instanceof Error?e.message:'无法恢复项目。')}},[readProject]);
  const restoration=useRestoreResult(projectId,readProject);
@@ -88,21 +120,34 @@ export function useProject(initialProjectId?:string){
   const next=attachments.filter(a=>a.id!==id);saveAttachments(idRef.current,next);
  }
 
- async function send(){
-  const text=readDraft(key),attachmentIds=attachments.map(a=>a.id);
+ async function send(retry=false){
+  const retryIntent=retry?pendingMessage:null;
+  if(retry&&!retryIntent)return;
+  let text=readDraft(key),attachmentIds=attachments.map(a=>a.id);
+  if(retry&&pendingMessage){text=pendingMessage.request.text;attachmentIds=pendingMessage.request.attachmentIds}
   if((!text.trim()&&!attachmentIds.length)||sending||uploading)return;
   if(attachmentIds.some(id=>!view?.assets.some(asset=>asset.id===id&&asset.status==='ready'))){setError('资料还在读取或读取失败，请等待或移除后发送。');return}
   setSending(true);setError('');
-  const previous=commandRef.current;
-  const command=previous?.text===text&&JSON.stringify(previous.attachmentIds)===JSON.stringify(attachmentIds)?previous:{text,attachmentIds,commandId:crypto.randomUUID(),messageId:crypto.randomUUID()};
-  commandRef.current=command;
   try{
    const id=await ensureProject();
-   await api(`/api/video/projects/${id}/messages`,{schemaVersion:5,clientCommandId:command.commandId,clientMessageId:command.messageId,text,attachmentIds,target:null});
-   if(readDraft(key)===text)saveDraft(key,'');
-   if(readDraft(draftKey(id))===text)saveDraft(draftKey(id),'');
+   const command=await messageLock(id,()=>{
+    const raw=localStorage.getItem(pendingMessageKey(id)),previous=raw?parseMessageIntent(raw,id):null;
+    if(raw&&!previous)throw Error('上一条消息的恢复记录无法读取，请保留草稿并检查浏览器存储。');
+    if(retryIntent&&(!previous||previous.request.clientCommandId!==retryIntent.request.clientCommandId||previous.request.clientMessageId!==retryIntent.request.clientMessageId))throw Error('上一条消息的状态已变化，请重新连接。');
+    if(previous&&(previous.request.text!==text||JSON.stringify(previous.request.attachmentIds)!==JSON.stringify(attachmentIds)))throw Error('上一条消息还未确认，请先重发上一条。');
+    if(previous&&!retry&&!sameTarget(previous.request.target,feedback.target))throw Error('上一条消息还未确认，请先重发上一条。');
+    if(!previous&&feedback.stale)throw Error('反馈视频已变化，请重新打开或选择要修改的视频。');
+    const intent:MessageIntent=previous??{version:1,projectId:id,request:{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientMessageId:crypto.randomUUID(),text,attachmentIds,target:feedback.target}};
+    localStorage.setItem(pendingMessageKey(id),JSON.stringify(intent));return intent;
+   });setPendingMessage(command);
+   await api(`/api/video/projects/${id}/messages`,command.request);
+   const selected=feedbackTarget(view,parseSelection(localStorage.getItem(feedbackKey(id))||'',id));
+   if(!selected.stale&&sameTarget(selected.target,command.request.target)){
+    if(readDraft(key)===text)saveDraft(key,'');
+    if(readDraft(draftKey(id))===text)saveDraft(draftKey(id),'');
+   }
    const remaining=readAttachments(id).filter(a=>!attachmentIds.includes(a.id));saveAttachments(id,remaining);
-   commandRef.current=undefined;
+   setPendingMessage(await clearMessageIntent(id,command));
    await refresh();
   }catch(e){setError(e instanceof Error?e.message:'连接失败，草稿已保留。')}
   finally{setSending(false)}
@@ -117,5 +162,5 @@ export function useProject(initialProjectId?:string){
   finally{previewBusy.current=false;setPreparingPreview(false)}
  }
  const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send,stopReply,preparePreview,preparingPreview,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:()=>send(),retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,preparePreview,preparingPreview,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
 }

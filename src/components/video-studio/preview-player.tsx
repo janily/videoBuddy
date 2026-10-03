@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-export function PreviewPlayer({projectId,artifactId,label="效果预览"}:{projectId:string;artifactId:string;label?:string}){
+export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelect}:{projectId:string;artifactId:string;label?:string;onSelect?:()=>void}){
  const [playback,setPlayback]=useState<{artifactId:string;url?:string;error?:string}>();
  const [reload,setReload]=useState(0);
  const videoRef=useRef<HTMLVideoElement>(null),resume=useRef<{time:number;playing:boolean}|null>(null),renewed=useRef(false);
@@ -23,7 +23,7 @@ export function PreviewPlayer({projectId,artifactId,label="效果预览"}:{proje
  },[projectId,artifactId,reload]);
  const current=playback?.artifactId===artifactId?playback:undefined;
  return<div className="preview-player">
-  {current?.url?<video ref={videoRef} aria-label={label} controls playsInline preload="metadata" src={current.url} onTimeUpdate={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.time=event.currentTarget.currentTime}} onPlay={()=>{progress.current.playing=true}} onPause={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.playing=false}} onLoadedMetadata={()=>{
+  {current?.url?<video ref={videoRef} aria-label={label} controls playsInline preload="metadata" src={current.url} onFocus={onSelect} onPointerDown={onSelect} onTimeUpdate={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.time=event.currentTarget.currentTime}} onPlay={()=>{progress.current.playing=true}} onPause={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.playing=false}} onLoadedMetadata={()=>{
    const video=videoRef.current,saved=resume.current;if(!video||!saved)return;
    video.currentTime=Math.min(saved.time,Number.isFinite(video.duration)?video.duration:saved.time);resume.current=null;
    if(saved.playing)void video.play().catch(()=>{setPlayback(old=>old?{...old,error:'点击播放继续观看。'}:old)});else video.pause();
@@ -32,6 +32,6 @@ export function PreviewPlayer({projectId,artifactId,label="效果预览"}:{proje
    if(!renewed.current){renewed.current=true;renew()}
   }}/>:<p role="status">{current?.error||'正在载入视频…'}</p>}
   {current?.url&&current.error&&<p role="status">{current.error}</p>}
-  {current?.error&&<button className="text-button" onClick={renew}>重新载入视频</button>}
+  {current?.error&&<button className="text-button" onClick={()=>{onSelect?.();renew()}}>重新载入视频</button>}
  </div>;
 }

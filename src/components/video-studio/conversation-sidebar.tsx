@@ -22,6 +22,7 @@ export function ConversationSidebar({project}:{project:ReturnType<typeof useProj
   {newMessages&&<button className="text-button" onClick={()=>{if(scroll.current)scroll.current.scrollTop=scroll.current.scrollHeight;setFollowing(true);setReadCount(project.messages.length)}}>有新消息 ↓</button>}
   <div className="composer-area">
    <p role="status" className="service-status">{project.error||project.connection}</p>
+   {project.pendingMessage&&<button className="text-button" disabled={project.sending||project.uploading} onClick={()=>void project.retryPendingMessage()}>重发上一条</button>}
    {project.view?.activeConversation&&<button className="text-button" onClick={()=>void project.stopReply()}>停止回复</button>}
    <input ref={picker} className="visually-hidden" type="file" accept=".md,.pdf,text/markdown,application/pdf" aria-label="选择资料文件" onChange={event=>{setChosenFile(event.target.files?.[0]||null);setRightsChecked(false);event.target.value=''}}/>
    {chosenFile&&<div className="attachment-choice"><span>{chosenFile.name}</span><label><input type="checkbox" checked={rightsChecked} onChange={event=>setRightsChecked(event.target.checked)}/>我有权使用这份资料</label><button type="button" className="text-button" disabled={!rightsChecked||project.uploading} onClick={async()=>{if(await project.uploadMaterial(chosenFile)){setChosenFile(null);setRightsChecked(false)}}}>{project.uploading?'正在上传…':'确认并添加'}</button></div>}
@@ -32,7 +33,7 @@ export function ConversationSidebar({project}:{project:ReturnType<typeof useProj
     return <div className="attachment-choice" key={attachment.id}><span>♧ {attachment.filename} · {label}</span><button className="text-button" aria-label={`移除 ${attachment.filename}`} onClick={()=>project.removeAttachment(attachment.id)}>移除</button></div>;
    })}
    <ChatComposer draft={project.draft} onDraft={project.setDraft} onSend={project.send} sending={project.sending||project.uploading} canSend={!waiting&&(!!project.draft.trim()||!!project.attachments.length)} onAttach={()=>picker.current?.click()}/>
-   <p className="input-hint">Enter 发送 · Shift + Enter 换行 · 支持 Markdown 和文本 PDF</p>
+   <p className="input-hint">{project.feedback.label?`关于${project.feedback.label}（整片） · `:project.feedback.stale?'反馈视频已变化，请重新选择 · ':''}Enter 发送 · Shift + Enter 换行 · 支持 Markdown 和文本 PDF</p>
   </div>
  </aside>;
 }
