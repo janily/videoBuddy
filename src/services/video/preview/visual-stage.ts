@@ -16,8 +16,9 @@ import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
 import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {assertPreviewProductionFence} from './fence';
+import {revisionSeed} from '@/services/video/timeline/seed';
 
-type Decide=(understanding:Understanding,treatment:unknown,timing:ReturnType<typeof TimingDraftSchema.parse>,timingHash:string,shotId:string,maxOutputTokens:number,env:Environment)=>Promise<unknown>;
+type Decide=(understanding:Understanding,treatment:unknown,timing:ReturnType<typeof TimingDraftSchema.parse>,timingHash:string,shotId:string,maxOutputTokens:number,env:Environment,seed:number)=>Promise<unknown>;
 interface Options{root?:string;env?:Environment;decide?:Decide;limits?:ModelLimits;mustExist?:boolean}
 export interface VisualStageRecord{schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;shotId:string;sourceRef:ObjectRef;sourceSha256:string;runtimeStatus:'not_checked'}
 
@@ -41,11 +42,11 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  if(!root)throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
  const timingRecord=await prepareTimingStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const timing=TimingDraftSchema.parse(await readRef<unknown>(projects,timingRecord.draftRef,revisionPrefix));
- const shotKey=canonicalHash({shotId}),key=`${revisionPrefix}visual/${shotKey}`,effectKey=`${prefix}/operations/${operationId}/effects/visual/${revisionId}/${shotKey}`;
+ const seed=revisionSeed(projectId,revisionId),shotKey=canonicalHash({shotId}),key=`${revisionPrefix}visual/${shotKey}`,effectKey=`${prefix}/operations/${operationId}/effects/visual/${revisionId}/${shotKey}`;
  async function verifyRecord(record:VisualStageRecord){
   if(record.schemaVersion!==1||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.shotId!==shotId||record.runtimeStatus!=='not_checked'||!record.sourceRef.key.startsWith(`${revisionPrefix}visual-source/${shotKey}/`))throw Error('VISUAL_STAGE_CONFLICT');
   const archived=await readRef<VisualShotSource>(projects,record.sourceRef,revisionPrefix);
-  guardVisualShot(archived,understanding,plan,timing,timingRecord.draftRef.sha256);
+  guardVisualShot(archived,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
   if(createHash('sha256').update(archived.sourceHtml).digest('hex')!==record.sourceSha256)throw Error('VISUAL_REF_CHANGED');
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
@@ -59,9 +60,9 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-visual-${revisionId}-${shotKey}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
  const source=await runEffect<VisualShotSource>(projects.store,effectKey,async()=>{
-  return guardVisualShot(await (options.decide||runVisualShot)(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env),understanding,plan,timing,timingRecord.draftRef.sha256);
+  return guardVisualShot(await (options.decide||runVisualShot)(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed),understanding,plan,timing,timingRecord.draftRef.sha256,seed);
  });
- guardVisualShot(source,understanding,plan,timing,timingRecord.draftRef.sha256);
+ guardVisualShot(source,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
  if(source.assetIds.some(id=>!control.assets.some(asset=>asset.id===id&&asset.status==='ready')))throw Error('VISUAL_ASSET_NOT_READY');
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});

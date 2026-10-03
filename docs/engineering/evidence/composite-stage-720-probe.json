@@ -1,19 +1,19 @@
 {
   "technicalProbeOnly": true,
   "styleSlug": "crayon-book",
-  "narrationPackageSha256": "af6c1774f8af2e46171a9ed23050fb3f69082afbd7f45bf04f3a883ff47b547f",
-  "timingDraftSha256": "f4daf95490c51b2ececadd4b52887eb2064526560e08ff4a97a6d8345fb744ca",
+  "narrationPackageSha256": "06dba25b22c09ab740acac1a26389bdc3761e14c981bcdf48e38d0c25968c898",
+  "timingDraftSha256": "87303baaac4f8a85765bd2a9f5192d39f8fb297e0bf123feb1e70c81fd6e9aff",
   "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
   "pictureSequence": {
-    "stageKey": "a6d42b3e617b9a9d4a09efb2b318ea937fe518cf87df8774c3bb31e188c28e1d",
+    "stageKey": "3fd94aae83328deca32a26f950571235f5970c3143e1c2c8e3d53f3135c33801",
     "sha256": "ef78517d4846955e8f207cfbc8cdaad7e1ee58e7082a48a92aee0ee224fc8530",
     "frames": 480
   },
-  "stageKey": "4411d4b42e52badd4334ab073bdb4deee35de9f3d670287d2c461fd997a81206",
+  "stageKey": "7c68f892ffb070ee58e91428cca8cd5ee9491a01ae160aa98dcdec2fa96e3d14",
   "technicalQa": {
     "result": "pass",
-    "sha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
-    "bytes": 173167,
+    "sha256": "267fa1bf61f25bfaae8ad576672f2275298754f9570f6387c33bb91fb07a4a8f",
+    "bytes": 173974,
     "width": 1280,
     "height": 720,
     "durationSec": 20,
@@ -23,7 +23,7 @@
   },
   "loudness": {
     "status": "pass",
-    "filmSha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
+    "filmSha256": "267fa1bf61f25bfaae8ad576672f2275298754f9570f6387c33bb91fb07a4a8f",
     "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
     "integratedLufs": -14.18,
     "truePeakDbtp": -1.5,
@@ -33,12 +33,12 @@
   },
   "postMix": {
     "status": "pass",
-    "filmSha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
+    "filmSha256": "267fa1bf61f25bfaae8ad576672f2275298754f9570f6387c33bb91fb07a4a8f",
     "lines": [
       {
         "lineId": "line_1",
         "recognizedText": "上海的活動將在10月8日開始",
-        "sourceSha256": "d06203bf3070e7fdc27bcaa5785fd63bb60732dd8a131e5fba744284b0d03212",
+        "sourceSha256": "8e21360173711de5885bd7db228fb36f831024342a8b33d1b5cda2d00b6739ad",
         "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 12,
         "status": "pass"

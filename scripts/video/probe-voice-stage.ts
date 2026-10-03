@@ -21,6 +21,10 @@ import {actualArtifactSha256} from '../../src/services/video/exports/verified-fi
 import {resolveArtifact} from '../../src/services/video/exports/access';
 import {prepareNarrationPackageStage,NarrationPackageDataSchema} from '../../src/services/video/preview/narration-package-stage';
 import {loadPackagedNarration} from '../../src/services/video/audio/narration-package';
+import {prepareFilmPackageStage} from '../../src/services/video/preview/film-package-stage';
+import {prepareAudioPlanStage} from '../../src/services/video/preview/audio-plan-stage';
+import {revisionSeed} from '../../src/services/video/timeline/seed';
+import {loadVerifiedFilmPackage} from '../../src/contracts/video/film-package';
 
 async function removeProbeContainer(name:string){
  const child=spawn('docker',['rm','--force',name],{stdio:'ignore'});
@@ -31,16 +35,17 @@ async function removeProbeContainer(name:string){
 async function main(){
  const root=await mkdtemp(join(tmpdir(),'vb-voice-stage-probe-'));
  const previewProfile=process.argv.includes('--preview-720')?'preview' as const:'probe' as const;
+ const wantsPackage=process.argv.includes('--package');
  const wantsPreview=process.argv.includes('--preview')||process.argv.includes('--preview-720');
  const wantsFilm=process.argv.includes('--film')||wantsPreview;
- const wantsPicture=process.argv.includes('--picture')||wantsFilm;
- const wantsNarrationPackage=process.argv.includes('--narration-package')||wantsFilm;
+ const wantsPicture=process.argv.includes('--picture')||wantsFilm||wantsPackage;
+ const wantsNarrationPackage=process.argv.includes('--narration-package')||wantsFilm||wantsPackage;
  let pictureContainerName:string|undefined;
  try{
   const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('probe-owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
   const revisionId=randomUUID(),operationId=randomUUID(),messageId=randomUUID(),style=getStyle('crayon-book'),base=initialUnderstanding(),line='上海的活动将在十月八日开始。';
   const fact={id:'event-date',text:'活动十月八日开始',sourceRefs:[{type:'user_message' as const,id:messageId}],status:'confirmed' as const,mustInclude:true,critical:true};
-  const understanding={...base,briefVersion:1,subject:'活动预告',sourceMessageIds:[messageId],facts:[fact],preferences:{...base.preferences,durationSec:20,styleSlug:style.slug,voiceMode:'tts' as const}};
+  const understanding={...base,briefVersion:1,subject:'活动预告',sourceMessageIds:[messageId],facts:[fact],preferences:{...base.preferences,durationSec:20,styleSlug:style.slug,voiceMode:'tts' as const,...(wantsPackage?{musicMode:'none' as const}:{})}};
   const understandingRef=await projects.index.immutable(`projects/${projectId}/understanding/1`,understanding);
   await updateJson(projects.store,`projects/${projectId}/control`,(control:ProjectControl)=>({...control,briefVersion:1,understandingRef,phase:'preparing_preview' as const,activeProduction:operationId}));
   const plan={schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,durationSec:20,aspect:'16:9',fps:24,summary:'活动预告',options:[
@@ -94,10 +99,23 @@ async function main(){
     process.stdout.write(JSON.stringify(packageEvidence)+'\n');
    }
    if(wantsPicture){
+    if(wantsPackage)await prepareAudioPlanStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,decide:async()=>({schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,seed:revisionSeed(projectId,revisionId),sections:[{id:'whole',startFrame:0,endFrame:480,bpm:120,beatsPerBar:4,beatUnit:4,barOffset:0}],cues:[],sources:[],music:[],foley:[],intentionalSilenceRanges:[{startSample:0,endSample:960000,buses:['music','foley']}],mix:{targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2,voiceGainDb:0,duck:{thresholdDb:-24,ratio:4,attackMs:10,releaseMs:180}},reasoning:'Technical fixture explicitly requests no music or Foley. Declared beat grid is metadata; only the real verified narration is executed.'}),limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:40000,dailyCalls:10}});
     const sourceHtml='<!doctype html><html><meta charset="utf-8"><body style="margin:0"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4eee5";x.fillRect(0,0,1920,1080);x.fillStyle="#48657a";x.fillRect(80,80,1760,920);x.fillStyle="#ffffff";x.font="bold 110px sans-serif";x.fillText("上海活动 10 月 8 日",170,520);x.fillStyle="#f3ba65";x.fillRect(160+t*20,680,400,28)};window.READY=true;</script></body></html>';
-    const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,decide:async()=>({schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:['event-date'],assetIds:[],sourceHtml}),limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10}});
-    const picture=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,profile:previewProfile});
+    const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,decide:async()=>({schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:['event-date'],assetIds:[],sourceHtml,seed:revisionSeed(projectId,revisionId),direction:{purpose:'展示上海活动与十月八日',framing:'全画幅二维画布',camera:'固定画布坐标',actorIds:[]}}),limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:40000,dailyCalls:10}});
+    if(wantsPackage){
+     const packaged=await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root}),replayed=await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true});
+     if(canonicalHash(packaged)!==canonicalHash(replayed))throw Error('FILM_PACKAGE_REPLAY_CHANGED');
+     const spec=(await projects.store.readFresh(packaged.filmSpecRef.key)).value,frozen=await loadVerifiedFilmPackage(projects.store,spec,root);
+     const badTimelineRef=await projects.index.immutable(`projects/${projectId}/revisions/${revisionId}/timeline`,{...frozen.timeline,sections:frozen.timeline.sections.map(section=>({...section,bpm:100}))});
+     let resignedTimelineTamperRejected=false;
+     try{await loadVerifiedFilmPackage(projects.store,{...frozen.filmSpec,timelineRef:badTimelineRef},root)}catch(error){if(error instanceof Error&&error.message==='FILM_AUDIO_PLAN_CHANGED')resignedTimelineTamperRejected=true;else throw error}
+     if(!resignedTimelineTamperRejected)throw Error('FILM_PACKAGE_TAMPER_ACCEPTED');
+     const result={executedAt:new Date().toISOString(),technicalProbeOnly:true,filmSpecSha256:packaged.filmSpecRef.sha256,qualityPolicySha256:packaged.qualityPolicyRef.sha256,qualityPolicyVersion:frozen.filmSpec.qualityPolicyVersion,output:frozen.filmSpec.output,seed:frozen.filmSpec.seed,mediaRuntimeDigest:frozen.filmSpec.runtimeDigest,audioPlanSha256:frozen.audioManifest.planRef!.sha256,visualSourceSha256:visual.sourceRef.sha256,narration:frozen.timeline.narration.map(line=>({lineId:line.lineId,sha256:line.audioRef.sha256,bytes:line.audioRef.bytes,startSample:line.startSample,endSample:line.endSample})),captionCount:frozen.timeline.captions.length,factsCount:frozen.facts.facts.length,modulesCount:frozen.sourceManifest.modules.length,replayIdentical:true,resignedTimelineTamperRejected,qualityStatus:packaged.qualityStatus,limits:'Synthetic frozen brief and injected complete Visual/Audio plans explicitly without music/Foley; actual offline TTS/ASR, private WAV bytes, timing and pinned font. FilmSpec declares a full 1080p target; this package probe does not prove a 1080p render, real model decisions, style/listening/semantic QA, approval or user preview.'};
+     if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/film-package-stage-probe.json',JSON.stringify(result,null,2)+'\n');
+     process.stdout.write(JSON.stringify(result)+'\n');
+    }
     pictureContainerName=`vb-${operationId}-picture-${previewProfile}-${canonicalHash({shotId:'shot'}).slice(0,12)}`;
+    const picture=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,profile:previewProfile});
     const replay=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,profile:previewProfile});
     if(picture.stageKey!==replay.stageKey||picture.technicalQa.sha256!==replay.technicalQa.sha256)throw Error('PICTURE_STAGE_REPLAY_CHANGED');
     const pictureEvidence={technicalProbeOnly:true,styleSlug:style.slug,visualSourceSha256:visual.sourceSha256,timingDraftSha256:timing.draftRef.sha256,stageKey:picture.stageKey,runtimeDigest:picture.runtimeDigest,technicalQa:picture.technicalQa,replayIdentical:true,limits:`Synthetic HTML via injected visual decision, ${picture.technicalQa.width}x${picture.technicalQa.height} technical render of all 480 frames; no paid Visual model, asset transfer, semantic/style QA, 1080p or user preview.`};
@@ -120,12 +138,20 @@ async function main(){
       if(artifact.objectRef.sha256!==preview.previewArtifactSha256||await actualArtifactSha256(root,artifact.objectRef.key,artifact.objectRef.bytes)!==preview.previewArtifactSha256)throw Error('PREVIEW_STAGE_STORAGE_CHANGED');
       let privateBeforeCommit=false;try{await resolveArtifact(projects,'probe-owner',projectId,preview.artifactId)}catch(error){privateBeforeCommit=error instanceof Error&&error.message==='ACCESS_NOT_FOUND'}
       if(!privateBeforeCommit)throw Error('PREVIEW_STAGE_EARLY_ACCESS');
-      const previewEvidence={technicalProbeOnly:true,sourceFilmSha256:preview.sourceFilmSha256,excerptMap:preview.excerptMap,stageKey:preview.stageKey,durationMs:preview.durationMs,artifactId:preview.artifactId,artifactSha256:preview.previewArtifactSha256,technicalQa:preview.technicalQa,privateBeforeCommit,replayIdentical:true,qualityStatus:preview.qualityStatus,limits:`Nine-second excerpt from the same synthetic ${preview.technicalQa.width}x${preview.technicalQa.height} project AV; real private object bytes and blocked public access before preview pointer. No FilmSpec package, user-visible preview, approval, real model or style QA.`};
+      const previewEvidence={technicalProbeOnly:true,sourceFilmSha256:preview.sourceFilmSha256,excerptMap:preview.excerptMap,stageKey:preview.stageKey,durationMs:preview.durationMs,artifactId:preview.artifactId,artifactSha256:preview.previewArtifactSha256,technicalQa:preview.technicalQa,privateBeforeCommit,replayIdentical:true,qualityStatus:preview.qualityStatus,limits:`Nine-second excerpt from the same synthetic ${preview.technicalQa.width}x${preview.technicalQa.height} project AV; real private object bytes and blocked public access before preview pointer. No approved FilmSpec render binding, user-visible preview, approval, real model or style QA.`};
       if(process.argv.includes('--record'))await writeFile(`docs/engineering/evidence/${previewProfile==='preview'?'preview-720-stage-probe.json':'preview-stage-probe.json'}`,JSON.stringify(previewEvidence,null,2)+'\n');
       process.stdout.write(JSON.stringify(previewEvidence)+'\n');
      }
     }
    }
+  }
+  if(wantsPackage){
+   const record=(await projects.store.readFresh<{filmSpecRef:{key:string}}>(`projects/${projectId}/revisions/${revisionId}/film-package-stage`)).value,spec=(await projects.store.readFresh(record.filmSpecRef.key)).value;
+   await rm(join(root,'voice'),{recursive:true});await rm(join(root,'audio'),{recursive:true});
+   await loadVerifiedFilmPackage(projects.store,spec,root);
+   const result={independentPackageRead:true,voiceAndAudioWorkDirectoriesRemoved:true,limits:'Independent package loader survives removal of voice/audio workfiles. Cached Voice/Timing and producer stage replay still require those workfiles; downstream formal render worker is not implemented.'};
+   if(process.argv.includes('--record')){const path='docs/engineering/evidence/film-package-stage-probe.json',existing=JSON.parse(await readFile(path,'utf8'));await writeFile(path,JSON.stringify({...existing,...result,limits:existing.limits+' '+result.limits},null,2)+'\n')}
+   process.stdout.write(JSON.stringify(result)+'\n');
   }
  }finally{try{if(pictureContainerName)await removeProbeContainer(pictureContainerName)}finally{await rm(root,{recursive:true,force:true})}}
 }

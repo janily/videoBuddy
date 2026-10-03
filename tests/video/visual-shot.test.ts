@@ -21,12 +21,14 @@ it('T06 Visual only accepts pinned shot, facts, timing and deterministic offline
  expect(()=>guardVisualShot({...result,sourceHtml:html.replace('Math.sin(t)','Math.random()')},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
  expect(()=>guardVisualShot({...result,sourceHtml:html.replace('window.READY=true','setInterval(()=>{},100)')},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
  expect(()=>guardVisualShot({...result,assetIds:[randomUUID()]},understanding,treatment,timing,timingHash)).toThrow('VISUAL_ASSET_INVALID');
+ expect(()=>guardVisualShot({...result,seed:9},understanding,treatment,timing,timingHash,10)).toThrow('VISUAL_BASELINE_CHANGED');
+ expect(()=>guardVisualShot({...result,direction:{purpose:'活动日期',framing:'全景',camera:'静止',actorIds:['a','a']}},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
 });
 it('T06 Visual sends the selected STYLE and real timing through the compatible model adapter',async()=>{
  const requests:Record<string,unknown>[]=[];
  const server=createServer(async(req,res)=>{
   let body='';for await(const part of req)body+=part;const parsed=JSON.parse(body) as Record<string,unknown>;requests.push(parsed);
-  const content=JSON.stringify(result);
+  const content=JSON.stringify({...result,seed:0,direction:{purpose:'活动日期',framing:'全景',camera:'静止',actorIds:[]}});
   if(!parsed.stream){res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({id:'visual-test',object:'chat.completion',created:1,model:'test-model',choices:[{index:0,message:{role:'assistant',content},finish_reason:'stop'}],usage:{prompt_tokens:100,completion_tokens:100,total_tokens:200}}));return}
   res.writeHead(200,{'content-type':'text/event-stream'});
   res.write('data: '+JSON.stringify({id:'visual-test',object:'chat.completion.chunk',created:1,model:'test-model',choices:[{index:0,delta:{role:'assistant',content},finish_reason:null}]})+'\n\n');

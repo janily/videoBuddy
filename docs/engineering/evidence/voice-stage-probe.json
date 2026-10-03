@@ -4,12 +4,12 @@
   "briefVersion": 1,
   "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
   "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
-  "voiceSha256": "5bf07d89203cbdde7d1ab6bac51c9b977db29ea96e6acddd971280ef278e51c3",
+  "voiceSha256": "0ac16bf5802f49a2786d4207df15fc9d24f85a18b3b094dfd089c6995babca0a",
   "voiceDurationMs": 4100,
   "wordCount": 12,
   "asrStatus": "pass",
   "immutablePlanSha256": "1809a876a20b8bacc3d3c9d38292dcc5d33dd0d2dd95c6fed36d28029ca50835",
-  "immutableVerifiedSha256": "65c745b6f6407ffded53d3a31c9e5437a2a5b590cda745689b9bb30ebc2f8dba",
+  "immutableVerifiedSha256": "6e034bfe9b92da46d344cb5688bb8d76286ecec0c5394f8b2e7681b928e7ff1a",
   "replayIdentical": true,
   "limits": "One synthetic 20-second project brief and one real offline TTS/ASR line; no visual preview, full mix, listening review or user footage."
 }

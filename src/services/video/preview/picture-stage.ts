@@ -13,12 +13,13 @@ import {assertPreviewProductionFence} from './fence';
 import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVisualShotStage} from './visual-stage';
+import {revisionSeed} from '@/services/video/timeline/seed';
 
 type Qa=typeof technicalVideoQa;
 type Profile='full'|'preview'|'probe';
 interface Options{root?:string;env?:Environment;executor?:MediaExecutor;qa?:Qa;profile?:Profile;pollMs?:number;mustExist?:boolean}
 export interface PictureShotRecord{
- schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;visualSourceSha256:string;
+ schemaVersion:2;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;visualSourceSha256:string;visualSourceRefSha256:string;seed:number;
  shotId:string;profile:Profile;stageKey:string;runtimeDigest:string;outputPath:string;
  technicalQa:Awaited<ReturnType<Qa>>;
 }
@@ -46,13 +47,13 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
  const outputWidth=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):logicalWidth,outputHeight=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):logicalHeight;
  const shotKey=canonicalHash({shotId}),key=`${revisionPrefix}picture/${profile}/${shotKey}`;
  const config=dockerConfiguration(env,operationId);
- const bundleHash=canonicalHash({revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,visualSourceSha256:visual.sourceSha256,shotId});
- const parameters={projectId,bundleHash,runtimeDigest:config.runtimeDigest,sourceHtml:source.sourceHtml,logicalWidth,logicalHeight,outputWidth,outputHeight,fps:timing.fps,startFrame:source.startFrame,endFrame:source.endFrame,seed:Number.parseInt(bundleHash.slice(0,8),16),fence:expectedConsentEpoch};
+ const bundleHash=canonicalHash({revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,visualSourceSha256:visual.sourceSha256,visualSourceRefSha256:visual.sourceRef.sha256,shotId});
+ const seed=revisionSeed(projectId,revisionId),parameters={projectId,bundleHash,runtimeDigest:config.runtimeDigest,sourceHtml:source.sourceHtml,logicalWidth,logicalHeight,outputWidth,outputHeight,fps:timing.fps,startFrame:source.startFrame,endFrame:source.endFrame,seed,fence:expectedConsentEpoch};
  const stageKey=computeStageKey(parameters),stageDir=join(root,'media',stageKey),outputPath=join(stageDir,'output','picture.mp4');
  const expected={width:outputWidth,height:outputHeight,durationSec:(source.endFrame-source.startFrame)/timing.fps,fps:timing.fps,audio:false};
  const qa=options.qa||technicalVideoQa;
  async function verify(record:PictureShotRecord){
-  if(record.schemaVersion!==1||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.visualSourceSha256!==visual.sourceSha256||record.shotId!==shotId||record.profile!==profile||record.stageKey!==stageKey||record.runtimeDigest!==config.runtimeDigest||record.outputPath!==outputPath)throw Error('PICTURE_STAGE_CONFLICT');
+  if(record.schemaVersion!==2||record.seed!==seed||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.visualSourceSha256!==visual.sourceSha256||record.visualSourceRefSha256!==visual.sourceRef.sha256||record.shotId!==shotId||record.profile!==profile||record.stageKey!==stageKey||record.runtimeDigest!==config.runtimeDigest||record.outputPath!==outputPath)throw Error('PICTURE_STAGE_CONFLICT');
   const actual=await qa(stageDir,config.image,'output/picture.mp4',expected);
   if(canonicalHash(actual)!==canonicalHash(record.technicalQa))throw Error('PICTURE_OUTPUT_CHANGED');
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
@@ -77,7 +78,7 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
  if(checkedVisual.sourceSha256!==visual.sourceSha256||checkedVisual.sourceRef.sha256!==visual.sourceRef.sha256)throw Error('PICTURE_SOURCE_CHANGED');
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
- const record:PictureShotRecord={schemaVersion:1,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,visualSourceSha256:visual.sourceSha256,shotId,profile,stageKey,runtimeDigest:config.runtimeDigest,outputPath,technicalQa};
+ const record:PictureShotRecord={schemaVersion:2,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,visualSourceSha256:visual.sourceSha256,visualSourceRefSha256:visual.sourceRef.sha256,seed,shotId,profile,stageKey,runtimeDigest:config.runtimeDigest,outputPath,technicalQa};
  const stored=await createOrRead(projects.store,key,record);
  if(canonicalHash(stored)!==canonicalHash(record))throw Error('PICTURE_STAGE_CONFLICT');
  return verify(stored);

@@ -1,10 +1,10 @@
 {
-  "executedAt": "2026-10-03T00:56:35.282Z",
+  "executedAt": "2026-10-03T05:21:42.135Z",
   "technicalProbeOnly": true,
   "voiceRuntimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
   "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
-  "narrationPackageSha256": "af6c1774f8af2e46171a9ed23050fb3f69082afbd7f45bf04f3a883ff47b547f",
-  "audioSha256": "5bf07d89203cbdde7d1ab6bac51c9b977db29ea96e6acddd971280ef278e51c3",
+  "narrationPackageSha256": "06dba25b22c09ab740acac1a26389bdc3761e14c981bcdf48e38d0c25968c898",
+  "audioSha256": "0ac16bf5802f49a2786d4207df15fc9d24f85a18b3b094dfd089c6995babca0a",
   "audioBytes": 393644,
   "sourceSampleRate": 24000,
   "sourceSamples": 98400,

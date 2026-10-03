@@ -20,6 +20,7 @@ import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVoiceStage} from './voice-stage';
 import {prepareNarrationPackageStage} from './narration-package-stage';
+import {captionStyleForProfile} from '@/services/video/timeline/package';
 
 type Profile='full'|'preview'|'probe';
 type Qa=typeof technicalVideoQa;
@@ -63,7 +64,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   const font=await (options.readFont||readPinnedSubtitleFont)(env);
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||cues.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('COMPOSITE_FONT_CHANGED');
  }
- const captionStyle:CaptionStyle|null=cues.length?profile==='probe'?{fontSize:42,marginV:12,outline:2,primary:'#FFFFFF',outlineColor:'#000000'}:profile==='preview'?{fontSize:54,marginV:48,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:{fontSize:68,marginV:72,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:null;
+ const captionStyle:CaptionStyle|null=cues.length?captionStyleForProfile(profile):null;
  const bundleHash=canonicalHash({projectId,revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256,narrationPackageSha256:narrationPackage.packageRef.sha256});
  const spec={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,bundleHash,fence:expectedConsentEpoch};
  const srt=formatSrt(cues),srtSha256=srt?createHash('sha256').update(srt).digest('hex'):null;

@@ -1,6 +1,6 @@
 {
   "technicalProbeOnly": true,
-  "sourceFilmSha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
+  "sourceFilmSha256": "267fa1bf61f25bfaae8ad576672f2275298754f9570f6387c33bb91fb07a4a8f",
   "excerptMap": [
     {
       "previewStartMs": 0,
@@ -24,14 +24,14 @@
       "shotId": "shot"
     }
   ],
-  "stageKey": "126740af625d44f37607e0d6d291dd45745e424bdd9af6235a633dea3673aa5d",
+  "stageKey": "2af1da35e26be96c27f928faed04a1a31fe3449081aefa9d00f37cb604a99f3a",
   "durationMs": 9000,
-  "artifactId": "a7088c5b-47f0-42dc-86a5-3a209254103a",
-  "artifactSha256": "e95679e3614e014136f051df70c247f572e622c7b99a3adf127016bb64de3018",
+  "artifactId": "cded6372-7da3-471a-9bed-a893e1408f7c",
+  "artifactSha256": "78ca3a42b2b5df504456a44a0fb6030c6a633f2d20608e8a751210f4d6568364",
   "technicalQa": {
     "result": "pass",
-    "sha256": "e95679e3614e014136f051df70c247f572e622c7b99a3adf127016bb64de3018",
-    "bytes": 142284,
+    "sha256": "78ca3a42b2b5df504456a44a0fb6030c6a633f2d20608e8a751210f4d6568364",
+    "bytes": 142794,
     "width": 1280,
     "height": 720,
     "durationSec": 9,
@@ -42,5 +42,5 @@
   "privateBeforeCommit": true,
   "replayIdentical": true,
   "qualityStatus": "semantic_not_checked",
-  "limits": "Nine-second excerpt from the same synthetic 1280x720 project AV; real private object bytes and blocked public access before preview pointer. No FilmSpec package, user-visible preview, approval, real model or style QA."
+  "limits": "Nine-second excerpt from the same synthetic 1280x720 project AV; real private object bytes and blocked public access before preview pointer. No approved FilmSpec render binding, user-visible preview, approval, real model or style QA."
 }

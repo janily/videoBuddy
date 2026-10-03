@@ -1,0 +1,36 @@
+{
+  "executedAt": "2026-10-03T05:21:43.371Z",
+  "technicalProbeOnly": true,
+  "filmSpecSha256": "375db49de9d5739eab06a274d8529f32bcae8729e8e31683dbc933c98f5a0e65",
+  "qualityPolicySha256": "9ae29a7379521b0b909f109b362d04d1833e5e9065873116026d8afd952410a7",
+  "qualityPolicyVersion": "v5.1-package-1",
+  "output": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "totalFrames": 480,
+    "sampleRate": 48000
+  },
+  "seed": 2355757551,
+  "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "audioPlanSha256": "1b8deb05222e5192d2d02f0cda90ff2359fe812cb8e0bcf08997e6dab441693c",
+  "visualSourceSha256": "23868a5583497e915467c3e5a22dcba6cc3f46bf35fc94dba49c2c4a24b60a2c",
+  "narration": [
+    {
+      "lineId": "line_1",
+      "sha256": "0ac16bf5802f49a2786d4207df15fc9d24f85a18b3b094dfd089c6995babca0a",
+      "bytes": 393644,
+      "startSample": 0,
+      "endSample": 196800
+    }
+  ],
+  "captionCount": 1,
+  "factsCount": 1,
+  "modulesCount": 1,
+  "replayIdentical": true,
+  "resignedTimelineTamperRejected": true,
+  "qualityStatus": "semantic_not_checked",
+  "limits": "Synthetic frozen brief and injected complete Visual/Audio plans explicitly without music/Foley; actual offline TTS/ASR, private WAV bytes, timing and pinned font. FilmSpec declares a full 1080p target; this package probe does not prove a 1080p render, real model decisions, style/listening/semantic QA, approval or user preview. Independent package loader survives removal of voice/audio workfiles. Cached Voice/Timing and producer stage replay still require those workfiles; downstream formal render worker is not implemented.",
+  "independentPackageRead": true,
+  "voiceAndAudioWorkDirectoriesRemoved": true
+}

@@ -76,21 +76,19 @@ it('T11 checks actual packaged voice bytes and ASR references before accepting a
  const root=await mkdtemp(join(tmpdir(),'vb-film-narration-'));
  try{
   const projects=new ProjectStore(new FileStore(root)),projectId=randomUUID(),revisionId=randomUUID(),input=await fixture(root);
-  const bundle=await seedPreviewBundle(projects,{projectId,revisionId,durationSec:20,script:[input.verified.lines[0].spokenText],previewArtifactSha256:'c'.repeat(64)});
-  const original=(await projects.store.readFresh<FilmSpec>(bundle.filmSpecRef.key)).value,prefix=`projects/${projectId}/revisions/${revisionId}`;
-  const understanding=(await projects.store.readFresh<Record<string,unknown>>(original.understandingRef.key)).value;
-  const understandingRef=await projects.index.immutable(`projects/${projectId}/understanding/3`,{...understanding,preferences:{...(understanding.preferences as Record<string,unknown>),voiceMode:'tts',captions:'none'}});
-  const timeline=(await projects.store.readFresh<FilmTimeline>(original.timelineRef.key)).value;
   // Film fixture's sole shot starts at 0; the independent archive fixture starts at 1 s.
   input.verified.lines[0].startMs=0;input.narration[0].startSample=0;input.narration[0].endSample=48000;
   const archived=await archiveVerifiedNarration(projects,root,projectId,revisionId,input.verified,input.narration);
-  const timelineRef=await projects.index.immutable(`${prefix}/timeline`,{...timeline,narration:archived.lines}),audioManifestRef=await projects.index.immutable(`${prefix}/audio`,{schemaVersion:1,sources:archived.sources,buses:[{id:'voice'}]});
-  const spec={...original,understandingRef,timelineRef,audioManifestRef};
+  const bundle=await seedPreviewBundle(projects,{projectId,revisionId,durationSec:20,script:[input.verified.lines[0].spokenText],previewArtifactSha256:'c'.repeat(64),narration:archived,voiceMetadata:input.narration});
+  const spec=(await projects.store.readFresh<FilmSpec>(bundle.filmSpecRef.key)).value,prefix=`projects/${projectId}/revisions/${revisionId}`;
+  const timeline=(await projects.store.readFresh<FilmTimeline>(spec.timelineRef.key)).value;
+  const missingNarration=await projects.index.immutable(`${prefix}/timeline`,{...timeline,narration:[]});
   await expect(loadVerifiedFilmPackage(projects.store,spec,root)).resolves.toMatchObject({timeline:{narration:archived.lines}});
-  await expect(loadVerifiedFilmPackage(projects.store,{...spec,timelineRef:original.timelineRef},root)).rejects.toThrow('FILM_NARRATION_CHANGED');
+  await expect(loadVerifiedFilmPackage(projects.store,{...spec,timelineRef:missingNarration},root)).rejects.toThrow('FILM_NARRATION_CHANGED');
   const forgedTimelineRef=await projects.index.immutable(`${prefix}/timeline`,{...timeline,narration:[{...archived.lines[0],spokenText:'活动十月九日开始。'}]});
   await expect(loadVerifiedFilmPackage(projects.store,{...spec,timelineRef:forgedTimelineRef},root)).rejects.toThrow('FILM_NARRATION_CHANGED');
-  const noSourcesRef=await projects.index.immutable(`${prefix}/audio`,{schemaVersion:1,sources:[],buses:[{id:'voice'}]});
+  const audio=(await projects.store.readFresh<Record<string,unknown>>(spec.audioManifestRef.key)).value;
+  const noSourcesRef=await projects.index.immutable(`${prefix}/audio`,{...audio,sources:[]});
   await expect(loadVerifiedFilmPackage(projects.store,{...spec,audioManifestRef:noSourcesRef},root)).rejects.toThrow('FILM_NARRATION_CHANGED');
   const words=await projects.store.readFresh(archived.lines[0].wordTimingsRef.key);
   await projects.store.cas(archived.lines[0].wordTimingsRef.key,words.etag,{bad:'changed'});
