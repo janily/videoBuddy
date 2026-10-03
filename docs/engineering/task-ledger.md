@@ -131,3 +131,13 @@ Visual上下文复核：本地模型协议测试新增断言后先失败，确�
 两项独立审查共同发现整轨RMS会误拒绝短轻拟音；真实Python 100ms/-30dB回归先退出1，立体声stem改为精确零PCM静音判定后相关5项通过，单声道人声阈值和最终LUFS门槛保持。首次完整回归54文件211项通过，lint退出0但有未使用import警告，已移除；build与构建后typecheck退出0。
 
 最终复测54文件211项、无警告lint、build、构建后typecheck及diff-check退出0；审查回归夹具曾因联合类型未缩窄导致typecheck退出2，已缩窄并复验。standards/spec两项复审关闭稀疏拟音P2，无剩余发现。模型验证与声音stem实现已测试、未部署；T06/T10及整个项目继续partial。
+
+2026-10-03 T06/T09/T10/T11 真实模型声画增量：新增固定无网FFmpeg主混音，冻结实际人声/配乐/拟音SHA、MixPlan和可信工具摘要，立体声48kHz主轨；独立220Hz频谱测量，人声880Hz技术信号出现时配乐降低9.18dB，结束后恢复，重放与篡改拒绝通过。该信号不是TTS/用户语音。AAC声道回归先错误输出mono退出1，现保留stereo；独立QA拒绝声道压成mono的回归也先失败后通过。
+
+另开明确无旁白、继续原创音乐的真实模型用例，不修改之前青禾ASR失败的有声用例。原生Treatment/Voice-none/Timing通过，首Audio事件校验失败被保留。四次原生Visual HTTP200，首镜通过；后三镜被旧静态校验器误把JS注释当URL拒绝。Acorn语法解析回归先退出1，修复后对四份原始HTTP响应SHA重验通过，三个started effect由显式本地修复收据关联，额外模型调用0；没有改源或删除预算预约。首次真实画面暴露env未传到DockerExecutor（退出1）；传递修复后实际720p渲染，首镜曾QA abort，剩余三镜通过。一次本地并发探针互换activeProduction，fence正确拒绝；已恢复原控制操作，顺序复核全部四镜及20秒480帧拼接通过。失败证据保留。
+
+Audio补明确采样/包络/source/cue约束，显式新operation的一次付费实验成功，旧不确定effect/预约保留；隔离项目调用额度6→7，原控制操作恢复。真实计划15个音乐事件、7个拟音、8个合成source、4个节拍段，用量7438输入/13457输出，再次超过请求12000；不能称硬token上限。七次该无声旁白用例原生调用合计41407输入/69693输出，未超过实验整体80000输出额度，但生产实际usage对账/未知消费熔断尚缺。
+
+[真实模型成片探针](evidence/native-composition-probe.json)实际使用这些冻结Visual与Audio计划、可信合成/混音和无网Chromium/FFmpeg，生成1280×720、20秒480帧、7829730字节H.264/AAC立体声；SHA c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790，独立全解码、faststart/BT.709、声道2、-14.08LUFS/-1.5dBTP通过、重放相同。四个实际抽帧见[来源清单](evidence/native-frames.json)，中途书写文字未完全出现，未把它当阅读/事实/风格质量通过。此为显式无旁白技术用例，原青禾ASR仍阻断；未接AudioExecution/FilmSpec与预览Worker/UI，不是用户可批准影片。43风格86基线仍not_run，质量仍semantic_not_checked，C0/C1/C2未达到、不部署不push。
+
+两项独立审查中standards发现跨语言小数格式误拒绝合法voiceGainDb=0.000001；真实TS→Python有声/无声回归先2失败，修复为受限数字字面量与冻结值相等、完整固定图逐字匹配后3通过，仍拒绝改增益/追加滤镜。复审关闭P2，spec无新增发现。更新可信工具SHA后实际Docker master和原生声画探针重新通过，最终MP4 SHA相同。最终Node22验证：55文件217项通过、无警告lint、build、构建后typecheck和diff-check均退出0。新增直接依赖Acorn安装使用项目规定Node22；npm audit记录11个high依赖链告警，尚待受控修复。实现/测试增量已保存本地，T06/T09–T11与整个项目仍partial，未push或部署。

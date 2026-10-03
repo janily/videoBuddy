@@ -29,7 +29,7 @@ export async function writeStageInputs(stageDir:string,scene:string,jobDocument:
  const dir=await open(stageDir,'r');try{await dir.sync()}finally{await dir.close()}
 }
 export class DockerExecutor implements MediaExecutor{
- constructor(private root:string){if(!isAbsolute(root))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR')}
+ constructor(private root:string,private env:Environment=process.env){if(!isAbsolute(root))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR')}
  async submit(job:MediaJob):Promise<MediaJobHandle>{
   validateSource(job.sourceHtml);
   const dimensions=[job.logicalWidth,job.logicalHeight,job.outputWidth,job.outputHeight];
@@ -37,7 +37,7 @@ export class DockerExecutor implements MediaExecutor{
    dimensions.some(value=>!Number.isSafeInteger(value)||value<64||value>3840)||job.outputWidth%2||job.outputHeight%2||
    ![24,30,60].includes(job.fps)||!Number.isSafeInteger(job.startFrame)||!Number.isSafeInteger(job.endFrame)||job.startFrame<0||job.endFrame<=job.startFrame||job.endFrame-job.startFrame>7200||
    !Number.isSafeInteger(job.seed)||!Number.isSafeInteger(job.fence)||job.fence<0||job.stageKey!==computeStageKey(job))throw Error('RENDER_JOB_INVALID');
-  const config=dockerConfiguration(process.env,`${job.operationId}-${job.attemptId}`);if(job.runtimeDigest!==config.runtimeDigest)throw Error('RENDER_JOB_INVALID');
+  const config=dockerConfiguration(this.env,`${job.operationId}-${job.attemptId}`);if(job.runtimeDigest!==config.runtimeDigest)throw Error('RENDER_JOB_INVALID');
   const stageDir=join(this.root,'media',job.stageKey);await mkdir(stageDir,{recursive:true});
   await writeStageInputs(stageDir,job.sourceHtml,JSON.stringify(job));
   let containerId:string;

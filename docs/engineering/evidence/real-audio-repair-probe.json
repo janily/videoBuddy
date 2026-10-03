@@ -1,0 +1,544 @@
+{
+  "executedAt": "2026-10-03T06:27:02.853Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+  "operationId": "c80551ac-b393-48e8-9a0e-2d0c54760223",
+  "auditRef": {
+    "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/audio-repair-intent/30086fae0990c49ac34c5644e0f60636ba4be68bf8ab5135626a53dc9c5954b7",
+    "sha256": "30086fae0990c49ac34c5644e0f60636ba4be68bf8ab5135626a53dc9c5954b7",
+    "bytes": 271,
+    "mime": "application/json"
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "status": 200,
+      "responseSha256": "4d78547d0a46902efa9c5637153029e7ca5db4864e8afbc0eeb7bf9744611b7b",
+      "responseFile": "model-diagnostics/4d78547d0a46902efa9c5637153029e7ca5db4864e8afbc0eeb7bf9744611b7b.json",
+      "usage": {
+        "prompt_tokens": 7438,
+        "completion_tokens": 13457,
+        "total_tokens": 20895,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "status": "pass",
+  "limits": "Manual isolated one-call Audio experiment after explicit event constraints; prior failed paid effect/reservation retained. Project aggregate limit seven calls. Actual output caps remain unenforced; no semantic/listening QA, approval or publication.",
+  "record": {
+    "schemaVersion": 1,
+    "briefVersion": 2,
+    "understandingSha256": "f63dbe751b77a531562e2fb10f11c400033a56ea77929a7d208c1c6a13a67f6e",
+    "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+    "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+    "seed": 2568290722,
+    "planRef": {
+      "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/audio-plan/fafc59050eee09734b39985d1a2f9784bc16de7602f57bc7c0347bacbc32cc74",
+      "sha256": "fafc59050eee09734b39985d1a2f9784bc16de7602f57bc7c0347bacbc32cc74",
+      "bytes": 8293,
+      "mime": "application/json"
+    },
+    "executionStatus": "not_started"
+  },
+  "plan": {
+    "schemaVersion": 1,
+    "briefVersion": 2,
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "timingDraftHash": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+    "seed": 2568290722,
+    "sections": [
+      {
+        "id": "sec-shot-1",
+        "startFrame": 0,
+        "endFrame": 120,
+        "bpm": 96,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "barOffset": 0
+      },
+      {
+        "id": "sec-shot-2",
+        "startFrame": 120,
+        "endFrame": 264,
+        "bpm": 96,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "barOffset": 2
+      },
+      {
+        "id": "sec-shot-3",
+        "startFrame": 264,
+        "endFrame": 384,
+        "bpm": 96,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "barOffset": 5
+      },
+      {
+        "id": "sec-shot-4",
+        "startFrame": 384,
+        "endFrame": 480,
+        "bpm": 96,
+        "beatsPerBar": 4,
+        "beatUnit": 4,
+        "barOffset": 7
+      }
+    ],
+    "cues": [
+      {
+        "id": "cue-s1-m1",
+        "sourceShotId": "shot-1-pick-book",
+        "requestedTimeUs": 0,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s1-m2",
+        "sourceShotId": "shot-1-pick-book",
+        "requestedTimeUs": 500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s1-f1",
+        "sourceShotId": "shot-1-pick-book",
+        "requestedTimeUs": 1000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s1-m3",
+        "sourceShotId": "shot-1-pick-book",
+        "requestedTimeUs": 2000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s1-f2",
+        "sourceShotId": "shot-1-pick-book",
+        "requestedTimeUs": 3000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s1-m4",
+        "sourceShotId": "shot-1-pick-book",
+        "requestedTimeUs": 3500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s2-f1",
+        "sourceShotId": "shot-2-date-reveal",
+        "requestedTimeUs": 5000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s2-m1",
+        "sourceShotId": "shot-2-date-reveal",
+        "requestedTimeUs": 5500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s2-m2",
+        "sourceShotId": "shot-2-date-reveal",
+        "requestedTimeUs": 6500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s2-f2",
+        "sourceShotId": "shot-2-date-reveal",
+        "requestedTimeUs": 7500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s2-m3",
+        "sourceShotId": "shot-2-date-reveal",
+        "requestedTimeUs": 8500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s2-m4",
+        "sourceShotId": "shot-2-date-reveal",
+        "requestedTimeUs": 9500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s3-m1",
+        "sourceShotId": "shot-3-plaza-gathering",
+        "requestedTimeUs": 11000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s3-m2",
+        "sourceShotId": "shot-3-plaza-gathering",
+        "requestedTimeUs": 12000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s3-f1",
+        "sourceShotId": "shot-3-plaza-gathering",
+        "requestedTimeUs": 13000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s3-m3",
+        "sourceShotId": "shot-3-plaza-gathering",
+        "requestedTimeUs": 14000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s3-f2",
+        "sourceShotId": "shot-3-plaza-gathering",
+        "requestedTimeUs": 14500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s4-m1",
+        "sourceShotId": "shot-4-invitation-end",
+        "requestedTimeUs": 16000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s4-f1",
+        "sourceShotId": "shot-4-invitation-end",
+        "requestedTimeUs": 16500000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s4-m2",
+        "sourceShotId": "shot-4-invitation-end",
+        "requestedTimeUs": 17000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s4-m3",
+        "sourceShotId": "shot-4-invitation-end",
+        "requestedTimeUs": 18000000,
+        "alignmentPolicy": "frame"
+      },
+      {
+        "id": "cue-s4-m4",
+        "sourceShotId": "shot-4-invitation-end",
+        "requestedTimeUs": 19000000,
+        "alignmentPolicy": "frame"
+      }
+    ],
+    "sources": [
+      {
+        "id": "src-music-glock-c5",
+        "kind": "synthesis",
+        "description": "Clear high-register plucked glockenspiel note C5",
+        "material": "metal",
+        "recipe": {
+          "instrument": "pluck",
+          "frequencyHz": 523.25,
+          "attackMs": 5,
+          "releaseMs": 350
+        }
+      },
+      {
+        "id": "src-music-glock-e5",
+        "kind": "synthesis",
+        "description": "Clear plucked glockenspiel note E5",
+        "material": "metal",
+        "recipe": {
+          "instrument": "pluck",
+          "frequencyHz": 659.25,
+          "attackMs": 5,
+          "releaseMs": 350
+        }
+      },
+      {
+        "id": "src-music-glock-g5",
+        "kind": "synthesis",
+        "description": "Clear plucked glockenspiel note G5",
+        "material": "metal",
+        "recipe": {
+          "instrument": "pluck",
+          "frequencyHz": 783.99,
+          "attackMs": 5,
+          "releaseMs": 350
+        }
+      },
+      {
+        "id": "src-music-bass-c3",
+        "kind": "synthesis",
+        "description": "Warm woodwind-like rounded bass root note C3",
+        "material": "wood",
+        "recipe": {
+          "instrument": "triangle",
+          "frequencyHz": 130.81,
+          "attackMs": 20,
+          "releaseMs": 400
+        }
+      },
+      {
+        "id": "src-music-bass-g3",
+        "kind": "synthesis",
+        "description": "Warm rounded bass fifth note G3",
+        "material": "wood",
+        "recipe": {
+          "instrument": "triangle",
+          "frequencyHz": 196,
+          "attackMs": 20,
+          "releaseMs": 400
+        }
+      },
+      {
+        "id": "src-foley-crayon",
+        "kind": "synthesis",
+        "description": "Textured wax crayon rubbing across toothy paper",
+        "material": "paper",
+        "recipe": {
+          "instrument": "noise",
+          "frequencyHz": 2500,
+          "attackMs": 10,
+          "releaseMs": 150
+        }
+      },
+      {
+        "id": "src-foley-paper-turn",
+        "kind": "synthesis",
+        "description": "Soft paper page turning sound",
+        "material": "paper",
+        "recipe": {
+          "instrument": "noise",
+          "frequencyHz": 1100,
+          "attackMs": 20,
+          "releaseMs": 230
+        }
+      },
+      {
+        "id": "src-foley-book-tap",
+        "kind": "synthesis",
+        "description": "Gentle wooden cover tap of a children book",
+        "material": "wood",
+        "recipe": {
+          "instrument": "pluck",
+          "frequencyHz": 220,
+          "attackMs": 10,
+          "releaseMs": 190
+        }
+      }
+    ],
+    "music": [
+      {
+        "eventId": "evt-m-1",
+        "cueId": "cue-s1-m1",
+        "source": "src-music-bass-c3",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -16,
+        "pan": -0.1
+      },
+      {
+        "eventId": "evt-m-2",
+        "cueId": "cue-s1-m2",
+        "source": "src-music-glock-c5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.2
+      },
+      {
+        "eventId": "evt-m-3",
+        "cueId": "cue-s1-m3",
+        "source": "src-music-glock-e5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.25
+      },
+      {
+        "eventId": "evt-m-4",
+        "cueId": "cue-s1-m4",
+        "source": "src-music-glock-g5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.3
+      },
+      {
+        "eventId": "evt-m-5",
+        "cueId": "cue-s2-m1",
+        "source": "src-music-bass-g3",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -16,
+        "pan": -0.1
+      },
+      {
+        "eventId": "evt-m-6",
+        "cueId": "cue-s2-m2",
+        "source": "src-music-glock-e5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": -0.2
+      },
+      {
+        "eventId": "evt-m-7",
+        "cueId": "cue-s2-m3",
+        "source": "src-music-glock-g5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.1
+      },
+      {
+        "eventId": "evt-m-8",
+        "cueId": "cue-s2-m4",
+        "source": "src-music-glock-c5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.25
+      },
+      {
+        "eventId": "evt-m-9",
+        "cueId": "cue-s3-m1",
+        "source": "src-music-bass-c3",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -16,
+        "pan": -0.1
+      },
+      {
+        "eventId": "evt-m-10",
+        "cueId": "cue-s3-m2",
+        "source": "src-music-glock-e5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.2
+      },
+      {
+        "eventId": "evt-m-11",
+        "cueId": "cue-s3-m3",
+        "source": "src-music-glock-g5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": -0.2
+      },
+      {
+        "eventId": "evt-m-12",
+        "cueId": "cue-s4-m1",
+        "source": "src-music-bass-c3",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -16,
+        "pan": -0.1
+      },
+      {
+        "eventId": "evt-m-13",
+        "cueId": "cue-s4-m2",
+        "source": "src-music-glock-e5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.15
+      },
+      {
+        "eventId": "evt-m-14",
+        "cueId": "cue-s4-m3",
+        "source": "src-music-glock-g5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -14,
+        "pan": 0.2
+      },
+      {
+        "eventId": "evt-m-15",
+        "cueId": "cue-s4-m4",
+        "source": "src-music-glock-c5",
+        "pitch": 1,
+        "durationSamples": 24000,
+        "gainDb": -15,
+        "pan": 0
+      }
+    ],
+    "foley": [
+      {
+        "eventId": "evt-f-1",
+        "cueId": "cue-s1-f1",
+        "source": "src-foley-crayon",
+        "pitch": 1,
+        "durationSamples": 12000,
+        "gainDb": -18,
+        "pan": -0.2
+      },
+      {
+        "eventId": "evt-f-2",
+        "cueId": "cue-s1-f2",
+        "source": "src-foley-book-tap",
+        "pitch": 1,
+        "durationSamples": 12000,
+        "gainDb": -17,
+        "pan": 0.1
+      },
+      {
+        "eventId": "evt-f-3",
+        "cueId": "cue-s2-f1",
+        "source": "src-foley-paper-turn",
+        "pitch": 1,
+        "durationSamples": 16000,
+        "gainDb": -18,
+        "pan": 0.15
+      },
+      {
+        "eventId": "evt-f-4",
+        "cueId": "cue-s2-f2",
+        "source": "src-foley-crayon",
+        "pitch": 1,
+        "durationSamples": 12000,
+        "gainDb": -18,
+        "pan": 0.2
+      },
+      {
+        "eventId": "evt-f-5",
+        "cueId": "cue-s3-f1",
+        "source": "src-foley-crayon",
+        "pitch": 1,
+        "durationSamples": 12000,
+        "gainDb": -18,
+        "pan": -0.15
+      },
+      {
+        "eventId": "evt-f-6",
+        "cueId": "cue-s3-f2",
+        "source": "src-foley-book-tap",
+        "pitch": 1,
+        "durationSamples": 12000,
+        "gainDb": -17,
+        "pan": 0.25
+      },
+      {
+        "eventId": "evt-f-7",
+        "cueId": "cue-s4-f1",
+        "source": "src-foley-paper-turn",
+        "pitch": 1,
+        "durationSamples": 16000,
+        "gainDb": -19,
+        "pan": -0.1
+      }
+    ],
+    "intentionalSilenceRanges": [],
+    "mix": {
+      "targetLufs": -14,
+      "toleranceLu": 1,
+      "maxTruePeakDbtp": -1.2,
+      "voiceGainDb": -6,
+      "duck": {
+        "thresholdDb": -24,
+        "ratio": 3,
+        "attackMs": 10,
+        "releaseMs": 200
+      }
+    },
+    "reasoning": "严格基于 crayon-book（手绘蜡笔绘本）风格定制声音设计。乐器选用绘本规范中推荐的金属音片琴（glockenspiel）与圆润木管低音声学合成配方，营造温暖、纯真且略带童趣的音乐质感；Foley 则精准提炼粗糙画纸摩擦、蜡笔描画起笔以及书本翻页动作的材质物理声响。节拍段连续完整覆盖全片480帧，所有cue与合成音源均为严格引用且无闲置声明，采样时长与增益控制完全满足48kHz与-14 LUFS/-1.2 dBTP规范。"
+  },
+  "originalProbeOperationRestored": true
+}

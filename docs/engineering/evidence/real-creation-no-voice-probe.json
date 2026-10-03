@@ -1,0 +1,166 @@
+{
+  "executedAt": "2026-10-03T06:04:38.959Z",
+  "model": "gemini-3.8-flash",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "stages": {
+    "project": {
+      "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+      "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+      "operationId": "bd519de6-34ef-4d45-9a7a-115871d5f354",
+      "understandingSha256": "f63dbe751b77a531562e2fb10f11c400033a56ea77929a7d208c1c6a13a67f6e"
+    },
+    "treatment": {
+      "treatmentRef": {
+        "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/treatment-plan/22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "sha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "bytes": 4073,
+        "mime": "application/json"
+      },
+      "plan": {
+        "schemaVersion": 1,
+        "briefVersion": 2,
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "durationSec": 20,
+        "aspect": "16:9",
+        "fps": 24,
+        "summary": "以手绘蜡笔绘本风格展开一段温暖的邻里换书旅程。通过粗颗粒纸面、稚拙蜡笔线条与水彩浸润，逐步描绘出居民携书相聚青禾社区广场的生动场景，清晰传递2026年10月8日换书活动的核心信息与邻里温情。",
+        "options": [
+          {
+            "id": "option-1-fairytale-exchange",
+            "concept": "童趣折页翻阅式：从床头绘本出发，页面实时手绘翻折，两名邻里角色从书桌走向社区广场交换图书。",
+            "visualApproach": "深棕色蜡笔起稿与暖调上色，画面以横向移动镜头模拟绘本逐页绘制展开，最后定格在阳光洒满的广场大景。",
+            "soundApproach": "轻柔尼龙吉他拨弦辅以蜡笔在粗纹纸上沙沙作响的Foley音效，搭配温暖亲切的叙事旁白。",
+            "tradeoff": "情境感强烈且画面生动，但场景翻折变换较多，需要精细控制画面信息流速以防喧宾夺主。"
+          },
+          {
+            "id": "option-2-wax-resist-reveal",
+            "concept": "蜡笔留白显影式：利用白色蜡笔在纸上预留信息，水彩笔刷轻扫显现关键时间与活动地点。",
+            "visualApproach": "镜头固定俯拍暖米色画纸，水彩从画面上方缓缓晕染开，显影蜡笔文字与广场插画，突显材质物理特性。",
+            "soundApproach": "钢片琴与柔和水刷声为主，节奏舒缓空灵，文案音节留白充裕。",
+            "tradeoff": "材质实验感强，但大面积水彩晕染对角色生动互动的刻画略显单薄。"
+          },
+          {
+            "id": "option-3-neighbourhood-living-page",
+            "concept": "整页画卷生长式：同一张温暖画纸上，蜡笔线条从一本小书逐步生长出绿树、广场与交换图书的居民。",
+            "visualApproach": "镜头由特写向后平移推进，儿童视角透视绘制广场红蓝帐篷与彩色图书，最后平移展现手写标题与具体日期地点。",
+            "soundApproach": "木吉他搭配木管乐器铺垫欢快舒缓的主题旋律，落笔与呼吸节奏舒适自然。",
+            "tradeoff": "画面元素逐层丰富、聚焦感极佳，但视角相对统一，缺乏多场景跳跃带来的强烈戏剧反差。"
+          }
+        ],
+        "selectedOptionId": "option-1-fairytale-exchange",
+        "selectionReason": "方案一在20秒内最具叙事连贯性与邻里代入感。从个人手中的一本好书自然过渡到社区广场的互换分享，既完美契合绘本风格的材质质感，又能在有限时长内清晰、从容地交代2026年10月8日与上海青禾社区广场这两大核心事实。",
+        "shots": [
+          {
+            "id": "shot-1-pick-book",
+            "startFrame": 0,
+            "endFrame": 120,
+            "visualIntent": "暖米色纸面上，深棕色粗蜡笔实时勾勒出一张书桌与一双戴着连指手套的小手，轻轻捧起一本封面画着小鸟的精装绘本，蜡笔碎屑与纸纹质感鲜明。",
+            "scriptLine": "带上一本你喜欢的故事书。",
+            "factIds": []
+          },
+          {
+            "id": "shot-2-date-reveal",
+            "startFrame": 120,
+            "endFrame": 264,
+            "visualIntent": "画面向右平移，角色迈着简朴可爱的步伐走在绿茵小径上，上方由橙色蜡笔手写写出日历翻页图案，醒目标记活动日期。",
+            "scriptLine": "二零二六年十月八日。",
+            "factIds": [
+              "fact-time"
+            ]
+          },
+          {
+            "id": "shot-3-plaza-gathering",
+            "startFrame": 264,
+            "endFrame": 384,
+            "visualIntent": "镜头推开至全景，上海青禾社区广场的热闹场景逐笔显现：彩色遮阳棚、木质长椅、摆满书籍的折叠桌，邻里居民互相递送图书并微笑致意。",
+            "scriptLine": "相约上海青禾社区广场。",
+            "factIds": [
+              "fact-location"
+            ]
+          },
+          {
+            "id": "shot-4-invitation-end",
+            "startFrame": 384,
+            "endFrame": 480,
+            "visualIntent": "特写定格在两双小手同时交接一本绘本的温馨瞬间，淡粉色水彩晕染出暖光，底部手写体整齐浮现邀请语，线条伴随轻微手工抖动。",
+            "scriptLine": "一起换书交朋友吧。",
+            "factIds": []
+          }
+        ],
+        "script": [
+          "带上一本你喜欢的故事书。",
+          "二零二六年十月八日。",
+          "相约上海青禾社区广场。",
+          "一起换书交朋友吧。"
+        ]
+      }
+    },
+    "voice": {
+      "schemaVersion": 1,
+      "briefVersion": 2,
+      "understandingSha256": "f63dbe751b77a531562e2fb10f11c400033a56ea77929a7d208c1c6a13a67f6e",
+      "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+      "planRef": {
+        "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/voice-plan/348c92e789726c6418800f1cfa5ba93e4234c17e772cf90cad4af7d9b5d9ad45",
+        "sha256": "348c92e789726c6418800f1cfa5ba93e4234c17e772cf90cad4af7d9b5d9ad45",
+        "bytes": 31,
+        "mime": "application/json"
+      },
+      "verifiedRef": {
+        "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/voice-verified/348c92e789726c6418800f1cfa5ba93e4234c17e772cf90cad4af7d9b5d9ad45",
+        "sha256": "348c92e789726c6418800f1cfa5ba93e4234c17e772cf90cad4af7d9b5d9ad45",
+        "bytes": 31,
+        "mime": "application/json"
+      }
+    },
+    "timing": {
+      "schemaVersion": 1,
+      "briefVersion": 2,
+      "understandingSha256": "f63dbe751b77a531562e2fb10f11c400033a56ea77929a7d208c1c6a13a67f6e",
+      "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+      "voiceStageHash": "3be703979b9d9de8e78ebf6773673a788b44aea1fcba9d64b6a7f55c0cb4d120",
+      "draftRef": {
+        "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/timing-draft/be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "sha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "bytes": 1806,
+        "mime": "application/json"
+      }
+    }
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 5000,
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 4364,
+        "completion_tokens": 3560,
+        "total_tokens": 7924,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 7168,
+        "completion_tokens": 8626,
+        "total_tokens": 15794,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "status": "blocked",
+  "limits": "Separate explicitly no-voice test variant; previous spoken-name failure remains blocked. Opt-in isolated local real-model pipeline, maximum six HTTP calls and no automatic retries. Provider ignores output caps; requests and observed usage are recorded, no claim of hard token bounds, semantic/style/listening QA or approved final movie.",
+  "errorCode": "AUDIO_EVENT_INVALID"
+}

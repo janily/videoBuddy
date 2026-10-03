@@ -1,0 +1,110 @@
+{
+  "executedAt": "2026-10-03T06:09:23.233Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "status": 200,
+      "responseSha256": "d3c1842a8e88ddf18aeff8caed839a3877440a7708650b78dda3040749d6dae3",
+      "responseFile": "model-diagnostics/d3c1842a8e88ddf18aeff8caed839a3877440a7708650b78dda3040749d6dae3.json",
+      "usage": {
+        "prompt_tokens": 5613,
+        "completion_tokens": 9214,
+        "total_tokens": 14827,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "status": 200,
+      "responseSha256": "24d84271139ab6155d408d4a58de6d98c7540683cea9e0547b185a16bb62fc28",
+      "responseFile": "model-diagnostics/24d84271139ab6155d408d4a58de6d98c7540683cea9e0547b185a16bb62fc28.json",
+      "usage": {
+        "prompt_tokens": 5604,
+        "completion_tokens": 10414,
+        "total_tokens": 16018,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "status": 200,
+      "responseSha256": "a9ee636363519d33ec2c066abf29c4221a9e83fbfb2a893c7b9f9b8b45c19ecf",
+      "responseFile": "model-diagnostics/a9ee636363519d33ec2c066abf29c4221a9e83fbfb2a893c7b9f9b8b45c19ecf.json",
+      "usage": {
+        "prompt_tokens": 5611,
+        "completion_tokens": 12115,
+        "total_tokens": 17726,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "status": 200,
+      "responseSha256": "0efed88738d4965ffc7b07089d99ff56839fbbf152adebe3ebf704f963cfda08",
+      "responseFile": "model-diagnostics/0efed88738d4965ffc7b07089d99ff56839fbbf152adebe3ebf704f963cfda08.json",
+      "usage": {
+        "prompt_tokens": 5609,
+        "completion_tokens": 12307,
+        "total_tokens": 17916,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "shots": {
+    "shot-1-pick-book": {
+      "status": "pass",
+      "result": {
+        "schemaVersion": 1,
+        "briefVersion": 2,
+        "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "shotId": "shot-1-pick-book",
+        "sourceRef": {
+          "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/visual-source/cac6beb39b1ee6837743dbb5d8748b25cdcec09d0daa89f0826bbc35469ce8c7/576776c5b616d203e72f9377bad09a8b9b8a230bead6b45d68394e0cc73c580c",
+          "sha256": "576776c5b616d203e72f9377bad09a8b9b8a230bead6b45d68394e0cc73c580c",
+          "bytes": 18871,
+          "mime": "application/json"
+        },
+        "sourceSha256": "dc45924ec331c79db51eff953357c37faeb3f6ac14125e617a9e134cad6b8180",
+        "runtimeStatus": "not_checked"
+      }
+    },
+    "shot-2-date-reveal": {
+      "status": "blocked",
+      "errorCode": "VISUAL_SOURCE_INVALID"
+    },
+    "shot-3-plaza-gathering": {
+      "status": "blocked",
+      "errorCode": "VISUAL_SOURCE_INVALID"
+    },
+    "shot-4-invitation-end": {
+      "status": "blocked",
+      "errorCode": "VISUAL_SOURCE_INVALID"
+    }
+  },
+  "status": "blocked",
+  "limits": "Read-only reuse of real Treatment/Timing from an explicit no-voice case. Audio model previously failed its event guard and is not retried. At most four additional HTTP calls; project aggregate budget six. Visual success is source validation only, no rendered movie or style QA."
+}

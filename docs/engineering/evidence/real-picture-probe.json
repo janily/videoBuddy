@@ -1,0 +1,151 @@
+{
+  "executedAt": "2026-10-03T06:29:30.289Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+  "actualModelSource": true,
+  "additionalModelCalls": 0,
+  "profile": "preview",
+  "shots": {
+    "shot-1-pick-book": {
+      "status": "pass",
+      "result": {
+        "schemaVersion": 2,
+        "briefVersion": 2,
+        "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "visualSourceSha256": "dc45924ec331c79db51eff953357c37faeb3f6ac14125e617a9e134cad6b8180",
+        "visualSourceRefSha256": "576776c5b616d203e72f9377bad09a8b9b8a230bead6b45d68394e0cc73c580c",
+        "seed": 2568290722,
+        "shotId": "shot-1-pick-book",
+        "profile": "preview",
+        "stageKey": "92c9983759955adf0ff305a0fd8736f290042a2271cdf114f21266c29bb0b00f",
+        "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480/media/92c9983759955adf0ff305a0fd8736f290042a2271cdf114f21266c29bb0b00f/output/picture.mp4",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "ac199d5e5ccacb40ce3277d96bfecb245792fb58387be52442c601ea4a4ae8c0",
+          "bytes": 2021984,
+          "width": 1280,
+          "height": 720,
+          "durationSec": 5,
+          "fps": 24,
+          "frames": 120,
+          "audio": false
+        }
+      },
+      "replayIdentical": true
+    },
+    "shot-2-date-reveal": {
+      "status": "pass",
+      "result": {
+        "schemaVersion": 2,
+        "briefVersion": 2,
+        "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "visualSourceSha256": "4d30d25ebc6960c906951ba0852c40f5e905dd2da6b2404e50c752fcfe416248",
+        "visualSourceRefSha256": "5bddfd8fdc24cf535f6249e7f1e86f51485100dabc00dc2334d44cc7e778393f",
+        "seed": 2568290722,
+        "shotId": "shot-2-date-reveal",
+        "profile": "preview",
+        "stageKey": "5b504bfe685c0ef553808819021b10c38a124cdaa414af68bea3db0c14c9b9eb",
+        "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480/media/5b504bfe685c0ef553808819021b10c38a124cdaa414af68bea3db0c14c9b9eb/output/picture.mp4",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "46caf3a62257ab3974c9852bdb0e6c75ff5a45a3cca150fe1340588c40f43828",
+          "bytes": 1659277,
+          "width": 1280,
+          "height": 720,
+          "durationSec": 6,
+          "fps": 24,
+          "frames": 144,
+          "audio": false
+        }
+      },
+      "replayIdentical": true
+    },
+    "shot-3-plaza-gathering": {
+      "status": "pass",
+      "result": {
+        "schemaVersion": 2,
+        "briefVersion": 2,
+        "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "visualSourceSha256": "930736a767e0e62b7c197d8cacaaded2d4058a4db45abc402398b9711ce3fe77",
+        "visualSourceRefSha256": "26392a214ec7f546865874a87b517a2e4d301069fd76f67bf191453d1676b7b1",
+        "seed": 2568290722,
+        "shotId": "shot-3-plaza-gathering",
+        "profile": "preview",
+        "stageKey": "ee7283492c38244f902d86f425b8d8f9400b226a9d0296cd23d468cb8625940c",
+        "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480/media/ee7283492c38244f902d86f425b8d8f9400b226a9d0296cd23d468cb8625940c/output/picture.mp4",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "e1a05a757a126dd9cea16be49fc782187776ccfc8789739be5b0d7aa9c3debff",
+          "bytes": 800183,
+          "width": 1280,
+          "height": 720,
+          "durationSec": 5,
+          "fps": 24,
+          "frames": 120,
+          "audio": false
+        }
+      },
+      "replayIdentical": true
+    },
+    "shot-4-invitation-end": {
+      "status": "pass",
+      "result": {
+        "schemaVersion": 2,
+        "briefVersion": 2,
+        "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+        "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+        "visualSourceSha256": "682cf4a3530ede42908acc69eefc178bc569d96bd2154b486baf3f9478e98f70",
+        "visualSourceRefSha256": "a3fec5ab612c61333a3edd6ef761a3b5fea68a35349a10bbdced898bec82ac8b",
+        "seed": 2568290722,
+        "shotId": "shot-4-invitation-end",
+        "profile": "preview",
+        "stageKey": "5ca81cd603919c4cad2a386f78d7e2bc3c197490ba2db1185eb45576f4a52899",
+        "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480/media/5ca81cd603919c4cad2a386f78d7e2bc3c197490ba2db1185eb45576f4a52899/output/picture.mp4",
+        "technicalQa": {
+          "result": "pass",
+          "sha256": "4eb12b0c83f89bdf424345f4bcfecd2c1cca765d820943bb83268b093a916741",
+          "bytes": 1023860,
+          "width": 1280,
+          "height": 720,
+          "durationSec": 4,
+          "fps": 24,
+          "frames": 96,
+          "audio": false
+        }
+      },
+      "replayIdentical": true
+    }
+  },
+  "status": "pass",
+  "limits": "Actual cached gemini-3.8-flash Visual HTML, frozen real Treatment/Timing, pinned offline Chromium/Docker full-frame renders at 720p. No model retries, audio mix, semantic/style QA, approved full-resolution render or user preview.",
+  "sequence": {
+    "schemaVersion": 1,
+    "briefVersion": 2,
+    "treatmentSha256": "22a1ef8a95808444ca2914dbb02c7ebfc18058e65cf3910ed8304ac632c41985",
+    "timingDraftSha256": "be1a6cf3510df591b4cea7f1b4f669a549ec8118680b76c58f97333fee896df8",
+    "inputHash": "d9436c89737c12457e55cb60c74d40b5577b2b76c71326e08c399e067e194826",
+    "profile": "preview",
+    "stageKey": "eb727f5b38a0e49c2c5fe9c4e362cd198efd7c293ef5fcfa6b31980917e48f83",
+    "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480/picture-sequence/eb727f5b38a0e49c2c5fe9c4e362cd198efd7c293ef5fcfa6b31980917e48f83/output/picture.mp4",
+    "totalFrames": 480,
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "eed5a7f0473aadd8f5b296fe2383f8a752a78268f4acab97c697f7b87db7bb97",
+      "bytes": 7613735,
+      "width": 1280,
+      "height": 720,
+      "durationSec": 20,
+      "fps": 24,
+      "frames": 480,
+      "audio": false
+    }
+  }
+}

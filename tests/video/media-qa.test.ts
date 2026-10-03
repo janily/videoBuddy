@@ -30,3 +30,8 @@ it('requires AAC at 48 kHz when a completed film has an audio track',()=>{
  expect(()=>validateVideoProbe({...film,streams:[valid.streams[0],{codec_type:'audio',codec_name:'mp3',sample_rate:'48000',channels:1}]},{...expected,audio:true})).toThrow('QA_FAILED');
  expect(()=>validateVideoProbe({...film,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac',sample_rate:'24000',channels:1}]},{...expected,audio:true})).toThrow('QA_FAILED');
 });
+it('rejects a collapsed mono delivery when the declared master is stereo',()=>{
+ const film={...valid,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac',sample_rate:'48000',channels:1}]};
+ expect(()=>validateVideoProbe(film,{...expected,audio:true,audioChannels:2})).toThrow('QA_FAILED');
+ expect(validateVideoProbe({...film,streams:[valid.streams[0],{codec_type:'audio',codec_name:'aac',sample_rate:'48000',channels:2}]},{...expected,audio:true,audioChannels:2})).toMatchObject({audioChannels:2});
+});

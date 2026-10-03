@@ -62,7 +62,7 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
  }
  try{return await verify((await projects.store.readFresh<PictureShotRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(options.mustExist)throw Error('PICTURE_STAGE_MISSING');
- const executor=options.executor||new DockerExecutor(root),job:MediaJob={...parameters,operationId,attemptId:`picture-${profile}-${shotKey.slice(0,12)}`,stageKey};
+ const executor=options.executor||new DockerExecutor(root,env),job:MediaJob={...parameters,operationId,attemptId:`picture-${profile}-${shotKey.slice(0,12)}`,stageKey};
  const handle=await executor.submit(job),deadline=Date.now()+config.timeoutSeconds*1000+30000,pollMs=options.pollMs??1000;
  let status=await executor.inspect(handle);
  while(status.status==='running'&&Date.now()<deadline){

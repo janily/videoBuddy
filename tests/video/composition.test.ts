@@ -2,6 +2,11 @@ import {expect,it} from 'vitest';
 import {composeDockerArguments,composeStageKey,validateCaptionStyle} from '@/services/video/media/compose';
 
 const style={fontSize:42,marginV:20,outline:2,primary:'#FFFFFF',outlineColor:'#112233'};
+it('preserves a stereo master in final AAC instead of collapsing planned pan to mono',()=>{
+ const args=composeDockerArguments('sha256:'+'a'.repeat(64),'1000:1000','b'.repeat(64),'/tmp/picture.mp4','/tmp/master.wav',null,'/tmp/output',null,false,2);
+ expect(args[args.indexOf('-ac')+1]).toBe('2');
+ expect(()=>composeDockerArguments('sha256:'+'a'.repeat(64),'1000:1000','b'.repeat(64),'/tmp/picture.mp4','/tmp/master.wav',null,'/tmp/output',null,false,3 as 2)).toThrow('COMPOSITION_INVALID');
+});
 it('composes video, audio and subtitles in a pinned no-network image with explicit style',()=>{
  const args=composeDockerArguments('sha256:'+'a'.repeat(64),'1000:1000','b'.repeat(64),'/tmp/picture.mp4','/tmp/track.wav','/tmp/captions.srt','/tmp/output',style,false);
  expect(args).toContain('--network');expect(args).toContain('none');expect(args).toContain('--read-only');expect(args).toContain('--cap-drop');

@@ -7,14 +7,14 @@ import {z} from 'zod';
 import {validateOutputPath} from './executor';
 
 const probeSchema=z.object({streams:z.array(z.object({codec_type:z.string(),codec_name:z.string(),width:z.number().optional(),height:z.number().optional(),avg_frame_rate:z.string().optional(),nb_read_frames:z.string().optional(),pix_fmt:z.string().optional(),color_primaries:z.string().optional(),color_transfer:z.string().optional(),color_space:z.string().optional(),sample_rate:z.string().optional(),channels:z.number().optional()})),format:z.object({duration:z.string()})});
-export interface ExpectedVideo{width:number;height:number;durationSec:number;fps:number;audio:boolean}
+export interface ExpectedVideo{width:number;height:number;durationSec:number;fps:number;audio:boolean;audioChannels?:1|2}
 export function validateVideoProbe(raw:unknown,expected:ExpectedVideo){
  const probe=probeSchema.parse(raw),video=probe.streams.filter(stream=>stream.codec_type==='video'),audio=probe.streams.filter(stream=>stream.codec_type==='audio');
  const duration=Number(probe.format.duration),rate=video[0]?.avg_frame_rate?.split('/').map(Number),fps=rate?.length===2?rate[0]/rate[1]:NaN,frames=Number(video[0]?.nb_read_frames),expectedFrames=Math.round(expected.durationSec*expected.fps);
  if(video.length!==1||video[0].codec_name!=='h264'||video[0].pix_fmt!=='yuv420p'||video[0].color_primaries!=='bt709'||video[0].color_transfer!=='bt709'||video[0].color_space!=='bt709'||video[0].width!==expected.width||video[0].height!==expected.height||
-  audio.length!==(expected.audio?1:0)||(expected.audio&&(audio[0].codec_name!=='aac'||audio[0].sample_rate!=='48000'||![1,2].includes(audio[0].channels??0)))||!Number.isFinite(duration)||Math.abs(duration-expected.durationSec)>1/expected.fps||
+  audio.length!==(expected.audio?1:0)||(expected.audio&&(audio[0].codec_name!=='aac'||audio[0].sample_rate!=='48000'||![1,2].includes(audio[0].channels??0)||expected.audioChannels!==undefined&&audio[0].channels!==expected.audioChannels))||expected.audioChannels!==undefined&&!expected.audio||!Number.isFinite(duration)||Math.abs(duration-expected.durationSec)>1/expected.fps||
   !Number.isFinite(fps)||Math.abs(fps-expected.fps)>0.001||!Number.isSafeInteger(frames)||frames!==expectedFrames||Math.abs(expected.durationSec*expected.fps-expectedFrames)>0.001)throw Error('QA_FAILED: media metadata');
- return{width:video[0].width,height:video[0].height,durationSec:duration,fps,frames,audio:audio.length===1};
+ return{width:video[0].width,height:video[0].height,durationSec:duration,fps,frames,audio:audio.length===1,...(expected.audioChannels!==undefined?{audioChannels:audio[0].channels}: {})};
 }
 export async function assertMp4Faststart(path:string,size:number){
  const file=await open(path,'r');let offset=0,ftyp=false,moov=false,mdat=false;

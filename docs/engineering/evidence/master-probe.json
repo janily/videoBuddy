@@ -1,0 +1,32 @@
+{
+  "executedAt": "2026-10-03T06:42:04.575Z",
+  "technicalProbeOnly": true,
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "toolSha256": "2f65dfc54b7632d0ef1234a9f0bf42c53bc0ceb0b7af473c27ae17ea738242e1",
+  "planSha256": "e72f5c7bd2ebeb1b5564aee0111c578bb3c06ce90fffc90d90cd61ec79dec0ab",
+  "stageKey": "7b03774a424b8dbd6b39f9c33e4de19afc22ed65f2ac957637538f5149a52c93",
+  "voiceSha256": "a38c5c07c986bba80fdd851216987d98972b6f72b5ea504ea5911d2fb22a2ba3",
+  "musicSha256": "d1f67682f3ae3b4ad4e5d31fb0c6de7dd901783a9fda5673dbf530c06cbf3442",
+  "foleySha256": "88862448df55b1cff1b55f5065a7745bacbd5d0a45263cfab728f9fd0ebe627a",
+  "master": {
+    "codec": "pcm_f32le",
+    "sampleRate": 48000,
+    "channels": 2,
+    "samples": 960000,
+    "durationMs": 20000,
+    "bytes": 7680114,
+    "sha256": "cad474793adc0f357e8bc7750237e2d3e802b1cb9d74aec8c6435a623b98cd0b",
+    "peakDbfs": -11.454299976903513,
+    "rmsDbfs": -26.758252128835693,
+    "silence": false
+  },
+  "music220HzAmplitude": {
+    "before": 0.044615421648977,
+    "during": 0.015508422265986962,
+    "after": 0.044615421648978026,
+    "duckDb": -9.17834768413784
+  },
+  "replayIdentical": true,
+  "tamperRejected": true,
+  "limits": "Actual pinned offline Docker/FFmpeg master mix, stereo, exact samples, frozen gain/duck parameters and measured attenuation/recovery. 880Hz test signal is explicitly not TTS/user speech; no final AAC, ASR, loudness, listening/style QA or user preview."
+}

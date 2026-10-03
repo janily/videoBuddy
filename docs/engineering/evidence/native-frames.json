@@ -1,0 +1,31 @@
+{
+  "executedOn": "2026-10-03",
+  "sourceFilmSha256": "c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790",
+  "frames": [
+    {
+      "path": "docs/engineering/evidence/native-frame-1.png",
+      "sourceTimeSec": 2.5,
+      "bytes": 1012202,
+      "sha256": "ae26b45df8a7d1c8bfde339cfd98854e1e2aefa5291addf1eaf592541a2ae05e"
+    },
+    {
+      "path": "docs/engineering/evidence/native-frame-2.png",
+      "sourceTimeSec": 8,
+      "bytes": 1082842,
+      "sha256": "c38b2f8252bd1000da44de411937ccd4110f17e32b61b6a24c24817cad6f4fd5"
+    },
+    {
+      "path": "docs/engineering/evidence/native-frame-3.png",
+      "sourceTimeSec": 13.5,
+      "bytes": 617011,
+      "sha256": "7d3c38589f3e195eb8c33e7d09ee2a432c24bf3203e71246d1bc0d6c89cd6ce1"
+    },
+    {
+      "path": "docs/engineering/evidence/native-frame-4.png",
+      "sourceTimeSec": 18,
+      "bytes": 1000410,
+      "sha256": "88872617a8c52379c3a28269d1108f0d7cd59f35fc4d7936baa983ba0f1da3ec"
+    }
+  ],
+  "limits": "Four actual native-model movie frames; progressive text at sampled mid-shot times is incomplete in some frames. No semantic/reading-time/style QA pass claimed."
+}

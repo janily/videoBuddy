@@ -39,3 +39,9 @@ MODEL_API_KEY、MODEL_BASE_URL 与四角色模型现已由用户提供并授权�
 实测 max_tokens:1 返回352 completion_tokens，max_completion_tokens:1 返回297；当前提供方不执行请求输出限制。默认生产生成开关仍关闭。人工授权探针限制HTTP总次数、时间、零重试并记录真实usage，但不能保证硬token计费上限。后续需提供方支持可验证硬上限，或明确接受该风险并接入实际usage对账/超限熔断；不能只把请求参数称为硬上限。
 
 真实20秒创作第二轮台词可容纳，独立ASR把青禾识别为清和，ASR_MISMATCH正确阻断。当前需专名发音验证策略/更强识别证据，不能篡改期待台词或自动用模型改正识别结果。失败记录见 evidence/real-creation-duration-failure.json 与 evidence/real-creation-probe.json；ignored .video-local/real-creation/ 保留实际工作文件。声音合成器已生成真实立体声WAV，音乐主混音/用户音轨/最终听验仍未完成。
+
+### 本轮真实声音与画面后续
+
+可信stems和主混音已在固定无网Docker实跑；实际Native Treatment/Visual/Audio的20秒720p AAC立体声技术片通过全解码和响度。旧缺真实Visual/Audio调用的阻断已消除；未执行的音乐FilmSpec仍应拒绝，需AudioExecution不可变对象归档与producer/独立loader/Composite阶段正式接入，不能用技术片绕过发布门槛。声音听验、逐镜事实/阅读时间与风格QA、1080p、真实预览/批准/渲染/导出、43风格86基线仍缺。
+
+Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工程>=22.13<23后安装Acorn8.15.0成功。当前npm audit实报11个high：braces/http-cache-semantics及传播依赖，主要经eslint-config-next/@swc工具链；不能用建议的Next14降级或force自动修复。后续需核实可用补丁/替代及生产依赖影响，安全验收未通过。

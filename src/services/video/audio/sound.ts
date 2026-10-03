@@ -24,7 +24,7 @@ export function compileSoundJob(raw:AudioPlan,durationMs:number,fps:24|30|60){
  return{schemaVersion:1 as const,planSha256:canonicalHash(plan),sampleRate:48000 as const,channels:2 as const,samples,events};
 }
 export type SoundJob=ReturnType<typeof compileSoundJob>;
-async function frozenInput(path:string,bytes:Buffer){
+export async function frozenAudioInput(path:string,bytes:Buffer){
  try{const file=await open(path,'wx',0o600);try{await file.writeFile(bytes);await file.sync()}finally{await file.close()}}
  catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||!bytes.equals(await readFile(path)))throw Error('AUDIO_STAGE_CHANGED')}
 }
@@ -32,18 +32,18 @@ export async function buildSoundStems(root:string,plan:AudioPlan,durationMs:numb
  if(!isAbsolute(root)||!/^\/[A-Za-z0-9_./-]+$/.test(root))throw Error('AUDIO_JOB_INVALID');
  const config=dockerConfiguration(env,'sound'),job=compileSoundJob(plan,durationMs,fps),toolPath=resolve('runtime/media/sound.py'),info=await lstat(toolPath);
  if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1)throw Error('AUDIO_TOOL_INVALID');
- const toolBytes=await readFile(toolPath),toolSha256=(await import('node:crypto')).createHash('sha256').update(toolBytes).digest('hex'),stageKey=canonicalHash({job,runtimeDigest:config.runtimeDigest,toolSha256}),stageDir=join(root,'sound',stageKey);
- await mkdir(stageDir,{recursive:true,mode:0o700});
+ const toolBytes=await readFile(toolPath),toolSha256=(await import('node:crypto')).createHash('sha256').update(toolBytes).digest('hex'),stageKey=canonicalHash({job,runtimeDigest:config.runtimeDigest,toolSha256,layout:'output-only-v2'}),stageDir=join(root,'sound',stageKey),outputDir=join(stageDir,'output');
+ await mkdir(outputDir,{recursive:true,mode:0o700});
  // The exact trusted tool bytes are archived and mounted read-only; no generated program runs in Python.
- await frozenInput(join(stageDir,'sound.py'),toolBytes);await frozenInput(join(stageDir,'job.json'),Buffer.from(canonicalJson(job)));
+ await frozenAudioInput(join(stageDir,'sound.py'),toolBytes);await frozenAudioInput(join(stageDir,'job.json'),Buffer.from(canonicalJson(job)));
  const dir=await open(stageDir,'r');try{await dir.sync()}finally{await dir.close()}
- const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--memory-swap','1g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=64m','--mount','type=bind,src='+stageDir+',dst=/output','--mount','type=bind,src='+join(stageDir,'sound.py')+',dst=/input/sound.py,readonly','--mount','type=bind,src='+join(stageDir,'job.json')+',dst=/input/job.json,readonly',config.image,'python3','/input/sound.py','--job','/input/job.json','--output','/output'];
+ const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--memory-swap','1g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=64m','--mount','type=bind,src='+outputDir+',dst=/output','--mount','type=bind,src='+join(stageDir,'sound.py')+',dst=/input/sound.py,readonly','--mount','type=bind,src='+join(stageDir,'job.json')+',dst=/input/job.json,readonly',config.image,'python3','/input/sound.py','--job','/input/job.json','--output','/output'];
  const child=spawn('docker',args,{stdio:['ignore','ignore','pipe'],signal:AbortSignal.timeout(180000)}),errors:Buffer[]=[];let length=0;
  child.stderr.on('data',(part:Buffer)=>{length+=part.length;if(length<4096)errors.push(part)});
  const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
  if(code!==0)throw Error('AUDIO_SYNTHESIS_FAILED: '+Buffer.concat(errors).toString('utf8').slice(-300));
- const musicPath=join(stageDir,'music.wav'),foleyPath=join(stageDir,'foley.wav'),music=await inspectStereoTrackWav(musicPath,job.samples,plan.music.length===0),foley=await inspectStereoTrackWav(foleyPath,job.samples,plan.foley.length===0);
- const state=JSON.parse(await readFile(join(stageDir,'state.json'),'utf8'));
+ const musicPath=join(outputDir,'music.wav'),foleyPath=join(outputDir,'foley.wav'),music=await inspectStereoTrackWav(musicPath,job.samples,plan.music.length===0),foley=await inspectStereoTrackWav(foleyPath,job.samples,plan.foley.length===0);
+ const state=JSON.parse(await readFile(join(outputDir,'state.json'),'utf8'));
  if(state.jobSha256!==canonicalHash(job)||state.outputs?.music!==music.sha256||state.outputs?.foley!==foley.sha256)throw Error('AUDIO_SYNTHESIS_CHANGED');
  return{stageKey,planSha256:job.planSha256,runtimeDigest:config.runtimeDigest,toolSha256,music:{outputPath:musicPath,wav:music},foley:{outputPath:foleyPath,wav:foley},qualityStatus:'listening_not_checked' as const};
 }

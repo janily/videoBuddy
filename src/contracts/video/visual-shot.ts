@@ -3,7 +3,7 @@ import type {Understanding} from './domain';
 import {guardTreatment} from './treatment';
 import {TimingDraftSchema,type TimingDraft} from '@/services/video/preview/timing-draft';
 import {canonicalHash} from '@/services/video/domain/hash';
-import {validateSource} from '@/services/video/media/executor';
+import {validateSource,sourceForStaticInspection} from '@/services/video/media/executor';
 import {getStyle} from '@/services/video/styles/registry';
 
 const id=z.string().min(1).max(120),digest=z.string().regex(/^[a-f0-9]{64}$/);
@@ -15,7 +15,8 @@ export type VisualShotSource=z.infer<typeof VisualShotSourceSchema>;
 
 export function validateVisualSource(source:string){
  try{validateSource(source)}catch{throw Error('VISUAL_SOURCE_INVALID')}
- if(Buffer.byteLength(source)>180000||!/window\.render\s*=/.test(source)||!/window\.READY\s*=/.test(source)||/\b(?:setInterval|setTimeout|requestAnimationFrame|cancelAnimationFrame|eval|Function|Worker|SharedWorker|EventSource|RTCPeerConnection|WebSocket|XMLHttpRequest|fetch|sendBeacon|localStorage|sessionStorage|indexedDB)\s*\(/.test(source)||/\b(?:Math\.random|Date\.now|performance\.now|crypto\.getRandomValues|document\.cookie|navigator\.sendBeacon|new\s+Date)\b/.test(source)||/<(?:iframe|object|embed|script\s+[^>]*src\s*=|link\s+[^>]*href\s*=)/i.test(source))throw Error('VISUAL_SOURCE_INVALID');
+ const inspected=sourceForStaticInspection(source);
+ if(Buffer.byteLength(source)>180000||!/window\.render\s*=/.test(inspected)||!/window\.READY\s*=/.test(inspected)||/\b(?:setInterval|setTimeout|requestAnimationFrame|cancelAnimationFrame|eval|Function|Worker|SharedWorker|EventSource|RTCPeerConnection|WebSocket|XMLHttpRequest|fetch|sendBeacon|localStorage|sessionStorage|indexedDB)\s*\(/.test(inspected)||/\b(?:Math\.random|Date\.now|performance\.now|crypto\.getRandomValues|document\.cookie|navigator\.sendBeacon|new\s+Date)\b/.test(inspected)||/<(?:iframe|object|embed|script\s+[^>]*src\s*=|link\s+[^>]*href\s*=)/i.test(inspected))throw Error('VISUAL_SOURCE_INVALID');
  return{status:'static_pass' as const,scope:'offline source syntax only; isolated runtime and visual QA still required'};
 }
 

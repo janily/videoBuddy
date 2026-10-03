@@ -24,6 +24,16 @@ it('T06 Visual only accepts pinned shot, facts, timing and deterministic offline
  expect(()=>guardVisualShot({...result,seed:9},understanding,treatment,timing,timingHash,10)).toThrow('VISUAL_BASELINE_CHANGED');
  expect(()=>guardVisualShot({...result,direction:{purpose:'活动日期',framing:'全景',camera:'静止',actorIds:['a','a']}},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
 });
+it('accepts ordinary JS comments while retaining URL and executable API checks in actual code and strings',()=>{
+ const commented=html.replace('<script>','<script>// drawing layout\n/* Explain offline policy: do not fetch https://example.test */\n');
+ expect(guardVisualShot({...result,sourceHtml:commented},understanding,treatment,timing,timingHash).sourceHtml).toBe(commented);
+ const literal=html.replace('<script>','<script>const note="/* https://example.test */";');
+ expect(()=>guardVisualShot({...result,sourceHtml:literal},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
+ const htmlCommentLiteral=html.replace('<script>','<script>const note="<!-- https://example.test -->";');
+ expect(()=>guardVisualShot({...result,sourceHtml:htmlCommentLiteral},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
+ const hiddenCall=html.replace('<script>','<script>/* documentation */fetch("/private");');
+ expect(()=>guardVisualShot({...result,sourceHtml:hiddenCall},understanding,treatment,timing,timingHash)).toThrow('VISUAL_SOURCE_INVALID');
+});
 it('T06 Visual sends the selected STYLE and real timing through the compatible model adapter',async()=>{
  const requests:Record<string,unknown>[]=[];
  const server=createServer(async(req,res)=>{
