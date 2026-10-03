@@ -1,0 +1,21 @@
+{
+  "executedAt": "2026-10-03T11:02:51.062Z",
+  "status": "pass",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+  "previewId": "00d38077-3195-4590-a361-8bbc31f86081",
+  "bundleHash": "81217548f2dc2e01322e1609167d684727c0b57c77c5b2a21258d83f12d30d4b",
+  "path": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo/source-archive-eIYLeA/6d72359566d6047f3685067bafd397196b1e4ff4e6313b119588339cf098aac1.zip",
+  "sha256": "6d72359566d6047f3685067bafd397196b1e4ff4e6313b119588339cf098aac1",
+  "bytes": 27307795,
+  "entries": 64,
+  "crcAndEveryEntryHashPassed": true,
+  "importedRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo/source-archive-import-kZjHPV",
+  "restoredFilmPackageVerified": true,
+  "replayIdentical": true,
+  "controlUnchanged": true,
+  "additionalModelCalls": 0,
+  "resultPublished": false,
+  "publicExportAvailable": false,
+  "limits": "Private diagnostic source archive from a real frozen film package. No user assets are referenced. Independent ZIP extraction into fresh storage passed loadVerifiedFilmPackage, including frozen scene documents, archived audio WAVs and authoritative audio execution receipts. No final-quality approval; public export operation and download binding remain pending. Font binaries/model weights are excluded; no claim of a single-click offline rebuild or image-source attestation."
+}
