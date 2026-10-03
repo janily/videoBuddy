@@ -44,7 +44,14 @@ it('approved creation rejects replaced Understanding and a mismatched operation 
 it('formal composition refuses a missing frozen audio execution instead of generating fallback sound',async()=>{
  const f=await setup();try{
   await expect(composeApprovedFilm(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env})).rejects.toThrow('APPROVED_AUDIO_NOT_READY');
-  await expect(f.projects.store.readFresh(`projects/${f.projectId}/approvals/${f.approval.approvalId}/composite-stage`)).rejects.toThrow();
+  await expect(f.projects.store.readFresh(`projects/${f.projectId}/approvals/${f.approval.approvalId}/composite-v2-stage`)).rejects.toThrow();
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('read-only approved rendering does not submit missing picture or composition stages',async()=>{
+ const f=await setup();try{
+  let submissions=0;const executor:MediaExecutor={submit:async()=>{submissions++;throw Error('UNEXPECTED_SUBMISSION')},inspect:async()=>{throw Error('UNEXPECTED_INSPECT')},cancel:async()=>({status:'cancelled'})};
+  await expect(renderApprovedPictures(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,executor,mustExist:true})).rejects.toThrow('RENDER_STAGE_MISSING');
+  await expect(composeApprovedFilm(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,mustExist:true})).rejects.toThrow('RENDER_STAGE_MISSING');expect(submissions).toBe(0);
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
 it('cancellation during approved picture execution stops the actual executor handle and saves no stage',async()=>{

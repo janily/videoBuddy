@@ -1,4 +1,4 @@
-import {expect,it} from 'vitest';
+import {expect,it,vi} from 'vitest';
 import {createServer} from 'node:http';
 import {readFile,mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -35,4 +35,18 @@ it('sends exact decoded PNG bytes through native Mastra multimodal transport and
   const body=JSON.stringify(received[0]);expect(body).toContain('data:image/png;base64,'+image.toString('base64'));expect(body).not.toContain('local-unit-only');
   expect((await store.readFresh<{accounting:Record<string,{state:string;inputTokens:number;outputTokens:number}>}>('projects/project/budget')).value.accounting[r.id]).toMatchObject({state:'settled',inputTokens:120,outputTokens:60});
  }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
+});
+it('checks cancellation after durable model accounting before making a transport request',async()=>{
+ const image=await readFile('docs/engineering/evidence/native-frame-3.png'),style=getStyle('crayon-book'),context=visualReviewContext({filmSha256:'b'.repeat(64),filmSpecSha256:'a'.repeat(64),styleSlug:style.slug,styleRulesHash:style.rulesHash,round:1,frames:[{id:'frame-324',frame:324,sha256:createHash('sha256').update(image).digest('hex'),bytes:image.length}],facts:[]});
+ const root=await mkdtemp(join(tmpdir(),'vb-critic-fence-'));let requests=0,checks=0;
+ const env={MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:'http://127.0.0.1:9/v1',MODEL_API_KEY:'local-unit-only',VIDEO_CRITIC_MODEL:'local-unit'};
+ vi.stubGlobal('fetch',async()=>{requests++;throw Error('UNEXPECTED_TRANSPORT')});
+ try{
+  const store=new FileStore(root),reservation=(await reserveModelBudget(store,'project','critic-fence',{inputTokens:1000,outputTokens:1000},{projectCalls:1,projectInputTokens:10000,projectOutputTokens:10000,dailyCalls:1})).reservation;
+  await expect(withAccountedModel(store,reservation,()=>runVisualCritic(context,new Map([['frame-324',image]]),1000,env,{assertActive:async()=>{checks++;if(checks===2)throw Error('RENDER_FENCED')}}))).rejects.toThrow('RENDER_FENCED');
+  expect(checks).toBe(2);expect(requests).toBe(0);
+  // An already-started durable attempt remains conservative/unknown; this
+  // cancellation does not silently refund or reset the billing gate.
+  expect((await store.readFresh<{accounting:Record<string,{state:string}>}>('projects/project/budget')).value.accounting[reservation.id].state).toBe('unknown');
+ }finally{vi.unstubAllGlobals();await rm(root,{recursive:true,force:true})}
 });

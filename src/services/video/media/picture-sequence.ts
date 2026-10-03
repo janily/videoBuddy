@@ -37,7 +37,7 @@ export function pictureSequenceDockerArguments(image:string,user:string,key:stri
  return args;
 }
 
-export async function assemblePictureSequence(root:string,input:PictureSequenceInput,env:Environment=process.env,options:{assertActive?:()=>Promise<void>}={}){
+export async function assemblePictureSequence(root:string,input:PictureSequenceInput,env:Environment=process.env,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}){
  if(!isAbsolute(root)||!/^\/[A-Za-z0-9_./-]+$/.test(root))throw Error('PICTURE_SEQUENCE_INVALID');
  const totalFrames=validatePictureSequence(input),config=dockerConfiguration(env,'picture-sequence');
  if(config.runtimeDigest!==input.runtimeDigest)throw Error('PICTURE_SEQUENCE_INVALID');
@@ -49,9 +49,10 @@ export async function assemblePictureSequence(root:string,input:PictureSequenceI
   sourcePaths.push(sourcePath);
  }
  const stageKey=pictureSequenceStageKey(input),stageDir=join(root,'picture-sequence',stageKey),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'picture.mp4');
- await mkdir(outputDir,{recursive:true,mode:0o700});
+ if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
  let exists=false;try{await lstat(outputPath);exists=true}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
  await options.assertActive?.();
+ if(!exists&&options.mustExist)throw Error('PICTURE_SEQUENCE_MISSING');
  if(!exists)await runOwnedDocker(pictureSequenceDockerArguments(config.image,config.user,stageKey,outputDir,sourcePaths,input.shots,input.fps),config.timeoutSeconds*1000,config.image,options.assertActive);
  await options.assertActive?.();
  const technicalQa=await technicalVideoQa(stageDir,config.image,'output/picture.mp4',{width:input.width,height:input.height,durationSec:totalFrames/input.fps,fps:input.fps,audio:false});

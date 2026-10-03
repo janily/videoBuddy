@@ -1,4 +1,4 @@
-import {spawn} from 'node:child_process';
+import {runOwnedDocker} from '@/services/video/media/owned-docker';
 import {constants} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {mkdir,mkdtemp,open,realpath,rename,rm,lstat,writeFile} from 'node:fs/promises';
@@ -53,26 +53,28 @@ export async function readVisualEvidence(root:string,expected:VisualEvidence){
  if(canonicalHash(manifest)!==canonicalHash(evidence))throw Error('VISUAL_EVIDENCE_CHANGED');
  const images=new Map<string,Uint8Array>();for(const frame of evidence.frames){const data=await pngBytes(join(directory,frame.filename),evidence.width,evidence.height);if(data.length!==frame.bytes||createHash('sha256').update(data).digest('hex')!==frame.sha256)throw Error('VISUAL_EVIDENCE_CHANGED');images.set(frame.id,data)}return images;
 }
-export async function extractVisualFrames(root:string,rawFilm:z.input<typeof filmSchema>,frames:number[],image:string):Promise<VisualEvidence>{
+export async function extractVisualFrames(root:string,rawFilm:z.input<typeof filmSchema>,frames:number[],image:string,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}):Promise<VisualEvidence>{
+ await options.assertActive?.();
  const parsed=filmSchema.safeParse(rawFilm);if(!parsed.success||!validFrames(frames)||frames.at(-1)!>=parsed.data.totalFrames||!isAbsolute(root)||!/^sha256:[a-f0-9]{64}$/.test(image))throw Error('VISUAL_SAMPLE_INVALID');const film=parsed.data;
  const rootReal=await realpath(root),fileReal=await realpath(film.outputPath);
  if(!fileReal.startsWith(rootReal+'/composition/')||fileReal!==film.outputPath||await fileHash(fileReal)!==film.sha256)throw Error('VISUAL_FILM_CHANGED');
  const runtimeDigest=image.slice(7),stageKey=canonicalHash({extractor:'ffmpeg-select-v2',filmSha256:film.sha256,runtimeDigest,width:film.width,height:film.height,frames}),parent=join(rootReal,'visual-evidence'),destination=join(parent,stageKey);
- await mkdir(parent,{recursive:true,mode:0o700});
+ if(!options.mustExist)await mkdir(parent,{recursive:true,mode:0o700});
  if(await realpath(parent)!==parent)throw Error('VISUAL_EVIDENCE_CHANGED');
- try{const existing=await readManifest(join(destination,'manifest.json'));if(existing.stageKey!==stageKey||existing.filmSha256!==film.sha256||existing.runtimeDigest!==runtimeDigest||existing.width!==film.width||existing.height!==film.height||canonicalHash(existing.frames.map(f=>f.frame))!==canonicalHash(frames))throw Error('VISUAL_EVIDENCE_CHANGED');await readVisualEvidence(rootReal,existing);return existing}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;if(await lstat(destination).catch(()=>null))throw Error('VISUAL_EVIDENCE_UNKNOWN')}
+ try{const existing=await readManifest(join(destination,'manifest.json'));if(existing.stageKey!==stageKey||existing.filmSha256!==film.sha256||existing.runtimeDigest!==runtimeDigest||existing.width!==film.width||existing.height!==film.height||canonicalHash(existing.frames.map(f=>f.frame))!==canonicalHash(frames))throw Error('VISUAL_EVIDENCE_CHANGED');await readVisualEvidence(rootReal,existing);await options.assertActive?.();return existing}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;if(await lstat(destination).catch(()=>null))throw Error('VISUAL_EVIDENCE_UNKNOWN')}
+ if(options.mustExist)throw Error('VISUAL_EVIDENCE_MISSING');
  const temp=await mkdtemp(join(parent,'extract-'));
  try{
-  const args=frameExtractionArguments(fileReal,temp,image,frames),child=spawn('docker',args,{stdio:['ignore','ignore','ignore'],signal:AbortSignal.timeout(120000)});
-  const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});if(code!==0)throw Error('VISUAL_EXTRACTION_FAILED');
+  await runOwnedDocker(frameExtractionArguments(fileReal,temp,image,frames),120000,image,options.assertActive);
   const records:VisualEvidence['frames']=[];for(const [index,frame] of frames.entries()){const filename='frame-'+String(index+1).padStart(4,'0')+'.png',path=join(temp,filename),data=await pngBytes(path,film.width,film.height);records.push({id:'frame-'+frame,frame,sha256:createHash('sha256').update(data).digest('hex'),bytes:data.length,filename});const file=await open(path,'r');try{await file.sync()}finally{await file.close()}}
   if(await fileHash(fileReal)!==film.sha256)throw Error('VISUAL_FILM_CHANGED');
   const evidence:VisualEvidence={schemaVersion:2,extractor:'ffmpeg-select-v2',stageKey,filmSha256:film.sha256,runtimeDigest,width:film.width,height:film.height,frames:records};
   await writeFile(join(temp,'manifest.json'),JSON.stringify(evidence),{flag:'wx',mode:0o600});const marker=await open(join(temp,'manifest.json'),'r');try{await marker.sync()}finally{await marker.close()}
   const dir=await open(temp,'r');try{await dir.sync()}finally{await dir.close()}
+  await options.assertActive?.();
   const receipt=await createOrRead(new FileStore(rootReal),'visual-frame-runs/'+stageKey,evidence);if(canonicalHash(receipt)!==canonicalHash(evidence))throw Error('VISUAL_EVIDENCE_CHANGED');
   try{await rename(temp,destination)}catch(error){if(!['EEXIST','ENOTEMPTY'].includes((error as NodeJS.ErrnoException).code||''))throw error}
   const parentHandle=await open(parent,'r');try{await parentHandle.sync()}finally{await parentHandle.close()}
-  await readVisualEvidence(rootReal,evidence);return evidence;
+  await readVisualEvidence(rootReal,evidence);await options.assertActive?.();return evidence;
  }finally{await rm(temp,{recursive:true,force:true})}
 }

@@ -40,7 +40,7 @@ export async function verifyPostMixNoNarration(store:AtomicStore,root:string,fil
  await verifiedFilmHash(root,film);
  return{status:'not_applicable' as const,reason:'no_narration' as const,filmSha256:film.sha256,executionSha256:executionRef.sha256,voiceTrackSha256:voice.sha256,lines:[]};
 }
-export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>}={}){
+export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}){
  await options.assertActive?.();
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
  await verifiedFilmHash(root,film);
@@ -48,9 +48,10 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   const config=dockerConfiguration(env,'postmix-asr');
   const key=createHash('sha256').update(JSON.stringify([film.sha256,config.runtimeDigest,'postmix-silence-v1'])).digest('hex');
   const outputDir=join(root,'postmix',key,'output'),outputPath=join(outputDir,'track.wav');
-  await mkdir(outputDir,{recursive:true,mode:0o700});
+  if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
   let track;try{track=await inspectTrackWav(outputPath,film.durationMs*48,true,1024)}catch(error){
    if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
+   if(options.mustExist)throw Error('POSTMIX_EVIDENCE_MISSING');
    await runOwnedDocker(postMixSilenceDockerArguments(config.image,config.user,film.outputPath,outputDir),60000,config.image,options.assertActive);
    track=await inspectTrackWav(outputPath,film.durationMs*48,true,1024);
   }
@@ -68,9 +69,10 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   const nextStart=ordered[index+1]?.startMs??film.durationMs,lengthMs=Math.min(line.durationMs+300,nextStart-line.startMs,film.durationMs-line.startMs);
   if(lengthMs<line.durationMs||lengthMs>30000)throw Error('POSTMIX_PLAN_CHANGED');
   const key=createHash('sha256').update(JSON.stringify([film.sha256,line.lineId,line.language,line.startMs,lengthMs,config.runtimeDigest,'postmix-v1'])).digest('hex');
-  const stageDir=join(root,'postmix',key),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'line.wav');await mkdir(outputDir,{recursive:true,mode:0o700});
+  const stageDir=join(root,'postmix',key),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'line.wav');if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
   let wav;try{wav=await inspectVoiceWav(outputPath)}catch(error){
    if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
+   if(options.mustExist)throw Error('POSTMIX_EVIDENCE_MISSING');
    await runOwnedDocker(postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs),60000,config.image,options.assertActive);
    wav=await inspectVoiceWav(outputPath);
   }

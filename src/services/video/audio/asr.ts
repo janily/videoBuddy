@@ -23,7 +23,8 @@ export function asrDockerArguments(config:ReturnType<typeof asrConfiguration>,jo
  for(const path of [jobPath,voicePath])if(!isAbsolute(path)||!/^\/[A-Za-z0-9_./-]+$/.test(path))throw Error('ASR_JOB_INVALID');
  return['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','2g','--memory-swap','2g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=128m','--mount',`type=bind,src=${jobPath},dst=/work/job.json,readonly`,'--mount',`type=bind,src=${voicePath},dst=/input/voice.wav,readonly`,config.image,'python3','/opt/videobuddy/asr/transcribe.py','/work/job.json'];
 }
-async function writeOnce(path:string,value:string){
+async function writeOnce(path:string,value:string,mustExist=false){
+ if(mustExist){const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('ASR_STAGE_UNKNOWN');return}
  try{const file=await open(path,'wx',0o600);try{await file.writeFile(value);await file.sync()}finally{await file.close()}}
  catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('ASR_STAGE_UNKNOWN')}
 }
@@ -41,7 +42,7 @@ function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typ
  if(!recognizedText)throw Error('ASR_OUTPUT_INVALID');
  return{...parsed,voiceSha256:voice.wav.sha256,runtimeDigest:config.runtimeDigest,recognizedText};
 }
-export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env,options:{assertActive?:()=>Promise<void>}={}):Promise<AsrTranscript>{
+export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}):Promise<AsrTranscript>{
  await options.assertActive?.();
  if(!isAbsolute(root))throw Error('ASR_JOB_INVALID');
  const rel=relative(join(root,sourceDirectory),voice.outputPath);
@@ -50,11 +51,12 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
  if(inspected.sha256!==voice.wav.sha256)throw Error('ASR_SOURCE_CHANGED');
  const config=asrConfiguration(env),key=createHash('sha256').update(JSON.stringify([voice.language,inspected.sha256,config.runtimeDigest,'faster-whisper-small'])).digest('hex');
  const stageDir=join(root,'asr',key),jobPath=join(stageDir,'job.json'),resultPath=join(stageDir,'transcript.json');
- await mkdir(stageDir,{recursive:true,mode:0o700});
- await writeOnce(jobPath,JSON.stringify({language:voice.language}));
+ if(!options.mustExist)await mkdir(stageDir,{recursive:true,mode:0o700});
+ await writeOnce(jobPath,JSON.stringify({language:voice.language}),options.mustExist);
  let raw:string;
  try{raw=await readFile(resultPath,'utf8')}catch(error){
   if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
+  if(options.mustExist)throw Error('ASR_EVIDENCE_MISSING');
   raw=await runOwnedDocker(asrDockerArguments(config,jobPath,voice.outputPath),120000,config.image,options.assertActive);
   validateTranscript(raw,voice,config);
   await options.assertActive?.();

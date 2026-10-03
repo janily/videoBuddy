@@ -1,0 +1,16 @@
+{
+  "executedAt": "2026-10-03T10:49:24.777Z",
+  "status": "blocked",
+  "expectedGuardConfirmed": true,
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo",
+  "diagnosticRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/visual-budget-inspection-RThToy",
+  "historicalProjectCalls": 7,
+  "accountingVersion": null,
+  "budgetSha256": "0b27081d91e6e6e6893c6e8822adbd61be6746134efe97285d3bb2cc93ecc880",
+  "errorCode": "MODEL_ACCOUNTING_MIGRATION_REQUIRED",
+  "originalBudgetUnchanged": true,
+  "copiedCounterUnchanged": true,
+  "additionalModelCalls": 0,
+  "limits": "Isolated exact occupied legacy-counter copy demonstrates the actual budget migration guard. No generation, provider request, audit approval, migration, refund or counter reset. This is a billing preflight blocker, not a visual-quality pass."
+}

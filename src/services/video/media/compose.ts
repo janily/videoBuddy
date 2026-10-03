@@ -40,11 +40,12 @@ export function composeDockerArguments(image:string,user:string,key:string,pictu
  args.push('-c:a','aac','-b:a','192k','-ar','48000','-ac',String(channels),'-movflags','+faststart','/output/final.mp4');
  return args;
 }
-async function writeOnce(path:string,value:string){
+async function writeOnce(path:string,value:string,mustExist=false){
+ if(mustExist){const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('COMPOSITION_STAGE_UNKNOWN');return}
  try{const file=await open(path,'wx',0o600);try{await file.writeFile(value);await file.sync()}finally{await file.close()}}
  catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('COMPOSITION_STAGE_UNKNOWN')}
 }
-export async function composeVideo(root:string,pictureStageDir:string,track:CompositionTrack,cues:SubtitleCue[],style:CaptionStyle|null,spec:CompositionSpec,env:Environment=process.env,options:{assertActive?:()=>Promise<void>;producerReceipt?:boolean}={}){
+export async function composeVideo(root:string,pictureStageDir:string,track:CompositionTrack,cues:SubtitleCue[],style:CaptionStyle|null,spec:CompositionSpec,env:Environment=process.env,options:{assertActive?:()=>Promise<void>;producerReceipt?:boolean;mustExist?:boolean}={}){
  if(!isAbsolute(root)||!isAbsolute(pictureStageDir)||!Number.isInteger(spec.width)||!Number.isInteger(spec.height)||spec.width<64||spec.height<64||spec.width>3840||spec.height>3840||spec.width%2||spec.height%2||!Number.isInteger(spec.durationSec)||spec.durationSec<20||spec.durationSec>120||![24,30,60].includes(spec.fps)||Boolean(cues.length)!==Boolean(style))throw Error('COMPOSITION_INVALID');
  const config=dockerConfiguration(env,'composition'),picturePath=join(pictureStageDir,'output','picture.mp4');
  const picture=await technicalVideoQa(pictureStageDir,config.image,'output/picture.mp4',{width:spec.width,height:spec.height,durationSec:spec.durationSec,fps:spec.fps,audio:false});
@@ -58,11 +59,12 @@ export async function composeVideo(root:string,pictureStageDir:string,track:Comp
  }
  const key=composeStageKey({pictureSha256:picture.sha256,trackSha256:trackProbe.sha256,trackSilent:trackProbe.silence,srtSha256,style,runtimeDigest:config.runtimeDigest,spec},options.producerReceipt),stageDir=join(root,'composition',key),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'final.mp4');
  const receiptInput={stageKey:key,pictureSha256:picture.sha256,trackSha256:trackProbe.sha256,srtSha256};
- await mkdir(outputDir,{recursive:true,mode:0o700});
+ if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
  const srtPath=cues.length?join(stageDir,'subtitles.srt'):null;
- if(srtPath)await writeOnce(srtPath,srt);
+ if(srtPath)await writeOnce(srtPath,srt,options.mustExist);
  let exists=false;try{await lstat(outputPath);exists=true}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
  await options.assertActive?.();
+ if(!exists&&options.mustExist)throw Error('COMPOSITION_STAGE_MISSING');
  if(!exists){
   const args=composeDockerArguments(config.image,config.user,key,picturePath,track.outputPath,srtPath,outputDir,style,trackProbe.silence,trackProbe.channels);
   // Invocation identity belongs to this execution, independent of cached output.
