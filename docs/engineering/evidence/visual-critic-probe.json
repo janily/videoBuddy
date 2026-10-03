@@ -1,0 +1,173 @@
+{
+  "executedAt": "2026-10-03T07:33:43.878Z",
+  "status": "validated",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/visual-critic/run-T34yLm",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "sourceProjectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "sourceRevisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+  "filmSpecRef": {
+    "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/film/50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+    "sha256": "50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+    "bytes": 2612,
+    "mime": "application/json"
+  },
+  "filmSha256": "c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790",
+  "frameEvidenceSha256": "b85aeda48eec02883bb1b35a0ecb211d25d23c0dcc0669ad602ab8fc99c7ea23",
+  "contextRef": {
+    "key": "projects/1e522c18-920a-460a-879d-035115666cbc/visual-review-context/eb08605e8fe0322c6d09fcbdc45236466c4349da53c27527d62953fb69363ce5",
+    "sha256": "eb08605e8fe0322c6d09fcbdc45236466c4349da53c27527d62953fb69363ce5",
+    "bytes": 1011,
+    "mime": "application/json"
+  },
+  "reviewRef": {
+    "key": "projects/1e522c18-920a-460a-879d-035115666cbc/visual-review/f067f57415d69ca2cbf5c3bd1709ec8c6eb71d540475d99cda178ad91b587a22",
+    "sha256": "f067f57415d69ca2cbf5c3bd1709ec8c6eb71d540475d99cda178ad91b587a22",
+    "bytes": 3189,
+    "mime": "application/json"
+  },
+  "model": "gemini-3.8-flash",
+  "providerOrigin": "https://grsaiapi.com",
+  "reserved": {
+    "inputTokens": 49359,
+    "outputTokens": 16000
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 16000,
+      "status": 200,
+      "responseSha256": "39d21e32a3202eb85a164fb7c1b28120f515413a380ce668e67e2d6e7e06369d",
+      "responseFile": "model-diagnostics/39d21e32a3202eb85a164fb7c1b28120f515413a380ce668e67e2d6e7e06369d.json",
+      "usage": {
+        "prompt_tokens": 9384,
+        "completion_tokens": 10541,
+        "total_tokens": 19925,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "actual": {
+    "state": "settled",
+    "startedAt": "2026-10-03T07:32:49.341Z",
+    "inputTokens": 9384,
+    "outputTokens": 10541
+  },
+  "review": {
+    "schemaVersion": 1,
+    "filmSha256": "c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790",
+    "filmSpecSha256": "50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+    "frameSetSha256": "c0558cecd87eb186b0e15047d9e348ec41675c7fdb9392feac016d380f0042b6",
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "round": 1,
+    "scope": "sampled_frames",
+    "observations": [
+      {
+        "frameId": "frame-60",
+        "visibleText": [
+          "带上一本你喜欢的故事书。"
+        ],
+        "issues": [
+          {
+            "kind": "style_drift",
+            "severity": "blocking",
+            "description": "底部字幕使用标准现代印刷无衬线黑体，而非规范要求的倾斜错落手写字体（handwriting face）。"
+          }
+        ]
+      },
+      {
+        "frameId": "frame-192",
+        "visibleText": [
+          "2026年",
+          "10月8日",
+          "★社区图书交换日★",
+          "二零二六年十月八日。"
+        ],
+        "issues": [
+          {
+            "kind": "style_drift",
+            "severity": "blocking",
+            "description": "底部字幕继续使用规整的计算机印刷黑体，未遵循蜡笔绘本风格的手写体规范。"
+          }
+        ]
+      },
+      {
+        "frameId": "frame-324",
+        "visibleText": [
+          "上海青禾社",
+          "相约上"
+        ],
+        "issues": [
+          {
+            "kind": "clipped_text",
+            "severity": "blocking",
+            "description": "摊位招牌文字仅显示'上海青禾社'（缺失'区广场'），底部字幕仅显示'相约上'，均为动画尚未完整显示导致的文字截断，语意缺失。"
+          },
+          {
+            "kind": "style_drift",
+            "severity": "blocking",
+            "description": "底部字幕仍为标准黑体，偏离手写字体风格规范。"
+          }
+        ]
+      },
+      {
+        "frameId": "frame-432",
+        "visibleText": [
+          "一起换书大朋友吧。"
+        ],
+        "issues": [
+          {
+            "kind": "style_drift",
+            "severity": "blocking",
+            "description": "底部字幕突然切换为卡通手写体，与前三帧使用的无衬线黑体风格完全不一致，全片排版割裂。"
+          },
+          {
+            "kind": "unreadable",
+            "severity": "warning",
+            "description": "字幕显示为'一起换书大朋友吧。'，字形显示为'大'而非'交'，疑似错别字或笔画异常导致语意难读。"
+          }
+        ]
+      }
+    ],
+    "facts": [
+      {
+        "result": "fail",
+        "frameIds": [
+          "frame-192"
+        ],
+        "reason": "事实原文为'活动时间为2026年10月8日'，抽样帧中 frame-192 仅显示日历中的'2026年'、'10月8日'与字幕'二零二六年十月八日。'，没有任何单帧完整呈现包含'活动时间为'的事实原文。",
+        "factId": "fact-time"
+      },
+      {
+        "result": "fail",
+        "frameIds": [
+          "frame-324"
+        ],
+        "reason": "事实原文为'活动地点为上海青禾社区广场'，抽样帧中 frame-324 招牌仅截断显示'上海青禾社'，字幕仅显示'相约上'，未完整呈现包含'活动地点为'及完整地名的原文。",
+        "factId": "fact-location"
+      }
+    ],
+    "style": {
+      "result": "fail",
+      "frameIds": [
+        "frame-60",
+        "frame-192",
+        "frame-324",
+        "frame-432"
+      ],
+      "reason": "frame-60、frame-192 与 frame-324 均违背规范第4节（Subtitles are the book's printed words: a handwriting face, each glyph tilted and offset），使用了机械规整的计算机印刷黑体，且在 frame-432 突变为另一种卡通手写体，存在 blocking 级别的风格漂移与前后不统一。"
+    },
+    "readability": {
+      "result": "fail",
+      "frameIds": [
+        "frame-324"
+      ],
+      "reason": "frame-324 中摊位招牌（'上海青禾社'）与底部字幕（'相约上'）均因动画未播放完整而产生严重截断（blocking clipped_text），阻碍有效识读。"
+    }
+  },
+  "limits": "One paid native Mastra multimodal Critic request on four exact real movie frames; zero retries, HTTP deadline, actual usage ledger in a new isolated read-only technical experiment scope. Historical ledgers are not cleared or migrated. Provider ignores hard token limits. This is one sampled round, not full visual/reading-time/motion QA and never listening QA or a publishable delivery."
+}

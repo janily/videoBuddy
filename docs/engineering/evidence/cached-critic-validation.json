@@ -1,0 +1,12 @@
+{
+  "executedAt": "2026-10-03T07:40:25.644Z",
+  "status": "binding_validated",
+  "originalReviewSha256": "f067f57415d69ca2cbf5c3bd1709ec8c6eb71d540475d99cda178ad91b587a22",
+  "frameEvidenceV2Sha256": "eb37cab8417797629bd15904987f7e07e453312955ff70008c4d30ffe5603f87",
+  "frameSetSha256": "c0558cecd87eb186b0e15047d9e348ec41675c7fdb9392feac016d380f0042b6",
+  "additionalModelCalls": 0,
+  "style": "fail",
+  "readability": "fail",
+  "qualityPassed": false,
+  "limits": "Historical paid review checked against byte-identical v2 extraction receipts; original report is preserved and still fails sampled visual checks. No new semantic or listening review."
+}

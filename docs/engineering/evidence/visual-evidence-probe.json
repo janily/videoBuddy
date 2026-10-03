@@ -1,0 +1,69 @@
+{
+  "executedAt": "2026-10-03T07:39:41.114Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "revisionId": "64239bc0-9d50-45e8-85fc-6f7b38f53b7a",
+  "filmSpecRef": {
+    "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/film/50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+    "sha256": "50cb05eca74241db402f9ddeeeed282b49618f5644cb202295aac33fc95f30a9",
+    "bytes": 2612,
+    "mime": "application/json"
+  },
+  "evidence": {
+    "schemaVersion": 2,
+    "extractor": "ffmpeg-select-v2",
+    "stageKey": "66d85de9ad8fe3e1274cc8b894276c33e158cf6e37193c0037cd94437763aa47",
+    "filmSha256": "c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790",
+    "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "width": 1280,
+    "height": 720,
+    "frames": [
+      {
+        "id": "frame-60",
+        "frame": 60,
+        "sha256": "ae26b45df8a7d1c8bfde339cfd98854e1e2aefa5291addf1eaf592541a2ae05e",
+        "bytes": 1012202,
+        "filename": "frame-0001.png"
+      },
+      {
+        "id": "frame-192",
+        "frame": 192,
+        "sha256": "c38b2f8252bd1000da44de411937ccd4110f17e32b61b6a24c24817cad6f4fd5",
+        "bytes": 1082842,
+        "filename": "frame-0002.png"
+      },
+      {
+        "id": "frame-324",
+        "frame": 324,
+        "sha256": "7d3c38589f3e195eb8c33e7d09ee2a432c24bf3203e71246d1bc0d6c89cd6ce1",
+        "bytes": 617011,
+        "filename": "frame-0003.png"
+      },
+      {
+        "id": "frame-432",
+        "frame": 432,
+        "sha256": "88872617a8c52379c3a28269d1108f0d7cd59f35fc4d7936baa983ba0f1da3ec",
+        "bytes": 1000410,
+        "filename": "frame-0004.png"
+      }
+    ]
+  },
+  "sourceVideoQa": {
+    "result": "pass",
+    "sha256": "c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790",
+    "bytes": 7829730,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2
+  },
+  "coldRead": "pass",
+  "tamperRejected": true,
+  "resignedCacheRejected": true,
+  "additionalModelCalls": 0,
+  "limits": "Four exact decoded native-model movie frames only. Film SHA verified before and after extraction; no semantic, full-frame coverage, reading-time or listening pass claimed."
+}

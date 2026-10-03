@@ -32,7 +32,7 @@ type Qa=typeof technicalVideoQa;
 type Compose=typeof composeVideo;
 type PostMix=typeof verifyPostMixNarration;
 type Font=typeof readPinnedSubtitleFont;
-interface Options{root?:string;env?:Environment;profile?:Profile;pictureQa?:Qa;filmQa?:Qa;compose?:Compose;postMix?:PostMix;readFont?:Font}
+interface Options{root?:string;env?:Environment;profile?:Profile;pictureQa?:Qa;filmQa?:Qa;compose?:Compose;postMix?:PostMix;readFont?:Font;mustExist?:boolean}
 export interface CompositeStageRecord{
  schemaVersion:4;audioPlanSha256:string;audioExecutionSha256:string|null;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;pictureSequenceHash:string;voiceVerifiedSha256:string;narrationPackageSha256:string;
  profile:Profile;stageKey:string;outputPath:string;captionStyle:CaptionStyle|null;technicalQa:Awaited<ReturnType<Qa>>;
@@ -57,8 +57,8 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const [originalPlan,verified]=await Promise.all([readRef<NarrationPlan>(projects,voice.planRef,revisionPrefix),readRef<VerifiedNarrationManifest>(projects,voice.verifiedRef,revisionPrefix)]);
  const timingRecord=await prepareTimingStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const timing=TimingDraftSchema.parse(await readRef<unknown>(projects,timingRecord.draftRef,revisionPrefix));
- const narrationPackage=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env});
- const picture=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,profile,qa:options.pictureQa});
+ const narrationPackage=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:options.mustExist});
+ const picture=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,profile,qa:options.pictureQa,mustExist:options.mustExist});
  const landscape=understanding.preferences.aspect==='16:9',width=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):(landscape?1920:1080),height=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):(landscape?1080:1920);
  const config=dockerConfiguration(env,operationId),wav=await inspectTrackWav(timing.track.outputPath,timing.durationMs*48,timing.track.silence);
  if(wav.sha256!==timing.track.sha256||wav.samples!==timing.track.samples||timing.track.runtimeDigest!==config.runtimeDigest)throw Error('COMPOSITE_TRACK_CHANGED');
@@ -93,6 +93,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   return record;
  }
  try{return await verify((await projects.store.readFresh<CompositeStageRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
+ if(options.mustExist)throw Error('COMPOSITE_STAGE_MISSING');
  const composed=await (options.compose||composeVideo)(root,join(root,'picture-sequence',picture.stageKey),track,cues,captionStyle,spec,env);
  if(composed.stageKey!==stageKey||composed.outputPath!==outputPath||composed.qaStatus!=='semantic_not_checked'||composed.technicalQa.audio!==true||composed.technicalQa.frames!==timing.totalFrames||composed.loudness.status!==(masterWav.silence?'not_applicable':'pass'))throw Error('COMPOSITE_OUTPUT_INVALID');
  const actual=await qa(stageDir,config.image,'output/final.mp4',expected);

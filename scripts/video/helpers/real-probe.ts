@@ -13,6 +13,9 @@ export function recordModelRequests(env:Environment,root:string,maxCalls:number)
  const original=globalThis.fetch,provider=new URL(env.MODEL_BASE_URL!),requests:ProbeRequest[]=[],reads:Promise<void>[]=[];
  globalThis.fetch=async(input,init)=>{
   const url=new URL(input instanceof Request?input.url:String(input));
+  // Mastra decodes its generated inline image URI through fetch; this is local
+  // byte decoding, not an HTTP request or an asset network permission.
+  if(url.protocol==='data:'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(url.href)&&url.href.length<=12*1024*1024)return original(input,init);
   if(url.origin!==provider.origin||url.pathname!==provider.pathname.replace(/\/$/,'')+'/chat/completions')throw Error('MODEL_PROBE_UNEXPECTED_DESTINATION');
   if(requests.length>=maxCalls)throw Error('MODEL_PROBE_CALL_LIMIT');
   const body=JSON.parse(String(init?.body||'{}')),entry:ProbeRequest={model:String(body.model),maxTokens:body.max_tokens??body.max_completion_tokens};requests.push(entry);

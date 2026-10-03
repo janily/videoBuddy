@@ -16,7 +16,7 @@ import {prepareTimingStage} from './timing-stage';
 type Profile='full'|'preview'|'probe';
 type Qa=typeof technicalVideoQa;
 type Assemble=typeof assemblePictureSequence;
-interface Options{root?:string;env?:Environment;profile?:Profile;qa?:Qa;assemble?:Assemble}
+interface Options{root?:string;env?:Environment;profile?:Profile;qa?:Qa;assemble?:Assemble;mustExist?:boolean}
 export interface PictureSequenceRecord{schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;inputHash:string;profile:Profile;stageKey:string;outputPath:string;totalFrames:number;technicalQa:Awaited<ReturnType<Qa>>}
 
 async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Promise<T>{
@@ -53,6 +53,7 @@ export async function preparePictureSequenceStage(projects:ProjectStore,projectI
   return record;
  }
  try{return await verify((await projects.store.readFresh<PictureSequenceRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
+ if(options.mustExist)throw Error('PICTURE_SEQUENCE_MISSING');
  const assembled=await (options.assemble||assemblePictureSequence)(root,input,env);
  if(assembled.stageKey!==stageKey||assembled.outputPath!==outputPath||assembled.totalFrames!==timing.totalFrames)throw Error('PICTURE_SEQUENCE_INVALID');
  for(const shot of timing.shots){

@@ -161,3 +161,5 @@ Audio补明确采样/包络/source/cue约束，显式新operation的一次付费
 历史迁移边界复审P2：旧日/其他项目无gate legacy账本可绕过首次初始化。新增精确旧数据fixture先成功（测试退出1），修复为首次必须取得有界、不跟随symlink的所有日账本及项目budget清单；已有calls>0且gate缺失即MODEL_ACCOUNTING_MIGRATION_REQUIRED，不建active:null，不自动迁移或清零。缺清单能力、symlink清单均阻断；只允许全空新作用域初始化。升级时须停止旧worker并先审计历史占用，不能与旧版本并行写账本。新格式跨日故障/重放规则保持不变。
 
 迁移修复最终验证：两轴独立复审关闭P2，无剩余发现；58文件243项、lint、无警告build、构建后typecheck及diff-check退出0。真实单次用量证据保留（没有因只读初始化修复额外付费重跑）。该增量仅本地提交；继续下一阶段开发。
+
+2026-10-03 T06/T09/T12 真实抽帧 Critic 增量：新增严格 sampled_frames 合同、原生 Mastra 多模态 Agent、固定无网 FFmpeg 抽帧与持久审查阶段。真实 Gemini 请求 HTTP200，输入9384/输出10541，实际用量 settled；原报告保留且字体/style及可读性失败，不能作为质量通过。首个本地 inline PNG 解码阻断记录零提供方请求，修复后才显式运行独立技术重测，没有自动重试。复审来源绑定与缓存换帧漏洞后，桥接冻结 Timing/AudioPlan/Execution/Visual来源，并只读重算 PictureSequence/Composite 完整键与实际视频QA；抽帧v2固定输入地址回执阻止自行重签manifest换时间点。两轴独立复审无剩余实质发现；真实movie只读验证禁网通过，四帧cold-copy、字节篡改与第324帧冒充第60帧重签缓存拒绝均通过。历史付费报告与v2四帧SHA完全一致，零新增调用重新校验绑定，仍qualityPassed=false。完整回归62文件251项、lint/build/构建后typecheck退出0。详见 evidence/visual-critic-validation.md；T06/T09/T12仍partial，尚未接通用户预览/批准/正式render与全片两轮QA，43风格86基线未运行，C0/C1/C2未达到，deployed=false。

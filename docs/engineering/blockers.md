@@ -49,3 +49,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 模型对账更新：四个原生生成入口已接SDK实际usage、不可变receipt与跨日持久部署门闩；已知超限冻结，未知用量冻结，旧日未用预约拒绝。未知消费不因新UTC日/新项目消失；旧无版本计数必须审计，不自动迁移或清零。真实单次探针HTTP200/4103input/2716output/settled，见 [model-accounting-probe.json](evidence/model-accounting-probe.json)。此前缺实际usage对账的开发缺口已消除，但提供方仍不执行硬token限制，对账无法阻止单次已发请求的额外收费。生产生成默认仍关闭；独立Critic、完整预览和制作Worker/API/UI及剩余验收继续开发。
 
 历史迁移边界复审P2：旧日/其他项目无gate legacy账本可绕过首次初始化。新增精确旧数据fixture先成功（测试退出1），修复为首次必须取得有界、不跟随symlink的所有日账本及项目budget清单；已有calls>0且gate缺失即MODEL_ACCOUNTING_MIGRATION_REQUIRED，不建active:null，不自动迁移或清零。缺清单能力、symlink清单均阻断；只允许全空新作用域初始化。升级时须停止旧worker并先审计历史占用，不能与旧版本并行写账本。新格式跨日故障/重放规则保持不变。
+
+2026-10-03 Critic实测：真实模型看到所选蜡笔绘本画面中字体不符合手写规范、第324帧地点尚未完整显示；保持预览证据，禁止当最终质量通过。事实pass目前要求一帧中的完整原文（仅忽略标点/空白），对“活动时间为…”这类描述前缀较保守，可产生未通过，尚需来源固定的显示片段契约；不靠白名单/改写事实放宽专名日期。四帧静态审查不代表全片两轮覆盖、0.2秒关键动作、阅读停留或听感通过。缺的不是Blob/Sandbox凭据：当前真实无网Docker链可运行，仍需完成生产Worker/API/UI、真正聊天增量、风格修复及全部验收。
