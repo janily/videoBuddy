@@ -20,7 +20,9 @@ export interface PreviewSpeechWindow{startMs:number;endMs:number}
 export function validatePreviewSpeechCoverage(segments:ExcerptSegment[],speechWindows:PreviewSpeechWindow[],sourceDurationMs:number){
  validateExcerptMap(segments,sourceDurationMs);
  for(const window of speechWindows){
-  if(!Number.isSafeInteger(window.startMs)||!Number.isSafeInteger(window.endMs)||window.startMs<0||window.endMs<=window.startMs||window.endMs>sourceDurationMs)throw Error('EXCERPT_SPEECH_INVALID');
+  // Native 48kHz samples and video frames often end at fractional milliseconds.
+  // Compare their exact bounded values; rounding inward could cut real speech.
+  if(!Number.isFinite(window.startMs)||!Number.isFinite(window.endMs)||window.startMs<0||window.endMs<=window.startMs||window.endMs>sourceDurationMs)throw Error('EXCERPT_SPEECH_INVALID');
   for(const segment of segments){
    if(segment.sourceStartMs===null||segment.sourceEndMs===null)continue;
    if(window.startMs<segment.sourceEndMs&&window.endMs>segment.sourceStartMs&&
