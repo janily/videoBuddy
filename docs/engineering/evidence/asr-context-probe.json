@@ -1,0 +1,287 @@
+{
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-context/probe-c8UIVI",
+  "sourcePlanHash": "7b19fc8406ff2affb6d8c37f9252e95f8d94d7e1512b36258a35a2961a6e0ead",
+  "journalPrefix": "projects/e0112f8e-bfb8-43cb-93f4-56fc69519e8e/operations/4d42768a-d887-46ea-85a2-9dc9ca38b86a/media-effects",
+  "networkCalls": 0,
+  "stages": {
+    "expectedAsrText": "把种子轻轻埋进泥土。 适量浇水，润湿大地。 种子醒来了，探出绿芽。 一起观察成长，耐心照料。",
+    "pcm": {
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 480000,
+        "durationMs": 20000,
+        "bytes": 1920114,
+        "sha256": "0b2123795c4c0c39453337cdab1c29d0ee8d0fffbb0a724692668d7ddddc46d4",
+        "peakDbfs": -5.517251851628617,
+        "rmsDbfs": -25.9974813476885
+      },
+      "originalWindowsExactlyEqual": true
+    },
+    "transcript": {
+      "language": "zh-CN",
+      "model": "Systran/faster-whisper-small",
+      "segments": [
+        {
+          "text": "把種子輕輕埋進泥土",
+          "startMs": 0,
+          "endMs": 2400,
+          "words": [
+            {
+              "text": "把",
+              "startMs": 0,
+              "endMs": 440,
+              "probability": 0.9701069593429565
+            },
+            {
+              "text": "種",
+              "startMs": 440,
+              "endMs": 660,
+              "probability": 0.9058482646942139
+            },
+            {
+              "text": "子",
+              "startMs": 660,
+              "endMs": 900,
+              "probability": 0.9962236881256104
+            },
+            {
+              "text": "輕",
+              "startMs": 900,
+              "endMs": 1160,
+              "probability": 0.7598662376403809
+            },
+            {
+              "text": "輕",
+              "startMs": 1160,
+              "endMs": 1440,
+              "probability": 0.9989566802978516
+            },
+            {
+              "text": "埋",
+              "startMs": 1440,
+              "endMs": 1700,
+              "probability": 0.9817867577075958
+            },
+            {
+              "text": "進",
+              "startMs": 1700,
+              "endMs": 1940,
+              "probability": 0.982513964176178
+            },
+            {
+              "text": "泥",
+              "startMs": 1940,
+              "endMs": 2100,
+              "probability": 0.9785910546779633
+            },
+            {
+              "text": "土",
+              "startMs": 2100,
+              "endMs": 2400,
+              "probability": 0.9987125396728516
+            }
+          ]
+        },
+        {
+          "text": "適量澆水潤濕大地",
+          "startMs": 4940,
+          "endMs": 7220,
+          "words": [
+            {
+              "text": "適",
+              "startMs": 4940,
+              "endMs": 5460,
+              "probability": 0.6892101019620895
+            },
+            {
+              "text": "量",
+              "startMs": 5460,
+              "endMs": 5640,
+              "probability": 0.9993321299552917
+            },
+            {
+              "text": "澆",
+              "startMs": 5640,
+              "endMs": 5860,
+              "probability": 0.8360117673873901
+            },
+            {
+              "text": "水",
+              "startMs": 5860,
+              "endMs": 6200,
+              "probability": 0.999594509601593
+            },
+            {
+              "text": "潤",
+              "startMs": 6200,
+              "endMs": 6540,
+              "probability": 0.9412341713905334
+            },
+            {
+              "text": "濕",
+              "startMs": 6540,
+              "endMs": 6720,
+              "probability": 0.9571104049682617
+            },
+            {
+              "text": "大",
+              "startMs": 6720,
+              "endMs": 6960,
+              "probability": 0.9986341595649719
+            },
+            {
+              "text": "地",
+              "startMs": 6960,
+              "endMs": 7220,
+              "probability": 0.9590912461280823
+            }
+          ]
+        },
+        {
+          "text": "種子醒來了,探出綠牙",
+          "startMs": 9960,
+          "endMs": 12600,
+          "words": [
+            {
+              "text": "種",
+              "startMs": 9960,
+              "endMs": 10480,
+              "probability": 0.9009999632835388
+            },
+            {
+              "text": "子",
+              "startMs": 10480,
+              "endMs": 10700,
+              "probability": 0.9998562335968018
+            },
+            {
+              "text": "醒",
+              "startMs": 10700,
+              "endMs": 10960,
+              "probability": 0.9986188411712646
+            },
+            {
+              "text": "來了,",
+              "startMs": 10960,
+              "endMs": 11360,
+              "probability": 0.9502733945846558
+            },
+            {
+              "text": "探",
+              "startMs": 11760,
+              "endMs": 11860,
+              "probability": 0.7294023782014847
+            },
+            {
+              "text": "出",
+              "startMs": 11860,
+              "endMs": 12100,
+              "probability": 0.9944764971733093
+            },
+            {
+              "text": "綠",
+              "startMs": 12100,
+              "endMs": 12300,
+              "probability": 0.9879003167152405
+            },
+            {
+              "text": "牙",
+              "startMs": 12300,
+              "endMs": 12600,
+              "probability": 0.924295961856842
+            }
+          ]
+        },
+        {
+          "text": "一起觀察成長,耐心照料",
+          "startMs": 15000,
+          "endMs": 17860,
+          "words": [
+            {
+              "text": "一起",
+              "startMs": 15000,
+              "endMs": 15520,
+              "probability": 0.8150110244750977
+            },
+            {
+              "text": "觀",
+              "startMs": 15520,
+              "endMs": 15880,
+              "probability": 0.9982092380523682
+            },
+            {
+              "text": "察",
+              "startMs": 15880,
+              "endMs": 16160,
+              "probability": 0.9985325336456299
+            },
+            {
+              "text": "成",
+              "startMs": 16160,
+              "endMs": 16380,
+              "probability": 0.9966179728507996
+            },
+            {
+              "text": "長,",
+              "startMs": 16380,
+              "endMs": 16660,
+              "probability": 0.9982307553291321
+            },
+            {
+              "text": "耐",
+              "startMs": 16980,
+              "endMs": 17160,
+              "probability": 0.9897356629371643
+            },
+            {
+              "text": "心",
+              "startMs": 17160,
+              "endMs": 17420,
+              "probability": 0.9971653819084167
+            },
+            {
+              "text": "照",
+              "startMs": 17420,
+              "endMs": 17640,
+              "probability": 0.9822583198547363
+            },
+            {
+              "text": "料",
+              "startMs": 17640,
+              "endMs": 17860,
+              "probability": 0.9813217520713806
+            }
+          ]
+        }
+      ],
+      "voiceSha256": "0b2123795c4c0c39453337cdab1c29d0ee8d0fffbb0a724692668d7ddddc46d4",
+      "runtimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "recognizedText": "把種子輕輕埋進泥土適量澆水潤濕大地種子醒來了,探出綠牙一起觀察成長,耐心照料"
+    },
+    "sourceControlAndBudgetUnchanged": true,
+    "receipts": [
+      {
+        "schemaVersion": 1,
+        "invocation": "998cf7aa-4a47-4bd6-9266-8bc0b7998897",
+        "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "argsSha256": "20590c959c8154bd126d7f5beebcdaafce6da7f4e16489a5985e53d0e67351f3",
+        "state": "completed",
+        "output": ""
+      },
+      {
+        "schemaVersion": 1,
+        "invocation": "2b309c39-bb6f-440a-9177-71b342555a96",
+        "image": "sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+        "argsSha256": "9aada9960a7e2aaf859f2e7105d8a0e97bee83daf8faa1da6555a42de6873690",
+        "state": "completed",
+        "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-small\", \"segments\": [{\"text\": \"把種子輕輕埋進泥土\", \"startMs\": 0, \"endMs\": 2400, \"words\": [{\"text\": \"把\", \"startMs\": 0, \"endMs\": 440, \"probability\": 0.9701069593429565}, {\"text\": \"種\", \"startMs\": 440, \"endMs\": 660, \"probability\": 0.9058482646942139}, {\"text\": \"子\", \"startMs\": 660, \"endMs\": 900, \"probability\": 0.9962236881256104}, {\"text\": \"輕\", \"startMs\": 900, \"endMs\": 1160, \"probability\": 0.7598662376403809}, {\"text\": \"輕\", \"startMs\": 1160, \"endMs\": 1440, \"probability\": 0.9989566802978516}, {\"text\": \"埋\", \"startMs\": 1440, \"endMs\": 1700, \"probability\": 0.9817867577075958}, {\"text\": \"進\", \"startMs\": 1700, \"endMs\": 1940, \"probability\": 0.982513964176178}, {\"text\": \"泥\", \"startMs\": 1940, \"endMs\": 2100, \"probability\": 0.9785910546779633}, {\"text\": \"土\", \"startMs\": 2100, \"endMs\": 2400, \"probability\": 0.9987125396728516}]}, {\"text\": \"適量澆水潤濕大地\", \"startMs\": 4940, \"endMs\": 7220, \"words\": [{\"text\": \"適\", \"startMs\": 4940, \"endMs\": 5460, \"probability\": 0.6892101019620895}, {\"text\": \"量\", \"startMs\": 5460, \"endMs\": 5640, \"probability\": 0.9993321299552917}, {\"text\": \"澆\", \"startMs\": 5640, \"endMs\": 5860, \"probability\": 0.8360117673873901}, {\"text\": \"水\", \"startMs\": 5860, \"endMs\": 6200, \"probability\": 0.999594509601593}, {\"text\": \"潤\", \"startMs\": 6200, \"endMs\": 6540, \"probability\": 0.9412341713905334}, {\"text\": \"濕\", \"startMs\": 6540, \"endMs\": 6720, \"probability\": 0.9571104049682617}, {\"text\": \"大\", \"startMs\": 6720, \"endMs\": 6960, \"probability\": 0.9986341595649719}, {\"text\": \"地\", \"startMs\": 6960, \"endMs\": 7220, \"probability\": 0.9590912461280823}]}, {\"text\": \"種子醒來了,探出綠牙\", \"startMs\": 9960, \"endMs\": 12600, \"words\": [{\"text\": \"種\", \"startMs\": 9960, \"endMs\": 10480, \"probability\": 0.9009999632835388}, {\"text\": \"子\", \"startMs\": 10480, \"endMs\": 10700, \"probability\": 0.9998562335968018}, {\"text\": \"醒\", \"startMs\": 10700, \"endMs\": 10960, \"probability\": 0.9986188411712646}, {\"text\": \"來了,\", \"startMs\": 10960, \"endMs\": 11360, \"probability\": 0.9502733945846558}, {\"text\": \"探\", \"startMs\": 11760, \"endMs\": 11860, \"probability\": 0.7294023782014847}, {\"text\": \"出\", \"startMs\": 11860, \"endMs\": 12100, \"probability\": 0.9944764971733093}, {\"text\": \"綠\", \"startMs\": 12100, \"endMs\": 12300, \"probability\": 0.9879003167152405}, {\"text\": \"牙\", \"startMs\": 12300, \"endMs\": 12600, \"probability\": 0.924295961856842}]}, {\"text\": \"一起觀察成長,耐心照料\", \"startMs\": 15000, \"endMs\": 17860, \"words\": [{\"text\": \"一起\", \"startMs\": 15000, \"endMs\": 15520, \"probability\": 0.8150110244750977}, {\"text\": \"觀\", \"startMs\": 15520, \"endMs\": 15880, \"probability\": 0.9982092380523682}, {\"text\": \"察\", \"startMs\": 15880, \"endMs\": 16160, \"probability\": 0.9985325336456299}, {\"text\": \"成\", \"startMs\": 16160, \"endMs\": 16380, \"probability\": 0.9966179728507996}, {\"text\": \"長,\", \"startMs\": 16380, \"endMs\": 16660, \"probability\": 0.9982307553291321}, {\"text\": \"耐\", \"startMs\": 16980, \"endMs\": 17160, \"probability\": 0.9897356629371643}, {\"text\": \"心\", \"startMs\": 17160, \"endMs\": 17420, \"probability\": 0.9971653819084167}, {\"text\": \"照\", \"startMs\": 17420, \"endMs\": 17640, \"probability\": 0.9822583198547363}, {\"text\": \"料\", \"startMs\": 17640, \"endMs\": 17860, \"probability\": 0.9813217520713806}]}]}"
+      }
+    ],
+    "readOnlyReportRecovery": true
+  },
+  "limits": "Independent full-context ASR diagnostic using unchanged frozen narration PCM at original positions; no initial_prompt or expected transcript provided to recognizer. Does not override failed individual checks, validate per-line timing or publish a preview. Original control/budget and failure reports remain unchanged.",
+  "errorCode": "ASR_MISMATCH"
+}

@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 最新完整上下文诊断：原四句PCM按冻结时窗进入20秒24k轨，480000samples、四窗逐字节相同；固定盲ASR仍綠牙，保留ASR_MISMATCH。两owned持久回执completed、无遗留容器、0network、原plan/control/预算不变。归档depth10错误与恢复丢SHA的P2都已修复，实际隔离失败→只读恢复保留同SHA与原失败，两轴clean；见 [上下文验证](evidence/asr-context-validation.md)。英文日期已过、原中文四句仍3/4；下一步按04§5.2升级独立ASR模型核同一音频，不能改预期或豁免同音差异。C0/C1/C2继续未达到。
+
 2026-10-04 最新英文日期表示修正：只对英文月名+1–31日合法序数规范化比较，原expected与音频不改；错误日期/月份/suffix及青禾清和、绿芽绿牙继续拒绝。3新增RED→GREEN、102文件536单元与lint/build/构建后types通过，双轴clean。原六WAV/原blind transcript只读mustExist复核5通过1失败，0producer/provider/network，原source control/预算不变；旧4/2报告原样保留。原四句仍3/4，绿芽→綠牙仍blocked，未发布预览。见 [英文日期验证](evidence/asr-date-normalization-validation.md)。下一步诊断原音频上下文，不自动降低门槛。
 
 2026-10-04 语音前端增量：复合词词典声调修正、实际规范化后英文片段发现与型号连接符/负数区分，实际9项前端测试通过；应用102文件533项与lint/build/构建后types通过。两个APT构建明确失败（直连80、主机代理拒绝），最终构建使用ASR同digest固定Python base和原Node stage，最终固定工具镜像b145374e…已构建，无网9tests/pipcheck通过。六条真实TTS生成后独立ASR四通过、原绿芽→绿牙与英文eighth→8th两失败，原大地句修复通过，原control/预算不变、0network，不能将前端音素测试计为发音或全片验收。见 [前端验证](evidence/voice-front-end-validation.json)。

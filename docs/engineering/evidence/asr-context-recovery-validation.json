@@ -1,0 +1,10 @@
+{
+  "scenario": "isolated report fixture loses receipt pointer, preserves original PCM SHA, then restores known pointer and recovers original semantic failure without producers",
+  "missingReceiptResult": "MEDIA_RECEIPT_MISSING",
+  "baselineShaPreserved": true,
+  "restoredResult": "ASR_MISMATCH",
+  "completedReceipts": 2,
+  "networkCalls": 0,
+  "mediaExecutions": 0,
+  "originalReportUnchanged": true
+}

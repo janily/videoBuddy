@@ -1,5 +1,7 @@
 # 当前工程交接（更新至2026-10-04）
 
+2026-10-04 最新完整上下文诊断：原四句PCM按冻结时窗进入20秒24k轨，480000samples、四窗逐字节相同；固定盲ASR仍綠牙，保留ASR_MISMATCH。两owned持久回执completed、无遗留容器、0network、原plan/control/预算不变。归档depth10错误与恢复丢SHA的P2都已修复，实际隔离失败→只读恢复保留同SHA与原失败，两轴clean；见 [上下文验证](evidence/asr-context-validation.md)。英文日期已过、原中文四句仍3/4；下一步按04§5.2升级独立ASR模型核同一音频，不能改预期或豁免同音差异。C0/C1/C2继续未达到。
+
 2026-10-04 最新英文日期表示修正：只对英文月名+1–31日合法序数规范化比较，原expected与音频不改；错误日期/月份/suffix及青禾清和、绿芽绿牙继续拒绝。3新增RED→GREEN、102文件536单元与lint/build/构建后types通过，双轴clean。原六WAV/原blind transcript只读mustExist复核5通过1失败，0producer/provider/network，原source control/预算不变；旧4/2报告原样保留。原四句仍3/4，绿芽→綠牙仍blocked，未发布预览。见 [英文日期验证](evidence/asr-date-normalization-validation.md)。下一步诊断原音频上下文，不自动降低门槛。
 
 videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付文档保留；未 push、未生产部署。真实模型已调用并保留历史对账与未知调用记录，费用授权不限次数/上限。当前仍是阶段工程，C0/C1/C2 均未达到。用户已将 Vercel 方案改为完全自托管；以 [自托管架构](self-hosted-architecture.md) 和 [执行计划](self-hosted-plan.md) 为当前部署依据，原规格的产品功能、SSE、持久消息、43 风格及验收范围继续有效。
