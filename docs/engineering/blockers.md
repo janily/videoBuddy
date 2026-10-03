@@ -97,3 +97,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 T13 修改候选可冻结真实来源/基线并冷核验，455单元及构建等检查通过，见 [候选验证](evidence/music-change-draft-validation.md)。此候选无已批准语义、无预算预约、无执行权限，不解决正式改稿；待接模型分类、原音乐证明、幂等准入/混音/完整QA发布。0新模型/真实control账目未改，旧unknown门闩保留、不限费用授权有效。
 
 2026-10-03 Director/Worker音乐候选接入缺口已关闭：本轮原话、当前整片目标、冻结分类上下文、固定server计划ID与op指针、relative/absolute意图保持及冷恢复经465单元/构建等检查验证；本地真实SDK协议不是远端语义验收，0provider。见 [Director候选验证](evidence/director-music-change-validation.md)。候选not_started/nullbudget，正式语义/原音乐增益/操作准入/混音完整QA发布未完成；旧unknown用量门闩保留，费用授权不限继续有效。
+
+2026-10-03 实际原音乐/增益读取缺口已关闭：新增v3归档和真实断网−3dB混音/冷恢复通过，469单元及构建等检查通过，见 [增益归档验证](evidence/music-gain-package-validation.md)。本切片无用户修改准入权限、无新revision/全片QA/发布；原片零旁白不能代表有旁白验收。最终合成的loudnorm可能抵消sole-music降幅，需实际测量并处理质量/意图冲突，不放宽强制响度或冒充可听修改成功。旧unknown门闩未改，0新模型/原control预算不变；不限费用授权有效，整个项目继续未交付。

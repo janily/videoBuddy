@@ -16,7 +16,7 @@ export {masterMixFilter} from './master-filter';
 import {masterMixFilter} from './master-filter';
 type Stems=Awaited<ReturnType<typeof buildSoundStems>>;
 function inside(root:string,path:string){const rel=relative(root,path);if(!isAbsolute(path)||!rel||rel.startsWith('..')||isAbsolute(rel)||!/^\/[A-Za-z0-9_./-]+$/.test(path))throw Error('AUDIO_SOURCE_CHANGED')}
-export async function buildAudioMaster(root:string,raw:AudioPlan,narration:NarrationTrack,stems:Stems,durationMs:number,fps:24|30|60,env:Environment=process.env,options:{musicGainDb?:number}={}):Promise<{stageKey:string;planSha256:string;toolSha256:string;voiceSha256:string;musicSha256:string;foleySha256:string;track:FilmAudioTrack;qualityStatus:'listening_not_checked'}>{
+export async function buildAudioMaster(root:string,raw:AudioPlan,narration:NarrationTrack,stems:Stems,durationMs:number,fps:24|30|60,env:Environment=process.env,options:{musicGainDb?:number}={}):Promise<{stageKey:string;musicGainDb?:number;planSha256:string;toolSha256:string;voiceSha256:string;musicSha256:string;foleySha256:string;track:FilmAudioTrack;qualityStatus:'listening_not_checked'}>{
  if(!isAbsolute(root)||!/^\/[A-Za-z0-9_./-]+$/.test(root))throw Error('AUDIO_JOB_INVALID');
  const plan=AudioPlanSchema.parse(raw),job=compileSoundJob(plan,durationMs,fps),config=dockerConfiguration(env,'audio-master');
  inside(join(root,'audio'),narration.outputPath);inside(join(root,'sound'),stems.music.outputPath);inside(join(root,'sound'),stems.foley.outputPath);
@@ -38,5 +38,5 @@ export async function buildAudioMaster(root:string,raw:AudioPlan,narration:Narra
  if(code!==0)throw Error('AUDIO_MASTER_FAILED: '+Buffer.concat(errors).toString('utf8').slice(-300));
  const outputPath=join(outputDir,'master.wav'),wav=await inspectStereoTrackWav(outputPath,job.samples,voice.silence&&music.silence&&foley.silence),state=JSON.parse(await readFile(join(outputDir,'state.json'),'utf8'));
  if(state.jobSha256!==canonicalHash(document)||state.outputSha256!==wav.sha256)throw Error('AUDIO_MASTER_CHANGED');
- return{stageKey,planSha256:job.planSha256,toolSha256,voiceSha256:voice.sha256,musicSha256:music.sha256,foleySha256:foley.sha256,track:{outputPath,runtimeDigest:config.runtimeDigest,wav,kind:'film_mix',qaStatus:'not_checked'},qualityStatus:'listening_not_checked'};
+ return{stageKey,...(options.musicGainDb===undefined?{}:{musicGainDb:options.musicGainDb}),planSha256:job.planSha256,toolSha256,voiceSha256:voice.sha256,musicSha256:music.sha256,foleySha256:foley.sha256,track:{outputPath,runtimeDigest:config.runtimeDigest,wav,kind:'film_mix',qaStatus:'not_checked'},qualityStatus:'listening_not_checked'};
 }

@@ -5,9 +5,9 @@ import type {ProjectStore} from '@/services/video/storage/project-store';
 import {createOrRead} from '@/services/video/storage/atomic-store';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {exportBaseline} from '@/services/video/exports/publication';
+import {MusicGainOperationSchema} from './music-gain';
 const Id=z.uuid(),Digest=z.string().regex(/^[a-f0-9]{64}$/),Counter=z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
-const MusicOperation=z.strictObject({field:z.literal('musicGainDb'),value:z.number().min(-6).max(0),valueMode:z.enum(['relative','absolute']).optional()}).refine(operation=>operation.valueMode!=='relative'||operation.value<0);
-const MusicProposal=z.strictObject({schemaVersion:z.literal(5),changePlanId:Id,sourceMessageId:Id,targetArtifactId:Id,revisionId:Id,operations:z.tuple([MusicOperation]),factsChanged:z.literal(false),reason:z.string().min(1).max(1000)});
+const MusicProposal=z.strictObject({schemaVersion:z.literal(5),changePlanId:Id,sourceMessageId:Id,targetArtifactId:Id,revisionId:Id,operations:z.tuple([MusicGainOperationSchema]),factsChanged:z.literal(false),reason:z.string().min(1).max(1000)});
 const Draft=MusicProposal.extend({projectId:Id,ownerKeyHash:Digest,candidateRisk:z.literal('safe_direct'),scope:z.literal('entire_film'),authorizationSource:z.literal('explicit_message'),sourceMessageSha256:Digest,baseline:z.strictObject({resultId:Id,resultHash:Digest,bundleHash:Digest,consentEpoch:Counter,briefVersion:Counter}),requiredQualityChecks:z.array(z.string().min(1)).min(1),budgetReservation:z.null(),execution:z.literal('not_started')});
 export type MusicChangeDraft=z.infer<typeof Draft>;
 async function verifiedRead<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Promise<T>{

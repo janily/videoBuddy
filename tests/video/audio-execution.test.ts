@@ -20,6 +20,7 @@ import {getStyle} from '@/services/video/styles/registry';
 import {revisionSeed} from '@/services/video/timeline/seed';
 import type {FilmSpec} from '@/contracts/video/film';
 import {verifyPostMixNoNarration} from '@/services/video/audio/postmix-asr';
+import {readMusicGainBaseline} from '@/services/video/revisions/music-gain';
 
 function pcm(channels:1|2,active:boolean){
  const samples=960000,bytes=Buffer.alloc(44+samples*channels*4);
@@ -27,7 +28,7 @@ function pcm(channels:1|2,active:boolean){
  if(active)for(let i=0;i<48000*channels;i++)bytes.writeFloatLE(0.1*Math.sin(i/10),44+i*4);
  return bytes;
 }
-async function fixture(root:string){
+async function fixture(root:string,musicGainDb?:number){
  const projects=new ProjectStore(new FileStore(root)),projectId=randomUUID(),revisionId=randomUUID(),prefix='projects/'+projectId+'/revisions/'+revisionId,runtimeDigest='a'.repeat(64);
  const voiceBytes=pcm(1,false),musicBytes=pcm(2,true),foleyBytes=pcm(2,false),voicePath=join(root,'audio','fixture','track.wav');
  await mkdir(dirname(voicePath),{recursive:true});await writeFile(voicePath,voiceBytes);
@@ -42,15 +43,17 @@ async function fixture(root:string){
  const musicPath=join(root,'sound',soundKey,'output','music.wav'),foleyPath=join(dirname(musicPath),'foley.wav');
  await mkdir(dirname(musicPath),{recursive:true});await writeFile(musicPath,musicBytes);await writeFile(foleyPath,foleyBytes);
  const stems={stageKey:soundKey,planSha256:planRef.sha256,runtimeDigest,toolSha256:soundTool,music:{outputPath:musicPath,wav:musicWav},foley:{outputPath:foleyPath,wav:foleyWav},qualityStatus:'listening_not_checked' as const};
- const doc={schemaVersion:1,planSha256:planRef.sha256,samples:960000,hasVoice:false,mix:plan.mix,filter:masterMixFilter(plan.mix,960000,false),inputSha256:{voice:voiceWav.sha256,music:musicWav.sha256,foley:foleyWav.sha256}};
+ const doc={schemaVersion:musicGainDb===undefined?1:2,...(musicGainDb===undefined?{}:{musicGainDb}),planSha256:planRef.sha256,samples:960000,hasVoice:false,mix:plan.mix,filter:masterMixFilter(plan.mix,960000,false,musicGainDb),inputSha256:{voice:voiceWav.sha256,music:musicWav.sha256,foley:foleyWav.sha256}};
  const masterKey=canonicalHash({document:doc,runtimeDigest,toolSha256:masterTool}),masterPath=join(root,'audio-master',masterKey,'output','master.wav');
- await mkdir(dirname(masterPath),{recursive:true});await writeFile(masterPath,musicBytes);
+ const mixBytes=Buffer.from(musicBytes);if(musicGainDb!==undefined)for(let offset=44;offset<mixBytes.length;offset+=4)mixBytes.writeFloatLE(mixBytes.readFloatLE(offset)*10**(musicGainDb/20),offset);
+ const mixWav=probeStereoTrackWav(mixBytes,960000,false);
+ await mkdir(dirname(masterPath),{recursive:true});await writeFile(masterPath,mixBytes);
  await writeFile(join(root,'sound',soundKey,'job.json'),canonicalJson(job));
  await writeFile(join(dirname(musicPath),'state.json'),JSON.stringify({schemaVersion:1,jobSha256:canonicalHash(job),outputs:{music:musicWav.sha256,foley:foleyWav.sha256}}));
  await writeFile(join(root,'audio-master',masterKey,'job.json'),canonicalJson(doc));
- await writeFile(join(dirname(masterPath),'state.json'),JSON.stringify({schemaVersion:1,jobSha256:canonicalHash(doc),outputSha256:musicWav.sha256}));
+ await writeFile(join(dirname(masterPath),'state.json'),JSON.stringify({schemaVersion:1,jobSha256:canonicalHash(doc),outputSha256:mixWav.sha256}));
  const narration={outputPath:voicePath,runtimeDigest,wav:voiceWav,kind:'narration_only' as const,qaStatus:'not_checked' as const};
- const master={stageKey:masterKey,planSha256:planRef.sha256,toolSha256:masterTool,voiceSha256:voiceWav.sha256,musicSha256:musicWav.sha256,foleySha256:foleyWav.sha256,track:{outputPath:masterPath,runtimeDigest,wav:musicWav,kind:'film_mix' as const,qaStatus:'not_checked' as const},qualityStatus:'listening_not_checked' as const};
+ const master={stageKey:masterKey,...(musicGainDb===undefined?{}:{musicGainDb}),planSha256:planRef.sha256,toolSha256:masterTool,voiceSha256:voiceWav.sha256,musicSha256:musicWav.sha256,foleySha256:foleyWav.sha256,track:{outputPath:masterPath,runtimeDigest,wav:mixWav,kind:'film_mix' as const,qaStatus:'not_checked' as const},qualityStatus:'listening_not_checked' as const};
  return {projects,projectId,revisionId,prefix,plan,planRef,timing,timingRef,narration,stems,master};
 }
 it('archives all four actual buses and reloads with no disposable audio directories',async()=>{
@@ -62,6 +65,7 @@ it('archives all four actual buses and reloads with no disposable audio director
   expect(before.package.qualityStatus).toBe('listening_not_checked');
   expect(before.track.wav.channels).toBe(2);
   expect(before.package.tracks.voice.wav.peakDbfs).toBeNull();
+  expect((await readMusicGainBaseline(f.projects.store,root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef)).musicGainDb).toBe(0);
   const moviePath=join(root,'composition','unit','output','final.mp4'),movie=Buffer.alloc(2048,1);
   await mkdir(dirname(moviePath),{recursive:true});await writeFile(moviePath,movie);
   const film={outputPath:moviePath,sha256:createHash('sha256').update(movie).digest('hex'),durationMs:20000,technicalQa:'pass' as const};
@@ -138,5 +142,27 @@ it('does not archive an output whose actual trusted completion marker is absent'
   const f=await fixture(root);
   await rm(join(dirname(f.master.track.outputPath),'state.json'));
   await expect(archiveAudioExecution(f.projects,root,f.projectId,f.revisionId,f.planRef,f.timingRef,f.narration,f.stems,f.master)).rejects.toThrow('AUDIO_EXECUTION_CHANGED');
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+it('archives explicit music gain as a new execution version and cold reads independently verify its original gain',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-audio-gain-package-'));
+ try{
+  const f=await fixture(root,-3),ref=await archiveAudioExecution(f.projects,root,f.projectId,f.revisionId,f.planRef,f.timingRef,f.narration,f.stems,f.master);
+  const loaded=await loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef);expect(loaded.package).toMatchObject({schemaVersion:3,master:{musicGainDb:-3}});
+  expect((await readMusicGainBaseline(f.projects.store,root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef)).musicGainDb).toBe(-3);
+  for(const dir of ['audio','sound','audio-master'])await rm(join(root,dir),{recursive:true});
+  expect(await loadAudioExecution(new FileStore(root),root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef)).toEqual(loaded);
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+it('gain metadata cannot redirect a frozen master by re-signing its package and receipt',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-audio-gain-tamper-'));
+ try{
+  const f=await fixture(root,-3),ref=await archiveAudioExecution(f.projects,root,f.projectId,f.revisionId,f.planRef,f.timingRef,f.narration,f.stems,f.master),loaded=await loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef),data=loaded.package;
+  if(data.schemaVersion!==3)throw Error('EXPECTED_GAIN_PACKAGE');
+  const wrong=await f.projects.index.immutable(f.prefix+'/audio-execution',{...data,master:{...data.master,musicGainDb:-4}});await expect(loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,wrong,f.planRef,f.timingRef)).rejects.toThrow('AUDIO_EXECUTION_CHANGED');
+  const doc={schemaVersion:2,musicGainDb:-4,planSha256:f.planRef.sha256,samples:data.totalSamples,hasVoice:false,mix:f.plan.mix,filter:masterMixFilter(f.plan.mix,data.totalSamples,false,-4),inputSha256:{voice:data.tracks.voice.wav.sha256,music:data.tracks.music.wav.sha256,foley:data.tracks.foley.wav.sha256}};
+  const receipts=(await f.projects.store.readFresh<{schemaVersion:1;kind:string;soundState:unknown;masterState:{schemaVersion:1;jobSha256:string;outputSha256:string}}>(data.receiptsRef.key)).value;
+  const forgedReceiptsRef=await f.projects.index.immutable(f.prefix+'/audio-receipts',{...receipts,masterState:{...receipts.masterState,jobSha256:canonicalHash(doc)}}),stageKey=canonicalHash({document:doc,runtimeDigest:data.runtimeDigest,toolSha256:data.master.toolSha256});
+  const forged=await f.projects.index.immutable(f.prefix+'/audio-execution',{...data,master:{...data.master,musicGainDb:-4,stageKey},receiptsRef:forgedReceiptsRef});await expect(loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,forged,f.planRef,f.timingRef)).rejects.toThrow('AUDIO_EXECUTION_CHANGED');
  }finally{await rm(root,{recursive:true,force:true})}
 });
