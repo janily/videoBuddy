@@ -1,0 +1,38 @@
+{
+  "executedAt": "2026-10-03T05:58:40.861Z",
+  "technicalProbeOnly": true,
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "toolSha256": "b6b7d3cdbfea67cf128c0d8a8beee3d315cb0d2ae65e997f41253681def5b33c",
+  "planSha256": "319146be903ad509667ac04699b74ab3909002d307f809e14900854770384062",
+  "stageKey": "2e1d9b98be4d871821cbcc197772091ca7f942ba74d5e5f217a478d0472a4b61",
+  "music": {
+    "codec": "pcm_f32le",
+    "sampleRate": 48000,
+    "channels": 2,
+    "samples": 960000,
+    "durationMs": 20000,
+    "bytes": 7680044,
+    "sha256": "90810cae098591fb1304a5a5961b6135a80820ab3e3429492f8b7acddd34854e",
+    "peakDbfs": -14.71589312452898,
+    "rmsDbfs": -43.38929390587061,
+    "silence": false
+  },
+  "foley": {
+    "codec": "pcm_f32le",
+    "sampleRate": 48000,
+    "channels": 2,
+    "samples": 960000,
+    "durationMs": 20000,
+    "bytes": 7680044,
+    "sha256": "f8215fae92b2b74d5eda443d500ef1b04d67f90fafd2519c49a3125f783ccf6f",
+    "peakDbfs": -18.864465262741824,
+    "rmsDbfs": -53.636734369768426,
+    "silence": false
+  },
+  "leftEnergy": 3.115942991488733e-32,
+  "rightEnergy": 8.310512206503956,
+  "outsideEnergy": 0,
+  "replayIdentical": true,
+  "durationMs": 515,
+  "limits": "Actual pinned offline Docker synthesizer, stereo 48 kHz/sample alignment/seeded noise and replay. Synthetic plan, no model-authored score, user audio, voice ducking, final movie, listening or 43-style QA."
+}

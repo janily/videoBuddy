@@ -31,3 +31,11 @@ T11 已在同一技术项目中生成并私有落盘9秒真实AV节选，320×18
 T10/T11 持久旁白对象已用真实离线TTS/ASR验证：删除原voice工作目录后可凭冻结引用独立读取，WAV/ASR篡改及错日期拒绝；硬链接发布中断可在OS锁下按实际SHA/字节核验恢复，未知链接仍阻断，见 [验证报告](evidence/narration-package-validation.md)。Voice/Timing阶段本身仍要求工作文件，正式生产链恢复仍待实现。
 
 T06/T09/T10/T11 新增真实 FilmSpec 组装器、AudioAgent 严格计划/预算阶段与统一 revision seed；未知质量策略不能降级，完整来源、字幕和实际素材字节均校验。明确无配乐/拟音的技术项目已冻结制作包，删除 voice/audio 工作目录后独立读取仍通过，见 [制作包验证](evidence/film-package-validation.md)。默认原创配乐保留；音乐/拟音/非零增益未执行时明确 `FILM_AUDIO_EXECUTION_NOT_READY`，这是尚未实现的本地执行部分，并非凭据问题。真实 Audio/Visual 模型、用户录音、素材送入容器、独立语义/风格/听感 QA 与正式批准渲染Worker仍缺，43风格86基线仍全部not_run，不标C0/C1/C2完成。
+
+## 2026-10-03 实际模型接入更新
+
+MODEL_API_KEY、MODEL_BASE_URL 与四角色模型现已由用户提供并授权本地真实验证，旧“缺模型凭据”记录为历史阻断。当前提供方 gemini-3.8-flash 在非流/流式HTTP和原生Mastra Director/Treatment均返回200；不是Vercel服务，也不需要Blob/Sandbox。
+
+实测 max_tokens:1 返回352 completion_tokens，max_completion_tokens:1 返回297；当前提供方不执行请求输出限制。默认生产生成开关仍关闭。人工授权探针限制HTTP总次数、时间、零重试并记录真实usage，但不能保证硬token计费上限。后续需提供方支持可验证硬上限，或明确接受该风险并接入实际usage对账/超限熔断；不能只把请求参数称为硬上限。
+
+真实20秒创作第二轮台词可容纳，独立ASR把青禾识别为清和，ASR_MISMATCH正确阻断。当前需专名发音验证策略/更强识别证据，不能篡改期待台词或自动用模型改正识别结果。失败记录见 evidence/real-creation-duration-failure.json 与 evidence/real-creation-probe.json；ignored .video-local/real-creation/ 保留实际工作文件。声音合成器已生成真实立体声WAV，音乐主混音/用户音轨/最终听验仍未完成。

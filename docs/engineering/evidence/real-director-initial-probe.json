@@ -1,0 +1,181 @@
+{
+  "executedAt": "2026-10-03T05:50:48.964Z",
+  "providerOrigin": "https://grsaiapi.com",
+  "model": "gemini-3.8-flash",
+  "actualModelCall": true,
+  "callCount": 1,
+  "requests": [
+    {
+      "stream": false,
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 3097,
+        "completion_tokens": 2434,
+        "total_tokens": 5531,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "durationMs": 77715,
+  "decision": {
+    "action": "suggest_preview",
+    "reply": "已为您梳理社区图书交换活动的需求（20秒横屏、手绘蜡笔风格、包含时间与地点信息）。您可以点击界面中的预览按钮查看分镜与脚本效果，确认满意后再决定后续操作。",
+    "effect": "update_brief",
+    "understandingPatch": {
+      "baseBriefVersion": 0,
+      "operations": [
+        {
+          "op": "replace_summary",
+          "summary": [
+            "社区图书交换活动宣传视频",
+            "包含活动时间（2026年10月8日）与地点（上海青禾社区广场）"
+          ],
+          "subject": "社区图书交换",
+          "audience": "社区居民",
+          "objective": "宣传图书交换活动并号召居民参与",
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        },
+        {
+          "op": "add_fact",
+          "fact": {
+            "id": "fact_event_time",
+            "text": "活动时间是2026年10月8日",
+            "sourceRefs": [
+              {
+                "type": "user_message",
+                "id": "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+              }
+            ],
+            "status": "provided",
+            "mustInclude": true,
+            "critical": true
+          },
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        },
+        {
+          "op": "add_fact",
+          "fact": {
+            "id": "fact_event_location",
+            "text": "活动地点是上海青禾社区广场",
+            "sourceRefs": [
+              {
+                "type": "user_message",
+                "id": "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+              }
+            ],
+            "status": "provided",
+            "mustInclude": true,
+            "critical": true
+          },
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        },
+        {
+          "op": "set_preference",
+          "field": "durationSec",
+          "value": 20,
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        },
+        {
+          "op": "set_preference",
+          "field": "aspect",
+          "value": "16:9",
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        },
+        {
+          "op": "set_preference",
+          "field": "styleSlug",
+          "value": "hand-drawn-crayon",
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        },
+        {
+          "op": "set_preference",
+          "field": "language",
+          "value": "zh-CN",
+          "sourceMessageIds": [
+            "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          ]
+        }
+      ]
+    },
+    "recommendedStyleId": "hand-drawn-crayon",
+    "executionIntent": "none",
+    "evidenceMessageIds": [
+      "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+    ]
+  },
+  "understanding": {
+    "schemaVersion": 5,
+    "briefVersion": 1,
+    "subject": "社区图书交换",
+    "audience": "社区居民",
+    "objective": "宣传图书交换活动并号召居民参与",
+    "summary": [
+      "社区图书交换活动宣传视频",
+      "包含活动时间（2026年10月8日）与地点（上海青禾社区广场）"
+    ],
+    "facts": [
+      {
+        "id": "fact_event_time",
+        "text": "活动时间是2026年10月8日",
+        "sourceRefs": [
+          {
+            "type": "user_message",
+            "id": "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          }
+        ],
+        "status": "provided",
+        "mustInclude": true,
+        "critical": true
+      },
+      {
+        "id": "fact_event_location",
+        "text": "活动地点是上海青禾社区广场",
+        "sourceRefs": [
+          {
+            "type": "user_message",
+            "id": "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+          }
+        ],
+        "status": "provided",
+        "mustInclude": true,
+        "critical": true
+      }
+    ],
+    "assetUses": [],
+    "preferences": {
+      "durationSec": 20,
+      "aspect": "16:9",
+      "language": "zh-CN",
+      "styleSlug": "hand-drawn-crayon",
+      "voiceMode": "tts",
+      "musicMode": "composed",
+      "captions": "auto"
+    },
+    "skippedTopics": [],
+    "askedTopics": [],
+    "optionalQuestionCount": 0,
+    "unresolvedConflictIds": [],
+    "sourceMessageIds": [
+      "55a08811-0350-4d63-b2c0-09e3c9d2fb3d"
+    ]
+  },
+  "limits": "One actual Director guidance call, strict schema and source-authorized patch; not a 16-case behavior evaluation, movie or QA result.",
+  "semanticValidation": "failed: invented hand-drawn-crayon style accepted before guard fix",
+  "regressionStatus": "preserved original provider output; not a valid style recommendation"
+}

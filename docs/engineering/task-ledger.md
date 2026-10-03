@@ -52,7 +52,7 @@ Ruling：进一步定位扫描器 importSpecifierPatterns 依赖 from 后的空�
 | T20 | 配置fail closed、模型CAS预算预约与零隐式重试；budget 2项 | Sandbox/TTS预算实际消费集成、反滥用配置、运维cron/清理/回滚演练、Preview部署未完成 |
 | T21 | 真实状态表、43风格86基线not_run清单、启动与阻断说明 | 22需求/92验收/16行为/86风格与全部公开profile未验收；不能宣称C2 |
 
-模型预算是保守预约上界：输入按UTF8字节数+4096开销预留、输出2000tokens硬上限；daily先预约，project失败时不自动返还，未知计费不会重试。该行为可少用预算，不会放宽上限。媒体/TTS尚未接入收费入口，不能声称这两类预算已运行。
+模型预算是保守预约上界：输入按UTF8字节数+4096开销预留、输出2000tokens请求上限（2026-10-03实测当前提供方不执行该限制，不能视为硬上限）；daily先预约，project失败时不自动返还，未知计费不会重试。预约与零隐式重试保守限制调用次数；当前提供方的实际输出token可能超过预约，不具备硬token费用上限。媒体/TTS尚未接入收费入口，不能声称这两类预算已运行。
 
 审查修复：hot128 receipt淘汰仍按durable accepted重放；完成归档不得被空interrupted覆盖；SSE OPERATION_NOT_STARTED重试并可显式恢复；cancel在CAS内校验通道/终态，未claim取消立即终结；真实失败run可恢复为interrupted，unknown保留占用；用户新消息刷新30天activity期限。测试fixtures只用于本地测试，不进入生产返回值。
 
@@ -125,3 +125,9 @@ Visual上下文复核：本地模型协议测试新增断言后先失败，确�
 2026-10-03 T10/T11 持久旁白包增量：新增 `archiveVerifiedNarration`、`loadPackagedNarration` 与 `prepareNarrationPackageStage`，真实 WAV 按内容哈希进入私有修订目录，固定台词、音色配置、ASR 来源、逐词时间及48 kHz采样范围；合成记录升级 schemaVersion=2 并绑定旁白包哈希。FilmSpec 读取现在拒绝重签名的错误日期、缺旁白、变更逐词记录和实际 WAV 篡改。两项审查指出硬链接发布中断后 nlink=2 无法恢复，新增 OS flock 与“先核实际SHA/字节、只清理同 inode 的已知临时别名”修复；真实子进程在 link 后退出73，冷进程恢复为单链接且未知硬链接仍拒绝。归档/阶段缺模块、日期与词文本漏洞测试均先失败后通过；完整联合测试在构建/Docker并行时曾超5秒，单项改为15秒，断言未减。最终 `npm test` 51文件205项、lint/build/构建后typecheck/diff-check退出0。真实离线4.1秒/12词 WAV 删除 voice 工作目录后独立读取通过，篡改对象拒绝；最终720p合成20秒480帧、-14.18 LUFS/-1.5 dBTP及成片后ASR通过，9秒216帧节选142,284字节、SHA `e95679e3…`，提交指针前访问拒绝，容器清理完毕。详见 [验证报告](evidence/narration-package-validation.md) 与真实JSON证据。独立归档读取不等于删工作文件后整条制作链可重放；仍无完整FilmSpec生产者、音乐/音效、独立语义/风格/听感QA及用户预览发布/批准，43风格86基线仍not_run，T10/T11 partial，deployed=false。
 
 2026-10-03 T06/T09/T10/T11 FilmSpec 制作包增量：新增 AudioAgent 原生严格计划与持久预算/effect阶段，固定STYLE、TimingDraft、节拍段、合成/用户音轨、cue/事件及MixPlan。Visual原生输出新增目的/构图/镜头/actor声明和revision seed；所有镜头统一seed，Picture记录schemaVersion=2同时锁完整Visual引用与HTML哈希。`prepareFilmPackageStage` 只读已冻结各阶段，生成1080p目标的FilmSpec与七份不可变manifest，并在阶段marker前验证完整图、实际旁白/素材字节、字幕/font、runtime与consent fence。AudioPlan和producer缺模块测试先退出1；未执行的拟音/增益、缺Visual信息、BPM/镜头/字幕重签名与素材实际字节变化被拒。规格审查发现把质量策略改成v1可走弱兼容分支，回归先错误resolved退出1，修复为未知策略立即`FILM_POLICY_UNSUPPORTED`及所有来源字段必填；审批夹具补齐严格冻结来源，未放宽断言或生产默认。两项复审无剩余发现。最终`npm test`53文件208项、lint/build/构建后typecheck退出0。真实技术探针用离线4.1秒/12词中文TTS/ASR与393,644字节私有WAV组装FilmSpec，重放与重签名篡改拒绝通过；删除voice/audio工作目录后独立包读取通过，但Voice/Timing/producer重放仍需工作文件。同项目720p成片20秒480帧、173,974字节、-14.18 LUFS/-1.5 dBTP、最终ASR匹配；9秒216帧节选142,794字节、SHA `78ca3a42…`，未发布指针前拒访且容器清理完成。详见 [制作包验证](evidence/film-package-validation.md)。计划音乐/拟音/增益未实际执行时明确`FILM_AUDIO_EXECUTION_NOT_READY`，默认原创配乐未删除。输入Visual/Audio为技术注入；14条基础策略不是质量通过报告或43风格规则。正式批准FilmSpec到render Worker绑定、真实模型、素材容器传输、音乐/录音、独立语义/风格/听感QA及43风格86基线尚缺。T06/T09/T10/T11 partial，C0/C1/C2未达到，deployed=false；无push/生产部署。
+
+2026-10-03 T06/T10 真实模型与合成器增量：用户授权提供方接入，凭据仅存忽略的0600本地文件。真实非流/流式HTTP均200；原生Mastra Director首轮编造风格被记录，新增回归先退出1，服务端目录校验与43项上下文修复后11项通过。真实复测选择crayon-book，保留两条来源事实，用量4119输入/1663输出。原生Treatment首轮计划通过但实际TTS超时，补自然语速约束后时长通过，却在专名青禾的独立ASR核验失败（识别清和），未放宽事实门槛。失败的付费调用与工作目录保留、无自动重试。提供方实测忽略max_tokens及max_completion_tokens，不能再宣称预约即硬输出上限，见[API证据](evidence/provider-probe.json)。新增可信数据合成器先因缺模块退出1，后在固定无网Docker生成实际48kHz立体声配乐/拟音，20秒各960000采样，声像/事件外静音/哈希重放通过，见[声音探针](evidence/sound-probe.json)。还未接入音乐主混音、成片、听验、用户预览或43风格；项目仍未完成，不部署不push。
+
+两项独立审查共同发现整轨RMS会误拒绝短轻拟音；真实Python 100ms/-30dB回归先退出1，立体声stem改为精确零PCM静音判定后相关5项通过，单声道人声阈值和最终LUFS门槛保持。首次完整回归54文件211项通过，lint退出0但有未使用import警告，已移除；build与构建后typecheck退出0。
+
+最终复测54文件211项、无警告lint、build、构建后typecheck及diff-check退出0；审查回归夹具曾因联合类型未缩窄导致typecheck退出2，已缩窄并复验。standards/spec两项复审关闭稀疏拟音P2，无剩余发现。模型验证与声音stem实现已测试、未部署；T06/T10及整个项目继续partial。

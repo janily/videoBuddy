@@ -1,0 +1,59 @@
+{
+  "recordedOn": "2026-10-03",
+  "providerOrigin": "https://grsaiapi.com",
+  "endpoint": "/v1/chat/completions",
+  "model": "gemini-3.8-flash",
+  "actualRequests": [
+    {
+      "case": "non_streaming_smoke",
+      "status": 200,
+      "finishReason": "stop",
+      "textMatches": true,
+      "usage": {
+        "prompt_tokens": 93,
+        "completion_tokens": 162,
+        "total_tokens": 255
+      }
+    },
+    {
+      "case": "streaming_smoke",
+      "status": 200,
+      "transportChunks": 2,
+      "sseEvents": 2,
+      "finished": true,
+      "textMatches": true,
+      "usage": {
+        "prompt_tokens": 94,
+        "completion_tokens": 210,
+        "total_tokens": 304
+      }
+    },
+    {
+      "case": "max_tokens_1",
+      "status": 200,
+      "requestedLimit": 1,
+      "responseCharacters": 68,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 98,
+        "completion_tokens": 352,
+        "total_tokens": 450
+      },
+      "enforced": false
+    },
+    {
+      "case": "max_completion_tokens_1",
+      "status": 200,
+      "requestedLimit": 1,
+      "responseCharacters": 64,
+      "finishReason": "stop",
+      "usage": {
+        "prompt_tokens": 101,
+        "completion_tokens": 297,
+        "total_tokens": 398
+      },
+      "enforced": false
+    }
+  ],
+  "limits": "Recorded from actual HTTP results in this session. Provider output caps are empirically unenforced. This is protocol evidence, not hard token-budget enforcement, production enablement or model quality evaluation."
+}

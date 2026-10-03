@@ -11,7 +11,7 @@ export async function runTreatment(understanding:Understanding,maxOutputTokens=5
  const pack=getStyle(understanding.preferences.styleSlug),knowledge=await loadStageKnowledge(pack.slug,'style');
  const context=JSON.stringify({understanding,style:{slug:pack.slug,packVersion:pack.packVersion,rulesHash:knowledge.sha256,rules:knowledge.rules}});
  if(Buffer.byteLength(context)>100000)throw Error('CONTEXT_LIMIT');
- const agent=createVideoAgent('director',instructions,env);
+ const agent=createVideoAgent('director',instructions+' 本地旁白以自然语速发声，不能靠加速塞满镜头。中文每秒最多安排3个发声汉字，英文每秒最多2个单词；数字、年份、日期先展开读音再计算，并为每镜预留至少0.5秒呼吸。20秒视频应控制在约45个发声汉字内，优先准确保留关键事实，可减少镜头或情绪铺垫。不得在台词中使用不能读出的舞台说明。',env);
  const response=await agent.generate(context,{structuredOutput:{schema:TreatmentPlanSchema,jsonPromptInjection:env.MODEL_PROVIDER==='openai-compatible',errorStrategy:'strict'},maxSteps:1,modelSettings:{maxOutputTokens,maxRetries:0}});
  return guardTreatment(response.object,understanding,knowledge.sha256);
 }

@@ -1,0 +1,119 @@
+{
+  "executedAt": "2026-10-03T05:55:38.847Z",
+  "model": "gemini-3.8-flash",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/65ff1a5e-8d4f-4b2b-a718-be5b85ea1af8",
+  "stages": {
+    "project": {
+      "projectId": "7007e739-239b-43cd-92ae-38af42f72cb5",
+      "revisionId": "20fec1df-5adc-44c9-be16-beb7e12bbe70",
+      "operationId": "f3557e3a-33d6-4dd7-8bc1-de59fc5dd3cc",
+      "understandingSha256": "857be2ef88b6fc4f18403ede77b09c2577b5b5f78dd9ba85b1c911fc88c297ab"
+    },
+    "treatment": {
+      "treatmentRef": {
+        "key": "projects/7007e739-239b-43cd-92ae-38af42f72cb5/revisions/20fec1df-5adc-44c9-be16-beb7e12bbe70/treatment-plan/10f869aeea749b4116ef122c40e7d17f4e08ce7ee37912f8aef68d7d9eb84749",
+        "sha256": "10f869aeea749b4116ef122c40e7d17f4e08ce7ee37912f8aef68d7d9eb84749",
+        "bytes": 4422,
+        "mime": "application/json"
+      },
+      "plan": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "durationSec": 20,
+        "aspect": "16:9",
+        "fps": 24,
+        "summary": "以蜡笔绘本风格创作的20秒社区图书交换活动宣传片。通过暖色纸面上的蜡笔手绘笔触，讲述好书在邻里之间温暖流转的故事，并在上海青禾社区广场的秋日图景中清晰呈现2026年10月8日的活动关键信息，号召居民以书会友。",
+        "options": [
+          {
+            "id": "option-book-journey",
+            "concept": "以“一本书的漂流日记”为情感线索，借由书本在居民手中的传递，展现分享阅读的喜悦与新友谊的萌芽。",
+            "visualApproach": "深褐蜡笔勾勒质朴线条，暖黄与草绿排线涂抹，蜡笔逐帧抖动营造生动呼吸感，由单本书特写自然过渡到社区广场的热闹场景。",
+            "soundApproach": "轻柔的尤克里里与八音盒旋律主导，搭配纸张摩擦、蜡笔在粗糙纸面沙沙作响的生动拟音，旁白温和从容。",
+            "tradeoff": "叙事温润亲切，极契合绘本风格；但前段偏重情感铺垫，活动全景镜头展现时间相对紧凑。"
+          },
+          {
+            "id": "option-square-festival",
+            "concept": "聚焦上海青禾社区广场的换书集市全景，以热闹的群像互动烘托热烈的社区文化氛围。",
+            "visualApproach": "多人物宽幅画面，蜡笔快速铺设摊位与绿树，淡水彩蓝绿晕染天空，强调多人翻书与交谈的动态姿态。",
+            "soundApproach": "木管乐器与轻快沙锤合奏，伴随户外微风与隐约的社区欢笑声，整体节庆感鲜明。",
+            "tradeoff": "全景信息饱满热烈，但缺乏单一角色的情感聚焦点，绘本特有的静谧温暖感略有减弱。"
+          },
+          {
+            "id": "option-hands-and-covers",
+            "concept": "以“双手递送图书”的特写镜头组为核心意象，通过书本封面的蜡笔色彩碰撞隐喻思想交汇。",
+            "visualApproach": "圆润的蜡笔手部动作与书封特写频繁替换，色块交叠冲出轮廓，结尾镜头迅速拉开展示活动日程手写字样。",
+            "soundApproach": "单把尼龙吉他伴奏，强调手指触碰与翻页的贴近麦克风质感，节奏舒缓克制。",
+            "tradeoff": "艺术质感与材质表现力极高，但形式相对抽象，对社区具体场景与烟火气的呈现较少。"
+          }
+        ],
+        "selectedOptionId": "option-book-journey",
+        "selectionReason": "方案一完美融合了绘本风格的材质魅力与温情叙事。以一本静待翻阅的旧书作为切入点，能迅速引起爱书居民的情感共鸣，随后自然过渡到青禾社区广场与换书约定，节奏张弛有度，在20秒内既传达了核心事实，又赋予活动持久的温暖记忆。",
+        "shots": [
+          {
+            "id": "shot-01",
+            "startFrame": 0,
+            "endFrame": 120,
+            "visualIntent": "米白粗糙纸面上，深褐蜡笔现场勾勒出一个木质小书架，一本红皮故事书微微晃动并轻轻翻开一角，蜡笔排线微带抖动，伴随八音盒清脆音色。",
+            "scriptLine": "一本读完的好书，正在书架上静静等待新的朋友。",
+            "factIds": []
+          },
+          {
+            "id": "shot-02",
+            "startFrame": 120,
+            "endFrame": 240,
+            "visualIntent": "镜头推移，两双圆滚滚的蜡笔手在暖黄桌面上推移两本色彩鲜艳的图书完成交换，头顶上方飘落几片蜡笔绿色落叶，充满童趣生机。",
+            "scriptLine": "带上你珍藏的旧书，换回一段意想不到的新故事。",
+            "factIds": []
+          },
+          {
+            "id": "shot-03",
+            "startFrame": 240,
+            "endFrame": 360,
+            "visualIntent": "横移并拉远，上海青禾社区广场的手绘全貌迅速铺开，绿树下居民三两围坐翻阅图书，上方以手写蜡笔字样清晰浮现2026年10月8日与地点信息。",
+            "scriptLine": "2026年10月8日，活动将在上海青禾社区广场温馨开启。",
+            "factIds": [
+              "fact-time",
+              "fact-location"
+            ]
+          },
+          {
+            "id": "shot-04",
+            "startFrame": 360,
+            "endFrame": 480,
+            "visualIntent": "镜头微微拉出画框边缘，显出整张绘本纸张质感，画面中邻里高举书本挥手微笑，页面下方留白处手写字迹柔和固定，伴随吉他扫弦余音淡出。",
+            "scriptLine": "期待与你在书香中相遇，一起翻开社区的温暖篇章。",
+            "factIds": []
+          }
+        ],
+        "script": [
+          "一本读完的好书，正在书架上静静等待新的朋友。",
+          "带上你珍藏的旧书，换回一段意想不到的新故事。",
+          "2026年10月8日，活动将在上海青禾社区广场温馨开启。",
+          "期待与你在书香中相遇，一起翻开社区的温暖篇章。"
+        ]
+      }
+    }
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 5000,
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 4222,
+        "completion_tokens": 3537,
+        "total_tokens": 7759,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "status": "blocked",
+  "limits": "Opt-in isolated local real-model pipeline, maximum six HTTP calls and no automatic retries. Provider ignores output caps; requests and observed usage are recorded, no claim of hard token bounds, semantic/style/listening QA or approved final movie.",
+  "errorCode": "DURATION_CONFLICT"
+}

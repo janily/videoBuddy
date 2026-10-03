@@ -1,0 +1,121 @@
+{
+  "executedAt": "2026-10-03T05:58:54.305Z",
+  "model": "gemini-3.8-flash",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9292f363-61e7-4817-9004-3827d5d37e0b",
+  "stages": {
+    "project": {
+      "projectId": "698dee33-b19c-417a-9188-7f48a4b3851a",
+      "revisionId": "43701df2-b8e6-41b1-a44c-16351ffb53ab",
+      "operationId": "b9e0f6f3-4128-4a1f-b216-1eaba92a9401",
+      "understandingSha256": "857be2ef88b6fc4f18403ede77b09c2577b5b5f78dd9ba85b1c911fc88c297ab"
+    },
+    "treatment": {
+      "treatmentRef": {
+        "key": "projects/698dee33-b19c-417a-9188-7f48a4b3851a/revisions/43701df2-b8e6-41b1-a44c-16351ffb53ab/treatment-plan/30b4f3560147bede1cc8075215e5cd0200fe2795f8422d7cde524a19a9c21583",
+        "sha256": "30b4f3560147bede1cc8075215e5cd0200fe2795f8422d7cde524a19a9c21583",
+        "bytes": 3854,
+        "mime": "application/json"
+      },
+      "plan": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "durationSec": 20,
+        "aspect": "16:9",
+        "fps": 24,
+        "summary": "围绕2026年10月8日上海青禾社区广场图书交换活动，以蜡笔绘本风格展开一场充满童趣与温暖的邻里换书叙事，20秒内精准传递时间、地点与活动主题。",
+        "options": [
+          {
+            "id": "option-live-drawn-scroll",
+            "concept": "连续长卷作画：蜡笔线条在粗糙纸面上即时延展，从一本旧书勾勒到热闹的社区广场，展现邻里分享的温情流淌。",
+            "visualApproach": "镜头沿暖白纸面横向平移，深棕蜡笔以稚拙笔触与轻微抖动绘制书本、树木与广场书摊，伴随红黄蜡笔的饱满涂色。",
+            "soundApproach": "清脆的尤克里里轻扫弦与钢片琴点缀，伴随蜡笔划过纸张的沙沙摩擦声与温暖柔和的旁白。",
+            "tradeoff": "强调连续作画的即时感与空间流动，但省略了单页翻折的书页实体转换质感。"
+          },
+          {
+            "id": "option-picture-book-turn",
+            "concept": "绘本翻页故事：以经典幼儿图画书翻页结构展开，每一页定格一个换书瞬间与关键信息。",
+            "visualApproach": "固定俯拍纸面，每5秒伴随真实的纸张翻折动态切换画面，构图采用儿童视角的前后错层布局。",
+            "soundApproach": "木吉他分解和弦搭配清脆翻页声与木鱼敲击，配音节奏沉稳规整。",
+            "tradeoff": "结构清晰且仪式感强，但短时间内多次翻页略微打断视觉连贯流动。"
+          },
+          {
+            "id": "option-wax-resist-reveal",
+            "concept": "蜡笔留白显影：白色蜡笔预先写下活动日期与地点，水彩笔刷轻轻扫过，显影出隐藏在阳光下的社区聚会。",
+            "visualApproach": "暖调水彩在纸上缓慢晕染，与抗水白蜡笔边缘形成质感肌理，最后展现全景广场。",
+            "soundApproach": "湿润笔刷滑过纸面的微响与八音盒空灵音符交织，叙事氛围唯美神秘。",
+            "tradeoff": "视觉艺术表现力极高，但关键事实文字的即时识别性略低于纯蜡笔手绘。"
+          }
+        ],
+        "selectedOptionId": "option-live-drawn-scroll",
+        "selectionReason": "方案一通过连续手绘长卷的形式，最自然地贴合蜡笔绘本“现场作画”的核心风格，线条与色彩在暖白纸面上即时生长，既保证了20秒内时间与地点信息的清晰传达，又营造出邻里间亲切真挚的温情互动。",
+        "shots": [
+          {
+            "id": "shot-1",
+            "startFrame": 0,
+            "endFrame": 120,
+            "visualIntent": "全景暖白纸面上，深棕色蜡笔以手绘线条即时勾勒出一本微微开启的精装绘本，黄色与红褐色蜡笔涂抹封面，书页间跃出一只展翅的简笔小鸟。",
+            "scriptLine": "带一本旧书，换新故事。",
+            "factIds": []
+          },
+          {
+            "id": "shot-2",
+            "startFrame": 120,
+            "endFrame": 240,
+            "visualIntent": "镜头平移跟随小鸟飞入纸页中央，上方以稚拙手写体蜡笔工整写出活动日期，下方画出一本日历翻开到金秋十月的场景，伴有金黄落叶飘落笔触。",
+            "scriptLine": "2026年10月8日见。",
+            "factIds": [
+              "fact-time"
+            ]
+          },
+          {
+            "id": "shot-3",
+            "startFrame": 240,
+            "endFrame": 360,
+            "visualIntent": "镜头继续向右推移，深色线条迅速绘出青禾社区广场的标志性大树与露天木质长椅，两位圆脸红脸颊的居民人偶正微笑着相互递送图书。",
+            "scriptLine": "相约上海青禾社区广场。",
+            "factIds": [
+              "fact-location"
+            ]
+          },
+          {
+            "id": "shot-4",
+            "startFrame": 360,
+            "endFrame": 480,
+            "visualIntent": "镜头微微拉远展现整幅暖意融融的绘本全景，阳光般的柠檬黄蜡笔光晕洒落草坪，彩色书本堆叠成小塔，画面底部显现活动的温馨邀请标语。",
+            "scriptLine": "社区图书交换，等你来！",
+            "factIds": []
+          }
+        ],
+        "script": [
+          "带一本旧书，换新故事。",
+          "2026年10月8日见。",
+          "相约上海青禾社区广场。",
+          "社区图书交换，等你来！"
+        ]
+      }
+    }
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 5000,
+      "status": 200,
+      "usage": {
+        "prompt_tokens": 4330,
+        "completion_tokens": 3517,
+        "total_tokens": 7847,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "status": "blocked",
+  "limits": "Opt-in isolated local real-model pipeline, maximum six HTTP calls and no automatic retries. Provider ignores output caps; requests and observed usage are recorded, no claim of hard token bounds, semantic/style/listening QA or approved final movie.",
+  "errorCode": "ASR_MISMATCH",
+  "blockerDetail": "Actual ASR recognized 相約上海清和社區廣場 for planned 相约上海青禾社区广场. Orthographic normalization still differs; no expected-text hint or homophone substitution was used."
+}
