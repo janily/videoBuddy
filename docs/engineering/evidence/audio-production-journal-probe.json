@@ -1,0 +1,60 @@
+{
+  "executedAt": "2026-10-03T16:27:21.815Z",
+  "status": "pass",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/real-creation/9a9c4970-9205-4bce-bc93-04e5aef8d480",
+  "sourcePackageRef": {
+    "key": "projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/revisions/64239bc0-9d50-45e8-85fc-6f7b38f53b7a/audio-execution/9a546c855a4619a5ada91507c2872262d23cb2596ae90eedacf8187c47671d65",
+    "sha256": "9a546c855a4619a5ada91507c2872262d23cb2596ae90eedacf8187c47671d65",
+    "bytes": 4279,
+    "mime": "application/json"
+  },
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "baseline": {
+    "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/audio-production-cancel-grX6Nm",
+    "checks": 22,
+    "musicSha256": "f086f8d67d720b288ba588020602364098a633f36d599750fd8e7b64e9ce43b0",
+    "foleySha256": "fd22af0e922cb46dd1c55a15b849d8f79a2d70a309f40fb97022c94b078465a6",
+    "mixSha256": "0814f66cfe5dc618e51a2ad631b17a2c277264ad5269b3ef1ca6b56986ea6fc4",
+    "allHashesMatchArchived": true
+  },
+  "cancellation": {
+    "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/audio-production-cancel-dRl4Ca",
+    "projectId": "00cb3838-3cc2-4619-b9be-63968143b288",
+    "operationId": "7e26e142-00f7-4994-a42a-a7414abc752d",
+    "checks": 4,
+    "errorCode": "PREVIEW_STALE",
+    "containerId": "e53a51e377ee7d4569b18cbbb72c3efb3316de1380d3660099fc622eebc9e7b9",
+    "containerName": "vb-media-a24ac211-02b5-4d15-b0e9-d3dd68dfe52d",
+    "phase": "running_container_observed",
+    "containerRemoved": true,
+    "afterRevocationMs": 259,
+    "elapsedMs": 968,
+    "coldControlFenced": true,
+    "operationStatus": "cancelling",
+    "stemsReturned": false
+  },
+  "networkCalls": 0,
+  "sourceControlAndBudgetUnchanged": true,
+  "resultPublished": false,
+  "limits": "Actual archived model music/foley and intentional zero voice execute with pinned offline Docker and actual isolated FileStore control/cancelProduction fences. Diagnostic controls are initialized expressly for producer testing; this is not a user-approved FilmPackage, full preview pipeline, qualified result, public change operation or proof of physical cleanup. A running container observation followed by absence does not alone prove that the producer was interrupted before completion; this probe does not assert live-stop success.",
+  "journalReceipts": [
+    {
+      "key": "projects/f297ff42-ec80-48ca-aa9a-c5f26a9c0ad5/operations/48bf2b2e-3cf6-4dfb-b4e8-fe74bc39923c/media-effects/0d4e22ccf7245995defe0982edbda6e251d5d19d0b30fce91770b663568d430e",
+      "schemaVersion": 1,
+      "invocation": "9a6661f1-8303-43e2-af15-b3723b7a34b6",
+      "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+      "argsSha256": "0d4e22ccf7245995defe0982edbda6e251d5d19d0b30fce91770b663568d430e",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "key": "projects/f297ff42-ec80-48ca-aa9a-c5f26a9c0ad5/operations/48bf2b2e-3cf6-4dfb-b4e8-fe74bc39923c/media-effects/dd3e393eaada53c67e178727c884ce637f5524b4e2485c08b29237fcbd0e2d3b",
+      "schemaVersion": 1,
+      "invocation": "abe12648-10fe-4198-9278-1f74e98774be",
+      "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+      "argsSha256": "dd3e393eaada53c67e178727c884ce637f5524b4e2485c08b29237fcbd0e2d3b",
+      "state": "completed",
+      "output": ""
+    }
+  ]
+}

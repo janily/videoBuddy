@@ -21,6 +21,7 @@ async function docker(args:string[]){
 }
 async function main(){
  if(!process.argv.includes('--audio-cancellation'))throw Error('AUDIO_PRODUCTION_CANCELLATION_OPT_IN_REQUIRED');
+ const journalMode=process.argv.includes('--journal');
  const proof=JSON.parse(await readFile('docs/engineering/evidence/native-package-probe.json','utf8')),source=new FileStore(proof.root),prefix=`projects/${proof.projectId}`;
  const controlBefore=(await source.readFresh(prefix+'/control')).value,budgetBefore=(await source.readFresh(prefix+'/budget')).value;
  const data=AudioExecutionSchema.parse((await source.readFresh(proof.audio.packageRef.key)).value);await loadAudioExecution(source,proof.root,proof.projectId,proof.revisionId,proof.audio.packageRef,data.planRef,data.timingDraftRef);
@@ -30,20 +31,28 @@ async function main(){
   const control=await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,phase:'preparing_preview' as const,activeProduction:operationId}));
   await projects.store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,kind:'preview',status:'running',fence:0,canonicalRunId:operationId,streamEpoch:0});
   async function fence(){assertPreviewProductionFence(await projects.access(owner,projectId),projectId,operationId,control.consentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef})}
-  return{root,projects,projectId,operationId,fence};
+  return{root,projects,projectId,operationId,fence,journal:journalMode?{store:projects.store,prefix:`projects/${projectId}/operations/${operationId}/media-effects`}:undefined};
  }
  let networkCalls=0;const previousFetch=globalThis.fetch;globalThis.fetch=async()=>{networkCalls++;throw Error('AUDIO_PROBE_NETWORK_FORBIDDEN')};
  try{
   const baseline=await diagnostic();let baselineChecks=0;const baselineFence=async()=>{baselineChecks++;await baseline.fence()};
-  const stems=await buildSoundStems(baseline.root,plan,data.durationMs,data.fps,env,{assertActive:baselineFence});
+  const stems=await buildSoundStems(baseline.root,plan,data.durationMs,data.fps,env,{assertActive:baselineFence,journal:baseline.journal});
   if(stems.music.wav.sha256!==data.tracks.music.wav.sha256||stems.foley.wav.sha256!==data.tracks.foley.wav.sha256)throw Error('AUDIO_PROBE_STEMS_CHANGED');
   const voicePath=join(baseline.root,'audio','archived','track.wav');await mkdir(join(voicePath,'..'),{recursive:true,mode:0o700});await frozenAudioInput(voicePath,await readFile(join(proof.root,'objects',data.tracks.voice.audioRef.key)));
   const wav=await inspectTrackWav(voicePath,data.totalSamples,true);if(canonicalHash(wav)!==canonicalHash(data.tracks.voice.wav))throw Error('AUDIO_PROBE_VOICE_CHANGED');
-  const master=await buildAudioMaster(baseline.root,plan,{outputPath:voicePath,runtimeDigest:data.runtimeDigest,wav,kind:'narration_only',qaStatus:'not_checked'},stems,data.durationMs,data.fps,env,{assertActive:baselineFence});
+  const master=await buildAudioMaster(baseline.root,plan,{outputPath:voicePath,runtimeDigest:data.runtimeDigest,wav,kind:'narration_only',qaStatus:'not_checked'},stems,data.durationMs,data.fps,env,{assertActive:baselineFence,journal:baseline.journal});
   if(master.track.wav.sha256!==data.tracks.mix.wav.sha256)throw Error('AUDIO_PROBE_DEFAULT_MIX_CHANGED');
+  let journalReceipts:unknown[]|undefined;
+  if(baseline.journal){
+   const coldJournal={...baseline.journal,store:new FileStore(baseline.root)},keys=await coldJournal.store.listKeys(coldJournal.prefix,1),before=await Promise.all(keys.map(key=>coldJournal.store.readFresh<{state:string}>(key)));
+   if(keys.length!==2||before.some(({value})=>value.state!=='completed'))throw Error('AUDIO_PROBE_JOURNAL_INCOMPLETE');
+   const coldStems=await buildSoundStems(baseline.root,plan,data.durationMs,data.fps,env,{assertActive:baselineFence,journal:coldJournal}),coldMaster=await buildAudioMaster(baseline.root,plan,{outputPath:voicePath,runtimeDigest:data.runtimeDigest,wav,kind:'narration_only',qaStatus:'not_checked'},coldStems,data.durationMs,data.fps,env,{assertActive:baselineFence,journal:coldJournal});
+   if(coldStems.music.wav.sha256!==stems.music.wav.sha256||coldStems.foley.wav.sha256!==stems.foley.wav.sha256||coldMaster.track.wav.sha256!==master.track.wav.sha256||canonicalHash(before)!==canonicalHash(await Promise.all(keys.map(key=>coldJournal.store.readFresh(key)))))throw Error('AUDIO_PROBE_JOURNAL_REPLAY_CHANGED');
+   journalReceipts=before.map(({value},index)=>({key:keys[index],...value}));
+  }
   const cancelled=await diagnostic();let checks=0,containerId:string|null=null,containerName:string|null=null,revokeAt:number|null=null,errorCode='';
   async function active(){
-   if(++checks===3){
+   if(++checks===(journalMode?4:3)){
     const ids=await docker(['ps','--all','--quiet','--no-trunc','--filter','ancestor='+env.VIDEO_MEDIA_IMAGE_REF,'--filter','label=videobuddy.invocation']);
     for(const id of ids.split('\n').filter(Boolean)){
      const [info]=JSON.parse(await docker(['inspect',id]));
@@ -56,13 +65,13 @@ async function main(){
    }
    await cancelled.fence();
   }
-  const startedAt=Date.now();try{await buildSoundStems(cancelled.root,plan,data.durationMs,data.fps,env,{assertActive:active});errorCode='STEMS_RETURNED_AFTER_CANCEL'}catch(error){errorCode=error instanceof Error?error.message:''}
+  const startedAt=Date.now();try{await buildSoundStems(cancelled.root,plan,data.durationMs,data.fps,env,{assertActive:active,journal:cancelled.journal});errorCode='STEMS_RETURNED_AFTER_CANCEL'}catch(error){errorCode=error instanceof Error?error.message:''}
   if(errorCode!=='PREVIEW_STALE'||revokeAt===null)throw Error('AUDIO_PROBE_CANCELLATION_FAILED: '+errorCode);
   const remaining=await docker(['ps','--all','--quiet','--no-trunc','--filter','ancestor='+env.VIDEO_MEDIA_IMAGE_REF,'--filter','label=videobuddy.invocation']);if(containerId&&remaining.split('\n').includes(containerId))throw Error('AUDIO_PROBE_CONTAINER_REMAINS');
   const cold=new ProjectStore(new FileStore(cancelled.root)),c=await cold.access(owner,cancelled.projectId);if(c.consentEpoch!==1||c.activeProduction||c.cancelRequestedProductionId!==cancelled.operationId||(await cold.operation(cancelled.projectId,cancelled.operationId))?.status!=='cancelling')throw Error('AUDIO_PROBE_CANCEL_STATE_CHANGED');
   if(networkCalls||canonicalHash(controlBefore)!==canonicalHash((await source.readFresh(prefix+'/control')).value)||canonicalHash(budgetBefore)!==canonicalHash((await source.readFresh(prefix+'/budget')).value))throw Error('AUDIO_PROBE_SOURCE_CHANGED');
   const report={executedAt:new Date().toISOString(),status:'pass',sourceRoot:proof.root,sourcePackageRef:proof.audio.packageRef,runtimeDigest:data.runtimeDigest,baseline:{root:baseline.root,checks:baselineChecks,musicSha256:stems.music.wav.sha256,foleySha256:stems.foley.wav.sha256,mixSha256:master.track.wav.sha256,allHashesMatchArchived:true},cancellation:{root:cancelled.root,projectId:cancelled.projectId,operationId:cancelled.operationId,checks,errorCode,containerId,containerName,phase:containerId?'running_container_observed':'completed_before_return',containerRemoved:containerId?true:null,afterRevocationMs:Date.now()-revokeAt,elapsedMs:Date.now()-startedAt,coldControlFenced:true,operationStatus:'cancelling',stemsReturned:false},networkCalls,sourceControlAndBudgetUnchanged:true,resultPublished:false,limits:'Actual archived model music/foley and intentional zero voice execute with pinned offline Docker and actual isolated FileStore control/cancelProduction fences. Diagnostic controls are initialized expressly for producer testing; this is not a user-approved FilmPackage, full preview pipeline, qualified result, public change operation or proof of physical cleanup. A running container observation followed by absence does not alone prove that the producer was interrupted before completion; this probe does not assert live-stop success.'};
-  await writeFile('docs/engineering/evidence/audio-production-cancellation-probe.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({status:report.status,allHashesMatchArchived:true,cancellationPhase:report.cancellation.phase,containerRemoved:report.cancellation.containerRemoved,afterRevocationMs:report.cancellation.afterRevocationMs,networkCalls,resultPublished:false}));
+  await writeFile(journalMode?'docs/engineering/evidence/audio-production-journal-probe.json':'docs/engineering/evidence/audio-production-cancellation-probe.json',JSON.stringify({...report,journalReceipts},null,2)+'\n');console.log(JSON.stringify({status:report.status,allHashesMatchArchived:true,cancellationPhase:report.cancellation.phase,containerRemoved:report.cancellation.containerRemoved,afterRevocationMs:report.cancellation.afterRevocationMs,networkCalls,resultPublished:false}));
  }finally{globalThis.fetch=previousFetch}
 }
 main().catch(error=>{console.error(error instanceof Error?error.message:'AUDIO_PRODUCTION_CANCELLATION_PROBE_FAILED');process.exitCode=1});

@@ -1,10 +1,14 @@
 import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
+import {reserveDockerInvocation,finishDockerInvocation,readDockerInvocation,stopJournaledDocker,type DockerJournal} from './docker-journal';
 
-export async function runOwnedDocker(args:string[],timeoutMs:number,image:string,assertActive?:()=>Promise<void>){
+export async function runOwnedDocker(args:string[],timeoutMs:number,image:string,assertActive?:()=>Promise<void>,journal?:DockerJournal){
  await assertActive?.();
- const invocation=randomUUID(),name='vb-media-'+invocation;
- const child=spawn('docker',[...args.slice(0,1),'--name',name,'--label','videobuddy.invocation='+invocation,...args.slice(1)],{stdio:['ignore','pipe','pipe'],signal:AbortSignal.timeout(timeoutMs)}),errors:Buffer[]=[],output:Buffer[]=[];let size=0,outputSize=0;
+ const record=journal?await reserveDockerInvocation(journal,args,image):undefined;
+ if(record?.state==='completed'){await assertActive?.();return record.output!}
+ if(journal&&record)try{await assertActive?.()}catch(error){await finishDockerInvocation(journal,record,'stopped');throw error}
+ const invocation=record?.invocation||randomUUID(),name='vb-media-'+invocation;
+ const child=spawn('docker',[...args.slice(0,1),'--name',name,'--label','videobuddy.invocation='+invocation,...(record?['--label','videobuddy.arguments='+record.argsSha256]:[]),...args.slice(1)],{stdio:['ignore','pipe','pipe'],signal:AbortSignal.timeout(timeoutMs)}),errors:Buffer[]=[],output:Buffer[]=[];let size=0,outputSize=0;
  child.stderr.on('data',(part:Buffer)=>{size+=part.length;if(size<=8192)errors.push(part)});
  let closed=false,exitCode:number|null|undefined,interruption:unknown,pending=Promise.resolve();child.once('close',(code:number|null)=>{closed=true;exitCode=code});
  async function command(commandArgs:string[]){
@@ -16,6 +20,7 @@ export async function runOwnedDocker(args:string[],timeoutMs:number,image:string
  let stopPromise:Promise<void>|undefined;
  function stop(){return stopPromise??=stopOnce()}
  async function stopOnce(){
+  if(journal&&record){await stopJournaledDocker(journal,record.argsSha256,image,()=>closed&&exitCode===0);return}
   const deadline=Date.now()+5000;
   while(Date.now()<deadline){
    const identity=await command(['inspect','--format','{{.Id}} {{.Image}} {{index .Config.Labels "videobuddy.invocation"}}',name]).catch(async()=>{
@@ -37,8 +42,15 @@ export async function runOwnedDocker(args:string[],timeoutMs:number,image:string
   if(interruption)throw interruption;
   if(code!==0)throw Error(`MEDIA_EXECUTION_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,300)}`);
   await assertActive?.();
-  return Buffer.concat(output).toString('utf8').trim();
+  const result=Buffer.concat(output).toString('utf8').trim();
+  if(journal&&record)await finishDockerInvocation(journal,record,'completed',result);
+  return result;
   }catch(error){
+   if(journal&&record){
+    const saved=await readDockerInvocation(journal,record.argsSha256,image).catch(()=>undefined);
+    if(saved?.invocation===record.invocation&&saved.state==='completed'){await assertActive?.();return saved.output!}
+    if(saved?.invocation===record.invocation&&saved.state==='stopped')throw error;
+   }
    try{await stop()}catch(stopError){throw Error('MEDIA_STOP_UNKNOWN',{cause:stopError})}
    throw error;
   }

@@ -40,6 +40,8 @@ async function fixture(){
 it('passes the same durable production fence to synthesis and master, with cold completed-stage reuse',async()=>{
  const f=await fixture(),record=await f.run();expect(await f.run()).toEqual(record);expect(stems).toHaveBeenCalledTimes(1);expect(master).toHaveBeenCalledTimes(1);expect(archive).toHaveBeenCalledTimes(1);
  expect(stems.mock.calls[0][5].assertActive).toBe(master.mock.calls[0][7].assertActive);
+ expect(stems.mock.calls[0][5].journal).toBe(master.mock.calls[0][7].journal);
+ expect(stems.mock.calls[0][5].journal).toEqual({store:f.projects.store,prefix:`projects/${f.projectId}/operations/${f.operationId}/media-effects`});
 });
 it.each(['sound','master'] as const)('a revocation observed inside %s prevents audio package and completed stage publication',async producer=>{
  const f=await fixture(),revoke=async(options?:{assertActive?:()=>Promise<void>})=>{if(!options?.assertActive)throw Error('PRODUCER_FENCE_MISSING');await options.assertActive();await cancelProduction(f.projects.store,f.projectId,f.operationId);await options.assertActive();throw Error('REVOCATION_NOT_OBSERVED')};

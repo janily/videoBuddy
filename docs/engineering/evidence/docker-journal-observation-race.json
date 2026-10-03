@@ -1,0 +1,25 @@
+{
+  "executedAt": "2026-10-03T16:30:32.185Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/docker-journal-probe-Da680r",
+  "journalKey": "projects/e5cd1816-1f07-41a8-afa7-70ae5f907024/operations/4a670098-f069-4aa8-9478-2dd8360db490/media-effects/a2412aa071ade265ccea4d8347189c2e3d057c55d5e163c043eda6af418f40a3",
+  "initialProbeExit": 1,
+  "initialProbeError": "DOCKER_JOURNAL_PROBE_RESOURCE_UNKNOWN",
+  "before": {
+    "schemaVersion": 1,
+    "invocation": "7dee8eba-d71d-4f60-9884-72ddadca6831",
+    "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "argsSha256": "a2412aa071ade265ccea4d8347189c2e3d057c55d5e163c043eda6af418f40a3",
+    "state": "started"
+  },
+  "after": {
+    "schemaVersion": 1,
+    "invocation": "7dee8eba-d71d-4f60-9884-72ddadca6831",
+    "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "argsSha256": "a2412aa071ade265ccea4d8347189c2e3d057c55d5e163c043eda6af418f40a3",
+    "state": "stopped"
+  },
+  "errorCode": null,
+  "resourceStartRetried": false,
+  "resultPublished": false,
+  "providerCalls": 0
+}

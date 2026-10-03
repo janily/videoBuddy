@@ -1,4 +1,5 @@
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
+import type {DockerJournal} from '@/services/video/media/docker-journal';
 import {createHash} from 'node:crypto';
 import {lstat,mkdir,open,readFile} from 'node:fs/promises';
 import {isAbsolute,join,resolve,relative} from 'node:path';
@@ -16,7 +17,7 @@ export {masterMixFilter} from './master-filter';
 import {masterMixFilter} from './master-filter';
 type Stems=Awaited<ReturnType<typeof buildSoundStems>>;
 function inside(root:string,path:string){const rel=relative(root,path);if(!isAbsolute(path)||!rel||rel.startsWith('..')||isAbsolute(rel)||!/^\/[A-Za-z0-9_./-]+$/.test(path))throw Error('AUDIO_SOURCE_CHANGED')}
-export async function buildAudioMaster(root:string,raw:AudioPlan,narration:NarrationTrack,stems:Stems,durationMs:number,fps:24|30|60,env:Environment=process.env,options:{musicGainDb?:number;assertActive?:()=>Promise<void>}={}):Promise<{stageKey:string;musicGainDb?:number;planSha256:string;toolSha256:string;voiceSha256:string;musicSha256:string;foleySha256:string;track:FilmAudioTrack;qualityStatus:'listening_not_checked'}>{
+export async function buildAudioMaster(root:string,raw:AudioPlan,narration:NarrationTrack,stems:Stems,durationMs:number,fps:24|30|60,env:Environment=process.env,options:{musicGainDb?:number;assertActive?:()=>Promise<void>;journal?:DockerJournal}={}):Promise<{stageKey:string;musicGainDb?:number;planSha256:string;toolSha256:string;voiceSha256:string;musicSha256:string;foleySha256:string;track:FilmAudioTrack;qualityStatus:'listening_not_checked'}>{
  await options.assertActive?.();
  if(!isAbsolute(root)||!/^\/[A-Za-z0-9_./-]+$/.test(root))throw Error('AUDIO_JOB_INVALID');
  const plan=AudioPlanSchema.parse(raw),job=compileSoundJob(plan,durationMs,fps),config=dockerConfiguration(env,'audio-master');
@@ -33,7 +34,7 @@ export async function buildAudioMaster(root:string,raw:AudioPlan,narration:Narra
  const mounts:string[]=[];
  for(const [name,path] of [['master.py',join(stageDir,'master.py')],['sound.py',join(stageDir,'sound.py')],['job.json',join(stageDir,'job.json')],['voice.wav',narration.outputPath],['music.wav',stems.music.outputPath],['foley.wav',stems.foley.outputPath]])mounts.push('--mount','type=bind,src='+path+',dst=/input/'+name+',readonly');
  const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--memory-swap','1g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=64m',...mounts,'--mount','type=bind,src='+outputDir+',dst=/output',config.image,'python3','/input/master.py','--job','/input/job.json','--output','/output'];
- await runOwnedDocker(args,config.timeoutSeconds*1000,config.image,options.assertActive);
+ await runOwnedDocker(args,config.timeoutSeconds*1000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
  await options.assertActive?.();
  const outputPath=join(outputDir,'master.wav'),wav=await inspectStereoTrackWav(outputPath,job.samples,voice.silence&&music.silence&&foley.silence),state=JSON.parse(await readFile(join(outputDir,'state.json'),'utf8'));
  if(state.jobSha256!==canonicalHash(document)||state.outputSha256!==wav.sha256)throw Error('AUDIO_MASTER_CHANGED');

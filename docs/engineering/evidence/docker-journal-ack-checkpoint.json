@@ -1,0 +1,23 @@
+{
+  "executedAt": "2026-10-03T16:23:04.542Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/docker-journal-probe-Mr5jLO",
+  "journalKey": "projects/f753a95c-c8e4-4980-afdf-1587b3fe9358/operations/09cdd68b-68c4-4681-b3a2-e6b14b6e8f78/media-effects/a2412aa071ade265ccea4d8347189c2e3d057c55d5e163c043eda6af418f40a3",
+  "invocation": "011fd84f-8a33-44c1-842f-c43fac515c88",
+  "argsSha256": "a2412aa071ade265ccea4d8347189c2e3d057c55d5e163c043eda6af418f40a3",
+  "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "containerId": "6bd9bd442a236f788f00f7238cea18e1b69b7239c1d3843b0201a80b3870a189",
+  "hostExit": {
+    "code": null,
+    "signal": "SIGKILL"
+  },
+  "coldStateBeforeStop": "started",
+  "runningObservedAfterHostExit": true,
+  "stopState": "stopped",
+  "containerRemoved": true,
+  "replayCode": "MEDIA_EXECUTION_INTERRUPTED",
+  "sourceControlAndBudgetUnchanged": true,
+  "providerCalls": 0,
+  "resultPublished": false,
+  "limits": "Actual offline native FFmpeg signal-processing container proves cold owned resource stop after host process SIGKILL. This diagnostic is not authored audio/video, full production cleanup, operation cancellation, media QA or delivery."
+}

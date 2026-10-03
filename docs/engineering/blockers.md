@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 持久资源更新：sound/master已接启动前journal及warm/cold真实终态核验，实际宿主SIGKILL后同容器仍running，cold核验stop/removed成功；100文件520单元及构建检查通过。见 [资源验证及失败记录](evidence/docker-journal-validation.md)。下方历史段落中的“持久handle未实现”仅保留为当时记录：当前基础能力已经实现，但图像/TTS/ASR/合成/导出资源的全面接入、自动恢复协调和公共unknown解除仍未完成，不能算T14整体清理通过。0provider/原control账本未改，无push/部署。
+
 最新：模型凭据与无限费用授权已具备，追加费用不是阻断。全片 Critic 首次真实请求120秒超时，没有原始响应、供应商任务ID或 actual usage，unknown 保持冻结，不能猜测查询或自动重试。99文件505单元与构建检查通过；T13/T14 sound/master阶段授权、公共未知停止归档与断电防重执行已接，见 [音频撤销验证](evidence/audio-production-cancellation-validation.md)。持久容器 handle 查询/核实清理仍未实现；实际探针仅完成后撤销，没有 live-stop 证据。正式改稿、新 revision、全片视听/许可 QA、发布、43风格86真实基线及最终用户验收仍待完成。以下表为2026-10-02历史快照，最新状态以本段及后续日期增量为准。
 
 2026-10-03 最新模型预算授权：用户明确允许后续正式全片和43风格验证“不限次数和费用上限”。追加测试费用不再等待确认。历史只读审计定位全部7次预约，5次原始响应/2次历史报告，3次超预约共1,879输出token；见 [只读审计](evidence/legacy-model-audit-validation.md)。历史缺证据及旧格式运行兼容仍须实现，不清空计数、不将旧质量失败算通过。
