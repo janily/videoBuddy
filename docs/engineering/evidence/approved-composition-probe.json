@@ -1,0 +1,58 @@
+{
+  "executedAt": "2026-10-03T10:29:58.600Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "operationId": "00059b52-be2a-4089-a4b4-e3b1cc47dc7c",
+  "approvalId": "e9d3250b-65c0-4948-baf1-3ecd193d84a7",
+  "bundleHash": "81217548f2dc2e01322e1609167d684727c0b57c77c5b2a21258d83f12d30d4b",
+  "record": {
+    "schemaVersion": 2,
+    "inputHash": "516869fedbd120c5ec70f316e388f65528bb968b3efb9578385ecb38350f2c5d",
+    "pictureStageHash": "5ad030fc5544dba242c4ffddb011ea0a16a728b2fa07472ed3a1f523aca8150a",
+    "audioExecutionSha256": "9a546c855a4619a5ada91507c2872262d23cb2596ae90eedacf8187c47671d65",
+    "movie": {
+      "stageKey": "1ac16c8a245984c6aaea389a05bc2fc9a7170b46e88188671e6a6105e078301b",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/approved-pictures-fNJ1Qo/composition/1ac16c8a245984c6aaea389a05bc2fc9a7170b46e88188671e6a6105e078301b/output/final.mp4",
+      "subtitlesPath": null,
+      "technicalQa": {
+        "result": "pass",
+        "sha256": "b1c9e6c6c3d78ef50e6544aa743c0df241eb55139fceee2b715ace79a01efde9",
+        "bytes": 16911640,
+        "width": 1920,
+        "height": 1080,
+        "durationSec": 20,
+        "fps": 24,
+        "frames": 480,
+        "audio": true,
+        "audioChannels": 2
+      },
+      "loudness": {
+        "status": "pass",
+        "filmSha256": "b1c9e6c6c3d78ef50e6544aa743c0df241eb55139fceee2b715ace79a01efde9",
+        "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "integratedLufs": -14.08,
+        "truePeakDbtp": -1.5,
+        "targetLufs": -14,
+        "toleranceLu": 1,
+        "maxTruePeakDbtp": -1.2
+      },
+      "qaStatus": "semantic_not_checked"
+    },
+    "postMix": {
+      "status": "not_applicable",
+      "reason": "no_narration",
+      "filmSha256": "b1c9e6c6c3d78ef50e6544aa743c0df241eb55139fceee2b715ace79a01efde9",
+      "executionSha256": "9a546c855a4619a5ada91507c2872262d23cb2596ae90eedacf8187c47671d65",
+      "voiceTrackSha256": "eb7ac76780c4a47e34cf1bd24bfd08e2d404c961dc8dd9403fb65695794fcb03",
+      "lines": []
+    },
+    "qualityStatus": "semantic_not_checked",
+    "deliveryEligible": false
+  },
+  "replayIdentical": true,
+  "controlUnchanged": true,
+  "additionalModelCalls": 0,
+  "resultPublished": false,
+  "limits": "Actual approved frozen HTML and archived stereo music/foley mixed at full 1080p, independently decoded and loudness measured. Diagnostic copied approval; no regenerated content or model calls. Original spoken-name/visual style failures remain failures. This no-narration variant proves frozen audio reuse, not narrated post-mix ASR, full visual/listening quality or final delivery."
+}

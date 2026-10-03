@@ -71,3 +71,5 @@ T03/T06 修复预算拒绝后的错误未知效果：Director、Treatment、Visu
 
 
 2026-10-03 T12 冻结批准画面增量：新增独立approved-inputs与pictures阶段，正式running operation逐项绑定owner/approval/command/revision/bundle/Understanding/fence/consent；只编译冻结HTML为1080p任务，不放宽preparing_preview fence、不重新调用创作模型。真实隔离项目完整画面1920×1080/20秒/480帧/16,695,765字节/SHA c2a7ff0d…，独立全解码与冷重放通过，0新增模型调用，currentResult未发布。单镜timeout/inspect/fence错误均尝试停止同handle并保留unknown；拼接每500ms核授权，先核唯一容器label/image/ID再stop。实际拼接取消容器removed，5822ms。完整68文件300测试通过，两项审查无剩余实质问题；详见 [批准画面验证](evidence/approved-pictures-validation.md)。产物无音轨、technical_only；正式1080p音画/字幕、全片QA、真实听验和最终发布未完成，页面正式按钮继续disabled；后续导出/修改/清理/43风格86基线继续未完成，C0/C1/C2未达到。
+
+2026-10-03 T12 冻结批准音画增量：正式合成读取冻结1080p画面、已归档音轨/字幕和旁白字时间，不重新调用模型。真实20秒/480帧/1920×1080/双声道AAC成片SHA b1c9e6c6…，独立全解码、−14.08 LUFS/−1.5 dBTP及冷重放通过，控制态未改、未发布。正式v4生产容器核输入SHA并原子写实际输出回执；无回执unknown，交换AAC左右声道拒绝。提取/ASR贯穿授权检查并停止唯一所属容器；真实ASR撤销3160ms、无转录归档，拼接撤销6088ms，两容器removed。合法采样小数时长向外取整；旧v3协议保留。完整70文件304测试、lint/build/构建后typecheck通过，两项独立复审无剩余实质发现，0新增模型调用。详见 [批准音画验证](evidence/approved-composition-validation.md)。本片是原已归档无旁白配乐/音效变体，不证明正式旁白/字幕路径、全片视觉/听验或最终发布；正式UI仍disabled。修改/导出/清理/43风格86基线继续未完成，C0/C1/C2未达到，未push/部署。

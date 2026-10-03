@@ -1,0 +1,14 @@
+{
+  "executedAt": "2026-10-03T10:31:33.383Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-cancel-zFB4Oq",
+  "sourceSha256": "1ff8cd33fc5c5d7256885201c7f2a4696ff5c901120aecb52afd3b3ac1977276",
+  "containerId": "cbaa7ca7decc",
+  "containerState": "removed",
+  "checks": 4,
+  "errorCode": "RENDER_FENCED",
+  "elapsedMs": 3160,
+  "transcriptArchived": false,
+  "additionalModelCalls": 0,
+  "limits": "Actual offline ASR of a copied archived WAV interrupted through an injected live fence. Matching owned container stopped/removed; no transcript persisted. Not a semantic/listening or full narrated approved-film pass."
+}

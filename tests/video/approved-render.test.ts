@@ -12,6 +12,7 @@ import {seedPreviewBundle} from './fixtures/preview-package';
 import {loadApprovedRenderInputs,assertApprovedRenderFence} from '@/services/video/render/approved-inputs';
 import {renderApprovedPictures} from '@/services/video/render/pictures';
 import type {MediaExecutor} from '@/services/video/media/executor';
+import {composeApprovedFilm} from '@/services/video/render/composition';
 async function setup(){
  const root=await mkdtemp(join(tmpdir(),'vb-approved-render-')),projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
  const bundle=await seedPreviewBundle(projects,{projectId,previewArtifactSha256:'7'.repeat(64)}),operationId=randomUUID(),approvalId=randomUUID(),commandId=randomUUID();
@@ -38,6 +39,12 @@ it('approved creation rejects replaced Understanding and a mismatched operation 
  const f=await setup();try{
   await updateJson(f.projects.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,understandingRef:{...c.understandingRef,sha256:'9'.repeat(64)}}));
   await expect(loadApprovedRenderInputs(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env})).rejects.toThrow('RENDER_FENCED');
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('formal composition refuses a missing frozen audio execution instead of generating fallback sound',async()=>{
+ const f=await setup();try{
+  await expect(composeApprovedFilm(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env})).rejects.toThrow('APPROVED_AUDIO_NOT_READY');
+  await expect(f.projects.store.readFresh(`projects/${f.projectId}/approvals/${f.approval.approvalId}/composite-stage`)).rejects.toThrow();
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
 it('cancellation during approved picture execution stops the actual executor handle and saves no stage',async()=>{

@@ -1,5 +1,6 @@
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
+import {randomUUID} from 'node:crypto';
 import {readFile,writeFile} from 'node:fs/promises';
 import {assemblePictureSequence} from '../../src/services/video/media/picture-sequence';
 const exec=promisify(execFile);
@@ -10,9 +11,9 @@ async function main(){
  const mediaDigest='75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919';
  const env={VIDEO_MEDIA_IMAGE_REF:'sha256:'+mediaDigest,VIDEO_MEDIA_RUNTIME_DIGEST:mediaDigest,VIDEO_MEDIA_TIMEOUT_SECONDS:'600'};
  let checks=0,containerId='';const started=Date.now();let errorCode='';
- try{await assemblePictureSequence(root,{projectId:proof.projectId,revisionId:'cancellation-'+proof.approvalId,shots:proof.record.shots.map(({technicalQa,...shot}:{technicalQa:unknown;shotId:string;startFrame:number;endFrame:number;stageKey:string;sha256:string})=>{void technicalQa;return shot}),width,height,fps:24,runtimeDigest:mediaDigest,fence:1},env,{assertActive:async()=>{
-  checks++;if(checks===2){const output=(await exec('docker',['ps','--filter','label=videobuddy.invocation','--format','{{.ID}}'])).stdout.trim();if(!output||output.includes('\n'))throw Error('CANCEL_PROBE_CONTAINER_AMBIGUOUS');containerId=output}
-  if(checks>=3)throw Error('RENDER_FENCED');
+ try{await assemblePictureSequence(root,{projectId:proof.projectId,revisionId:'cancellation-'+randomUUID(),shots:proof.record.shots.map(({technicalQa,...shot}:{technicalQa:unknown;shotId:string;startFrame:number;endFrame:number;stageKey:string;sha256:string})=>{void technicalQa;return shot}),width,height,fps:24,runtimeDigest:mediaDigest,fence:1},env,{assertActive:async()=>{
+  checks++;if(containerId)throw Error('RENDER_FENCED');
+  const output=(await exec('docker',['ps','--filter','label=videobuddy.invocation','--format','{{.ID}}'])).stdout.trim();if(output.includes('\n'))throw Error('CANCEL_PROBE_CONTAINER_AMBIGUOUS');if(output)containerId=output;
  }})}catch(error){errorCode=error instanceof Error?error.message:'UNKNOWN'}
  if(errorCode!=='RENDER_FENCED'||!containerId)throw Error('CANCEL_PROBE_NOT_EXERCISED');
  const state=await exec('docker',['inspect','--format','{{.State.Running}}',containerId]).then(result=>result.stdout.trim()).catch(()=> 'removed');

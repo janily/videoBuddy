@@ -1,4 +1,4 @@
-import {spawn} from 'node:child_process';
+import {runOwnedDocker} from '@/services/video/media/owned-docker';
 import {createHash} from 'node:crypto';
 import {lstat,mkdir,open,readFile} from 'node:fs/promises';
 import {isAbsolute,join,relative} from 'node:path';
@@ -27,15 +27,6 @@ async function writeOnce(path:string,value:string){
  try{const file=await open(path,'wx',0o600);try{await file.writeFile(value);await file.sync()}finally{await file.close()}}
  catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('ASR_STAGE_UNKNOWN')}
 }
-async function runAsr(args:string[]){
- const child=spawn('docker',args,{stdio:['ignore','pipe','pipe'],signal:AbortSignal.timeout(120000)}),output:Buffer[]=[],errors:Buffer[]=[];
- let size=0,errorSize=0;
- child.stdout.on('data',(part:Buffer)=>{size+=part.length;if(size<=1024*1024)output.push(part);else child.kill()});
- child.stderr.on('data',(part:Buffer)=>{errorSize+=part.length;if(errorSize<=8192)errors.push(part)});
- const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',code=>resolve(code??1))});
- if(code!==0||size>1024*1024)throw Error(`ASR_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,300)}`);
- return Buffer.concat(output).toString('utf8').trim();
-}
 export interface AsrAudioInput{language:'zh-CN'|'en'|'auto';outputPath:string;wav:VoiceWavProbe}
 function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typeof asrConfiguration>):AsrTranscript{
  const parsed=transcriptSchema.parse(JSON.parse(raw));
@@ -50,7 +41,8 @@ function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typ
  if(!recognizedText)throw Error('ASR_OUTPUT_INVALID');
  return{...parsed,voiceSha256:voice.wav.sha256,runtimeDigest:config.runtimeDigest,recognizedText};
 }
-export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env):Promise<AsrTranscript>{
+export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env,options:{assertActive?:()=>Promise<void>}={}):Promise<AsrTranscript>{
+ await options.assertActive?.();
  if(!isAbsolute(root))throw Error('ASR_JOB_INVALID');
  const rel=relative(join(root,sourceDirectory),voice.outputPath);
  if(!isAbsolute(voice.outputPath)||rel.startsWith('..')||isAbsolute(rel))throw Error('ASR_JOB_INVALID');
@@ -63,10 +55,12 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
  let raw:string;
  try{raw=await readFile(resultPath,'utf8')}catch(error){
   if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
-  raw=await runAsr(asrDockerArguments(config,jobPath,voice.outputPath));
+  raw=await runOwnedDocker(asrDockerArguments(config,jobPath,voice.outputPath),120000,config.image,options.assertActive);
   validateTranscript(raw,voice,config);
+  await options.assertActive?.();
   await writeOnce(resultPath,raw);
  }
+ await options.assertActive?.();
  return validateTranscript(raw,voice,config);
 }
 export async function transcribeVoice(root:string,voice:VoiceResult,env:Environment=process.env):Promise<AsrTranscript>{

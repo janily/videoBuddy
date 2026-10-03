@@ -10,6 +10,10 @@ it('extracts only the selected final-film audio window in a restricted pinned co
  expect(()=>postMixDockerArguments('latest','1000:1000','/tmp/final.mp4','/tmp/output',1000,4500)).toThrow('POSTMIX_JOB_INVALID');
  expect(()=>postMixDockerArguments(image,'1000:1000','/tmp/final.mp4','/tmp/output',-1,4500)).toThrow('POSTMIX_JOB_INVALID');
 });
+it('accepts sample-accurate voice durations and rounds the extraction window outward',()=>{
+ const args=postMixDockerArguments(image,'1000:1000','/tmp/final.mp4','/tmp/output',1000,1300.0416666666665);
+ expect(args[args.indexOf('-t')+1]).toBe('1.301');
+});
 it('measures the entire final-film audio for intentional silence',()=>{
  const args=postMixSilenceDockerArguments(image,'1000:1000','/tmp/final.mp4','/tmp/output');
  expect(args).toContain('type=bind,src=/tmp/final.mp4,dst=/input/final.mp4,readonly');
