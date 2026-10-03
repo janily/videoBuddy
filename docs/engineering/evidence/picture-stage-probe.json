@@ -2,8 +2,8 @@
   "technicalProbeOnly": true,
   "styleSlug": "crayon-book",
   "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
-  "timingDraftSha256": "8d1ae55166c4422a03a98d19ff35a8ea0a5dbf52f54cc43e004086a66290d26d",
-  "stageKey": "26008793827fdf0d9d7c6a77d1f95aac28e0b4133700afe549d7d5ccce5add08",
+  "timingDraftSha256": "2841003ecee051c460645e4574f71de07036a2bc63f21952ea8478beb89d4a02",
+  "stageKey": "4699eafd4e5630d3d46b71daeb58e61096d79f032a8d25026a0ef209ff3e9ac7",
   "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
   "technicalQa": {
     "result": "pass",

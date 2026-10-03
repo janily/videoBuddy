@@ -20,7 +20,7 @@ import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVoiceStage} from './voice-stage';
 
-type Profile='full'|'probe';
+type Profile='full'|'preview'|'probe';
 type Qa=typeof technicalVideoQa;
 type Compose=typeof composeVideo;
 type PostMix=typeof verifyPostMixNarration;
@@ -41,7 +41,7 @@ async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Pro
 
 export async function prepareCompositeStage(projects:ProjectStore,projectId:string,revisionId:string,operationId:string,expectedConsentEpoch:number,treatmentRef:ObjectRef,options:Options={}):Promise<CompositeStageRecord>{
  const env=options.env||process.env,root=options.root||env.VIDEO_DATA_DIR,profile=options.profile||'full';
- if(!root||!isAbsolute(root)||!['full','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
+ if(!root||!isAbsolute(root)||!['full','preview','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
  const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(control,projectId,operationId,expectedConsentEpoch);
@@ -51,7 +51,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const timingRecord=await prepareTimingStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const timing=TimingDraftSchema.parse(await readRef<unknown>(projects,timingRecord.draftRef,revisionPrefix));
  const picture=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,profile,qa:options.pictureQa});
- const landscape=understanding.preferences.aspect==='16:9',width=profile==='probe'?(landscape?320:180):(landscape?1920:1080),height=profile==='probe'?(landscape?180:320):(landscape?1080:1920);
+ const landscape=understanding.preferences.aspect==='16:9',width=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):(landscape?1920:1080),height=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):(landscape?1080:1920);
  const config=dockerConfiguration(env,operationId),wav=await inspectTrackWav(timing.track.outputPath,timing.durationMs*48,timing.track.silence);
  if(wav.sha256!==timing.track.sha256||wav.samples!==timing.track.samples||timing.track.runtimeDigest!==config.runtimeDigest)throw Error('COMPOSITE_TRACK_CHANGED');
  const track={outputPath:timing.track.outputPath,runtimeDigest:timing.track.runtimeDigest,wav,kind:'narration_only' as const,qaStatus:'not_checked' as const};
@@ -61,7 +61,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   const font=await (options.readFont||readPinnedSubtitleFont)(env);
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||cues.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('COMPOSITE_FONT_CHANGED');
  }
- const captionStyle:CaptionStyle|null=cues.length?profile==='probe'?{fontSize:42,marginV:12,outline:2,primary:'#FFFFFF',outlineColor:'#000000'}:{fontSize:68,marginV:72,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:null;
+ const captionStyle:CaptionStyle|null=cues.length?profile==='probe'?{fontSize:42,marginV:12,outline:2,primary:'#FFFFFF',outlineColor:'#000000'}:profile==='preview'?{fontSize:54,marginV:48,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:{fontSize:68,marginV:72,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:null;
  const bundleHash=canonicalHash({projectId,revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256});
  const spec={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,bundleHash,fence:expectedConsentEpoch};
  const srt=formatSrt(cues),srtSha256=srt?createHash('sha256').update(srt).digest('hex'):null;

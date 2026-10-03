@@ -13,7 +13,7 @@ import {preparePictureShotStage} from './picture-stage';
 import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 
-type Profile='full'|'probe';
+type Profile='full'|'preview'|'probe';
 type Qa=typeof technicalVideoQa;
 type Assemble=typeof assemblePictureSequence;
 interface Options{root?:string;env?:Environment;profile?:Profile;qa?:Qa;assemble?:Assemble}
@@ -27,14 +27,14 @@ async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Pro
 }
 export async function preparePictureSequenceStage(projects:ProjectStore,projectId:string,revisionId:string,operationId:string,expectedConsentEpoch:number,treatmentRef:ObjectRef,options:Options={}):Promise<PictureSequenceRecord>{
  const env=options.env||process.env,root=options.root||env.VIDEO_DATA_DIR,profile=options.profile||'full';
- if(!root||!root.startsWith('/')||!['full','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
+ if(!root||!root.startsWith('/')||!['full','preview','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
  const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(control,projectId,operationId,expectedConsentEpoch);
  const understanding=await readRef<Understanding>(projects,control.understandingRef,`${prefix}/understanding/`);
  const timingRecord=await prepareTimingStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const timing=TimingDraftSchema.parse(await readRef<unknown>(projects,timingRecord.draftRef,revisionPrefix));
- const landscape=understanding.preferences.aspect==='16:9',width=profile==='probe'?(landscape?320:180):(landscape?1920:1080),height=profile==='probe'?(landscape?180:320):(landscape?1080:1920);
+ const landscape=understanding.preferences.aspect==='16:9',width=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):(landscape?1920:1080),height=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):(landscape?1080:1920);
  const config=dockerConfiguration(env,operationId),qa=options.qa||technicalVideoQa;
  const shots=[];
  for(const shot of timing.shots){

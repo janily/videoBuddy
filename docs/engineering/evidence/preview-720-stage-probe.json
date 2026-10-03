@@ -1,0 +1,46 @@
+{
+  "technicalProbeOnly": true,
+  "sourceFilmSha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
+  "excerptMap": [
+    {
+      "previewStartMs": 0,
+      "previewEndMs": 5000,
+      "sourceStartMs": 0,
+      "sourceEndMs": 5000,
+      "shotId": "shot"
+    },
+    {
+      "previewStartMs": 5000,
+      "previewEndMs": 7000,
+      "sourceStartMs": 10000,
+      "sourceEndMs": 12000,
+      "shotId": "shot"
+    },
+    {
+      "previewStartMs": 7000,
+      "previewEndMs": 9000,
+      "sourceStartMs": 16000,
+      "sourceEndMs": 18000,
+      "shotId": "shot"
+    }
+  ],
+  "stageKey": "c0b6c8107da6e74354284ef7f6819fb49fb119810ea2581143f6f1d8d7b8267f",
+  "durationMs": 9000,
+  "artifactId": "9b975e8c-0b04-4cf7-89ec-7c7fad471379",
+  "artifactSha256": "06f7bc527d522387dfac5f5cf3ab77f5a063be9ea160243fe5c132879ccda202",
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "06f7bc527d522387dfac5f5cf3ab77f5a063be9ea160243fe5c132879ccda202",
+    "bytes": 143214,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 9,
+    "fps": 24,
+    "frames": 216,
+    "audio": true
+  },
+  "privateBeforeCommit": true,
+  "replayIdentical": true,
+  "qualityStatus": "semantic_not_checked",
+  "limits": "Nine-second excerpt from the same synthetic 1280x720 project AV; real private object bytes and blocked public access before preview pointer. No FilmSpec package, user-visible preview, approval, real model or style QA."
+}

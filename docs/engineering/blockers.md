@@ -25,3 +25,5 @@ T09/T11 画面阶段已能只读取冻结Visual源码，并用固定Docker镜像
 T09/T11 两镜头技术拼接已实际通过20秒480帧全解码、逐帧计数、输入哈希、前后抽帧像素及重放；项目持久阶段只读已完成镜头，见 [picture-sequence-probe.json](evidence/picture-sequence-probe.json)。底层真实探针与项目阶段注入测试还未组成同一次真实项目流程；音轨/字幕、预览发布和正式渲染Worker仍未接通，不解除视频闭环阻断。
 
 T10/T11 同一技术项目现在已把真实离线TTS/ASR、48 kHz旁白、冻结画面、字幕与固定Docker合成器串成20秒H.264/AAC文件，最终全解码、响度、真峰值和成片后ASR通过；见 [composite-stage-probe.json](evidence/composite-stage-probe.json)。这消除了“项目阶段未接音画”的局部缺口，但输入Visual仍是合成HTML，320×180仅作技术探针；音乐/音效、1080p、43风格、语义/听感QA、真实预览节选和批准发布仍未完成。探针容器已清理，生产Worker的跨崩溃容器恢复/清理仍缺。
+
+T11 已在同一技术项目中生成并私有落盘9秒真实AV节选，320×180与1280×720均经独立全片解码、帧数/哈希及重放检查；720p产物未发布前公开访问被拒，见 [preview-720-stage-probe.json](evidence/preview-720-stage-probe.json)。此结果解除“项目级AV节选尚未生成”的局部缺口；输入Visual是合成HTML、质量状态仍为`semantic_not_checked`，FilmSpec/完整Bundle、真实预览发布Worker/API、播放器和明确批准尚缺，不能对用户宣称预览已可用。

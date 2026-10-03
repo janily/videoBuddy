@@ -15,7 +15,7 @@ import {prepareTimingStage} from './timing-stage';
 import {prepareVisualShotStage} from './visual-stage';
 
 type Qa=typeof technicalVideoQa;
-type Profile='full'|'probe';
+type Profile='full'|'preview'|'probe';
 interface Options{root?:string;env?:Environment;executor?:MediaExecutor;qa?:Qa;profile?:Profile;pollMs?:number;mustExist?:boolean}
 export interface PictureShotRecord{
  schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;visualSourceSha256:string;
@@ -32,7 +32,7 @@ async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Pro
 
 export async function preparePictureShotStage(projects:ProjectStore,projectId:string,revisionId:string,operationId:string,expectedConsentEpoch:number,treatmentRef:ObjectRef,shotId:string,options:Options={}):Promise<PictureShotRecord>{
  const env=options.env||process.env,root=options.root||env.VIDEO_DATA_DIR,profile=options.profile||'full';
- if(!root||!root.startsWith('/')||!['full','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
+ if(!root||!root.startsWith('/')||!['full','preview','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
  const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(control,projectId,operationId,expectedConsentEpoch);
@@ -43,7 +43,7 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
  const source=await readRef<VisualShotSource>(projects,visual.sourceRef,`${revisionPrefix}visual-source/`);
  if(source.assetIds.length)throw Error('VISUAL_ASSET_RUNTIME_UNAVAILABLE');
  const landscape=understanding.preferences.aspect==='16:9',logicalWidth=landscape?1920:1080,logicalHeight=landscape?1080:1920;
- const outputWidth=profile==='probe'?(landscape?320:180):logicalWidth,outputHeight=profile==='probe'?(landscape?180:320):logicalHeight;
+ const outputWidth=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):logicalWidth,outputHeight=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):logicalHeight;
  const shotKey=canonicalHash({shotId}),key=`${revisionPrefix}picture/${profile}/${shotKey}`;
  const config=dockerConfiguration(env,operationId);
  const bundleHash=canonicalHash({revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,visualSourceSha256:visual.sourceSha256,shotId});

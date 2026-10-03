@@ -21,6 +21,9 @@ import {pictureSequenceStageKey,type PictureSequenceInput} from '@/services/vide
 import {prepareCompositeStage} from '@/services/video/preview/composite-stage';
 import {composeStageKey} from '@/services/video/media/compose';
 import {formatSrt} from '@/services/video/audio/subtitles';
+import {preparePreviewExcerptStage} from '@/services/video/preview/excerpt-stage';
+import {previewExcerptStageKey} from '@/services/video/preview/render-excerpt';
+import type {ExcerptSegment} from '@/services/video/preview/excerpt';
 
 function wav(){
  const data=Buffer.alloc(24000*4);
@@ -81,6 +84,9 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect(picture.technicalQa).toMatchObject({durationSec:20,sha256:'e'.repeat(64)});
   expect(await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).toEqual(picture);
   expect(renderCalls).toBe(1);
+  const previewShot=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{...pictureOptions,profile:'preview'});
+  expect(previewShot.profile).toBe('preview');
+  expect(submitted).toMatchObject({logicalWidth:1920,logicalHeight:1080,outputWidth:1280,outputHeight:720});
   let assemblyCalls=0;
   const sequenceOptions={root,env:pictureOptions.env,qa:pictureOptions.qa,assemble:async(_root:string,input:PictureSequenceInput)=>{assemblyCalls++;const stageKey=pictureSequenceStageKey(input);return{stageKey,outputPath:join(root,'picture-sequence',stageKey,'output','picture.mp4'),technicalQa:{result:'pass' as const,sha256:qaHash,bytes:1234,width:1920,height:1080,durationSec:20,fps:24,frames:480,audio:false},totalFrames:480}}};
   const sequence=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,0,treatmentRef,sequenceOptions);
@@ -98,6 +104,22 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect(composite.qualityStatus).toBe('semantic_not_checked');
   expect(await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).toEqual(composite);
   expect([compositionCalls,postMixCalls]).toEqual([1,1]);
+  const segments:ExcerptSegment[]=[{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:5000,shotId:'shot'},{previewStartMs:5000,previewEndMs:7000,sourceStartMs:10000,sourceEndMs:12000,shotId:'shot'},{previewStartMs:7000,previewEndMs:9000,sourceStartMs:16000,sourceEndMs:18000,shotId:'shot'}];
+  let excerptCalls=0,previewSha='c'.repeat(64);
+  const excerptOptions={root,profile:'full' as const,env:pictureOptions.env,composite:compositeOptions,
+   qa:async(_dir:string,_image:string,_path:string,expected:{width:number;height:number;durationSec:number;fps:number;audio:boolean})=>({result:'pass' as const,sha256:previewSha,bytes:2345,frames:Math.round(expected.durationSec*expected.fps),...expected}),
+   render:async(input:{root:string;sourceSha256:string;segments:ExcerptSegment[];width:number;height:number;fps:24|30|60})=>{excerptCalls++;const stageKey=previewExcerptStageKey({fullFilmSha256:input.sourceSha256,segments:input.segments,width:input.width,height:input.height,fps:input.fps,runtimeDigest:'a'.repeat(64)});return{stageKey,outputPath:join(root,'preview',stageKey,'output','preview.mp4'),sha256:previewSha,bytes:2345,durationMs:9000,sourceFilmSha256:input.sourceSha256,excerptMap:segments,technicalQa:{result:'pass' as const,sha256:previewSha,bytes:2345,width:1920,height:1080,durationSec:9,fps:24,frames:216,audio:true}}},
+   stageArtifact:async(_projects:ProjectStore,_root:string,_projectId:string,revision:string,artifactId:string,preview:{sha256:string;bytes:number})=>({id:artifactId,revisionId:revision,objectRef:{key:`projects/${projectId}/artifacts/${artifactId}/files/preview.mp4`,sha256:preview.sha256,bytes:preview.bytes,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'preview.mp4',sourceFilmSha256:filmHash,excerptStageKey:'test'})};
+  const excerpt=await preparePreviewExcerptStage(projects,projectId,revisionId,operationId,0,treatmentRef,segments,excerptOptions);
+  expect(excerpt.durationMs).toBe(9000);
+  expect(await preparePreviewExcerptStage(projects,projectId,revisionId,operationId,0,treatmentRef,segments,excerptOptions)).toEqual(excerpt);
+  expect(excerptCalls).toBe(1);
+  await expect(preparePreviewExcerptStage(projects,projectId,revisionId,operationId,0,treatmentRef,[{...segments[0],shotId:'wrong'},...segments.slice(1)],excerptOptions)).rejects.toThrow('EXCERPT_SHOT_CHANGED');
+  await expect(preparePreviewExcerptStage(projects,projectId,revisionId,operationId,0,treatmentRef,[segments[0],{...segments[1],sourceStartMs:11000,sourceEndMs:13000},segments[2]],excerptOptions)).rejects.toThrow('PREVIEW_STAGE_CONFLICT');
+  const cutSpeech:ExcerptSegment[]=[{previewStartMs:0,previewEndMs:500,sourceStartMs:0,sourceEndMs:500,shotId:'shot'},{previewStartMs:500,previewEndMs:7000,sourceStartMs:10000,sourceEndMs:16500,shotId:'shot'},{previewStartMs:7000,previewEndMs:9000,sourceStartMs:17000,sourceEndMs:19000,shotId:'shot'}];
+  await expect(preparePreviewExcerptStage(projects,projectId,revisionId,operationId,0,treatmentRef,cutSpeech,excerptOptions)).rejects.toThrow('EXCERPT_SPEECH_CUT');
+  previewSha='d'.repeat(64);
+  await expect(preparePreviewExcerptStage(projects,projectId,revisionId,operationId,0,treatmentRef,segments,excerptOptions)).rejects.toThrow('PREVIEW_OUTPUT_CHANGED');
   filmHash='e'.repeat(64);
   await expect(prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).rejects.toThrow('COMPOSITE_OUTPUT_CHANGED');
   qaHash='f'.repeat(64);

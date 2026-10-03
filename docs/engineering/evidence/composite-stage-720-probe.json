@@ -1,20 +1,20 @@
 {
   "technicalProbeOnly": true,
   "styleSlug": "crayon-book",
-  "timingDraftSha256": "2841003ecee051c460645e4574f71de07036a2bc63f21952ea8478beb89d4a02",
+  "timingDraftSha256": "b244ee6ca94d0154d343a869cabafc447cf3ce0ee7772fd0babcb35a2dc33892",
   "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
   "pictureSequence": {
-    "stageKey": "767fab61754b8cf15d4185017b62104de7f6c00d96c2823ba5235e90b7d61223",
-    "sha256": "08143fdaddf5dba5938f22f54120a3f5fe2095cfb9ded8b4882c83b44981cb3f",
+    "stageKey": "2096485e356b1b95218a88b73045bc173a95683be930f31e41b0bd7e94f7e449",
+    "sha256": "ef78517d4846955e8f207cfbc8cdaad7e1ee58e7082a48a92aee0ee224fc8530",
     "frames": 480
   },
-  "stageKey": "945dd3d980708073f97841e8857cb785c94f6aab6ea9c005acf0a70c688eb148",
+  "stageKey": "5a5ff9f1467784a25a7250f17b554f374040f9c14086ea7f60d291700829fd74",
   "technicalQa": {
     "result": "pass",
-    "sha256": "7da1b0756d687bb3dfef637831a18f412a25a2a9b1dbc14bc0abf18bb8a7d667",
-    "bytes": 120891,
-    "width": 320,
-    "height": 180,
+    "sha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
+    "bytes": 174339,
+    "width": 1280,
+    "height": 720,
     "durationSec": 20,
     "fps": 24,
     "frames": 480,
@@ -22,22 +22,22 @@
   },
   "loudness": {
     "status": "pass",
-    "filmSha256": "7da1b0756d687bb3dfef637831a18f412a25a2a9b1dbc14bc0abf18bb8a7d667",
+    "filmSha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
     "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
     "integratedLufs": -14.19,
-    "truePeakDbtp": -1.49,
+    "truePeakDbtp": -1.5,
     "targetLufs": -14,
     "toleranceLu": 1,
     "maxTruePeakDbtp": -1.2
   },
   "postMix": {
     "status": "pass",
-    "filmSha256": "7da1b0756d687bb3dfef637831a18f412a25a2a9b1dbc14bc0abf18bb8a7d667",
+    "filmSha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
     "lines": [
       {
         "lineId": "line_1",
         "recognizedText": "上海的活動將在10月8日開始",
-        "sourceSha256": "853e9b45f697ab1e9248bd15301a7fad55f74a8ba4824bb7ed5e3bf867455b52",
+        "sourceSha256": "f88d0eccbf465698eea56a1746e3cff6675e118091abcb6bc4f3c29c10f17328",
         "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 12,
         "status": "pass"

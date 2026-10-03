@@ -1,0 +1,21 @@
+{
+  "technicalProbeOnly": true,
+  "styleSlug": "crayon-book",
+  "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
+  "timingDraftSha256": "b244ee6ca94d0154d343a869cabafc447cf3ce0ee7772fd0babcb35a2dc33892",
+  "stageKey": "8c2f5cb7ac8721cb0aa8386da132b014002adf750ca58cd87d21a4e2ce9cc5cc",
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "19a5aec83e1e2237b9401940b9f8d9920842ce0e17db76811371b70b98d93e13",
+    "bytes": 48925,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": false
+  },
+  "replayIdentical": true,
+  "limits": "Synthetic HTML via injected visual decision, 1280x720 technical render of all 480 frames; no paid Visual model, asset transfer, semantic/style QA, 1080p or user preview."
+}
