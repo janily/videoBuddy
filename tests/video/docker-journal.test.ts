@@ -8,11 +8,21 @@ import {randomUUID} from 'node:crypto';
 const {docker}=vi.hoisted(()=>({docker:vi.fn()}));
 vi.mock('node:child_process',async()=>{const actual=await vi.importActual<typeof import('node:child_process')>('node:child_process');return{...actual,spawn:(command:string,...args:unknown[])=>command==='docker'?docker(command,...args):Reflect.apply(actual.spawn,undefined,[command,...args])}});
 import {FileStore} from '@/services/video/storage/file-store';
-import {reserveDockerInvocation,finishDockerInvocation,stopJournaledDocker,dockerArgumentsHash,type DockerJournal} from '@/services/video/media/docker-journal';
+import {reserveDockerInvocation,finishDockerInvocation,stopJournaledDocker,dockerArgumentsHash,assertDockerCacheReusable,type DockerJournal} from '@/services/video/media/docker-journal';
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
 const image='sha256:'+'a'.repeat(64),args=['run','--rm',image,'true'];let root:string;
 async function fixture(){root=await mkdtemp(join(tmpdir(),'vb-docker-journal-'));return{store:new FileStore(root),prefix:`projects/${randomUUID()}/operations/${randomUUID()}/media-effects`} satisfies DockerJournal}
 afterEach(async()=>{docker.mockReset();if(root)await rm(root,{recursive:true,force:true})});
+it.each(['started','unknown','stopped'] as const)('refuses cached artifacts while the same invocation is %s',async state=>{
+ const journal=await fixture(),record=await reserveDockerInvocation(journal,args,image);
+ if(state!=='started')await finishDockerInvocation(journal,record,state);
+ await expect(assertDockerCacheReusable({...journal,store:new FileStore(root)},args,image)).rejects.toThrow(state==='stopped'?'MEDIA_EXECUTION_INTERRUPTED':'MEDIA_STOP_UNKNOWN');expect(docker).not.toHaveBeenCalled();
+});
+it('permits historical cache without an invocation and cache with a fixed completed receipt',async()=>{
+ const journal=await fixture();await assertDockerCacheReusable(journal,args,image);
+ const record=await reserveDockerInvocation(journal,args,image);await finishDockerInvocation(journal,record,'completed','done');
+ await assertDockerCacheReusable({...journal,store:new FileStore(root)},args,image);expect(docker).not.toHaveBeenCalled();
+});
 it('persists the invocation before spawn and reuses a completed cold receipt without another container',async()=>{
  const journal=await fixture(),hash=dockerArgumentsHash(args,image);let starts=0;
  docker.mockImplementation((_command:string,argv:string[])=>{

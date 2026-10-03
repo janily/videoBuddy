@@ -35,7 +35,8 @@ export async function renderApprovedPictures(projects:ProjectStore,owner:string,
     if(status.status!=='succeeded'||status.outputs.length!==1||status.outputs[0]!=='output/picture.mp4')throw Error('RENDER_PICTURE_FAILED');
    }catch(error){
     // Stop ACK failure cannot turn an unknown execution into a known success.
-    await executor.cancel(handle).catch(()=>undefined);throw error;
+    let stopped;try{stopped=await executor.cancel(handle)}catch(stopError){throw Error('MEDIA_STOP_UNKNOWN',{cause:stopError})}
+    if(stopped.status!=='cancelled')throw Error('MEDIA_STOP_UNKNOWN',{cause:error});throw error;
    }
   }
   await assertApprovedRenderFence(projects,inputs);
@@ -44,7 +45,7 @@ export async function renderApprovedPictures(projects:ProjectStore,owner:string,
   shots.push({shotId:shot.id,startFrame:shot.startFrame,endFrame:shot.endFrame,stageKey:job.stageKey,sha256:technicalQa.sha256,technicalQa});
  }
  await assertApprovedRenderFence(projects,inputs);
- const sequence=await (options.assemble||assemblePictureSequence)(root,{projectId,revisionId:inputs.bundle.revisionId,shots:shots.map(({technicalQa,...shot})=>{void technicalQa;return shot}),width,height,fps,runtimeDigest:inputs.frozen.filmSpec.runtimeDigest,fence:inputs.approval.consentEpoch},env,{mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs)});
+ const sequence=await (options.assemble||assemblePictureSequence)(root,{projectId,revisionId:inputs.bundle.revisionId,shots:shots.map(({technicalQa,...shot})=>{void technicalQa;return shot}),width,height,fps,runtimeDigest:inputs.frozen.filmSpec.runtimeDigest,fence:inputs.approval.consentEpoch},env,{mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs),journal:{store:projects.store,prefix:`projects/${projectId}/operations/${operationId}/media-effects`}});
  if(sequence.totalFrames!==totalFrames)throw Error('RENDER_OUTPUT_CHANGED');
  const record:PictureRecord={schemaVersion:1,inputHash:inputs.inputHash,shots,sequence,qualityStatus:'technical_only'};
  // Re-read every immutable source and approval before recording completion.

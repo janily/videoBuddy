@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {z} from 'zod';
 import type {AtomicStore} from '@/services/video/storage/atomic-store';
-import {StoreConflict,updateJson} from '@/services/video/storage/atomic-store';
+import {StoreConflict,StoreMissing,updateJson} from '@/services/video/storage/atomic-store';
 import {canonicalHash} from '@/services/video/domain/hash';
 
 export interface DockerJournal{store:AtomicStore;prefix:string}
@@ -16,6 +16,15 @@ function key(journal:DockerJournal,hash:string){
 }
 function verify(raw:unknown,hash:string,image:string){const parsed=RecordSchema.safeParse(raw);if(!parsed.success||parsed.data.argsSha256!==hash||parsed.data.image!==image)throw Error('MEDIA_JOURNAL_CHANGED');return parsed.data}
 export async function readDockerInvocation(journal:DockerJournal,argsSha256:string,image:string){return verify((await journal.store.readFresh(key(journal,argsSha256))).value,argsSha256,image)}
+// Existing artifacts from before journal adoption may have no local invocation.
+// Once this operation has a record, bytes alone cannot prove its terminal state.
+export async function assertDockerCacheReusable(journal:DockerJournal,args:string[],image:string){
+ let record:DockerInvocation;
+ try{record=await readDockerInvocation(journal,dockerArgumentsHash(args,image),image)}catch(error){if(error instanceof StoreMissing)return;throw Error('MEDIA_STOP_UNKNOWN',{cause:error})}
+ if(record.state==='stopped')throw Error('MEDIA_EXECUTION_INTERRUPTED');
+ if(record.state!=='completed')throw Error('MEDIA_STOP_UNKNOWN');
+ return record;
+}
 export async function reserveDockerInvocation(journal:DockerJournal,args:string[],image:string):Promise<DockerInvocation>{
  if(!imageSchema.safeParse(image).success||args[0]!=='run'||!args.includes('--rm')||args.some(arg=>arg==='--name'||arg.startsWith('--name=')||arg==='--restart'||arg.startsWith('--restart=')||arg.startsWith('videobuddy.')))throw Error('MEDIA_JOURNAL_INVALID');
  const argsSha256=dockerArgumentsHash(args,image),record:DockerInvocation={schemaVersion:1,invocation:randomUUID(),image,argsSha256,state:'started'};

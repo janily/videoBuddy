@@ -1,4 +1,5 @@
 import {runOwnedDocker} from './owned-docker';
+import {assertDockerCacheReusable,type DockerJournal} from './docker-journal';
 import {lstat,mkdir} from 'node:fs/promises';
 import {isAbsolute,join} from 'node:path';
 import type {Environment} from '@/services/video/config/environment';
@@ -37,7 +38,7 @@ export function pictureSequenceDockerArguments(image:string,user:string,key:stri
  return args;
 }
 
-export async function assemblePictureSequence(root:string,input:PictureSequenceInput,env:Environment=process.env,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}){
+export async function assemblePictureSequence(root:string,input:PictureSequenceInput,env:Environment=process.env,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal}={}){
  if(!isAbsolute(root)||!/^\/[A-Za-z0-9_./-]+$/.test(root))throw Error('PICTURE_SEQUENCE_INVALID');
  const totalFrames=validatePictureSequence(input),config=dockerConfiguration(env,'picture-sequence');
  if(config.runtimeDigest!==input.runtimeDigest)throw Error('PICTURE_SEQUENCE_INVALID');
@@ -53,7 +54,9 @@ export async function assemblePictureSequence(root:string,input:PictureSequenceI
  let exists=false;try{await lstat(outputPath);exists=true}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
  await options.assertActive?.();
  if(!exists&&options.mustExist)throw Error('PICTURE_SEQUENCE_MISSING');
- if(!exists)await runOwnedDocker(pictureSequenceDockerArguments(config.image,config.user,stageKey,outputDir,sourcePaths,input.shots,input.fps),config.timeoutSeconds*1000,config.image,options.assertActive);
+ const args=pictureSequenceDockerArguments(config.image,config.user,stageKey,outputDir,sourcePaths,input.shots,input.fps);
+ if(exists&&options.journal)await assertDockerCacheReusable(options.journal,args,config.image);
+ if(!exists)await runOwnedDocker(args,config.timeoutSeconds*1000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
  await options.assertActive?.();
  const technicalQa=await technicalVideoQa(stageDir,config.image,'output/picture.mp4',{width:input.width,height:input.height,durationSec:totalFrames/input.fps,fps:input.fps,audio:false});
  return{stageKey,outputPath,technicalQa,totalFrames};

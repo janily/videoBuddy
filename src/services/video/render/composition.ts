@@ -38,15 +38,16 @@ export async function composeApprovedFilm(projects:ProjectStore,owner:string,pro
  let style:CaptionStyle|null=null;
  if(cues.length){const entry=frozen.sourceManifest.captionStyles[0];if(!entry)throw Error('FILM_CAPTION_CHANGED');style=CaptionPackageSchema.parse(await readNarrationJson(projects.store,entry.styleRef,prefix)).profiles.full}
  const {plan,verified}=await archivedNarration(projects,root,inputs);
+ const journal={store:projects.store,prefix:`projects/${projectId}/operations/${operationId}/media-effects`};
  const picture=await renderApprovedPictures(projects,owner,projectId,operationId,expectedFence,{root,env,mustExist:options.mustExist});
  const {width,height,fps,totalFrames}=frozen.filmSpec.output,durationSec=totalFrames/fps;
  await assertApprovedRenderFence(projects,inputs);
- const movie=await composeVideo(root,join(root,'picture-sequence',picture.sequence.stageKey),track,cues,style,{width,height,fps,durationSec,bundleHash:inputs.bundle.bundleHash,fence:inputs.approval.consentEpoch},env,{producerReceipt:true,mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs)});
+ const movie=await composeVideo(root,join(root,'picture-sequence',picture.sequence.stageKey),track,cues,style,{width,height,fps,durationSec,bundleHash:inputs.bundle.bundleHash,fence:inputs.approval.consentEpoch},env,{producerReceipt:true,mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs),journal});
  const actual=await technicalVideoQa(join(root,'composition',movie.stageKey),'sha256:'+frozen.filmSpec.runtimeDigest,'output/final.mp4',{width,height,fps,durationSec,audio:true,audioChannels:track.wav.channels});
  if(canonicalHash(actual)!==canonicalHash(movie.technicalQa)||movie.loudness.filmSha256!==actual.sha256)throw Error('RENDER_OUTPUT_CHANGED');
  const film={outputPath:movie.outputPath,sha256:actual.sha256,durationMs:durationSec*1000,technicalQa:'pass' as const};
  await assertApprovedRenderFence(projects,inputs);
- const postMix=!verified.lines.length&&!track.wav.silence?await verifyPostMixNoNarration(projects.store,root,film,projectId,inputs.bundle.revisionId,executionRef,frozen.audioManifest.planRef,frozen.audioManifest.timingDraftRef):await verifyPostMixNarration(root,film,plan,verified,env,undefined,{mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs)});
+ const postMix=!verified.lines.length&&!track.wav.silence?await verifyPostMixNoNarration(projects.store,root,film,projectId,inputs.bundle.revisionId,executionRef,frozen.audioManifest.planRef,frozen.audioManifest.timingDraftRef):await verifyPostMixNarration(root,film,plan,verified,env,undefined,{mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs),journal});
  const record={schemaVersion:2 as const,inputHash:inputs.inputHash,pictureStageHash:canonicalHash(picture),audioExecutionSha256:executionRef.sha256,movie,postMix,qualityStatus:'semantic_not_checked' as const,deliveryEligible:false as const};
  let previous:typeof record|undefined;try{previous=(await projects.store.readFresh<typeof record>(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(previous&&canonicalHash(previous)!==canonicalHash(record))throw Error('RENDER_OUTPUT_CHANGED');

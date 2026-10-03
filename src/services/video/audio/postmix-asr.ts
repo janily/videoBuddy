@@ -1,4 +1,5 @@
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
+import {assertDockerCacheReusable,type DockerJournal} from '@/services/video/media/docker-journal';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
 import {lstat,mkdir} from 'node:fs/promises';
@@ -40,7 +41,7 @@ export async function verifyPostMixNoNarration(store:AtomicStore,root:string,fil
  await verifiedFilmHash(root,film);
  return{status:'not_applicable' as const,reason:'no_narration' as const,filmSha256:film.sha256,executionSha256:executionRef.sha256,voiceTrackSha256:voice.sha256,lines:[]};
 }
-export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}){
+export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal}={}){
  await options.assertActive?.();
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
  await verifiedFilmHash(root,film);
@@ -52,9 +53,10 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   let track;try{track=await inspectTrackWav(outputPath,film.durationMs*48,true,1024)}catch(error){
    if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
    if(options.mustExist)throw Error('POSTMIX_EVIDENCE_MISSING');
-   await runOwnedDocker(postMixSilenceDockerArguments(config.image,config.user,film.outputPath,outputDir),60000,config.image,options.assertActive);
+   await runOwnedDocker(postMixSilenceDockerArguments(config.image,config.user,film.outputPath,outputDir),60000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
    track=await inspectTrackWav(outputPath,film.durationMs*48,true,1024);
   }
+  if(options.journal)await assertDockerCacheReusable(options.journal,postMixSilenceDockerArguments(config.image,config.user,film.outputPath,outputDir),config.image);
   await options.assertActive?.();
   if(!track.silence||track.peakDbfs!==null&&track.peakDbfs>=-46||track.rmsDbfs!==null&&track.rmsDbfs>=-60)throw Error('POSTMIX_UNEXPECTED_AUDIO');
   return{status:'not_applicable' as const,reason:'intentional_silence' as const,filmSha256:film.sha256,trackSha256:track.sha256,samples:track.samples,peakDbfs:track.peakDbfs,rmsDbfs:track.rmsDbfs,lines:[]};
@@ -73,9 +75,10 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   let wav;try{wav=await inspectVoiceWav(outputPath)}catch(error){
    if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
    if(options.mustExist)throw Error('POSTMIX_EVIDENCE_MISSING');
-   await runOwnedDocker(postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs),60000,config.image,options.assertActive);
+   await runOwnedDocker(postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs),60000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
    wav=await inspectVoiceWav(outputPath);
   }
+  if(options.journal)await assertDockerCacheReusable(options.journal,postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs),config.image);
   await options.assertActive?.();
   const transcript=await transcribeAudio(root,{language:line.language,outputPath,wav},'postmix',env,options);
   await options.assertActive?.();

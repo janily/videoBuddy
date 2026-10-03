@@ -13,6 +13,8 @@ import {loadApprovedRenderInputs,assertApprovedRenderFence} from '@/services/vid
 import {renderApprovedPictures} from '@/services/video/render/pictures';
 import type {MediaExecutor} from '@/services/video/media/executor';
 import {composeApprovedFilm} from '@/services/video/render/composition';
+import type {technicalVideoQa} from '@/services/video/media/technical-qa';
+import type {assemblePictureSequence} from '@/services/video/media/picture-sequence';
 async function setup(){
  const root=await mkdtemp(join(tmpdir(),'vb-approved-render-')),projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
  const bundle=await seedPreviewBundle(projects,{projectId,previewArtifactSha256:'7'.repeat(64)}),operationId=randomUUID(),approvalId=randomUUID(),commandId=randomUUID();
@@ -65,11 +67,27 @@ it('cancellation during approved picture execution stops the actual executor han
   await expect(f.projects.store.readFresh(`projects/${f.projectId}/approvals/${f.approval.approvalId}/picture-stage`)).rejects.toThrow();
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
-it.each(['timeout','inspect'])('a %s failure stops the submitted handle and preserves the original error',async(mode)=>{
+it.each(['timeout','inspect'])('a %s failure preserves unknown physical stop instead of only the original error',async(mode)=>{
  const f=await setup();try{
   const now=Date.now(),clock=vi.spyOn(Date,'now').mockReturnValue(now);let cancellations=0;
   const executor:MediaExecutor={submit:async job=>({containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}),inspect:async()=>{if(mode==='inspect')throw Error('MEDIA_STATUS_UNKNOWN');clock.mockReturnValue(now+700000);return{status:'running',outputs:[]}},cancel:async()=>{cancellations++;throw Error('STOP_ACK_UNKNOWN')}};
-  await expect(renderApprovedPictures(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,executor,pollMs:0})).rejects.toThrow(mode==='inspect'?'MEDIA_STATUS_UNKNOWN':'STAGE_UNKNOWN');
+  await expect(renderApprovedPictures(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,executor,pollMs:0})).rejects.toThrow('MEDIA_STOP_UNKNOWN');
   expect(cancellations).toBe(1);
  }finally{vi.restoreAllMocks();await rm(f.root,{recursive:true,force:true})}
+});
+it('retains unknown when a submitted picture cancellation is still in progress',async()=>{
+ const f=await setup();try{
+  const executor:MediaExecutor={submit:async job=>({containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}),inspect:async()=>{throw Error('MEDIA_STATUS_UNKNOWN')},cancel:async()=>({status:'cancelling'})};
+  await expect(renderApprovedPictures(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,executor})).rejects.toThrow('MEDIA_STOP_UNKNOWN');
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('binds picture assembly to the approved operation journal',async()=>{
+ const f=await setup();try{
+  const executor:MediaExecutor={submit:async job=>({containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}),inspect:async()=>({status:'succeeded',outputs:['output/picture.mp4']}),cancel:async()=>({status:'cancelled'})};
+  // Protocol-only producer/QA. This does not certify media or approve delivery.
+  const technicalQa={result:'pass' as const,sha256:'a'.repeat(64),bytes:2048,width:1920,height:1080,durationSec:45,fps:24,frames:1080,audio:false};
+  const qa=vi.fn<typeof technicalVideoQa>(async()=>technicalQa),assemble=vi.fn<typeof assemblePictureSequence>(async(_root,_input,_env,options)=>{if(!options?.journal)throw Error('MEDIA_JOURNAL_CONTEXT_MISSING');await options.assertActive?.();return{totalFrames:1080,stageKey:'b'.repeat(64),outputPath:join(f.root,'picture-sequence','fixture','output','picture.mp4'),technicalQa}});
+  await renderApprovedPictures(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,executor,qa,assemble});
+  expect(assemble.mock.calls[0][3]?.journal).toEqual({store:f.projects.store,prefix:`projects/${f.projectId}/operations/${f.operationId}/media-effects`});
+ }finally{await rm(f.root,{recursive:true,force:true})}
 });

@@ -1,4 +1,5 @@
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
+import {assertDockerCacheReusable,type DockerJournal} from '@/services/video/media/docker-journal';
 import {createHash} from 'node:crypto';
 import {lstat,mkdir,open,readFile} from 'node:fs/promises';
 import {isAbsolute,join,relative} from 'node:path';
@@ -42,7 +43,7 @@ function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typ
  if(!recognizedText)throw Error('ASR_OUTPUT_INVALID');
  return{...parsed,voiceSha256:voice.wav.sha256,runtimeDigest:config.runtimeDigest,recognizedText};
 }
-export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env,options:{assertActive?:()=>Promise<void>;mustExist?:boolean}={}):Promise<AsrTranscript>{
+export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDirectory:'voice'|'postmix'|'source',env:Environment=process.env,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal}={}):Promise<AsrTranscript>{
  await options.assertActive?.();
  if(!isAbsolute(root))throw Error('ASR_JOB_INVALID');
  const rel=relative(join(root,sourceDirectory),voice.outputPath);
@@ -57,11 +58,12 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
  try{raw=await readFile(resultPath,'utf8')}catch(error){
   if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
   if(options.mustExist)throw Error('ASR_EVIDENCE_MISSING');
-  raw=await runOwnedDocker(asrDockerArguments(config,jobPath,voice.outputPath),120000,config.image,options.assertActive);
+  raw=await runOwnedDocker(asrDockerArguments(config,jobPath,voice.outputPath),120000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
   validateTranscript(raw,voice,config);
   await options.assertActive?.();
   await writeOnce(resultPath,raw);
  }
+ if(options.journal){const record=await assertDockerCacheReusable(options.journal,asrDockerArguments(config,jobPath,voice.outputPath),config.image);if(record&&record.output!==raw)throw Error('ASR_STAGE_UNKNOWN')}
  await options.assertActive?.();
  return validateTranscript(raw,voice,config);
 }
