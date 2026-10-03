@@ -55,3 +55,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 聊天incremental缺口已修复并真实提供方验证：objectStream首片段在终态前到达，停止/错误/冷启动保留片段，未知paid effect不重跑。仍未接通用户准备预览、批准、正式render、导出与自然语言修改的完整制作通道；不能将流式聊天成功等同完整产品完成。
 
 2026-10-03 prepare_preview持久命令与真实自动6–12s节选已独立实现/测试，尚未公开API/UI或接入production Worker。真实11s private artifact已生成，质量仅technical，既有renderer仍强制-ac1导致立体声源变单声道，接通发布前须将声道数纳入stage key并保存实际声道。自然语言修改/正式render/export及43风格86基线继续开发。
+
+2026-10-03 stereo节选限制已关闭：新v2真实节选保持源2ch，旧mono按2ch实际QA拒绝，stage key/record/artifact均固定channels。当前未完成的关键通道仍是preview Worker/API/UI发布→一次正式批准→render/独立完整QA→结果/下载/修改/export，以及43风格86基线和完整验收；现有字体/readability Critic失败仍保留。

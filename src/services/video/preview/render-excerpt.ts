@@ -30,12 +30,13 @@ export function validatePreviewSpeechCoverage(segments:ExcerptSegment[],speechWi
   }
  }
 }
-export function previewExcerptStageKey(input:{fullFilmSha256:string;segments:ExcerptSegment[];width:number;height:number;fps:24|30|60;runtimeDigest:string}){
+export function previewExcerptStageKey(input:{fullFilmSha256:string;segments:ExcerptSegment[];width:number;height:number;fps:24|30|60;runtimeDigest:string;audioChannels?:1|2}){
  if(!/^[a-f0-9]{64}$/.test(input.fullFilmSha256)||!/^[a-f0-9]{64}$/.test(input.runtimeDigest)||![input.width,input.height].every(value=>Number.isInteger(value)&&value>=64&&value<=3840&&value%2===0)||![24,30,60].includes(input.fps))throw Error('EXCERPT_INVALID');
- return canonicalHash({...input,version:'preview-excerpt-v1'});
+ if(input.audioChannels!==undefined&&![1,2].includes(input.audioChannels))throw Error('EXCERPT_INVALID');
+ return canonicalHash({...input,audioChannels:input.audioChannels??1,version:'preview-excerpt-v2'});
 }
-export function excerptDockerArguments(image:string,user:string,stageKey:string,sourcePath:string,outputDir:string,segments:ExcerptSegment[],fps:24|30|60){
- if(!/^sha256:[a-f0-9]{64}$/.test(image)||!/^\d+:\d+$/.test(user)||!/^[a-f0-9]{64}$/.test(stageKey)||[sourcePath,outputDir].some(path=>!isAbsolute(path)||!/^\/[A-Za-z0-9_./-]+$/.test(path)))throw Error('EXCERPT_INVALID');
+export function excerptDockerArguments(image:string,user:string,stageKey:string,sourcePath:string,outputDir:string,segments:ExcerptSegment[],fps:24|30|60,audioChannels:1|2=1){
+ if(![1,2].includes(audioChannels)||!/^sha256:[a-f0-9]{64}$/.test(image)||!/^\d+:\d+$/.test(user)||!/^[a-f0-9]{64}$/.test(stageKey)||[sourcePath,outputDir].some(path=>!isAbsolute(path)||!/^\/[A-Za-z0-9_./-]+$/.test(path)))throw Error('EXCERPT_INVALID');
  const sourceDurationMs=Math.max(...segments.map(segment=>segment.sourceEndMs??0)),{durationMs,totalFrames}=validatePreviewSegments(segments,Math.max(20000,sourceDurationMs),fps);
  const filters=segments.flatMap((segment,index)=>{
   const start=segment.sourceStartMs!,end=segment.sourceEndMs!;
@@ -43,7 +44,7 @@ export function excerptDockerArguments(image:string,user:string,stageKey:string,
    `[0:a]atrim=start_sample=${start*48}:end_sample=${end*48},asetpts=PTS-STARTPTS[a${index}]`];
  });
  filters.push(`${segments.map((_,index)=>`[v${index}][a${index}]`).join('')}concat=n=${segments.length}:v=1:a=1[v][a]`);
- return['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','2g','--memory-swap','2g','--user',user,'--tmpfs','/tmp:rw,nosuid,size=128m','--mount',`type=bind,src=${sourcePath},dst=/input/full.mp4,readonly`,'--mount',`type=bind,src=${outputDir},dst=/output`,image,'ffmpeg','-hide_banner','-loglevel','error','-xerror','-nostdin','-y','-i','/input/full.mp4','-filter_complex',filters.join(';'),'-map','[v]','-map','[a]','-frames:v',String(totalFrames),'-t',String(durationMs/1000),'-r',String(fps),'-c:v','libx264','-preset','medium','-crf','18','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-c:a','aac','-b:a','192k','-ar','48000','-ac','1','-movflags','+faststart','/output/preview.mp4'];
+ return['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','2g','--memory-swap','2g','--user',user,'--tmpfs','/tmp:rw,nosuid,size=128m','--mount',`type=bind,src=${sourcePath},dst=/input/full.mp4,readonly`,'--mount',`type=bind,src=${outputDir},dst=/output`,image,'ffmpeg','-hide_banner','-loglevel','error','-xerror','-nostdin','-y','-i','/input/full.mp4','-filter_complex',filters.join(';'),'-map','[v]','-map','[a]','-frames:v',String(totalFrames),'-t',String(durationMs/1000),'-r',String(fps),'-c:v','libx264','-preset','medium','-crf','18','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-c:a','aac','-b:a','192k','-ar','48000','-ac',String(audioChannels),'-movflags','+faststart','/output/preview.mp4'];
 }
 async function runDocker(args:string[],timeoutMs:number){
  const child=spawn('docker',args,{stdio:['ignore','ignore','pipe'],signal:AbortSignal.timeout(timeoutMs)}),errors:Buffer[]=[];let size=0;
@@ -51,18 +52,19 @@ async function runDocker(args:string[],timeoutMs:number){
  const code=await new Promise<number>((resolve,reject)=>{child.once('error',reject);child.once('close',value=>resolve(value??1))});
  if(code!==0)throw Error(`EXCERPT_RENDER_FAILED: docker exit ${code}; ${Buffer.concat(errors).toString('utf8').slice(0,300)}`);
 }
-export async function renderPreviewExcerpt(input:{root:string;sourcePath:string;sourceSha256:string;sourceDurationMs:number;segments:ExcerptSegment[];speechWindows:PreviewSpeechWindow[];width:number;height:number;fps:24|30|60;env?:Environment}){
+export async function renderPreviewExcerpt(input:{root:string;sourcePath:string;sourceSha256:string;sourceDurationMs:number;segments:ExcerptSegment[];speechWindows:PreviewSpeechWindow[];width:number;height:number;fps:24|30|60;audioChannels?:1|2;env?:Environment}){
  const{root,sourcePath,sourceSha256,sourceDurationMs,segments,width,height,fps}=input;
  if(!isAbsolute(root)||!isAbsolute(sourcePath)||!/^\/[A-Za-z0-9_./-]+$/.test(root)||!/^\/[A-Za-z0-9_./-]+$/.test(sourcePath)||!/^([a-f0-9]{64})\/output\/final\.mp4$/.test(relative(join(root,'composition'),sourcePath)))throw Error('EXCERPT_SOURCE_INVALID');
+ const audioChannels=input.audioChannels??1;if(![1,2].includes(audioChannels))throw Error('EXCERPT_INVALID');
  const config=dockerConfiguration(input.env||process.env,'preview-excerpt'),{durationMs}=validatePreviewSegments(segments,sourceDurationMs,fps);
  validatePreviewSpeechCoverage(segments,input.speechWindows,sourceDurationMs);
  const sourceStage=join(root,'composition',relative(join(root,'composition'),sourcePath).split('/')[0]);
- const source=await technicalVideoQa(sourceStage,config.image,'output/final.mp4',{width,height,durationSec:sourceDurationMs/1000,fps,audio:true});
+ const source=await technicalVideoQa(sourceStage,config.image,'output/final.mp4',{width,height,durationSec:sourceDurationMs/1000,fps,audio:true,audioChannels});
  if(source.sha256!==sourceSha256)throw Error('EXCERPT_SOURCE_CHANGED');
- const stageKey=previewExcerptStageKey({fullFilmSha256:sourceSha256,segments,width,height,fps,runtimeDigest:config.runtimeDigest}),stageDir=join(root,'preview',stageKey),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'preview.mp4');
+ const stageKey=previewExcerptStageKey({fullFilmSha256:sourceSha256,segments,width,height,fps,runtimeDigest:config.runtimeDigest,audioChannels}),stageDir=join(root,'preview',stageKey),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'preview.mp4');
  await mkdir(outputDir,{recursive:true,mode:0o700});
  let exists=false;try{await lstat(outputPath);exists=true}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
- if(!exists)await runDocker(excerptDockerArguments(config.image,config.user,stageKey,sourcePath,outputDir,segments,fps),config.timeoutSeconds*1000);
- const qa=await technicalVideoQa(stageDir,config.image,'output/preview.mp4',{width,height,durationSec:durationMs/1000,fps,audio:true});
- return{stageKey,outputPath,sha256:qa.sha256,bytes:qa.bytes,durationMs,sourceFilmSha256:sourceSha256,excerptMap:segments,technicalQa:qa};
+ if(!exists)await runDocker(excerptDockerArguments(config.image,config.user,stageKey,sourcePath,outputDir,segments,fps,audioChannels),config.timeoutSeconds*1000);
+ const qa=await technicalVideoQa(stageDir,config.image,'output/preview.mp4',{width,height,durationSec:durationMs/1000,fps,audio:true,audioChannels});
+ return{stageKey,outputPath,sha256:qa.sha256,bytes:qa.bytes,durationMs,sourceFilmSha256:sourceSha256,excerptMap:segments,technicalQa:qa,audioChannels};
 }

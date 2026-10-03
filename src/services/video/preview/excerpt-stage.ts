@@ -24,7 +24,7 @@ type StageArtifact=typeof stagePreviewArtifact;
 interface Options{root?:string;env?:Environment;profile?:Profile;qa?:Qa;render?:Render;stageArtifact?:StageArtifact;composite?:Parameters<typeof prepareCompositeStage>[6]}
 interface ExcerptIntent{inputHash:string;artifactId:string}
 export interface PreviewExcerptRecord{
- schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;compositeHash:string;profile:Profile;
+ schemaVersion:2;audioChannels:1|2;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;compositeHash:string;profile:Profile;
  excerptMap:ExcerptSegment[];stageKey:string;outputPath:string;sourceFilmSha256:string;durationMs:number;artifactId:string;
  previewArtifactSha256:string;technicalQa:Awaited<ReturnType<Qa>>;qualityStatus:'semantic_not_checked';
 }
@@ -54,26 +54,27 @@ export async function preparePreviewExcerptStage(projects:ProjectStore,projectId
  validatePreviewSpeechCoverage(segments,speechWindows,timing.durationMs);
  const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{...options.composite,root,env,profile});
  const config=dockerConfiguration(env,operationId),width=composite.technicalQa.width,height=composite.technicalQa.height,fps=timing.fps;
- const stageKey=previewExcerptStageKey({fullFilmSha256:composite.technicalQa.sha256,segments,width,height,fps,runtimeDigest:config.runtimeDigest});
- const stageDir=join(root,'preview',stageKey),outputPath=join(stageDir,'output','preview.mp4'),key=`${revisionPrefix}preview-excerpt/${profile}`;
+ const audioChannels=composite.technicalQa.audioChannels===2?2 as const:1 as const;
+ const stageKey=previewExcerptStageKey({fullFilmSha256:composite.technicalQa.sha256,segments,width,height,fps,runtimeDigest:config.runtimeDigest,audioChannels});
+ const stageDir=join(root,'preview',stageKey),outputPath=join(stageDir,'output','preview.mp4'),key=`${revisionPrefix}preview-excerpt-v2/${profile}`;
  const inputHash=canonicalHash({projectId,revisionId,profile,stageKey,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,compositeHash:canonicalHash(composite),segments});
  const intent=await createOrRead<ExcerptIntent>(projects.store,`${key}/intent`,{inputHash,artifactId:randomUUID()});
  if(intent.inputHash!==inputHash||!z.uuid().safeParse(intent.artifactId).success)throw Error('PREVIEW_STAGE_CONFLICT');
  const qa=options.qa||technicalVideoQa,stageArtifact=options.stageArtifact||stagePreviewArtifact;
- const expected={width,height,durationSec:durationMs/1000,fps,audio:true};
+ const expected={width,height,durationSec:durationMs/1000,fps,audio:true,audioChannels};
  async function verify(record:PreviewExcerptRecord){
-  if(record.schemaVersion!==1||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.compositeHash!==canonicalHash(composite)||record.profile!==profile||canonicalHash(record.excerptMap)!==canonicalHash(segments)||record.stageKey!==stageKey||record.outputPath!==outputPath||record.sourceFilmSha256!==composite.technicalQa.sha256||record.durationMs!==durationMs||record.artifactId!==intent.artifactId||record.previewArtifactSha256!==record.technicalQa.sha256||record.qualityStatus!=='semantic_not_checked')throw Error('PREVIEW_STAGE_CONFLICT');
+  if(record.schemaVersion!==2||record.audioChannels!==audioChannels||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.compositeHash!==canonicalHash(composite)||record.profile!==profile||canonicalHash(record.excerptMap)!==canonicalHash(segments)||record.stageKey!==stageKey||record.outputPath!==outputPath||record.sourceFilmSha256!==composite.technicalQa.sha256||record.durationMs!==durationMs||record.artifactId!==intent.artifactId||record.previewArtifactSha256!==record.technicalQa.sha256||record.qualityStatus!=='semantic_not_checked')throw Error('PREVIEW_STAGE_CONFLICT');
   const actual=await qa(stageDir,config.image,'output/preview.mp4',expected);
   if(canonicalHash(actual)!==canonicalHash(record.technicalQa))throw Error('PREVIEW_OUTPUT_CHANGED');
-  const artifact=await stageArtifact(projects,dataRoot,projectId,revisionId,record.artifactId,{stageKey,outputPath,sha256:actual.sha256,bytes:actual.bytes,durationMs,sourceFilmSha256:composite.technicalQa.sha256,excerptMap:segments,technicalQa:actual},env);
+  const artifact=await stageArtifact(projects,dataRoot,projectId,revisionId,record.artifactId,{stageKey,outputPath,sha256:actual.sha256,bytes:actual.bytes,durationMs,sourceFilmSha256:composite.technicalQa.sha256,excerptMap:segments,technicalQa:actual,audioChannels},env);
   if(artifact.id!==record.artifactId||artifact.revisionId!==revisionId||artifact.objectRef.sha256!==actual.sha256||artifact.objectRef.bytes!==actual.bytes||artifact.objectRef.mime!=='video/mp4'||!artifact.qaPassed||!artifact.uploaded)throw Error('PREVIEW_ARTIFACT_MISMATCH');
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
   return record;
  }
  try{return await verify((await projects.store.readFresh<PreviewExcerptRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
- const rendered=await (options.render||renderPreviewExcerpt)({root,sourcePath:composite.outputPath,sourceSha256:composite.technicalQa.sha256,sourceDurationMs:timing.durationMs,segments,speechWindows,width,height,fps,env});
- if(rendered.stageKey!==stageKey||rendered.outputPath!==outputPath||rendered.sourceFilmSha256!==composite.technicalQa.sha256||rendered.durationMs!==durationMs||rendered.sha256!==rendered.technicalQa.sha256||rendered.bytes!==rendered.technicalQa.bytes||rendered.technicalQa.frames!==totalFrames||canonicalHash(rendered.excerptMap)!==canonicalHash(segments))throw Error('PREVIEW_OUTPUT_INVALID');
+ const rendered=await (options.render||renderPreviewExcerpt)({root,sourcePath:composite.outputPath,sourceSha256:composite.technicalQa.sha256,sourceDurationMs:timing.durationMs,segments,speechWindows,width,height,fps,env,audioChannels});
+ if(rendered.audioChannels!==audioChannels||rendered.stageKey!==stageKey||rendered.outputPath!==outputPath||rendered.sourceFilmSha256!==composite.technicalQa.sha256||rendered.durationMs!==durationMs||rendered.sha256!==rendered.technicalQa.sha256||rendered.bytes!==rendered.technicalQa.bytes||rendered.technicalQa.frames!==totalFrames||canonicalHash(rendered.excerptMap)!==canonicalHash(segments))throw Error('PREVIEW_OUTPUT_INVALID');
  const actual=await qa(stageDir,config.image,'output/preview.mp4',expected);
  if(canonicalHash(actual)!==canonicalHash(rendered.technicalQa))throw Error('PREVIEW_OUTPUT_CHANGED');
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
@@ -82,7 +83,7 @@ export async function preparePreviewExcerptStage(projects:ProjectStore,projectId
  if(artifact.id!==intent.artifactId||artifact.revisionId!==revisionId||artifact.objectRef.sha256!==actual.sha256||artifact.objectRef.bytes!==actual.bytes||artifact.objectRef.mime!=='video/mp4'||!artifact.qaPassed||!artifact.uploaded)throw Error('PREVIEW_ARTIFACT_MISMATCH');
  const latestAfter=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latestAfter,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
- const record:PreviewExcerptRecord={schemaVersion:1,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,compositeHash:canonicalHash(composite),profile,excerptMap:segments,stageKey,outputPath,sourceFilmSha256:composite.technicalQa.sha256,durationMs,artifactId:intent.artifactId,previewArtifactSha256:actual.sha256,technicalQa:actual,qualityStatus:'semantic_not_checked'};
+ const record:PreviewExcerptRecord={schemaVersion:2,audioChannels,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,compositeHash:canonicalHash(composite),profile,excerptMap:segments,stageKey,outputPath,sourceFilmSha256:composite.technicalQa.sha256,durationMs,artifactId:intent.artifactId,previewArtifactSha256:actual.sha256,technicalQa:actual,qualityStatus:'semantic_not_checked'};
  const stored=await createOrRead(projects.store,key,record);
  if(canonicalHash(stored)!==canonicalHash(record))throw Error('PREVIEW_STAGE_CONFLICT');
  return verify(stored);
