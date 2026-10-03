@@ -19,10 +19,10 @@ import {writeWorkerHeartbeat} from '@/services/video/commands/worker-heartbeat';
 let root:string;const owner='a'.repeat(64);const prior=process.env.VIDEO_SESSION_SIGNING_KEY;
 beforeEach(async()=>{root=await mkdtemp(join(tmpdir(),'vb-export-op-'));process.env.VIDEO_SESSION_SIGNING_KEY='s'.repeat(64);await writeWorkerHeartbeat(root)});
 afterEach(async()=>{await rm(root,{recursive:true,force:true});if(prior===undefined)delete process.env.VIDEO_SESSION_SIGNING_KEY;else process.env.VIDEO_SESSION_SIGNING_KEY=prior});
-async function fixture(){
+async function fixture(input:{script?:string[]}={}){
  const store=new FileStore(root),projects=new ProjectStore(store),queue=new LocalOperationQueue(store,root),events=new LocalEventLog(root),{projectId}=await projects.create(owner,{schemaVersion:5,clientCreateId:randomUUID(),clientCommandId:randomUUID()});
  const artifactId=randomUUID(),bytes=Buffer.from('protocol fixture only; not a real qualified movie'),sha256=createHash('sha256').update(bytes).digest('hex'),revisionId=randomUUID(),resultId=randomUUID();
- const bundle=await seedPreviewBundle(projects,{projectId,revisionId,durationSec:20,briefVersion:1,previewArtifactSha256:'b'.repeat(64)});
+ const bundle=await seedPreviewBundle(projects,{projectId,revisionId,durationSec:20,briefVersion:1,previewArtifactSha256:'b'.repeat(64),...input});
  await store.create(`projects/${projectId}/previews/${bundle.previewId}/manifest`,bundle);
  const key=`projects/${projectId}/artifacts/${artifactId}/files/final.mp4`;await mkdir(join(root,'objects',`projects/${projectId}/artifacts/${artifactId}/files`),{recursive:true});await writeFile(join(root,'objects',key),bytes);
  await store.create(`projects/${projectId}/artifacts/${artifactId}/manifest`,{id:artifactId,revisionId,objectRef:{key,sha256,bytes:bytes.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'final.mp4'});
@@ -32,6 +32,44 @@ async function fixture(){
  const request={schemaVersion:5 as const,clientCommandId:randomUUID(),artifactId,format:'source_zip' as const};
  return{store,projects,queue,events,projectId,artifactId,resultId,manifest,request};
 }
+it.each(['treatment','credits','quality'] as const)('T14 %s export uses its own durable slot and produces a private deterministic document',async format=>{
+ const f=await fixture(),request={...f.request,format},started=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(started.status!==202)throw Error('TEST');
+ const zip=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);expect(zip.operationId).not.toBe(started.operationId);
+ await rm(join(root,'queue'),{recursive:true,force:true});await f.queue.reconcileExports();expect(await f.queue.pending()).toHaveLength(2);
+ await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
+ await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,started.operationId,{root});
+ const completed=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(completed.status!==200)throw Error('TEST');
+ const artifact=(await f.store.readFresh<{objectRef:{key:string;sha256:string;mime:string};filename:string}>(`projects/${f.projectId}/artifacts/${completed.artifactId}/manifest`)).value;
+ const bytes=await readFile(join(root,'objects',artifact.objectRef.key));expect(createHash('sha256').update(bytes).digest('hex')).toBe(artifact.objectRef.sha256);
+ if(format==='treatment')expect(bytes.toString()).toBe('活动预告\n\n上海的活动将在十月八日开始。\n');
+ else if(format==='quality')expect(JSON.parse(bytes.toString())).toMatchObject({mp4Sha256:f.manifest.mp4Sha256,qualityChecks:f.manifest.qualityChecks});
+ else expect(JSON.parse(bytes.toString())).toMatchObject({sources:[],revisionId:f.manifest.revisionId});
+ expect((await f.events.readFrom(f.projectId,started.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
+ await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'play')).rejects.toThrow('ACCESS_NOT_FOUND');
+ await f.projects.tombstone(owner,f.projectId);await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
+});
+it('T14 subtitle export without frozen captions fails explicitly without publishing an empty file',async()=>{
+ const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'srt'},root);if(started.status!==202)throw Error('TEST');
+ await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
+ expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('failed');
+ expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'EXPORT_NOT_APPLICABLE'});
+ expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
+});
+it('T14 refuses credentials in frozen treatment text before creating a public document',async()=>{
+ const f=await fixture({script:['包含虚构访问凭据 sk-testprivatecredential123456']}),started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'treatment'},root);if(started.status!==202)throw Error('TEST');
+ await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
+ expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'ARCHIVE_PRIVATE_DATA'});
+ expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
+});
+it('T14 refuses credentials in quality reasons without disclosing the failing content in SSE',async()=>{
+ const f=await fixture(),key=`projects/${f.projectId}/results/${f.resultId}/manifest`,old=await f.store.readFresh(key);
+ await f.store.cas(key,old.etag,{...f.manifest,qualityChecks:f.manifest.qualityChecks.map(check=>({...check,reason:'access_token=fakeprivatecredential123'}))});
+ const started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'quality'},root);if(started.status!==202)throw Error('TEST');
+ await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
+ expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'ARCHIVE_PRIVATE_DATA'});
+ expect(JSON.stringify(await f.events.readFrom(f.projectId,started.operationId,0))).not.toContain('fakeprivatecredential123');
+ expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
+});
 it('T14 source ZIP request dispatches once, produces actual ZIP, replays SSE once and opens private download',async()=>{
  const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);
  expect(first.status).toBe(202);if(first.status!==202)throw Error('TEST');

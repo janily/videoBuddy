@@ -7,9 +7,10 @@ import {validateDelivery} from '@/services/video/quality/delivery';
 import {canonicalHash} from '@/services/video/domain/hash';
 import {actualArtifactSha256} from './verified-file';
 import {inspectArtifact} from './access';
-export const ExportPublicationSchema=z.strictObject({schemaVersion:z.literal(1),projectId:z.uuid(),resultId:z.uuid(),sourceArtifactId:z.uuid(),revisionId:z.uuid(),bundleHash:z.string().regex(/^[a-f0-9]{64}$/),resultHash:z.string().regex(/^[a-f0-9]{64}$/),format:z.literal('source_zip'),artifactId:z.uuid(),operationId:z.uuid(),objectRef:ObjectRefSchema});
+import {DurableExportFormatSchema,type DurableExportFormat} from './formats';
+export const ExportPublicationSchema=z.strictObject({schemaVersion:z.literal(1),projectId:z.uuid(),resultId:z.uuid(),sourceArtifactId:z.uuid(),revisionId:z.uuid(),bundleHash:z.string().regex(/^[a-f0-9]{64}$/),resultHash:z.string().regex(/^[a-f0-9]{64}$/),format:DurableExportFormatSchema,artifactId:z.uuid(),operationId:z.uuid(),objectRef:ObjectRefSchema});
 export type ExportPublication=z.infer<typeof ExportPublicationSchema>;
-export function exportKey(projectId:string,resultId:string){return `projects/${projectId}/results/${resultId}/exports/source_zip`}
+export function exportKey(projectId:string,resultId:string,format:DurableExportFormat='source_zip'){return `projects/${projectId}/results/${resultId}/exports/${format}`}
 export async function exportBaseline(projects:ProjectStore,owner:string,projectId:string,sourceArtifactId:string,root:string){
  const control=await projects.access(owner,projectId);
  const results=await Promise.all([control.currentResultId,control.previousResultId].filter((id):id is string=>Boolean(id)).map(id=>readResultManifest(projects,projectId,id)));

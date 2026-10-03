@@ -4,6 +4,8 @@ import{assertArtifactAccess}from'./export';
 import{issueArtifactToken}from'./local-token';
 import{canonicalHash}from'@/services/video/domain/hash';
 import{StoreMissing}from'@/services/video/storage/atomic-store';
+import {ExportPublicationSchema} from './publication';
+import {exportFiles} from './formats';
 export interface ArtifactRecord{id:string;revisionId:string;objectRef:ObjectRef;qaPassed:boolean;uploaded:boolean;filename:string}
 export async function inspectArtifact(projects:ProjectStore,owner:string,projectId:string,artifactId:string){
  const control=await projects.access(owner,projectId);
@@ -22,10 +24,10 @@ export async function resolveArtifact(projects:ProjectStore,owner:string,project
  for(const resultId of[control.currentResultId,control.previousResultId])if(resultId&&!published){
   const result=await projects.store.readFresh<{artifactId:string;revisionId:string}>(`projects/${projectId}/results/${resultId}/manifest`);
   published=result.value.artifactId===artifactId&&result.value.revisionId===artifact.revisionId;
-  if(!published&&artifact.objectRef.mime==='application/zip'&&control.publishedExports?.[artifactId]){
+  if(!published&&control.publishedExports?.[artifactId]){
    try{
-    const record=(await projects.store.readFresh<{projectId:string;resultId:string;sourceArtifactId:string;revisionId:string;resultHash:string;artifactId:string;objectRef:ObjectRef;format:string}>(`projects/${projectId}/artifacts/${artifactId}/export-publication`)).value;
-    published=record.projectId===projectId&&record.resultId===resultId&&record.sourceArtifactId===result.value.artifactId&&record.artifactId===artifactId&&record.revisionId===artifact.revisionId&&record.revisionId===result.value.revisionId&&record.resultHash===canonicalHash(result.value)&&record.format==='source_zip'&&canonicalHash(record.objectRef)===canonicalHash(artifact.objectRef)&&canonicalHash(record)===control.publishedExports[artifactId];
+    const record=ExportPublicationSchema.parse((await projects.store.readFresh(`projects/${projectId}/artifacts/${artifactId}/export-publication`)).value),file=exportFiles[record.format];
+    published=record.projectId===projectId&&record.resultId===resultId&&record.sourceArtifactId===result.value.artifactId&&record.artifactId===artifactId&&record.revisionId===artifact.revisionId&&record.revisionId===result.value.revisionId&&record.resultHash===canonicalHash(result.value)&&record.objectRef.key===`projects/${projectId}/artifacts/${artifactId}/files/${file.file}`&&record.objectRef.mime===file.mime&&canonicalHash(record.objectRef)===canonicalHash(artifact.objectRef)&&canonicalHash(record)===control.publishedExports[artifactId];
    }catch(error){if(!(error instanceof StoreMissing))throw error}
   }
  }

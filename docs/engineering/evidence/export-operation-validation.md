@@ -24,4 +24,4 @@ Worker 仅在聊天/预览任务执行前检查模型生成配置；文件导出
 
 ## 尚未完成
 
-产品下载交互、poster/SRT/Treatment/CREDITS/quality 全格式下载、素材分发许可与清理仍未完整接通。正式影片的实际视觉/连续运动/听验及原子发布、自然语言修改、43风格86横竖基线和全验收仍未完成，C0/C1/C2 未达到。旧项目7次历史模型调用缺完整实际用量，仍为 `MODEL_ACCOUNTING_MIGRATION_REQUIRED`；未重置账本，未新增付费请求。
+本页记录 source_zip 初次服务验证。随后 SRT/Treatment/CREDITS/quality 已接入同一服务，范围和测试限制见 [文字导出验证](export-documents-validation.md)。产品下载交互、poster、素材分发许可与清理仍未完整接通。正式影片的实际视觉/连续运动/听验及原子发布、自然语言修改、43风格86横竖基线和全验收仍未完成，C0/C1/C2 未达到。旧项目7次历史模型调用缺完整实际用量，仍为 `MODEL_ACCOUNTING_MIGRATION_REQUIRED`；未重置账本，未新增付费请求。

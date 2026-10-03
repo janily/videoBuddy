@@ -52,9 +52,9 @@ export class LocalOperationQueue{
     // operation file/enqueue. The slot already binds the authorized frozen input.
     for(const key of await this.store.listKeys(`projects/${dir.name}/results`,3)){
      try{
-     if(!/\/results\/[a-f0-9-]{36}\/export-requests\/source_zip$/.test(key))continue;
+     if(!/\/results\/[a-f0-9-]{36}\/export-requests\/(source_zip|srt|treatment|credits|quality)$/.test(key))continue;
      const reserved=(await this.store.readFresh<ExportOperation>(key)).value;
-     if(reserved.projectId!==dir.name||reserved.resultId!==key.split('/')[3]||reserved.kind!=='export'||!/^[a-f0-9-]{36}$/.test(reserved.id))throw Error('QUEUE_RECORD_INVALID');
+     if(reserved.projectId!==dir.name||reserved.resultId!==key.split('/')[3]||reserved.format!==key.split('/').at(-1)||reserved.kind!=='export'||!/^[a-f0-9-]{36}$/.test(reserved.id))throw Error('QUEUE_RECORD_INVALID');
      await bindReservedExportCommand(this.store,reserved);
      await createOrRead(this.store,`projects/${dir.name}/operations/${reserved.id}`,reserved);
      }catch(error){failure ||= error}
