@@ -1,18 +1,19 @@
 {
   "technicalProbeOnly": true,
   "styleSlug": "crayon-book",
-  "timingDraftSha256": "b244ee6ca94d0154d343a869cabafc447cf3ce0ee7772fd0babcb35a2dc33892",
+  "narrationPackageSha256": "af6c1774f8af2e46171a9ed23050fb3f69082afbd7f45bf04f3a883ff47b547f",
+  "timingDraftSha256": "f4daf95490c51b2ececadd4b52887eb2064526560e08ff4a97a6d8345fb744ca",
   "visualSourceSha256": "63d08589b71a385aec816bb25d88fd53b9e6fa5c084f696022a8a84defeade4a",
   "pictureSequence": {
-    "stageKey": "2096485e356b1b95218a88b73045bc173a95683be930f31e41b0bd7e94f7e449",
+    "stageKey": "a6d42b3e617b9a9d4a09efb2b318ea937fe518cf87df8774c3bb31e188c28e1d",
     "sha256": "ef78517d4846955e8f207cfbc8cdaad7e1ee58e7082a48a92aee0ee224fc8530",
     "frames": 480
   },
-  "stageKey": "5a5ff9f1467784a25a7250f17b554f374040f9c14086ea7f60d291700829fd74",
+  "stageKey": "4411d4b42e52badd4334ab073bdb4deee35de9f3d670287d2c461fd997a81206",
   "technicalQa": {
     "result": "pass",
-    "sha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
-    "bytes": 174339,
+    "sha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
+    "bytes": 173167,
     "width": 1280,
     "height": 720,
     "durationSec": 20,
@@ -22,9 +23,9 @@
   },
   "loudness": {
     "status": "pass",
-    "filmSha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
+    "filmSha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
     "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
-    "integratedLufs": -14.19,
+    "integratedLufs": -14.18,
     "truePeakDbtp": -1.5,
     "targetLufs": -14,
     "toleranceLu": 1,
@@ -32,12 +33,12 @@
   },
   "postMix": {
     "status": "pass",
-    "filmSha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
+    "filmSha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
     "lines": [
       {
         "lineId": "line_1",
         "recognizedText": "上海的活動將在10月8日開始",
-        "sourceSha256": "f88d0eccbf465698eea56a1746e3cff6675e118091abcb6bc4f3c29c10f17328",
+        "sourceSha256": "d06203bf3070e7fdc27bcaa5785fd63bb60732dd8a131e5fba744284b0d03212",
         "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
         "wordCount": 12,
         "status": "pass"

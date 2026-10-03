@@ -1,6 +1,6 @@
 import {spawn} from 'node:child_process';
 import {randomUUID} from 'node:crypto';
-import {mkdtemp,rm,writeFile} from 'node:fs/promises';
+import {mkdtemp,readFile,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import type {ProjectControl} from '../../src/contracts/video/project';
@@ -19,6 +19,8 @@ import {preparePreviewExcerptStage} from '../../src/services/video/preview/excer
 import {canonicalHash} from '../../src/services/video/domain/hash';
 import {actualArtifactSha256} from '../../src/services/video/exports/verified-file';
 import {resolveArtifact} from '../../src/services/video/exports/access';
+import {prepareNarrationPackageStage,NarrationPackageDataSchema} from '../../src/services/video/preview/narration-package-stage';
+import {loadPackagedNarration} from '../../src/services/video/audio/narration-package';
 
 async function removeProbeContainer(name:string){
  const child=spawn('docker',['rm','--force',name],{stdio:'ignore'});
@@ -32,6 +34,7 @@ async function main(){
  const wantsPreview=process.argv.includes('--preview')||process.argv.includes('--preview-720');
  const wantsFilm=process.argv.includes('--film')||wantsPreview;
  const wantsPicture=process.argv.includes('--picture')||wantsFilm;
+ const wantsNarrationPackage=process.argv.includes('--narration-package')||wantsFilm;
  let pictureContainerName:string|undefined;
  try{
   const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('probe-owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
@@ -53,13 +56,13 @@ async function main(){
   const evidence={technicalProbeOnly:true,styleSlug:style.slug,briefVersion:1,voiceRuntimeDigest:verified.lines[0].voice.runtimeDigest,asrRuntimeDigest:verified.lines[0].asr.runtimeDigest,voiceSha256:verified.lines[0].voice.wav.sha256,voiceDurationMs:verified.lines[0].voice.wav.durationMs,wordCount:verified.lines[0].wordTimings.length,asrStatus:verified.lines[0].asrStatus,immutablePlanSha256:first.planRef.sha256,immutableVerifiedSha256:first.verifiedRef.sha256,replayIdentical:true,limits:'One synthetic 20-second project brief and one real offline TTS/ASR line; no visual preview, full mix, listening review or user footage.'};
   if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/voice-stage-probe.json',JSON.stringify(evidence,null,2)+'\n');
   process.stdout.write(JSON.stringify(evidence)+'\n');
-  if(wantsPicture){
+  if(wantsPicture||wantsNarrationPackage){
    const image=process.env.VIDEO_MEDIA_IMAGE_REF;
    if(!image||!/^sha256:[a-f0-9]{64}$/.test(image))throw Error('CAPABILITY_UNAVAILABLE: VIDEO_MEDIA_IMAGE_REF');
    process.env.VIDEO_MEDIA_RUNTIME_DIGEST=image.slice(7);
    process.env.VIDEO_MEDIA_TIMEOUT_SECONDS='300';
   }
-  if(process.argv.includes('--timing')||wantsPicture){
+  if(process.argv.includes('--timing')||wantsPicture||wantsNarrationPackage){
    const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
    const timingReplay=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
    if(timing.draftRef.sha256!==timingReplay.draftRef.sha256)throw Error('TIMING_STAGE_REPLAY_CHANGED');
@@ -68,6 +71,28 @@ async function main(){
    const result={technicalProbeOnly:true,styleSlug:style.slug,voiceStageSha256:first.verifiedRef.sha256,timingDraftSha256:timing.draftRef.sha256,totalFrames:draft.totalFrames,fps:draft.fps,narration:draft.narration,captions:draft.captions,track:{sha256:draft.track.sha256,samples:draft.track.samples,runtimeDigest:draft.track.runtimeDigest,silence:draft.track.silence},font:draft.font,replayIdentical:true,qualityStatus:draft.qualityStatus,limits:'One synthetic project brief; real offline voice, ASR, 48 kHz narration mix, pinned CJK font and subtitle timing. No visual source, burned captions, preview video or listening review.'};
    if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/timing-stage-probe.json',JSON.stringify(result,null,2)+'\n');
    process.stdout.write(JSON.stringify(result)+'\n');
+   if(wantsNarrationPackage){
+    const packaged=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
+    const replay=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true});
+    if(packaged.packageRef.sha256!==replay.packageRef.sha256)throw Error('NARRATION_PACKAGE_REPLAY_CHANGED');
+    const data=NarrationPackageDataSchema.parse((await projects.store.readFresh(packaged.packageRef.key)).value),sourceRef=data.sources[0].sourceRef;
+    const loaded=await loadPackagedNarration(projects.store,root,projectId,revisionId,sourceRef);
+    if(loaded.source.wav.sha256!==verified.lines[0].voice.wav.sha256||loaded.words.words.length!==verified.lines[0].wordTimings.length)throw Error('NARRATION_PACKAGE_PROBE_FAILED');
+    const workingVoiceDirectoryRemoved=!wantsPicture;
+    if(workingVoiceDirectoryRemoved)await rm(join(root,'voice'),{recursive:true});
+    const independent=await loadPackagedNarration(projects.store,root,projectId,revisionId,sourceRef);
+    if(independent.timelineLine.audioRef.sha256!==loaded.timelineLine.audioRef.sha256)throw Error('NARRATION_PACKAGE_REPLAY_CHANGED');
+    const objectPath=join(root,'objects',independent.timelineLine.audioRef.key);
+    await writeFile(objectPath,Buffer.from('intentional tamper for technical probe'));
+    let objectTamperRejected=false;
+    try{await loadPackagedNarration(projects.store,root,projectId,revisionId,sourceRef)}catch(error){if(error instanceof Error&&error.message==='NARRATION_AUDIO_CHANGED')objectTamperRejected=true;else throw error}
+    if(!objectTamperRejected)throw Error('NARRATION_PACKAGE_TAMPER_ACCEPTED');
+    // Picture/composition probes still need the intact object and original work directories.
+    if(wantsPicture){const source=(await projects.store.readFresh<{lines:Array<{voice:{outputPath:string}}> }>(first.verifiedRef.key)).value;await writeFile(objectPath,await readFile(source.lines[0].voice.outputPath));await loadPackagedNarration(projects.store,root,projectId,revisionId,sourceRef)}
+    const packageEvidence={executedAt:new Date().toISOString(),technicalProbeOnly:true,voiceRuntimeDigest:loaded.source.voiceConfig.runtimeDigest,asrRuntimeDigest:loaded.words.asrRuntimeDigest,narrationPackageSha256:packaged.packageRef.sha256,audioSha256:loaded.source.wav.sha256,audioBytes:loaded.source.wav.bytes,sourceSampleRate:loaded.source.wav.sampleRate,sourceSamples:loaded.source.wav.samples,timelineStartSample:loaded.timelineLine.startSample,timelineEndSample:loaded.timelineLine.endSample,timelineSampleRate:48000,wordCount:loaded.words.words.length,recognizedText:loaded.words.recognizedText,replayIdentical:true,workingVoiceDirectoryRemoved,independentObjectRead:true,objectTamperRejected,qualityStatus:data.qualityStatus,limits:'Synthetic frozen brief, one actual offline Chinese TTS/ASR line and private durable WAV/word-timing references. No paid model, music, user recording, complete FilmSpec, listening/style QA or publish/approval.'};
+    if(process.argv.includes('--record'))await writeFile(`docs/engineering/evidence/${wantsPicture?`narration-package-${previewProfile}-probe.json`:'narration-package-probe.json'}`,JSON.stringify(packageEvidence,null,2)+'\n');
+    process.stdout.write(JSON.stringify(packageEvidence)+'\n');
+   }
    if(wantsPicture){
     const sourceHtml='<!doctype html><html><meta charset="utf-8"><body style="margin:0"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4eee5";x.fillRect(0,0,1920,1080);x.fillStyle="#48657a";x.fillRect(80,80,1760,920);x.fillStyle="#ffffff";x.font="bold 110px sans-serif";x.fillText("上海活动 10 月 8 日",170,520);x.fillStyle="#f3ba65";x.fillRect(160+t*20,680,400,28)};window.READY=true;</script></body></html>';
     const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,decide:async()=>({schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:['event-date'],assetIds:[],sourceHtml}),limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10}});
@@ -83,7 +108,7 @@ async function main(){
      const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,profile:previewProfile});
      const compositeReplay=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,profile:previewProfile});
      if(composite.technicalQa.sha256!==compositeReplay.technicalQa.sha256)throw Error('COMPOSITE_STAGE_REPLAY_CHANGED');
-     const compositeEvidence={technicalProbeOnly:true,styleSlug:style.slug,timingDraftSha256:timing.draftRef.sha256,visualSourceSha256:visual.sourceSha256,pictureSequence:{stageKey:sequence.stageKey,sha256:sequence.technicalQa.sha256,frames:sequence.technicalQa.frames},stageKey:composite.stageKey,technicalQa:composite.technicalQa,loudness:composite.loudness,postMix:composite.postMix,qualityStatus:composite.qualityStatus,replayIdentical:true,limits:'Synthetic Visual source in one 20-second project, real local TTS/ASR, narration mix, burned caption, video composition, post-mix ASR and independent decode. No paid model, 1080p, style/semantic QA, user preview or approval.'};
+     const compositeEvidence={technicalProbeOnly:true,styleSlug:style.slug,narrationPackageSha256:composite.narrationPackageSha256,timingDraftSha256:timing.draftRef.sha256,visualSourceSha256:visual.sourceSha256,pictureSequence:{stageKey:sequence.stageKey,sha256:sequence.technicalQa.sha256,frames:sequence.technicalQa.frames},stageKey:composite.stageKey,technicalQa:composite.technicalQa,loudness:composite.loudness,postMix:composite.postMix,qualityStatus:composite.qualityStatus,replayIdentical:true,limits:'Synthetic Visual source in one 20-second project, real local TTS/ASR, narration mix, burned caption, video composition, post-mix ASR and independent decode. No paid model, 1080p, style/semantic QA, user preview or approval.'};
      if(process.argv.includes('--record'))await writeFile(`docs/engineering/evidence/${previewProfile==='preview'?'composite-stage-720-probe.json':'composite-stage-probe.json'}`,JSON.stringify(compositeEvidence,null,2)+'\n');
      process.stdout.write(JSON.stringify(compositeEvidence)+'\n');
      if(wantsPreview){

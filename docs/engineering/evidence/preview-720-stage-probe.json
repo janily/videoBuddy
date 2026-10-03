@@ -1,6 +1,6 @@
 {
   "technicalProbeOnly": true,
-  "sourceFilmSha256": "861b10fdf4d879eef2ab914ac5affdf11d7a2b2ad7051191d78605ac74bcbe97",
+  "sourceFilmSha256": "e1e05a655724f46279bc6a8e54309df69126b554cfb0315ad3393aa2942ac870",
   "excerptMap": [
     {
       "previewStartMs": 0,
@@ -24,14 +24,14 @@
       "shotId": "shot"
     }
   ],
-  "stageKey": "c0b6c8107da6e74354284ef7f6819fb49fb119810ea2581143f6f1d8d7b8267f",
+  "stageKey": "126740af625d44f37607e0d6d291dd45745e424bdd9af6235a633dea3673aa5d",
   "durationMs": 9000,
-  "artifactId": "9b975e8c-0b04-4cf7-89ec-7c7fad471379",
-  "artifactSha256": "06f7bc527d522387dfac5f5cf3ab77f5a063be9ea160243fe5c132879ccda202",
+  "artifactId": "a7088c5b-47f0-42dc-86a5-3a209254103a",
+  "artifactSha256": "e95679e3614e014136f051df70c247f572e622c7b99a3adf127016bb64de3018",
   "technicalQa": {
     "result": "pass",
-    "sha256": "06f7bc527d522387dfac5f5cf3ab77f5a063be9ea160243fe5c132879ccda202",
-    "bytes": 143214,
+    "sha256": "e95679e3614e014136f051df70c247f572e622c7b99a3adf127016bb64de3018",
+    "bytes": 142284,
     "width": 1280,
     "height": 720,
     "durationSec": 9,

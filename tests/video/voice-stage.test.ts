@@ -13,6 +13,7 @@ import {getStyle} from '@/services/video/styles/registry';
 import {prepareTreatmentStage} from '@/services/video/preview/treatment-stage';
 import {prepareVoiceStage} from '@/services/video/preview/voice-stage';
 import {prepareTimingStage} from '@/services/video/preview/timing-stage';
+import {prepareNarrationPackageStage} from '@/services/video/preview/narration-package-stage';
 import {prepareVisualShotStage} from '@/services/video/preview/visual-stage';
 import {preparePictureShotStage} from '@/services/video/preview/picture-stage';
 import type {MediaJob} from '@/services/video/media/executor';
@@ -33,7 +34,7 @@ function wav(){
  return result;
 }
 
-it('T10 persists real voice bytes and verified ASR timings for a frozen treatment, then detects tampering',async()=>{
+it('T10/T11 persists frozen voice through a private excerpt and detects tampering',async()=>{
  const root=await mkdtemp(join(tmpdir(),'vb-voice-stage-'));
  try{
   const projects=new ProjectStore(new FileStore(root)),created=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
@@ -64,6 +65,10 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
   expect((await projects.store.readFresh<{totalFrames:number;narration:unknown[];captions:unknown[]}>(timing.draftRef.key)).value).toMatchObject({totalFrames:480,narration:[{}],captions:[{}]});
   expect(await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions)).toEqual(timing);
   expect([mixed,fontReads]).toEqual([1,1]);
+  await expect(prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('NARRATION_PACKAGE_MISSING');
+  const narrationPackage=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
+  expect(await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).toEqual(narrationPackage);
+  expect([generated,recognized,mixed]).toEqual([1,1,1]);
   const visualHtml='<!doctype html><html><meta charset="utf-8"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4efe3";x.fillRect(0,0,1920,1080);x.fillText("欢迎参加",100+10*Math.sin(t),200)};window.READY=true;</script></html>';
   let visualCalls=0;const visualOptions={root,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10},decide:async()=>{visualCalls++;return{schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:[],assetIds:[],sourceHtml:visualHtml}}};
   await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true})).rejects.toThrow('VISUAL_STAGE_MISSING');
@@ -102,6 +107,7 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
    },postMix:async(_root:string,film:{sha256:string})=>{postMixCalls++;return{status:'pass' as const,filmSha256:film.sha256,lines:[{lineId:'line_1',recognizedText:'欢迎参加。',sourceSha256:'b'.repeat(64),asrRuntimeDigest:'b'.repeat(64),wordCount:1,status:'pass' as const}]}}};
   const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions);
   expect(composite.qualityStatus).toBe('semantic_not_checked');
+  expect(composite.narrationPackageSha256).toBe(narrationPackage.packageRef.sha256);
   expect(await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).toEqual(composite);
   expect([compositionCalls,postMixCalls]).toEqual([1,1]);
   const segments:ExcerptSegment[]=[{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:5000,shotId:'shot'},{previewStartMs:5000,previewEndMs:7000,sourceStartMs:10000,sourceEndMs:12000,shotId:'shot'},{previewStartMs:7000,previewEndMs:9000,sourceStartMs:16000,sourceEndMs:18000,shotId:'shot'}];
@@ -139,5 +145,6 @@ it('T10 persists real voice bytes and verified ASR timings for a frozen treatmen
    return voice;
   }})).rejects.toThrow('PREVIEW_STALE');
   await expect(projects.store.readFresh(`projects/${projectId}/revisions/${changedRevision}/voice-stage`)).rejects.toBeInstanceOf(StoreMissing);
+  await expect(prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('PREVIEW_STALE');
  }finally{await rm(root,{recursive:true,force:true})}
-});
+},15000);

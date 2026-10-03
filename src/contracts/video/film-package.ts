@@ -5,6 +5,8 @@ import{guardTreatment}from'./treatment';
 import{canonicalHash,canonicalJson}from'@/services/video/domain/hash';
 import type{AtomicStore}from'@/services/video/storage/atomic-store';
 import{getStyle}from'@/services/video/styles/registry';
+import{loadPackagedNarration}from'@/services/video/audio/narration-package';
+import{compileVoicePlan}from'@/services/video/preview/voice-plan';
 
 const id=z.string().min(1).max(120);
 export const TreatmentSchema=z.strictObject({schemaVersion:z.literal(1),summary:z.string().min(1),script:z.array(z.string().min(1)).min(1),factIds:z.array(id),planRef:ObjectRefSchema});
@@ -24,7 +26,7 @@ async function readVerifiedJson(store:AtomicStore,ref:ObjectRef,prefix:string):P
 }
 function parse<T>(schema:z.ZodType<T>,raw:unknown):T{const result=schema.safeParse(raw);if(!result.success)throw Error('FILM_MANIFEST_INVALID');return result.data}
 
-export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknown){
+export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknown,audioRoot=process.env.VIDEO_DATA_DIR){
  const parsed=FilmSpecSchema.safeParse(untrusted);if(!parsed.success)throw Error('FILM_SPEC_INVALID');
  const spec=parsed.data,projectPrefix=`projects/${spec.projectId}/`,revisionPrefix=`${projectPrefix}revisions/${spec.revisionId}/`;
  const top=[spec.understandingRef,spec.treatmentRef,spec.factsRef,spec.timelineRef,spec.assetManifestRef,spec.sourceManifestRef,spec.audioManifestRef];
@@ -59,7 +61,23 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
   const rights=parse(RightsSchema,await readVerifiedJson(store,asset.rightsRef,revisionPrefix));
   if(!proof.success||proof.data.assetId!==asset.id||rights.basis!=='user_supplied')throw Error('FILM_ASSET_INVALID');
  }
- for(const source of audio.sources){await readVerifiedJson(store,source.sourceRef,revisionPrefix);const rights=parse(RightsSchema,await readVerifiedJson(store,source.rightsRef,revisionPrefix));if(rights.basis!==source.kind)throw Error('FILM_MANIFEST_INVALID')}
+ const narrationSources=new Map<string,Awaited<ReturnType<typeof loadPackagedNarration>>>();
+ for(const source of audio.sources){
+  const raw=await readVerifiedJson(store,source.sourceRef,revisionPrefix),rights=parse(RightsSchema,await readVerifiedJson(store,source.rightsRef,revisionPrefix));
+  if(rights.basis!==source.kind)throw Error('FILM_MANIFEST_INVALID');
+  if(z.object({kind:z.literal('generated_narration')}).safeParse(raw).success){
+   if(source.kind!=='generated')throw Error('FILM_NARRATION_CHANGED');
+   const packaged=await loadPackagedNarration(store,audioRoot||'',spec.projectId,spec.revisionId,source.sourceRef);
+   if(narrationSources.has(packaged.source.lineId))throw Error('FILM_NARRATION_CHANGED');
+   narrationSources.set(packaged.source.lineId,packaged);
+  }
+ }
+ const expectedVoice=compileVoicePlan(treatmentPlan,understanding);
+ if(timeline.narration.length!==expectedVoice.lines.length||narrationSources.size!==timeline.narration.length)throw Error('FILM_NARRATION_CHANGED');
+ for(const [index,line] of timeline.narration.entries()){
+  const expected=expectedVoice.lines[index],source=narrationSources.get(line.lineId);
+  if(!source||canonicalHash(source.timelineLine)!==canonicalHash(line)||line.lineId!==expected.lineId||line.displayText!==expected.displayText||line.spokenText!==expected.spokenText||line.expectedAsrText!==expected.expectedAsrText||line.startSample!==expected.startMs*48||line.endSample>48*(expected.startMs+expected.reservedMs)||source.source.voiceConfig.language!==expected.language)throw Error('FILM_NARRATION_CHANGED');
+ }
  const refs:TimelineReferences={sourceModules:sourceIds,actorIds:new Set(sources.actors.map(actor=>actor.id)),factIds,captionStyles:new Set(sources.captionStyles.map(style=>style.id)),audioSources:new Set(audio.sources.map(source=>source.id)),audioBuses:new Set(audio.buses.map(bus=>bus.id))};
  validateFilmTimeline(timeline,refs);validateFilmSpec(spec,timeline);
  return{filmSpec:spec,understanding,treatment,treatmentPlan,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio};

@@ -19,6 +19,7 @@ import {preparePictureSequenceStage} from './picture-sequence-stage';
 import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVoiceStage} from './voice-stage';
+import {prepareNarrationPackageStage} from './narration-package-stage';
 
 type Profile='full'|'preview'|'probe';
 type Qa=typeof technicalVideoQa;
@@ -27,7 +28,7 @@ type PostMix=typeof verifyPostMixNarration;
 type Font=typeof readPinnedSubtitleFont;
 interface Options{root?:string;env?:Environment;profile?:Profile;pictureQa?:Qa;filmQa?:Qa;compose?:Compose;postMix?:PostMix;readFont?:Font}
 export interface CompositeStageRecord{
- schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;pictureSequenceHash:string;voiceVerifiedSha256:string;
+ schemaVersion:2;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;pictureSequenceHash:string;voiceVerifiedSha256:string;narrationPackageSha256:string;
  profile:Profile;stageKey:string;outputPath:string;captionStyle:CaptionStyle|null;technicalQa:Awaited<ReturnType<Qa>>;
  loudness:Awaited<ReturnType<Compose>>['loudness'];postMix:Awaited<ReturnType<PostMix>>;qualityStatus:'semantic_not_checked';
 }
@@ -50,6 +51,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const [originalPlan,verified]=await Promise.all([readRef<NarrationPlan>(projects,voice.planRef,revisionPrefix),readRef<VerifiedNarrationManifest>(projects,voice.verifiedRef,revisionPrefix)]);
  const timingRecord=await prepareTimingStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const timing=TimingDraftSchema.parse(await readRef<unknown>(projects,timingRecord.draftRef,revisionPrefix));
+ const narrationPackage=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env});
  const picture=await preparePictureSequenceStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,profile,qa:options.pictureQa});
  const landscape=understanding.preferences.aspect==='16:9',width=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):(landscape?1920:1080),height=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):(landscape?1080:1920);
  const config=dockerConfiguration(env,operationId),wav=await inspectTrackWav(timing.track.outputPath,timing.durationMs*48,timing.track.silence);
@@ -62,14 +64,14 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||cues.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('COMPOSITE_FONT_CHANGED');
  }
  const captionStyle:CaptionStyle|null=cues.length?profile==='probe'?{fontSize:42,marginV:12,outline:2,primary:'#FFFFFF',outlineColor:'#000000'}:profile==='preview'?{fontSize:54,marginV:48,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:{fontSize:68,marginV:72,outline:3,primary:'#FFFFFF',outlineColor:'#000000'}:null;
- const bundleHash=canonicalHash({projectId,revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256});
+ const bundleHash=canonicalHash({projectId,revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256,narrationPackageSha256:narrationPackage.packageRef.sha256});
  const spec={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,bundleHash,fence:expectedConsentEpoch};
  const srt=formatSrt(cues),srtSha256=srt?createHash('sha256').update(srt).digest('hex'):null;
  const stageKey=composeStageKey({pictureSha256:picture.technicalQa.sha256,trackSha256:wav.sha256,trackSilent:wav.silence,srtSha256,style:captionStyle,runtimeDigest:config.runtimeDigest,spec});
  const stageDir=join(root,'composition',stageKey),outputPath=join(stageDir,'output','final.mp4'),key=`${revisionPrefix}composite/${profile}`,qa=options.filmQa||technicalVideoQa;
  const expected={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,audio:true};
  async function verify(record:CompositeStageRecord){
-  if(record.schemaVersion!==1||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.pictureSequenceHash!==canonicalHash(picture)||record.voiceVerifiedSha256!==voice.verifiedRef.sha256||record.profile!==profile||record.stageKey!==stageKey||record.outputPath!==outputPath||canonicalHash(record.captionStyle)!==canonicalHash(captionStyle)||record.qualityStatus!=='semantic_not_checked'||record.postMix.filmSha256!==record.technicalQa.sha256||record.loudness.filmSha256!==record.technicalQa.sha256)throw Error('COMPOSITE_STAGE_CONFLICT');
+  if(record.schemaVersion!==2||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.pictureSequenceHash!==canonicalHash(picture)||record.voiceVerifiedSha256!==voice.verifiedRef.sha256||record.narrationPackageSha256!==narrationPackage.packageRef.sha256||record.profile!==profile||record.stageKey!==stageKey||record.outputPath!==outputPath||canonicalHash(record.captionStyle)!==canonicalHash(captionStyle)||record.qualityStatus!=='semantic_not_checked'||record.postMix.filmSha256!==record.technicalQa.sha256||record.loudness.filmSha256!==record.technicalQa.sha256)throw Error('COMPOSITE_STAGE_CONFLICT');
   const actual=await qa(stageDir,config.image,'output/final.mp4',expected);
   if(canonicalHash(actual)!==canonicalHash(record.technicalQa))throw Error('COMPOSITE_OUTPUT_CHANGED');
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
@@ -85,7 +87,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  if(postMix.filmSha256!==actual.sha256||postMix.status!==(wav.silence?'not_applicable':'pass')||postMix.lines.length!==verified.lines.length)throw Error('COMPOSITE_POSTMIX_FAILED');
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
- const record:CompositeStageRecord={schemaVersion:1,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256,profile,stageKey,outputPath,captionStyle,technicalQa:actual,loudness:composed.loudness,postMix,qualityStatus:'semantic_not_checked'};
+ const record:CompositeStageRecord={schemaVersion:2,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256,narrationPackageSha256:narrationPackage.packageRef.sha256,profile,stageKey,outputPath,captionStyle,technicalQa:actual,loudness:composed.loudness,postMix,qualityStatus:'semantic_not_checked'};
  const stored=await createOrRead(projects.store,key,record);
  if(canonicalHash(stored)!==canonicalHash(record))throw Error('COMPOSITE_STAGE_CONFLICT');
  return verify(stored);
