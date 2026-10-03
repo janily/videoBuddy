@@ -1,0 +1,104 @@
+{
+  "executedAt": "2026-10-03T17:32:23.677582+00:00",
+  "status": "frontend_fixed_acoustic_partially_blocked",
+  "sourceCommit": "c606ea50845e9efa6da29c87fadb6272fa088b46",
+  "frontend": {
+    "initialFailures": [
+      "Original native compound 大地/土地 uses de5",
+      "Original native 目的地 overrides lexical 的 and 地",
+      "New reference adapter GPT-4 fails missing normalized English fragment",
+      "Reference GPT-4 incorrectly pronounces connector as negative sign"
+    ],
+    "latestCommand": "PATH=.video-local/phoneme-evaluation/bin:$NODE22_PATH node --test runtime/voice/test/phonemes.test.mjs",
+    "passed": 9,
+    "failed": 0,
+    "durationMs": 32696.025667,
+    "acousticModelCalls": 0,
+    "limits": "Actual pinned frontends with tokenizer interception. No acoustic synthesis, independent ASR or listening QA yet."
+  },
+  "applicationChecks": {
+    "testFiles": 102,
+    "tests": 533,
+    "testExit": 0,
+    "lintExit": 0,
+    "buildExit": 0,
+    "postBuildTypecheckExit": 0,
+    "diffCheckExit": 0
+  },
+  "builds": [
+    {
+      "sessionId": 52350,
+      "status": "failed",
+      "exitCode": 1,
+      "aptExitCode": 100,
+      "error": "Debian bookworm/main arm64 Packages connection failed on port 80 after 411.8 seconds"
+    },
+    {
+      "sessionId": 17859,
+      "status": "failed",
+      "aptProxy": "http://host.docker.internal:10808",
+      "limits": "Build context predates final two-phase English and connector fix. Must rebuild final source after terminal outcome; never use this intermediate image for final QA.",
+      "exitCode": 1,
+      "aptExitCode": 100,
+      "error": "Unable to connect to host.docker.internal:10808 after partial package downloads; terminal failure at 323.6 seconds"
+    },
+    {
+      "sessionId": 73945,
+      "status": "completed_intermediate",
+      "base": "python:3.11-slim-bookworm@sha256:2333bd330d12de02514770b3585cad313644316047cdee24a7acfdece6de6efb",
+      "node": "22.23.1-bookworm-slim build stage",
+      "limits": "Actual container frontend tests pass, but jieba isolated build fetched unpinned build tools; this image is not the final runtime and was not used for acoustics. Final source now separately locks three build tools and disables build isolation.",
+      "exitCode": 0,
+      "imageDigest": "ce856ed7dc9d5e833500b27407696c32a7bfc5f739be1dc9f5e1ffc352ca3452",
+      "offlineFrontendTests": 9
+    },
+    {
+      "sessionId": 84261,
+      "status": "completed",
+      "base": "python:3.11-slim-bookworm@sha256:2333bd330d12de02514770b3585cad313644316047cdee24a7acfdece6de6efb",
+      "node": "22.23.1-bookworm-slim build stage",
+      "lockedRuntimeDependencies": 9,
+      "lockedBuildTools": [
+        "setuptools==80.9.0",
+        "wheel==0.45.1",
+        "packaging==25.0"
+      ],
+      "buildIsolation": false,
+      "limits": "Final image built successfully. Actual synthesis succeeded for six lines; independent ASR passed four and rejected two. No full narration, listening or final film success claim.",
+      "exitCode": 0,
+      "imageDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+      "offlineFrontendTests": 9,
+      "pipCheck": "No broken requirements found.",
+      "durationFrontendMs": 31543.686181
+    }
+  ],
+  "realVoiceAsr": {
+    "status": "blocked",
+    "exitCode": 1,
+    "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ",
+    "passed": 4,
+    "failed": 2,
+    "frozenSourceLinesPassed": 3,
+    "frozenSourceLinesTotal": 4,
+    "originalDi4Line": "pass: 适量浇水,润湿大地。",
+    "failures": [
+      {
+        "lineId": "line_3",
+        "expectedAsrText": "种子醒来了，探出绿芽。",
+        "recognizedText": "種子醒來了 探出綠牙",
+        "errorCode": "ASR_MISMATCH"
+      },
+      {
+        "lineId": "frontend_english",
+        "expectedAsrText": "The event in Shanghai begins on October eighth",
+        "recognizedText": "The event in Shanghai begins on October 8th.",
+        "errorCode": "ASR_MISMATCH"
+      }
+    ],
+    "networkCalls": 0,
+    "evidenceFile": "voice-front-end-probe.json"
+  },
+  "providerCalls": 0,
+  "sourceProjectControlAndBudget": "not_modified",
+  "goalComplete": false
+}

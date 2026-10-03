@@ -1,0 +1,141 @@
+{
+  "executedAt": "2026-10-03T17:47:46.339Z",
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-QXv7yx",
+  "sourceProjectId": "4fb6af6a-4d14-49b2-b791-291615b489da",
+  "sourcePlanHash": "7b19fc8406ff2affb6d8c37f9252e95f8d94d7e1512b36258a35a2961a6e0ead",
+  "voiceRuntimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+  "lines": [
+    {
+      "scenario": "frozen_new_theme",
+      "lineId": "line_1",
+      "spokenText": "把种子轻轻埋进泥土。",
+      "expectedAsrText": "把种子轻轻埋进泥土。",
+      "recognizedText": "把種子輕輕埋進泥土",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 75000,
+        "durationMs": 3125,
+        "bytes": 300044,
+        "sha256": "24598eed5d50b1d4d2ebc7a441fcddcf91ceb01c3cf88db6f4e643972531276e",
+        "peakDbfs": -6.971483292186934,
+        "rmsDbfs": -23.971200863290335
+      },
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/99640af9dfd1d911966263de32a447bda2c71fe51efd483760b97ea337446ba0/output/narration.wav",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "status": "pass"
+    },
+    {
+      "scenario": "frozen_new_theme",
+      "lineId": "line_2",
+      "spokenText": "适量浇水，润湿大地。",
+      "expectedAsrText": "适量浇水，润湿大地。",
+      "recognizedText": "适量浇水,润湿大地。",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 70800,
+        "durationMs": 2950,
+        "bytes": 283244,
+        "sha256": "f1c4fc819de1883db63d12613b98aef4589f141a81c39c811f9cd7225993630d",
+        "peakDbfs": -9.08545995157071,
+        "rmsDbfs": -24.038043263489723
+      },
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/7e01c064ed616de646d99a43e58948f01335c41a2cc209cb8b042d068ed8502f/output/narration.wav",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "status": "pass"
+    },
+    {
+      "scenario": "frozen_new_theme",
+      "lineId": "line_3",
+      "spokenText": "种子醒来了，探出绿芽。",
+      "expectedAsrText": "种子醒来了，探出绿芽。",
+      "recognizedText": "種子醒來了 探出綠牙",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 79800,
+        "durationMs": 3325,
+        "bytes": 319244,
+        "sha256": "fc0ffd605a9034915c9f133eeb4971b513d8fcc89e7be4f105059d2524649e4c",
+        "peakDbfs": -5.517251851628617,
+        "rmsDbfs": -24.391039827950266
+      },
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/8b88cf3c597508e54c87a6d1445fb1d70ecb3de05616f8f6f7704e8cba6aa223/output/narration.wav",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "status": "fail",
+      "errorCode": "ASR_MISMATCH"
+    },
+    {
+      "scenario": "frozen_new_theme",
+      "lineId": "line_4",
+      "spokenText": "一起观察成长，耐心照料。",
+      "expectedAsrText": "一起观察成长，耐心照料。",
+      "recognizedText": "一起觀察成長 耐心照料",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 88200,
+        "durationMs": 3675,
+        "bytes": 352844,
+        "sha256": "13ee3d7c08032d28d857f48af4f5e8d621797a4218546a404b2424dec436f9e9",
+        "peakDbfs": -7.758583288436707,
+        "rmsDbfs": -24.189978662174187
+      },
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/f65d496f190c29ffbd5b9fd8285e54413ad122d7c2033d0600bbc54eace6c197/output/narration.wav",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "status": "pass"
+    },
+    {
+      "scenario": "date_english_regression",
+      "lineId": "frontend_date",
+      "spokenText": "上海的活动将在十月八日开始。",
+      "expectedAsrText": "上海的活动将在十月八日开始",
+      "recognizedText": "上海的活动将在10月8日开始。",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 98400,
+        "durationMs": 4100,
+        "bytes": 393644,
+        "sha256": "6676380a72030f3bf2fee6d99e1e0ea87fa32ce3a4998a762dbaf8384e4f46a0",
+        "peakDbfs": -9.090582077651492,
+        "rmsDbfs": -24.38110566042747
+      },
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/6e7d6de4ee2af3b0b6a2f8f1724f2f164c00c0d7527ad1d23fcd360c1899bb98/output/narration.wav",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "status": "pass"
+    },
+    {
+      "scenario": "date_english_regression",
+      "lineId": "frontend_english",
+      "spokenText": "The event in Shanghai begins on October eighth.",
+      "expectedAsrText": "The event in Shanghai begins on October eighth",
+      "recognizedText": "The event in Shanghai begins on October 8th.",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 88800,
+        "durationMs": 3700,
+        "bytes": 355244,
+        "sha256": "4a6da566b07a5d13c8824e539c6b2b762e94677a2f3f35804559010fee4795e3",
+        "peakDbfs": -12.01715091576602,
+        "rmsDbfs": -28.433735768520595
+      },
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/fd5719e448e3fa43e68eeffb97ffbd5998aed43a1bb84a4b7598281512b6d7a3/output/narration.wav",
+      "asrRuntimeDigest": "67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "status": "fail",
+      "errorCode": "ASR_MISMATCH"
+    }
+  ],
+  "networkCalls": 0,
+  "limits": "Actual offline new-runtime TTS and independent input-blind ASR of the unchanged four frozen new-theme lines, plus two separately marked historic date/English regressions. No regenerated script or model call. Failures retained; this is not final AAC/postmix, listening, special-name or 43-style QA. Original failed preview/control/budget and historical unknown effects remain unchanged."
+}
