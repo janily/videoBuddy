@@ -1,3 +1,4 @@
+import {userActivity} from '@/services/video/commands/user-activity';
 import{RestoreResultRequestSchema,type RestoreResultRequest}from '@/contracts/video/commands';
 import type{ProjectControl}from '@/contracts/video/project';
 import{canonicalHash}from '@/services/video/domain/hash';
@@ -29,7 +30,7 @@ export async function restoreResult(projects:ProjectStore,owner:string,projectId
  await updateJson(projects.store,`${p}/control`,(current:ProjectControl)=>{
   if(current.lastRestoreCommandId===request.clientCommandId)return current;
   if(current.deletedAt||current.ownerKeyHash!==owner||current.activeProduction||current.phase!=='ready'||current.currentResultId!==intent!.fromResultId||current.previousResultId!==intent!.toResultId)throw Error('RESULT_STALE');
-  return{...current,controlVersion:current.controlVersion+1,consentEpoch:current.consentEpoch+1,currentResultId:intent!.toResultId,previousResultId:intent!.fromResultId,lastRestoreCommandId:request.clientCommandId,previewState:current.previewState==='ready'?'stale' as const:current.previewState};
+  return{...current,...userActivity(current),controlVersion:current.controlVersion+1,consentEpoch:current.consentEpoch+1,currentResultId:intent!.toResultId,previousResultId:intent!.fromResultId,lastRestoreCommandId:request.clientCommandId,previewState:current.previewState==='ready'?'stale' as const:current.previewState};
  });
  await updateJson(projects.store,key,(value:RestoreIntent)=>({...value,completed:true}));
  return projects.view(owner,projectId);

@@ -37,6 +37,7 @@ export async function deleteProject(store:AtomicStore,owner:string,projectId:str
  if(!z.uuid().safeParse(projectId).success)throw Error('VALIDATION_FAILED');
  const prefix=`projects/${projectId}`,key=`${prefix}/control`;
  const assertOwner=(c:ProjectControl)=>{
+  if(c.projectId===projectId&&c.ownerKeyHash===owner&&c.expiration)throw Error('PROJECT_EXPIRED');
   if(c.projectId!==projectId||c.ownerKeyHash!==owner||c.deletedAt&&c.deletion?.commandId!==request.clientCommandId)throw Error('ACCESS_NOT_FOUND');
   if(!c.deletedAt&&Date.parse(c.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');
  };

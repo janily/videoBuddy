@@ -81,3 +81,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 恢复入口缺口关闭：更多可显式查看历史并调用已有restore，原命令持久重连、确认后视图最低版本、跨标签/focus/visible刷新已实现。396单元与37浏览器通过，截图保留已确认视觉；仍没有真实合格成片可用于完整恢复媒体验收，协议夹具不代替QA。模型第一批超时unknown、自然语言修改/清理及43风格86真实基线仍待完成，0新增模型，本增量未改真实control/ledger，未push/部署。见 evidence/restore-ui-validation.md。
 
 2026-10-03 T14 删除增量：原命令持久回执、即时授权撤销、操作取消、冷Worker扫描及Director付费启动期间删除竞态已验证。85文件411项单测及构建/lint/typecheck通过，0新收费调用。物理文件/全局缓存/容器停止证明、未知effect处理和30天过期清理仍缺；接口明确保持 cancelling，不能把 AT-045 计为整体通过。详见 [删除验证](evidence/project-deletion-validation.md)。无限费用授权已持久保存，不再是缺少额度授权；真实全片请求超时unknown仍保留原门闩。
+
+2026-10-03 T14 过期增量：100 control页/冷游标与恢复协调、本人的410和跨owner404、后台不续期、用户首次准入活动、迟到取消/消息不复活、同UUID冷归档不续期已验证；两轴复审clean。详见 [过期验证](evidence/project-retention-validation.md)。保留50,000 entry库存上限和扫描时效限制；物理数据/缓存/容器清理、运行任务超时协调仍未完成，不能宣称完整留存运维已交付。

@@ -53,7 +53,7 @@ it('durable acceptance survives hot receipt eviction without reserving a complet
 });
 it('late cancellation never resurrects a terminal operation',async()=>{
  const {cancelReply}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
- await store.create('projects/p/control',{controlVersion:1,activeConversation:'op'});await store.create('projects/p/operations/op',{status:'succeeded',fence:1});
+ await store.create('projects/p/control',{controlVersion:1,expiresAt:'2030-01-01T00:00:00Z',activeConversation:'op'});await store.create('projects/p/operations/op',{status:'succeeded',fence:1});
  expect(await cancelReply(store,'p','op')).toBe('already_completed');expect((await store.readFresh<{status:string}>('projects/p/operations/op')).value.status).toBe('succeeded');
 });
 it('cancellation rechecks lane ownership in the CAS',async()=>{
@@ -63,14 +63,14 @@ it('cancellation rechecks lane ownership in the CAS',async()=>{
 });
 it('cancellation before canonical claim finalizes without holding the chat lane',async()=>{
  const {cancelReply}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
- await store.create('projects/p/control',{controlVersion:1,activeConversation:'op'});await store.create('projects/p/operations/op',{status:'reserved',fence:0,canonicalRunId:null});
+ await store.create('projects/p/control',{controlVersion:1,expiresAt:'2030-01-01T00:00:00Z',activeConversation:'op'});await store.create('projects/p/operations/op',{status:'reserved',fence:0,canonicalRunId:null});
  expect(await cancelReply(store,'p','op')).toBe('cancelled');
  expect((await store.readFresh<{activeConversation:null}>('projects/p/control')).value.activeConversation).toBeNull();
  expect((await claimOperation(store,'projects/p/operations/op','late-run')).claimed).toBe(false);
 });
 it('production cancellation fences the project before a queued render can claim, and is idempotent',async()=>{
  const {cancelProduction}=await import('@/services/video/commands/cancel');const store=new FileStore(dir);
- await store.create('projects/p/control',{controlVersion:1,consentEpoch:4,phase:'rendering',previewState:'ready',activeProduction:'op',currentResultId:'old'});
+ await store.create('projects/p/control',{controlVersion:1,expiresAt:'2030-01-01T00:00:00Z',consentEpoch:4,phase:'rendering',previewState:'ready',activeProduction:'op',currentResultId:'old'});
  await store.create('projects/p/operations/op',{status:'reserved',fence:0,canonicalRunId:null});
  expect(await cancelProduction(store,'p','op')).toBe('cancelled');
  const control=(await store.readFresh<{consentEpoch:number;activeProduction:null;currentResultId:string;previewState:string}>('projects/p/control')).value;

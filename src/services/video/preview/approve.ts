@@ -1,3 +1,4 @@
+import {userActivity} from '@/services/video/commands/user-activity';
 import {randomUUID}from 'node:crypto';
 import type{ApprovePreviewRequest,CommandReceipt}from '@/contracts/video/commands';
 import{ApprovePreviewRequestSchema}from '@/contracts/video/commands';
@@ -49,7 +50,7 @@ export async function approvePreview(projects:ProjectStore,queue:LocalOperationQ
   if(current.phase!=='preview_ready'||current.activeProduction||current.ownerKeyHash!==owner||current.consentEpoch!==approval.consentEpoch)throw Error('PREVIEW_STALE');
   if(Object.keys(current.renderOutcomes||{}).length>=16)throw Error('RECOVERY_REQUIRED');
   const receipt:Receipt={...intent.receipt,status:'accepted',controlVersion:current.controlVersion+1};
-  return{...current,controlVersion:receipt.controlVersion,phase:'rendering' as const,currentApprovalId:approval.approvalId,activeProduction:receipt.operationId,receipts:[...current.receipts.slice(-127),receipt]};
+  return{...current,...userActivity(current),controlVersion:receipt.controlVersion,phase:'rendering' as const,currentApprovalId:approval.approvalId,activeProduction:receipt.operationId,receipts:[...current.receipts.slice(-127),receipt]};
  });
  const receipt=control.receipts.find(item=>item.commandId===request.clientCommandId)!;
  await updateJson(projects.store,intentKey,(value:ApprovalIntent)=>({...value,receipt}));

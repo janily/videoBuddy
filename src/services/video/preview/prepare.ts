@@ -1,3 +1,4 @@
+import {userActivity} from '@/services/video/commands/user-activity';
 import {randomUUID} from 'node:crypto';
 import {PreparePreviewRequestSchema,type PreparePreviewRequest} from '@/contracts/video/commands';
 import {UnderstandingSchema,type ObjectRef} from '@/contracts/video/domain';
@@ -51,7 +52,7 @@ export async function preparePreview(projects:ProjectStore,queue:LocalOperationQ
  const updated=await updateJson(projects.store,prefix+'/control',(current:ProjectControl)=>{
   if(current.receipts.some(receipt=>receipt.commandId===request.clientCommandId))return current;
   assertBaseline(current);const receipt={...intent.receipt,status:'accepted' as const,controlVersion:current.controlVersion+1};
-  return{...current,controlVersion:receipt.controlVersion,phase:'preparing_preview' as const,activeProduction:operation.id,previewState:current.previewState==='ready'?'stale' as const:current.previewState,receipts:[...current.receipts.slice(-127),receipt]};
+  return{...current,...userActivity(current),controlVersion:receipt.controlVersion,phase:'preparing_preview' as const,activeProduction:operation.id,previewState:current.previewState==='ready'?'stale' as const:current.previewState,receipts:[...current.receipts.slice(-127),receipt]};
  });
  const receipt=updated.receipts.find(receipt=>receipt.commandId===request.clientCommandId)!;
  await updateJson(projects.store,intentKey,(value:Intent)=>({...value,receipt}));await dispatch(receipt);return receipt;

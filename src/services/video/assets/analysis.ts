@@ -13,7 +13,7 @@ export async function publishMarkdownAnalysis(projects:ProjectStore,projectId:st
  const prefix=`projects/${projectId}`;
  const ref=await projects.index.immutable(`${prefix}/assets/${assetId}/analysis/${parsed.sha256}`,record);
  const next=await updateJson(projects.store,`${prefix}/control`,async(control:ProjectControl)=>{
-  if(control.deletedAt)throw Error('ACCESS_NOT_FOUND');
+  if(control.deletedAt)throw Error('ACCESS_NOT_FOUND');if(!Number.isFinite(Date.parse(control.expiresAt))||Date.parse(control.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');
   const asset=control.assets.find(item=>item.id===assetId);
   if(!asset||asset.declaredMime!=='text/markdown'||asset.sha256!==parsed.sha256)throw Error('ASSET_HASH_CONFLICT');
   if(asset.status==='ready'){if(asset.analysisRef?.sha256!==ref.sha256)throw Error('ASSET_HASH_CONFLICT');return control}
@@ -23,8 +23,7 @@ export async function publishMarkdownAnalysis(projects:ProjectStore,projectId:st
   const updated:Understanding={...understanding,briefVersion,assetUses:understanding.assetUses.filter(use=>use.assetId!==assetId).concat({assetId,purpose:asset.intendedUse,required:false})};
   const understandingRef=await projects.index.immutable(`${prefix}/understanding/${briefVersion}/${randomUUID()}`,updated);
   const assets=control.assets.map(item=>item.id===assetId?{...item,status:'ready',analysisRef:ref}:item);
-  const now=new Date().toISOString();
-  return{...control,controlVersion:control.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(item=>['reserved','uploading','uploaded','analyzing'].includes(item.status)),previewState:control.previewState==='ready'?'stale':control.previewState,lastUserActivityAt:now,expiresAt:new Date(Date.parse(now)+30*86400000).toISOString()};
+  return{...control,controlVersion:control.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(item=>['reserved','uploading','uploaded','analyzing'].includes(item.status)),previewState:control.previewState==='ready'?'stale':control.previewState};
  });
  return next.assets.find(item=>item.id===assetId)!;
 }
@@ -37,7 +36,7 @@ export async function publishPdfAnalysis(projects:ProjectStore,projectId:string,
  const record:TextAnalysis={schemaVersion:5,assetId,mime:'application/pdf',sha256:asset.sha256,text,pages,trust:'untrusted_material'};
  const ref=await projects.index.immutable(`${prefix}/assets/${assetId}/analysis/${asset.sha256}`,record);
  const next=await updateJson(projects.store,`${prefix}/control`,async(current:ProjectControl)=>{
-  if(current.deletedAt)throw Error('ACCESS_NOT_FOUND');
+  if(current.deletedAt)throw Error('ACCESS_NOT_FOUND');if(!Number.isFinite(Date.parse(current.expiresAt))||Date.parse(current.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');
   const found=current.assets.find(item=>item.id===assetId);
   if(!found||found.sha256!==record.sha256)throw Error('ASSET_HASH_CONFLICT');
   if(found.status==='ready'){if(found.analysisRef?.sha256!==ref.sha256)throw Error('ASSET_HASH_CONFLICT');return current}
@@ -47,8 +46,7 @@ export async function publishPdfAnalysis(projects:ProjectStore,projectId:string,
   const updated:Understanding={...understanding,briefVersion,assetUses:understanding.assetUses.filter(use=>use.assetId!==assetId).concat({assetId,purpose:found.intendedUse,required:false})};
   const understandingRef=await projects.index.immutable(`${prefix}/understanding/${briefVersion}/${randomUUID()}`,updated);
   const assets=current.assets.map(item=>item.id===assetId?{...item,status:'ready',analysisRef:ref}:item);
-  const now=new Date().toISOString();
-  return{...current,controlVersion:current.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(item=>['reserved','uploading','uploaded','analyzing'].includes(item.status)),previewState:current.previewState==='ready'?'stale':current.previewState,lastUserActivityAt:now,expiresAt:new Date(Date.parse(now)+30*86400000).toISOString()};
+  return{...current,controlVersion:current.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(item=>['reserved','uploading','uploaded','analyzing'].includes(item.status)),previewState:current.previewState==='ready'?'stale':current.previewState};
  });
  return next.assets.find(item=>item.id===assetId)!;
 }
@@ -62,7 +60,7 @@ export async function publishAudioAnalysis(projects:ProjectStore,projectId:strin
  const record:TextAnalysis={schemaVersion:5,assetId,mime:asset.declaredMime as TextAnalysis['mime'],sha256:asset.sha256,text,segments:transcript.segments,language:transcript.language,durationMs:transcript.durationMs,asrRuntimeDigest:transcript.asrRuntimeDigest,mediaRuntimeDigest:transcript.mediaRuntimeDigest,wavChunks:transcript.wavChunks,chunkCount:transcript.chunkCount,trust:'untrusted_material'};
  const ref=await projects.index.immutable(`${prefix}/assets/${assetId}/analysis/${asset.sha256}`,record);
  const next=await updateJson(projects.store,`${prefix}/control`,async(current:ProjectControl)=>{
-  if(current.deletedAt)throw Error('ACCESS_NOT_FOUND');
+  if(current.deletedAt)throw Error('ACCESS_NOT_FOUND');if(!Number.isFinite(Date.parse(current.expiresAt))||Date.parse(current.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');
   const found=current.assets.find(item=>item.id===assetId);
   if(!found||found.sha256!==record.sha256)throw Error('ASSET_HASH_CONFLICT');
   if(found.status==='ready'){if(found.analysisRef?.sha256!==ref.sha256)throw Error('ASSET_HASH_CONFLICT');return current}
@@ -72,8 +70,7 @@ export async function publishAudioAnalysis(projects:ProjectStore,projectId:strin
   const updated:Understanding={...understanding,briefVersion,assetUses:understanding.assetUses.filter(use=>use.assetId!==assetId).concat({assetId,purpose:found.intendedUse,required:false})};
   const understandingRef=await projects.index.immutable(`${prefix}/understanding/${briefVersion}/${randomUUID()}`,updated);
   const assets=current.assets.map(item=>item.id===assetId?{...item,status:'ready',analysisRef:ref}:item);
-  const now=new Date().toISOString();
-  return{...current,controlVersion:current.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(item=>['reserved','uploading','uploaded','analyzing'].includes(item.status)),previewState:current.previewState==='ready'?'stale':current.previewState,lastUserActivityAt:now,expiresAt:new Date(Date.parse(now)+30*86400000).toISOString()};
+  return{...current,controlVersion:current.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(item=>['reserved','uploading','uploaded','analyzing'].includes(item.status)),previewState:current.previewState==='ready'?'stale':current.previewState};
  });
  return next.assets.find(item=>item.id===assetId)!;
 }

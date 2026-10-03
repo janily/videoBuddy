@@ -21,3 +21,18 @@ it('real filesystem route accepts and cold-replays the original deletion, with p
 it('wrong owner, wrong origin and malformed command cannot tombstone a live project',async()=>{
  const f=await setup();expect((await DELETE(f.request('2'.repeat(64)),f.context)).status).toBe(404);expect((await DELETE(f.request(sid,'https://foreign.test'),f.context)).status).toBe(403);expect((await DELETE(f.request(sid,origin,{...f.input,extra:'unexpected'}),f.context)).status).toBe(400);expect((await GET(f.request(),f.context)).status).toBe(200);
 });
+it('recover coordinates own expired resources and returns 410 without accepting new production',async()=>{
+ const {POST}=await import('@/app/api/video/projects/[projectId]/recover/route'),{updateJson}=await import('@/services/video/storage/atomic-store');const f=await setup(),{projectId}=await f.context.params,store=new FileStore(root),op=crypto.randomUUID();
+ await store.create(`projects/${projectId}/operations/${op}`,{id:op,projectId,status:'queued',canonicalRunId:null,fence:0});
+ await updateJson(store,`projects/${projectId}/control`,(c:import('@/contracts/video/project').ProjectControl)=>({...c,expiresAt:'2026-01-01T00:00:00Z',activeProduction:op}));
+ const recoverRequest=(sessionId=sid)=>new Request(`${origin}/api/video/projects/${projectId}/recover`,{method:'POST',headers:{origin,'Content-Type':'application/json',cookie:`vb-session=${issueSession(keys,Date.now(),sessionId).token}`},body:JSON.stringify(f.input)});
+ expect((await POST(recoverRequest('2'.repeat(64)),f.context)).status).toBe(404);expect((await store.readFresh<{deletedAt?:string}>(`projects/${projectId}/control`)).value.deletedAt).toBeUndefined();
+ expect((await POST(recoverRequest(),f.context)).status).toBe(410);expect((await POST(recoverRequest(),f.context)).status).toBe(410);expect((await GET(f.request(),f.context)).status).toBe(410);expect((await DELETE(f.request(),f.context)).status).toBe(410);
+ expect((await store.readFresh(`projects/${projectId}/operations/${op}`)).value).toMatchObject({status:'cancelled',fence:1});
+});
+it('recover continues from a fresh retained result after an initial stale expiry read',async()=>{
+ const {POST}=await import('@/app/api/video/projects/[projectId]/recover/route'),{updateJson}=await import('@/services/video/storage/atomic-store');const f=await setup(),{projectId}=await f.context.params,store=new FileStore(root);
+ await updateJson(store,`projects/${projectId}/control`,(c:import('@/contracts/video/project').ProjectControl)=>({...c,expiresAt:'2026-01-01T00:00:00Z'}));
+ const original=ProjectStore.prototype.access;let raced=false;const spy=vi.spyOn(ProjectStore.prototype,'access').mockImplementation(async function(this:ProjectStore,owner,id){try{return await original.call(this,owner,id)}catch(error){if(!raced&&error instanceof Error&&error.message==='PROJECT_EXPIRED'){raced=true;await updateJson(store,`projects/${projectId}/control`,(c:import('@/contracts/video/project').ProjectControl)=>({...c,expiresAt:'2030-01-01T00:00:00Z'}))}throw error}});
+ try{const response=await POST(new Request(`${origin}/api/video/projects/${projectId}/recover`,{method:'POST',headers:{origin,'Content-Type':'application/json',cookie:`vb-session=${issueSession(keys,Date.now(),sid).token}`},body:JSON.stringify(f.input)}),f.context);expect(response.status).toBe(200);expect(await response.json()).toEqual({status:'idle'});expect((await store.readFresh<{deletedAt?:string}>(`projects/${projectId}/control`)).value.deletedAt).toBeUndefined()}finally{spy.mockRestore()}
+});

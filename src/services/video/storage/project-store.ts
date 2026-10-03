@@ -8,6 +8,7 @@ import {canonicalHash}from '@/services/video/domain/hash';
 import {readPreviewBundle}from '@/services/video/preview/commit';
 import {readResultManifest}from '@/services/video/results/publish';
 import {previewAction}from '@/services/video/preview/action';
+import {assertLiveProject}from '@/services/video/commands/user-activity';
 export class ProjectStore{
  readonly index:IndexStore;constructor(readonly store:AtomicStore){this.index=new IndexStore(store)}
  async create(owner:string,input:CreateProjectRequest){
@@ -19,7 +20,7 @@ export class ProjectStore{
  }
  async access(owner:string,id:string){
   let control:ProjectControl;try{control=(await this.store.readFresh<ProjectControl>(`projects/${id}/control`)).value}catch(e){if(e instanceof StoreMissing)throw Error('ACCESS_NOT_FOUND');throw e}
-  if(control.ownerKeyHash!==owner||control.deletedAt)throw Error('ACCESS_NOT_FOUND');if(Date.parse(control.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');return control;
+  if(control.ownerKeyHash!==owner)throw Error('ACCESS_NOT_FOUND');if(control.deletedAt){if(control.expiration)throw Error('PROJECT_EXPIRED');throw Error('ACCESS_NOT_FOUND')}if(!Number.isFinite(Date.parse(control.expiresAt)))throw Error('RETENTION_RECORD_INVALID');if(Date.parse(control.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED');return control;
  }
  async archiveMessage(projectId:string,message:ArchivedMessage){
   const p=`projects/${projectId}`;const ref=await this.index.immutable(`${p}/messages/${message.id}/${message.contentVersion}`,message);
@@ -27,8 +28,8 @@ export class ProjectStore{
    if(c.deletedAt)throw Error('ACCESS_NOT_FOUND');
    const existing=(await this.index.all(c.messagesIndexRef)).find(e=>e.id===message.id);
    if(existing){const archived=(await this.store.readFresh<ArchivedMessage>(existing.ref.key)).value;if(archived.contentVersion>message.contentVersion||(archived.contentVersion===message.contentVersion&&archived.status==='completed'))return c;}
-   const now=new Date().toISOString();
-   return {...c,controlVersion:c.controlVersion+1,...(message.role==='user'?{lastUserActivityAt:now,expiresAt:new Date(Date.parse(now)+30*86400000).toISOString()}:{}),messagesIndexRef:await this.index.append(`${p}/indexes/messages`,c.messagesIndexRef,{id:message.id,ordinal:message.ordinal,ref})};
+   if(message.role==='user')assertLiveProject(c);
+   return {...c,controlVersion:c.controlVersion+1,messagesIndexRef:await this.index.append(`${p}/indexes/messages`,c.messagesIndexRef,{id:message.id,ordinal:message.ordinal,ref})};
   });
  }
  async messages(control:ProjectControl){const entries=await this.index.all(control.messagesIndexRef);return Promise.all(entries.map(async e=>(await this.store.readFresh<ArchivedMessage>(e.ref.key)).value))}

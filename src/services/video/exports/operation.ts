@@ -1,3 +1,4 @@
+import {userActivity} from '@/services/video/commands/user-activity';
 import {randomUUID,createHash} from 'node:crypto';
 import {z} from 'zod';
 import type {AtomicStore} from '@/services/video/storage/atomic-store';
@@ -31,7 +32,7 @@ export async function cancelExport(projects:ProjectStore,owner:string,projectId:
  const control=await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>{
   if(c.deletedAt||c.ownerKeyHash!==owner)throw Error('ACCESS_NOT_FOUND');
   if(c.publishedExports?.[op.artifactId]||terminal.has(op.status)||c.exportCancellations?.includes(operationId))return c;
-  return{...c,controlVersion:c.controlVersion+1,exportCancellations:[...(c.exportCancellations||[]).slice(-127),operationId]};
+  return{...c,...userActivity(c),controlVersion:c.controlVersion+1,exportCancellations:[...(c.exportCancellations||[]).slice(-127),operationId]};
  });
  if(control.publishedExports?.[op.artifactId]||terminal.has(op.status)&&op.status!=='cancelled')return'already_completed';
  const cancelled=await updateJson(projects.store,key,(current:ExportOperation)=>terminal.has(current.status)?current:{...current,status:current.canonicalRunId?'cancelling':'cancelled',fence:current.fence+1});

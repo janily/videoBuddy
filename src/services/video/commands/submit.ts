@@ -1,8 +1,9 @@
 import {randomUUID} from 'node:crypto';
 import {AtomicStore,createOrRead,updateJson} from '@/services/video/storage/atomic-store';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {userActivity} from './user-activity';
 export interface Receipt{schemaVersion:5;commandId:string;projectId:string;operationId:string;controlVersion:number;status:'reserved'|'accepted'|'replayed'|'completed'}
-interface Control{controlVersion:number;receipts:Receipt[];activeConversation?:string|null;activeProduction?:string|null}
+interface Control{controlVersion:number;receipts:Receipt[];activeConversation?:string|null;activeProduction?:string|null;deletedAt?:string;expiresAt?:string}
 export interface CommandIntent{hash:string;receipt:Receipt;kind:string;body:Record<string,unknown>}
 export class StartFailed extends Error{code='START_FAILED';constructor(public receipt:Receipt){super('START_FAILED')}}
 export class CommandService{
@@ -16,14 +17,15 @@ export class CommandService{
   if(intent.receipt.status!=='reserved')return {...intent.receipt,status:'replayed'};
   const lane=kind==='chat'||kind==='asset_analysis'?'activeConversation':'activeProduction';
   const control=await updateJson(this.store,`projects/${projectId}/control`,(c:Control)=>{
+   if(c.deletedAt)throw Error('ACCESS_NOT_FOUND');if(c.expiresAt!==undefined&&(!Number.isFinite(Date.parse(c.expiresAt))||Date.parse(c.expiresAt)<=Date.now()))throw Error('PROJECT_EXPIRED');
    if(c.receipts.some(r=>r.commandId===id))return c;
    if(c[lane])throw Error('BUSY');
-   return {...c,[lane]:intent.receipt.operationId,controlVersion:c.controlVersion+1,receipts:[...c.receipts.slice(-127),{...intent.receipt,controlVersion:c.controlVersion+1}]};
+   return {...c,...(kind==='chat'&&c.expiresAt!==undefined?userActivity(c):{}),[lane]:intent.receipt.operationId,controlVersion:c.controlVersion+1,receipts:[...c.receipts.slice(-127),{...intent.receipt,controlVersion:c.controlVersion+1}]};
   });
   const receipt=control.receipts.find(r=>r.commandId===id)!;
   if(receipt.status!=='reserved'){await updateJson(this.store,key,(i:CommandIntent)=>({...i,receipt}));return {...receipt,status:'replayed'};}
   await createOrRead(this.store,`projects/${projectId}/operations/${receipt.operationId}`,{id:receipt.operationId,projectId,commandId:id,kind,status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,inputHash:hash});
-  try{await this.start(projectId,receipt.operationId,kind)}catch{throw new StartFailed(receipt)}
+  try{await this.start(projectId,receipt.operationId,kind)}catch(error){if(error instanceof Error&&['ACCESS_NOT_FOUND','PROJECT_EXPIRED'].includes(error.message))throw error;throw new StartFailed(receipt)}
   const accepted={...receipt,status:'accepted' as const};
   await updateJson(this.store,key,(i:CommandIntent)=>({...i,receipt:accepted}));
   await updateJson(this.store,`projects/${projectId}/control`,(c:Control)=>({...c,controlVersion:c.controlVersion+1,receipts:c.receipts.map(r=>r.commandId===id?accepted:r)}));

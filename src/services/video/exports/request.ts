@@ -12,13 +12,15 @@ import {assertWorkerReady} from '@/services/video/commands/worker-heartbeat';
 import {StartFailed,type Receipt} from '@/services/video/commands/submit';
 import {bindReservedExportCommand,type ExportIntent} from './intent';
 import {DurableExportFormatSchema} from './formats';
+import {recordUserCommandActivity} from '@/services/video/commands/user-activity';
 const terminal=new Set(['succeeded','failed','cancelled','interrupted','superseded']);
 export async function requestExport(projects:ProjectStore,queue:LocalOperationQueue,owner:string,projectId:string,untrusted:ExportRequest,root:string){
- const request=ExportRequestSchema.parse(untrusted),control=await projects.access(owner,projectId);
+ const request=ExportRequestSchema.parse(untrusted);await projects.access(owner,projectId);
  const hash=canonicalHash({kind:'export',body:request}),prefix=`projects/${projectId}`;
  const intentKey=prefix+'/commands/'+request.clientCommandId,intent=await createOrRead<ExportIntent>(projects.store,intentKey,{kind:'export',hash});
  if(intent.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');
  const baseline=await exportBaseline(projects,owner,projectId,request.artifactId,root);
+ const activityControl=await recordUserCommandActivity(projects,owner,projectId,request.clientCommandId,hash);
  if(request.format==='mp4')return{status:200 as const,artifactId:request.artifactId,access:await getArtifactAccess(projects,owner,projectId,request.artifactId,'download')};
  const format=DurableExportFormatSchema.parse(request.format),publicationKey=exportKey(projectId,baseline.result.resultId,format);
  try{
@@ -30,7 +32,7 @@ export async function requestExport(projects:ProjectStore,queue:LocalOperationQu
   }
  }catch(error){if(!(error instanceof StoreMissing))throw error}
  // One input-bound slot coalesces concurrent commands for the same immutable result.
- const proposed:ExportOperation={id:randomUUID(),projectId,commandId:request.clientCommandId,kind:'export',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,controlVersion:control.controlVersion,ownerKeyHash:owner,resultId:baseline.result.resultId,resultHash:baseline.resultHash,sourceArtifactId:request.artifactId,revisionId:baseline.result.revisionId,previewId:baseline.result.previewId,bundleHash:baseline.result.bundleHash,artifactId:randomUUID(),format};
+ const proposed:ExportOperation={id:randomUUID(),projectId,commandId:request.clientCommandId,kind:'export',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,controlVersion:activityControl.controlVersion,ownerKeyHash:owner,resultId:baseline.result.resultId,resultHash:baseline.resultHash,sourceArtifactId:request.artifactId,revisionId:baseline.result.revisionId,previewId:baseline.result.previewId,bundleHash:baseline.result.bundleHash,artifactId:randomUUID(),format};
  const slotKey=`${prefix}/results/${baseline.result.resultId}/export-requests/${format}`;
  let operation:ExportOperation;
  if(intent.operation)operation=intent.operation;

@@ -40,3 +40,8 @@ it('a scanned PDF without readable text fails visibly and unlocks pending input'
  expect(control.assets[0]).toMatchObject({status:'failed',errorCode:'PDF_TEXT_UNAVAILABLE'});
  expect(control.inputPending).toBe(false);
 });
+it('an expired project cannot start new background PDF extraction',async()=>{
+ const {updateJson}=await import('@/services/video/storage/atomic-store');const {store,projectId}=await setup();let calls=0;
+ await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,expiresAt:'2026-01-01T00:00:00Z'}));
+ await runSourceAnalysisOnce(store,root,async()=>{calls++;return['旧资料']});expect(calls).toBe(0);expect((await store.readFresh<ProjectControl>(`projects/${projectId}/control`)).value.assets[0].status).toBe('uploaded');
+});

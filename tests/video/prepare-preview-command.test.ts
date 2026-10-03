@@ -57,3 +57,12 @@ it('a concurrent duplicate can finish after the worker has already claimed the s
   const duplicate=await preparePreview(projects,queue,'owner',projectId,request);expect(duplicate.operationId).toBe(originalOperation);expect(await queue.pending()).toHaveLength(1);
  }finally{await rm(root,{recursive:true,force:true})}
 });
+it('an explicit preview renews user retention once and background command replay does not',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-preview-activity-'));try{
+  const {projects,queue,projectId,request}=await fixture(root),key=`projects/${projectId}/control`,old=Date.now()-30*86400000+10000;
+  await updateJson(projects.store,key,(c:ProjectControl)=>({...c,lastUserActivityAt:new Date(old).toISOString(),expiresAt:new Date(old+30*86400000).toISOString()}));
+  await preparePreview(projects,queue,'owner',projectId,request);const first=(await projects.store.readFresh<ProjectControl>(key)).value;expect(Date.parse(first.lastUserActivityAt)).toBeGreaterThan(old);expect(Date.parse(first.expiresAt)-Date.parse(first.lastUserActivityAt)).toBe(30*86400000);
+  const {coordinateProjectExpiration}=await import('@/services/video/commands/project-retention');expect(await coordinateProjectExpiration(projects.store,projectId,old+30*86400000+1)).toEqual({status:'retained'});
+  await preparePreview(projects,queue,'owner',projectId,request);expect((await projects.store.readFresh<ProjectControl>(key)).value.lastUserActivityAt).toBe(first.lastUserActivityAt);
+ }finally{await rm(root,{recursive:true,force:true})}
+});

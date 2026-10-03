@@ -68,7 +68,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    }))}:{}),
   })));
   const bytes=Buffer.byteLength(JSON.stringify(directorContext(understanding,context)));if(bytes>60000)throw Error('CONTEXT_LIMIT');
-  const assertActive=async()=>{const latest=(await store.readFresh<ProjectControl>(`${p}/control`)).value,current=(await store.readFresh<{status:string}>(opKey)).value;if(latest.deletedAt||latest.activeConversation!==operationId||current.status!=='running')throw Error('ACCESS_NOT_FOUND')};
+  const assertActive=async()=>{const latest=(await store.readFresh<ProjectControl>(`${p}/control`)).value,current=(await store.readFresh<{status:string}>(opKey)).value;if(latest.deletedAt||latest.activeConversation!==operationId||current.status!=='running')throw Error('ACCESS_NOT_FOUND');if(!Number.isFinite(Date.parse(latest.expiresAt))||Date.parse(latest.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED')};
   await assertActive();
   const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());
   const decision=await runEffect(store,`${p}/operations/${operationId}/effects/director`,async()=>{
