@@ -12,7 +12,7 @@ import type{ProjectControl}from '@/contracts/video/project';
 
 const Id=z.string().uuid(),Digest=z.string().regex(/^[a-f0-9]{64}$/);
 const Check=z.strictObject({ruleId:z.string().min(1),result:z.enum(['pass','fail','not_checked','not_applicable','waived']),severity:z.enum(['blocking','warning']),evidenceRefs:z.array(z.string().min(1)),reason:z.string().optional(),waiverActor:z.string().optional()});
-const Manifest=z.strictObject({resultId:Id,artifactId:Id,revisionId:Id,previewId:Id,approvalId:Id,bundleHash:Digest,mp4Sha256:Digest,mp4Bytes:z.number().int().positive(),qualityPolicy:z.strictObject({schemaVersion:z.literal(1),audioIntent:z.enum(['voiced','silent']),captions:z.boolean(),requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)}),qualityChecks:z.array(Check),createdAt:z.string().datetime({offset:true})});
+const Manifest=z.strictObject({resultId:Id,artifactId:Id,revisionId:Id,previewId:Id,approvalId:Id,bundleHash:Digest,mp4Sha256:Digest,mp4Bytes:z.number().int().positive(),qualityPolicy:z.strictObject({schemaVersion:z.literal(1),audioIntent:z.enum(['voiced','music','silent']),captions:z.boolean(),requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)}),qualityChecks:z.array(Check),createdAt:z.string().datetime({offset:true})});
 export type ResultManifest=z.input<typeof Manifest>;
 function key(projectId:string,resultId:string){return`projects/${projectId}/results/${resultId}/manifest`}
 export async function readResultManifest(projects:ProjectStore,projectId:string,resultId:string){

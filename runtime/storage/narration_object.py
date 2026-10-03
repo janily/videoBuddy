@@ -9,9 +9,9 @@ import stat
 import sys
 import uuid
 
-MAX_BYTES = 20 * 1024 * 1024
+MAX_BYTES = 64 * 1024 * 1024
 UUID = r'[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'
-KEY = re.compile(r'projects/' + UUID + r'/revisions/' + UUID + r'/audio-files/([a-f0-9]{64})\.wav')
+KEY = re.compile(r'projects/' + UUID + r'/revisions/' + UUID + r'/(audio-files|sound-files)/([a-f0-9]{64})\.wav')
 
 
 def sync_directory(directory):
@@ -52,9 +52,9 @@ def verify_and_repair(path, digest, expected_bytes):
 
 def execute(root, mode, key, expected_bytes):
     match = KEY.fullmatch(key)
-    if not root.is_absolute() or mode not in ('publish', 'verify') or not match or not 44 <= expected_bytes <= MAX_BYTES:
+    if not root.is_absolute() or mode not in ('publish', 'verify') or not match or not 44 <= expected_bytes <= (20 * 1024 * 1024 if match[1] == 'audio-files' else MAX_BYTES):
         raise ValueError('NARRATION_AUDIO_CHANGED')
-    digest = match.group(1)
+    digest = match.group(2)
     raw = sys.stdin.buffer.read(MAX_BYTES + 1) if mode == 'publish' else None
     if raw is not None and (len(raw) != expected_bytes or hashlib.sha256(raw).hexdigest() != digest):
         raise ValueError('NARRATION_AUDIO_CHANGED')

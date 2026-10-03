@@ -141,3 +141,13 @@ Audio补明确采样/包络/source/cue约束，显式新operation的一次付费
 [真实模型成片探针](evidence/native-composition-probe.json)实际使用这些冻结Visual与Audio计划、可信合成/混音和无网Chromium/FFmpeg，生成1280×720、20秒480帧、7829730字节H.264/AAC立体声；SHA c852bb9737ce3c6f0c43a0f7f87e0b0ef7967f129696574c3573d8a5a3e4b790，独立全解码、faststart/BT.709、声道2、-14.08LUFS/-1.5dBTP通过、重放相同。四个实际抽帧见[来源清单](evidence/native-frames.json)，中途书写文字未完全出现，未把它当阅读/事实/风格质量通过。此为显式无旁白技术用例，原青禾ASR仍阻断；未接AudioExecution/FilmSpec与预览Worker/UI，不是用户可批准影片。43风格86基线仍not_run，质量仍semantic_not_checked，C0/C1/C2未达到、不部署不push。
 
 两项独立审查中standards发现跨语言小数格式误拒绝合法voiceGainDb=0.000001；真实TS→Python有声/无声回归先2失败，修复为受限数字字面量与冻结值相等、完整固定图逐字匹配后3通过，仍拒绝改增益/追加滤镜。复审关闭P2，spec无新增发现。更新可信工具SHA后实际Docker master和原生声画探针重新通过，最终MP4 SHA相同。最终Node22验证：55文件217项通过、无警告lint、build、构建后typecheck和diff-check均退出0。新增直接依赖Acorn安装使用项目规定Node22；npm audit记录11个high依赖链告警，尚待受控修复。实现/测试增量已保存本地，T06/T09–T11与整个项目仍partial，未push或部署。
+
+2026-10-03 T10/T11 声音执行制作包增量：音频包归档48kHz mono voice、stereo music/foley/master实际字节、Timing/AudioPlan/seed、冻结可信Python工具、runtime和执行收据。原audio-files仍20MB，新的sound-files最多64MB，沿用OS flock/同inode临时别名恢复。新增归档/阶段模块测试先因缺模块退出1；删除工作目录后独立读、改MixPlan、跨修订路径、symlink/实际WAV篡改拒绝通过。FilmSpec真实音乐绑定测试先因缺声音来源函数失败，现七份manifest包含执行包及合成recipe来源；未执行音乐仍FILM_AUDIO_EXECUTION_NOT_READY。Composite绑定AudioPlan/执行包SHA的回归先undefined退出1，现读取归档主轨、保持AAC stereo。明确无旁白且实际零voice PCM/全部合成源才能ASR not_applicable=no_narration；有声case仍必须成片后ASR。music质量策略不免听验、响度或true peak。
+
+规格审查发现P1：合法计划/输入stageKey未绑定实际master完成marker，重签全零master可误进入silent策略。真实冷副本攻击由审查复现；新全零归档回归先resolved退出1。修复执行包schema2，核实际sound/master job字节及完成state，冻结收据并与固定input-addressed audio-run-receipts槽位比较；旧弱schema1拒绝、阶段新版本键保留旧实验。非零bus对应零master直接拒绝，质量策略按冻结音乐/拟音意图选择music。全零替换、非零替换+重签匹配收据和缺实际marker均被拒。两项复审无剩余发现；规格审查在真实冷副本重做两种攻击均拒绝，独立10项回归通过。
+
+[真实制作包与合成证据](evidence/native-package-probe.json)：原生真实Treatment/四镜Visual/15音乐/7拟音，FilmSpec SHA50cb05ec…、声音执行包9a546c85…，全部持久JSON和WAV复制到新目录后（无voice/audio/sound/master/render工作目录）独立完整包读取通过，音乐对象篡改拒绝。首次冷复制仅复制objects漏掉FileStore项目JSON，FILM_REF_CHANGED退出1；补复制持久JSON后通过，未把此错误算能力成功。实际720p Composite使用归档master，全解码20秒480帧、7829730字节、AAC2声道、-14.08LUFS/-1.5dBTP，成片SHAc852bb97…，重放一致、额外模型调用0。1080p是冻结目标，未冒充实测结果。
+
+此增量尚未接预览Worker/API/UI批准，未完成语义/阅读/风格/听验，原青禾ASR失败及provider忽略token cap/缺实际用量对账仍为阻断。43风格86基线not_run，C0/C1/C2未达到，T10/T11仍partial、deployed=false。首次完整56文件223项/lint/typecheck通过，build退出0但出现master.ts动态路径追踪警告；纯滤镜编译拆为独立模块，包读取不再引入Docker执行模块，随后重新验证构建和回归。
+
+最终验证：纯滤镜模块分离后build退出0且无追踪警告；56文件223项、无警告lint、构建后typecheck和diff-check均退出0。两轴复审关闭P1、无剩余发现，容器清理完毕。仅本地提交，无push/部署，项目继续开发。

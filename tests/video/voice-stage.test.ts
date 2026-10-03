@@ -17,6 +17,7 @@ import {prepareNarrationPackageStage} from '@/services/video/preview/narration-p
 import {prepareAudioPlanStage} from '@/services/video/preview/audio-plan-stage';
 import {revisionSeed} from '@/services/video/timeline/seed';
 import {prepareFilmPackageStage} from '@/services/video/preview/film-package-stage';
+import {prepareAudioExecutionStage} from '@/services/video/preview/audio-execution-stage';
 import {loadVerifiedFilmPackage} from '@/contracts/video/film-package';
 import type {FilmSpec} from '@/contracts/video/film';
 import {prepareVisualShotStage} from '@/services/video/preview/visual-stage';
@@ -104,6 +105,7 @@ it('T10/T11 persists frozen voice through a private excerpt and detects tamperin
   const audioData=(await projects.store.readFresh<AudioPlan>(audio.planRef.key)).value;
   const unappliedGainRef=await projects.index.immutable(`${revisionPrefix}audio-plan`,{...audioData,mix:{...audioData.mix,voiceGainDb:-3}});
   await updateJson(projects.store,`${revisionPrefix}audio-plan-stage`,(r:AudioPlanStageRecord)=>({...r,planRef:unappliedGainRef}));
+  await expect(prepareAudioExecutionStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,mustExist:true})).rejects.toThrow('AUDIO_EXECUTION_MISSING');
   await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv})).rejects.toThrow('FILM_AUDIO_EXECUTION_NOT_READY');
   await expect(projects.store.readFresh(`${revisionPrefix}film-package-stage`)).rejects.toBeInstanceOf(StoreMissing);
   await updateJson(projects.store,`${revisionPrefix}audio-plan-stage`,()=>audio);
@@ -175,6 +177,8 @@ it('T10/T11 persists frozen voice through a private excerpt and detects tamperin
   const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions);
   expect(composite.qualityStatus).toBe('semantic_not_checked');
   expect(composite.narrationPackageSha256).toBe(narrationPackage.packageRef.sha256);
+  expect(composite.audioPlanSha256).toBe(audio.planRef.sha256);
+  expect(composite.audioExecutionSha256).toBeNull();
   expect(await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).toEqual(composite);
   expect([compositionCalls,postMixCalls]).toEqual([1,1]);
   const segments:ExcerptSegment[]=[{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:5000,shotId:'shot'},{previewStartMs:5000,previewEndMs:7000,sourceStartMs:10000,sourceEndMs:12000,shotId:'shot'},{previewStartMs:7000,previewEndMs:9000,sourceStartMs:16000,sourceEndMs:18000,shotId:'shot'}];

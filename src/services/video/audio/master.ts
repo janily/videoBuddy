@@ -12,15 +12,8 @@ import {inspectTrackWav,inspectStereoTrackWav,type StereoTrackWavProbe} from './
 
 export interface FilmAudioTrack{outputPath:string;runtimeDigest:string;wav:StereoTrackWavProbe;kind:'film_mix';qaStatus:'not_checked'}
 export type CompositionTrack=NarrationTrack|FilmAudioTrack;
-export function masterMixFilter(raw:AudioPlan['mix'],samples:number,hasVoice:boolean){
- const parsed=AudioPlanSchema.shape.mix.safeParse(raw);
- if(!parsed.success||!Number.isSafeInteger(samples)||samples<960000||samples>5760000)throw Error('AUDIO_MIX_INVALID');
- const mix=parsed.data,voice='[0:a]aresample=48000,aformat=sample_fmts=flt:channel_layouts=stereo,volume='+mix.voiceGainDb+'dB';
- const music='[1:a]aformat=sample_fmts=flt:channel_layouts=stereo';
- const foley='[2:a]aformat=sample_fmts=flt:channel_layouts=stereo[foley]';
- const gain=10**(mix.duck.thresholdDb/20),duck='sidechaincompress=threshold='+gain+':ratio='+mix.duck.ratio+':attack='+mix.duck.attackMs+':release='+mix.duck.releaseMs;
- return(hasVoice?[voice+',acompressor=threshold=0.08:ratio=4:attack=2:release=100:detection=peak,asplit=2[voice][side]',music+'[bed]','[bed][side]'+duck+'[music]',foley]:[voice+'[voice]',music+'[music]',foley]).concat('[voice][music][foley]amix=inputs=3:duration=first:normalize=0,atrim=end_sample='+samples+',asetpts=PTS-STARTPTS[out]').join(';');
-}
+export {masterMixFilter} from './master-filter';
+import {masterMixFilter} from './master-filter';
 type Stems=Awaited<ReturnType<typeof buildSoundStems>>;
 function inside(root:string,path:string){const rel=relative(root,path);if(!isAbsolute(path)||!rel||rel.startsWith('..')||isAbsolute(rel)||!/^\/[A-Za-z0-9_./-]+$/.test(path))throw Error('AUDIO_SOURCE_CHANGED')}
 export async function buildAudioMaster(root:string,raw:AudioPlan,narration:NarrationTrack,stems:Stems,durationMs:number,fps:24|30|60,env:Environment=process.env):Promise<{stageKey:string;planSha256:string;toolSha256:string;voiceSha256:string;musicSha256:string;foleySha256:string;track:FilmAudioTrack;qualityStatus:'listening_not_checked'}>{

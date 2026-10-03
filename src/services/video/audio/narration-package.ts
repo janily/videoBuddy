@@ -76,7 +76,7 @@ export async function loadPackagedNarration(store:AtomicStore,root:string,projec
  return{source,words,timelineLine:timelineLine(source)};
 }
 
-async function runObjectHelper(root:string,mode:'publish'|'verify',key:string,bytes:number,body?:Buffer){
+export async function runObjectHelper(root:string,mode:'publish'|'verify',key:string,bytes:number,body?:Buffer){
  const child=spawn(/* turbopackIgnore: true */ process.env.VIDEO_PYTHON_PATH||'python3',[join(process.cwd(),'runtime/storage/narration_object.py'),root,mode,key,String(bytes)],{stdio:['pipe','pipe','ignore'],signal:AbortSignal.timeout(30000)});
  let output='';child.stdout.on('data',(part:Buffer)=>{output+=part.toString('utf8');if(output.length>1024)child.kill()});
  child.stdin.on('error',()=>{});

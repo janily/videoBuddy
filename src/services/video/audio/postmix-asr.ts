@@ -8,6 +8,9 @@ import {dockerConfiguration} from '@/services/video/media/docker-executor';
 import {NarrationPlan} from './narration';
 import {VerifiedNarrationManifest,transcribeAudio,verifySpokenText} from './asr';
 import {inspectTrackWav,inspectVoiceWav} from './wav';
+import {loadAudioExecution} from './execution-package';
+import type {AtomicStore} from '@/services/video/storage/atomic-store';
+import type {ObjectRef} from '@/contracts/video/domain';
 
 export interface PostMixFilm{outputPath:string;sha256:string;durationMs:number;technicalQa:'pass'}
 function postMixDockerBase(image:string,user:string,filmPath:string,outputDir:string){
@@ -33,6 +36,14 @@ export async function verifiedFilmHash(root:string,film:PostMixFilm){
  const file=await lstat(path);if(!file.isFile()||file.isSymbolicLink()||file.nlink!==1||file.size<1024)throw Error('POSTMIX_SOURCE_INVALID');
  const hash=createHash('sha256');for await(const chunk of createReadStream(path))hash.update(chunk);
  if(hash.digest('hex')!==film.sha256)throw Error('POSTMIX_SOURCE_CHANGED');
+}
+// ASR applicability is established by actual archived zero voice PCM and the
+// frozen synthesis-only execution. This is not a listening or final quality pass.
+export async function verifyPostMixNoNarration(store:AtomicStore,root:string,film:PostMixFilm,projectId:string,revisionId:string,executionRef:ObjectRef,planRef:ObjectRef,timingRef:ObjectRef){
+ const loaded=await loadAudioExecution(store,root,projectId,revisionId,executionRef,planRef,timingRef),voice=loaded.package.tracks.voice.wav;
+ if(loaded.package.durationMs!==film.durationMs||!voice.silence||voice.peakDbfs!==null||voice.rmsDbfs!==null)throw Error('POSTMIX_PLAN_CHANGED');
+ await verifiedFilmHash(root,film);
+ return{status:'not_applicable' as const,reason:'no_narration' as const,filmSha256:film.sha256,executionSha256:executionRef.sha256,voiceTrackSha256:voice.sha256,lines:[]};
 }
 export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void){
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');

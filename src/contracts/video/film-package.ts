@@ -6,6 +6,7 @@ import{canonicalHash,canonicalJson}from'@/services/video/domain/hash';
 import type{AtomicStore}from'@/services/video/storage/atomic-store';
 import{getStyle}from'@/services/video/styles/registry';
 import{loadPackagedNarration}from'@/services/video/audio/narration-package';
+import{loadAudioExecution,synthSourceDocuments}from'@/services/video/audio/execution-package';
 import{compileVoicePlan}from'@/services/video/preview/voice-plan';
 import{guardAudioPlan,compileAudioCues}from'./audio-plan';
 import{CompleteVisualShotSchema,guardVisualShot}from'./visual-shot';
@@ -19,7 +20,7 @@ export const TreatmentSchema=z.strictObject({schemaVersion:z.literal(1),summary:
 export const FactsManifestSchema=z.strictObject({schemaVersion:z.literal(1),facts:z.array(FactSchema)});
 export const AssetManifestSchema=z.strictObject({schemaVersion:z.literal(1),assets:z.array(z.strictObject({id:z.string().uuid(),analysisRef:ObjectRefSchema,rightsRef:ObjectRefSchema,originalRef:ObjectRefSchema,usage:z.string().min(1)}))});
 export const SourceManifestSchema=z.strictObject({schemaVersion:z.literal(1),modules:z.array(z.strictObject({id,sourceRef:ObjectRefSchema})).min(1),actors:z.array(z.strictObject({id,sourceModuleId:id})),captionStyles:z.array(z.strictObject({id,styleRef:ObjectRefSchema}))});
-export const AudioManifestSchema=z.strictObject({schemaVersion:z.literal(1),sources:z.array(z.strictObject({id,kind:z.enum(['generated','licensed','user_supplied']),sourceRef:ObjectRefSchema,rightsRef:ObjectRefSchema})),buses:z.array(z.strictObject({id})).min(1),planRef:ObjectRefSchema,timingDraftRef:ObjectRefSchema});
+export const AudioManifestSchema=z.strictObject({schemaVersion:z.literal(1),sources:z.array(z.strictObject({id,kind:z.enum(['generated','licensed','user_supplied']),sourceRef:ObjectRefSchema,rightsRef:ObjectRefSchema})),buses:z.array(z.strictObject({id})).min(1),planRef:ObjectRefSchema,timingDraftRef:ObjectRefSchema,executionRef:ObjectRefSchema.optional()});
 export const SourceCodeSchema=z.strictObject({html:z.string().min(1),visualSourceRef:ObjectRefSchema,timingDraftRef:ObjectRefSchema});
 const captionStyle=z.strictObject({fontSize:z.number().int(),marginV:z.number().int(),outline:z.number().int(),primary:z.string(),outlineColor:z.string()});
 export const CaptionPackageSchema=z.strictObject({schemaVersion:z.literal(1),font:TimingDraftSchema.shape.font.unwrap(),profiles:z.strictObject({full:captionStyle,preview:captionStyle,probe:captionStyle})});
@@ -63,7 +64,8 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  const timing=parse(TimingDraftSchema,await readVerifiedJson(store,audio.timingDraftRef,`${revisionPrefix}timing-draft/`));
  if(spec.seed!==revisionSeed(spec.projectId,spec.revisionId)||timing.track.runtimeDigest!==spec.runtimeDigest||timing.font&&timing.font.runtimeDigest!==spec.runtimeDigest)throw Error('FILM_RUNTIME_CHANGED');
  const plan=guardAudioPlan(await readVerifiedJson(store,audio.planRef,`${revisionPrefix}audio-plan/`),understanding,treatmentPlan,timing,audio.timingDraftRef.sha256,spec.seed);
-  if(plan.music.length||plan.foley.length||plan.mix.voiceGainDb!==0)throw Error('FILM_AUDIO_EXECUTION_NOT_READY');
+  if((plan.music.length||plan.foley.length||plan.mix.voiceGainDb!==0)&&!audio.executionRef)throw Error('FILM_AUDIO_EXECUTION_NOT_READY');
+ const executed=audio.executionRef?await loadAudioExecution(store,audioRoot||'',spec.projectId,spec.revisionId,audio.executionRef,audio.planRef,audio.timingDraftRef):null;
   if(canonicalHash(timeline.sections)!==canonicalHash(plan.sections)||canonicalHash(timeline.cues)!==canonicalHash(compileAudioCues(plan,timing.fps))||canonicalHash(timeline.music)!==canonicalHash(plan.music)||canonicalHash(timeline.foley)!==canonicalHash(plan.foley))throw Error('FILM_AUDIO_PLAN_CHANGED');
   if(canonicalHash(timeline.captions)!==canonicalHash(frozenCaptions(timing,treatmentPlan))||timeline.intentionalBlackRanges.length)throw Error('FILM_CAPTION_CHANGED');
  const visualByModule=new Map<string,ReturnType<typeof CompleteVisualShotSchema.parse>>();
@@ -105,19 +107,25 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
    const actual=await new LocalAssetBytes(audioRoot).inspect(spec.projectId,asset.id,ref.mime);
    if(actual.sha256!==ref.sha256||actual.bytes!==ref.bytes)throw Error('FILM_ASSET_INVALID');
  }
- const narrationSources=new Map<string,Awaited<ReturnType<typeof loadPackagedNarration>>>();
+ const narrationSources=new Map<string,Awaited<ReturnType<typeof loadPackagedNarration>>>(),soundSources=new Set<string>();
  for(const source of audio.sources){
   const raw=await readVerifiedJson(store,source.sourceRef,revisionPrefix),rights=parse(RightsSchema,await readVerifiedJson(store,source.rightsRef,revisionPrefix));
   if(rights.basis!==source.kind)throw Error('FILM_MANIFEST_INVALID');
   if(z.object({kind:z.literal('generated_narration')}).safeParse(raw).success){
    if(source.kind!=='generated')throw Error('FILM_NARRATION_CHANGED');
    const packaged=await loadPackagedNarration(store,audioRoot||'',spec.projectId,spec.revisionId,source.sourceRef);
-   if(narrationSources.has(packaged.source.lineId))throw Error('FILM_NARRATION_CHANGED');
+   if(source.id!=='voice-'+packaged.source.lineId||narrationSources.has(packaged.source.lineId))throw Error('FILM_NARRATION_CHANGED');
    narrationSources.set(packaged.source.lineId,packaged);
+  }else{
+   const planned=plan.sources.find(entry=>entry.id===source.id);
+   if(!executed||!planned||source.kind!=='generated'||!source.sourceRef.key.startsWith(revisionPrefix+'audio-source/')||!source.rightsRef.key.startsWith(revisionPrefix+'sound-rights/'))throw Error('FILM_AUDIO_PLAN_CHANGED');
+   const expected=synthSourceDocuments(planned,audio.planRef,spec.runtimeDigest);
+   if(canonicalHash(raw)!==canonicalHash(expected.document)||canonicalHash(rights)!==canonicalHash(expected.rights)||soundSources.has(source.id))throw Error('FILM_AUDIO_PLAN_CHANGED');
+   soundSources.add(source.id);
   }
  }
  const expectedVoice=compileVoicePlan(treatmentPlan,understanding);
- if(audio.sources.length!==narrationSources.size||canonicalHash(audio.buses)!==canonicalHash([{id:'voice'},{id:'music'},{id:'foley'}]))throw Error('FILM_AUDIO_PLAN_CHANGED');
+ if(soundSources.size!==plan.sources.length||audio.sources.length!==narrationSources.size+soundSources.size||canonicalHash(audio.buses)!==canonicalHash([{id:'voice'},{id:'music'},{id:'foley'}]))throw Error('FILM_AUDIO_PLAN_CHANGED');
  if(timeline.narration.length!==expectedVoice.lines.length||narrationSources.size!==timeline.narration.length)throw Error('FILM_NARRATION_CHANGED');
  for(const [index,line] of timeline.narration.entries()){
   const expected=expectedVoice.lines[index],source=narrationSources.get(line.lineId);
@@ -129,5 +137,5 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  if(canonicalHash(timeline.intentionalSilenceRanges)!==canonicalHash([...plan.intentionalSilenceRanges,...narrationSilence(timeline.narration,timing.durationMs*48)]))throw Error('FILM_AUDIO_PLAN_CHANGED');
  const refs:TimelineReferences={sourceModules:sourceIds,actorIds:new Set(sources.actors.map(actor=>actor.id)),factIds,captionStyles:new Set(sources.captionStyles.map(style=>style.id)),audioSources:new Set(audio.sources.map(source=>source.id)),audioBuses:new Set(audio.buses.map(bus=>bus.id))};
  validateFilmTimeline(timeline,refs);validateFilmSpec(spec,timeline);
- return{filmSpec:spec,understanding,treatment,treatmentPlan,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio};
+ return{filmSpec:spec,understanding,treatment,treatmentPlan,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio,...(executed?{audioExecution:executed.package,filmAudioTrack:executed.track}:{})};
 }

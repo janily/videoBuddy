@@ -87,3 +87,12 @@ it('a matching approved result becomes the current immutable result only after f
   expect((await publishResult(projects,owner,projectId,approved.operationId!,0,result,dir)).currentResult?.resultId).toBe(result.resultId);
  }finally{await rm(dir,{recursive:true,force:true})}
 });
+it('requires measured loudness and listening for music without narration',()=>{
+ const musical:DeliveryPolicy={...policy,audioIntent:'music',captions:false};
+ const baseChecks=checks.map(c=>c.ruleId==='subtitle_sync'?{...c,result:'not_applicable' as const,reason:'no captions'}:c);
+ const input={policy:musical,expectedPolicySha256:canonicalHash(musical),expectedFileSha256:expected,actualFileSha256:expected,checks:baseChecks};
+ expect(validateDelivery(input).status).toBe('passed');
+ for(const rule of ['listening_review','loudness','true_peak']){
+  expect(()=>validateDelivery({...input,checks:baseChecks.map(c=>c.ruleId===rule?{...c,result:'not_applicable' as const,reason:'no narrator'}:c)})).toThrow('QUALITY_BLOCKED');
+ }
+});

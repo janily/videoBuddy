@@ -9,6 +9,8 @@ import {CompleteVisualShotSchema} from '@/contracts/video/visual-shot';
 import type {ProjectControl} from '@/contracts/video/project';
 import {LocalAssetBytes} from '@/services/video/assets/local-bytes';
 import {readNarrationJson} from '@/services/video/audio/narration-package';
+import {loadAudioExecution,archiveSynthSources} from '@/services/video/audio/execution-package';
+import {prepareAudioExecutionStage} from './audio-execution-stage';
 import {readPinnedSubtitleFont} from '@/services/video/audio/subtitles';
 import type {Environment} from '@/services/video/config/environment';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
@@ -26,7 +28,7 @@ import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVisualShotStage} from './visual-stage';
 
-const RecordSchema=z.strictObject({schemaVersion:z.literal(1),briefVersion:z.number().int().nonnegative(),filmSpecRef:ObjectRefSchema,qualityPolicyRef:ObjectRefSchema,qualityStatus:z.literal('semantic_not_checked')});
+const RecordSchema=z.strictObject({schemaVersion:z.literal(2),briefVersion:z.number().int().nonnegative(),filmSpecRef:ObjectRefSchema,qualityPolicyRef:ObjectRefSchema,qualityStatus:z.literal('semantic_not_checked')});
 export type FilmPackageStageRecord=z.infer<typeof RecordSchema>;
 interface Options{root?:string;env?:Environment;readFont?:()=>ReturnType<typeof readPinnedSubtitleFont>;mustExist?:boolean}
 
@@ -35,7 +37,7 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  if(![projectId,revisionId,operationId].every(id=>z.uuid().safeParse(id).success)||!Number.isSafeInteger(expectedConsentEpoch)||expectedConsentEpoch<0)throw Error('VALIDATION_FAILED');
  const env=options.env||process.env,root=options.root||env.VIDEO_DATA_DIR;
  if(!root||!isAbsolute(root))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
- const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`,key=`${revisionPrefix}film-package-stage`;
+ const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`,key=`${revisionPrefix}film-package-v2-stage`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(control,projectId,operationId,expectedConsentEpoch);
  let existing:unknown;
@@ -48,9 +50,12 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  const timing=TimingDraftSchema.parse(await readNarrationJson(projects.store,timingRecord.draftRef,`${revisionPrefix}timing-draft/`));
  const audioRecord=await prepareAudioPlanStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true}),seed=revisionSeed(projectId,revisionId);
  const audio=guardAudioPlan(await readNarrationJson(projects.store,audioRecord.planRef,`${revisionPrefix}audio-plan/`),understanding,treatment,timing,timingRecord.draftRef.sha256,seed);
- if(audio.music.length||audio.foley.length||audio.mix.voiceGainDb!==0)throw Error('FILM_AUDIO_EXECUTION_NOT_READY');
  const runtime=dockerConfiguration(env,operationId);
  if(runtime.runtimeDigest!==timing.track.runtimeDigest||timing.font&&timing.font.runtimeDigest!==runtime.runtimeDigest)throw Error('FILM_RUNTIME_CHANGED');
+ let executionRef:ObjectRef|undefined;
+ try{executionRef=(await prepareAudioExecutionStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true})).packageRef}
+ catch(error){if((error as Error).message!=='AUDIO_EXECUTION_MISSING')throw error;if(audio.music.length||audio.foley.length||audio.mix.voiceGainDb!==0)throw Error('FILM_AUDIO_EXECUTION_NOT_READY')}
+ const executed=executionRef?await loadAudioExecution(projects.store,root,projectId,revisionId,executionRef,audioRecord.planRef,timingRecord.draftRef):null;
  if(timing.font){
   const font=await (options.readFont||(()=>readPinnedSubtitleFont(env)))();
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||timing.captions.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('FILM_FONT_CHANGED');
@@ -82,18 +87,19 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  }
  const captions=frozenCaptions(timing,treatment),captionStyles=captions.length?[{id:captionStyleId,styleRef:document('caption-styles',CaptionPackageSchema.parse({schemaVersion:1,font:timing.font,profiles:{full:captionStyleForProfile('full'),preview:captionStyleForProfile('preview'),probe:captionStyleForProfile('probe')}}))}]:[];
  const facts=FactsManifestSchema.parse({schemaVersion:1,facts:understanding.facts.filter(fact=>['provided','confirmed'].includes(fact.status))});
+ const soundSources=executed?await archiveSynthSources(projects,projectId,revisionId,audioRecord.planRef,audio,runtime.runtimeDigest):[];
  const manifests={
   treatment:TreatmentSchema.parse({schemaVersion:1,summary:treatment.summary,script:treatment.script,factIds:[...new Set(treatment.shots.flatMap(shot=>shot.factIds))],planRef:treatmentRef}),facts,
   timeline:FilmTimelineSchema.parse({totalFrames:timing.totalFrames,fps:timing.fps,sampleRate:48000,sections:audio.sections,shots,cues:compileAudioCues(audio,timing.fps),narration:narration.lines,music:audio.music,foley:audio.foley,captions,intentionalBlackRanges:[],intentionalSilenceRanges:[...audio.intentionalSilenceRanges,...narrationSilence(narration.lines,timing.durationMs*48)]}),
   assets:AssetManifestSchema.parse({schemaVersion:1,assets:assetEntries}),
   sources:SourceManifestSchema.parse({schemaVersion:1,modules,actors:[...actors].map(([id,sourceModuleId])=>({id,sourceModuleId})),captionStyles}),
-  audio:AudioManifestSchema.parse({schemaVersion:1,sources:narration.sources,buses:[{id:'voice'},{id:'music'},{id:'foley'}],planRef:audioRecord.planRef,timingDraftRef:timingRecord.draftRef}),
+  audio:AudioManifestSchema.parse({schemaVersion:1,sources:[...narration.sources,...soundSources],buses:[{id:'voice'},{id:'music'},{id:'foley'}],planRef:audioRecord.planRef,timingDraftRef:timingRecord.draftRef,...(executionRef?{executionRef}:{})}),
  };
  const landscape=understanding.preferences.aspect==='16:9';
  const spec=FilmSpecSchema.parse({schemaVersion:5,projectId,revisionId,briefVersion:control.briefVersion,style:{slug:style.slug,packVersion:style.packVersion,upstreamCommit:style.upstreamCommit},output:{width:landscape?1920:1080,height:landscape?1080:1920,fps:timing.fps,totalFrames:timing.totalFrames,sampleRate:48000},seed,understandingRef:control.understandingRef,
   treatmentRef:document('treatment',manifests.treatment),factsRef:document('facts',facts),timelineRef:document('timeline',manifests.timeline),assetManifestRef:document('asset-manifest',manifests.assets),sourceManifestRef:document('source-manifest',manifests.sources),audioManifestRef:document('audio-manifest',manifests.audio),runtimeDigest:runtime.runtimeDigest,qualityPolicyVersion:filmPackagePolicyVersion});
- const policy:DeliveryPolicy={schemaVersion:1,audioIntent:narration.lines.length?'voiced':'silent',captions:Boolean(captions.length),requiredRules:[...mandatoryDeliveryRules]};
- const expected=RecordSchema.parse({schemaVersion:1,briefVersion:control.briefVersion,filmSpecRef:document('film',spec),qualityPolicyRef:document('quality-policy',policy),qualityStatus:'semantic_not_checked'});
+ const policy:DeliveryPolicy={schemaVersion:1,audioIntent:narration.lines.length?'voiced':audio.music.length||audio.foley.length?'music':'silent',captions:Boolean(captions.length),requiredRules:[...mandatoryDeliveryRules]};
+ const expected=RecordSchema.parse({schemaVersion:2,briefVersion:control.briefVersion,filmSpecRef:document('film',spec),qualityPolicyRef:document('quality-policy',policy),qualityStatus:'semantic_not_checked'});
  async function fence(){
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});

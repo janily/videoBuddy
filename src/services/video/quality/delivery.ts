@@ -7,7 +7,7 @@ export const mandatoryDeliveryRules=[
  'visual_review','listening_review','loudness','true_peak','subtitle_sync','font_coverage'
 ] as const;
 const Digest=z.string().regex(/^[a-f0-9]{64}$/);
-const Policy=z.strictObject({schemaVersion:z.literal(1),audioIntent:z.enum(['voiced','silent']),captions:z.boolean(),requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)});
+const Policy=z.strictObject({schemaVersion:z.literal(1),audioIntent:z.enum(['voiced','music','silent']),captions:z.boolean(),requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)});
 const Check=z.strictObject({ruleId:z.string().min(1),result:z.enum(['pass','fail','not_checked','not_applicable','waived']),severity:z.enum(['blocking','warning']),evidenceRefs:z.array(z.string().min(1)),reason:z.string().optional(),waiverActor:z.string().optional()});
 export type DeliveryPolicy=z.input<typeof Policy>;
 export interface DeliveryInput{policy:DeliveryPolicy;expectedPolicySha256:string;expectedFileSha256:string;actualFileSha256:string;checks:QualityCheck[]}
