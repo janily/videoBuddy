@@ -1,0 +1,40 @@
+{
+  "executedAt": "2026-10-03T07:44:18.619Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/director-stream/run-8JDAET",
+  "projectId": "f253a7b1-7067-44bc-8b8f-3473cec63ec3",
+  "model": "gemini-3.8-flash",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000,
+      "status": 200,
+      "responseSha256": "95e2f3db80ea758cf456f7876089a71ea5bf10837bccd03c9671ea587ab718d0",
+      "responseFile": "model-diagnostics/95e2f3db80ea758cf456f7876089a71ea5bf10837bccd03c9671ea587ab718d0.json"
+    }
+  ],
+  "firstDeltaMs": 8002,
+  "totalMs": 10646,
+  "fragments": [
+    {
+      "elapsedMs": 8002,
+      "characters": 5
+    },
+    {
+      "elapsedMs": 8059,
+      "characters": 32
+    },
+    {
+      "elapsedMs": 8174,
+      "characters": 15
+    }
+  ],
+  "reply": "已为您设定为20秒蜡笔绘本风格、无旁白宣传视频。请问当天的具体起止时间以及居民参与换书有什么具体规则吗？",
+  "actual": {
+    "state": "settled",
+    "startedAt": "2026-10-03T07:44:07.975Z",
+    "inputTokens": 4110,
+    "outputTokens": 1807
+  },
+  "limits": "Real provider native structured stream; fragments forwarded during parsing, exact final text and actual usage checked. No preview/render or final quality claim."
+}

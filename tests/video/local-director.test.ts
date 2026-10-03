@@ -44,3 +44,52 @@ it.each(['MODEL_BUDGET_OVERRUN','MODEL_USAGE_UNCERTAIN','MODEL_RESERVATION_EXPIR
  expect(last?.payload).toMatchObject({status:'interrupted',errorCode:code==='MODEL_BUDGET_OVERRUN'?'BUDGET_LIMIT':'MODEL_USAGE_UNCERTAIN',retryable:false});
  expect((await projects.view('owner',projectId)).messages.at(-1)?.status).toBe('interrupted');
 });
+it.each(['interrupted','cancelled'] as const)('persists native fragments before completion and retains them when %s',async status=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir);
+ const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()}),operationId=crypto.randomUUID();
+ await updateJson(store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,activeConversation:operationId,ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create('projects/'+projectId+'/operations/'+operationId,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ const decideStream=async(_understanding:unknown,_messages:unknown,_max:number|undefined,onDelta:(text:string)=>Promise<void>=async()=>{})=>{
+  await onDelta('正在理解🌱');
+  const stream=await events.readFrom(projectId,operationId,0);expect(stream.filter(x=>x.event.type==='message.delta').map(x=>x.event.payload)).toEqual([expect.objectContaining({offset:0,text:'正在理解🌱'})]);
+  if(status==='interrupted')throw Error('NETWORK_DISCONNECTED');
+  const {cancelReply}=await import('@/services/video/commands/cancel');await cancelReply(store,projectId,operationId);
+  await onDelta('这部分应被停止');
+  return{action:'acknowledge' as const,reply:'正在理解🌱这部分应被停止',effect:'no_change' as const,executionIntent:'none' as const,evidenceMessageIds:[]};
+ };
+ await runDirectorOperation(store,events,projectId,operationId,{decideStream,limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ const view=await projects.view('owner',projectId);expect(view.messages.at(-1)).toMatchObject({text:'正在理解🌱',status:status==='cancelled'?'stopped':'interrupted'});
+ const stream=await events.readFrom(projectId,operationId,0);expect(stream.filter(x=>x.event.type==='message.delta')).toHaveLength(1);expect(stream.at(-1)?.event.payload).toMatchObject({status});
+});
+it('a cold worker archives durable fragments from an uncertain started effect without calling the model again',async()=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir),operationId=crypto.randomUUID(),assistantId=crypto.randomUUID();
+ const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
+ await updateJson(store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,activeConversation:operationId,ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create('projects/'+projectId+'/operations/'+operationId,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'running',canonicalRunId:operationId,streamEpoch:0,fence:0,assistantMessageId:assistantId});
+ await store.create('projects/'+projectId+'/operations/'+operationId+'/effects/director',{status:'started',attemptId:crypto.randomUUID()});
+ await events.append({schemaVersion:5,projectId,operationId,epoch:0,eventId:crypto.randomUUID(),createdAt:new Date().toISOString(),type:'message.delta',payload:{messageId:assistantId,contentVersion:1,offset:0,text:'已经收到的真实片段🌱'}});
+ let calls=0;await runDirectorOperation(new FileStore(dir),new LocalEventLog(dir),projectId,operationId,{decide:async()=>{calls++;throw Error('MUST_NOT_RETRY')},limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ expect(calls).toBe(0);expect((await projects.view('owner',projectId)).messages.at(-1)).toMatchObject({text:'已经收到的真实片段🌱',status:'interrupted'});
+ expect((await events.readFrom(projectId,operationId,0)).filter(x=>x.event.type==='message.delta')).toHaveLength(1);
+});
+it('archives one large native Chinese fragment through bounded Unicode-safe durable events',async()=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir),operationId=crypto.randomUUID();
+ const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
+ await updateJson(store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,activeConversation:operationId,ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create('projects/'+projectId+'/operations/'+operationId,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ const reply='中'.repeat(1023)+'🌱'+'文'.repeat(5000);
+ await runDirectorOperation(store,events,projectId,operationId,{decideStream:async(_u,_m,_max,onDelta)=>{await onDelta!(reply);return{action:'acknowledge',reply,effect:'no_change',executionIntent:'none',evidenceMessageIds:[]}},limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ expect((await projects.view('owner',projectId)).messages.at(-1)).toMatchObject({text:reply,status:'completed'});
+ const deltas=(await events.readFrom(projectId,operationId,0)).filter(x=>x.event.type==='message.delta');let rebuilt='';
+ for(const {event} of deltas){if(event.type!=='message.delta')throw Error('BAD_TEST_EVENT');expect(event.payload.offset).toBe(rebuilt.length);expect(Buffer.byteLength(JSON.stringify(event))).toBeLessThan(16384);expect(/[\uD800-\uDBFF]$/.test(event.payload.text)).toBe(false);rebuilt+=event.payload.text}
+ expect(rebuilt).toBe(reply);
+});
+it('recovers a fragment fsynced to the log when its append acknowledgement is lost',async()=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir),operationId=crypto.randomUUID();
+ const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
+ await updateJson(store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,activeConversation:operationId,ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create('projects/'+projectId+'/operations/'+operationId,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ const append=events.append.bind(events);events.append=async event=>{const index=await append(event);if(event.type==='message.delta')throw Error('ACK_LOST_AFTER_FSYNC');return index};
+ await runDirectorOperation(store,events,projectId,operationId,{decideStream:async(_u,_m,_max,onDelta)=>{await onDelta!('持久片段🌱');throw Error('UNREACHABLE')},limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ expect((await projects.view('owner',projectId)).messages.at(-1)).toMatchObject({text:'持久片段🌱',status:'interrupted'});
+});

@@ -3,6 +3,8 @@ import {z} from 'zod';
 import {Understanding,UnderstandingSchema,UnderstandingPatchSchema,PreferencesSchema} from '@/contracts/video/domain';
 import {createVideoAgent} from './model-adapter';
 import {getStyle,listStyles} from '@/services/video/styles/registry';
+import {noopLogger} from '@mastra/core/logger';
+import type {Environment} from '@/services/video/config/environment';
 export const GuidanceDecisionSchema=z.strictObject({action:z.enum(['ask','suggest_preview','acknowledge','status','change']),reply:z.string().min(1).max(8000),effect:z.enum(['no_change','update_brief','pending_followup','clarify_conflict']),question:z.strictObject({topic:z.string(),text:z.string(),required:z.boolean(),reason:z.string()}).optional(),understandingPatch:UnderstandingPatchSchema.optional(),recommendedStyleId:z.string().optional(),executionIntent:z.enum(['prepare_preview','classify_change','none']),evidenceMessageIds:z.array(z.string().uuid())});
 export type GuidanceDecision=z.infer<typeof GuidanceDecisionSchema>;
 export interface SourceAttachment{assetId:string;filename:string;mime:string;sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string;language?:'zh-CN'|'en'}>}
@@ -66,4 +68,27 @@ export async function runDirector(understanding:Understanding,messages:SourceMes
  const response=await agent.generate(JSON.stringify(directorContext(understanding,messages)),{structuredOutput:{schema:GuidanceDecisionSchema,jsonPromptInjection:process.env.MODEL_PROVIDER==='openai-compatible',errorStrategy:'strict'},maxSteps:1,modelSettings:{maxOutputTokens,maxRetries:0}});
  await recordModelUsage(response.usage);
  const decision=GuidanceDecisionSchema.parse(response.object);guardGuidance(decision,messages,false,understanding);return decision;
+}
+
+export async function runDirectorStream(understanding:Understanding,messages:SourceMessage[],maxOutputTokens=2000,onDelta:(text:string)=>Promise<void>=async()=>{},env:Environment=process.env):Promise<GuidanceDecision>{
+ const agent=createVideoAgent('director',instructions+' 风格推荐与styleSlug只能使用styleCatalog中原样的id，不得翻译或编造slug。',env);
+ agent.__registerPrimitives({logger:noopLogger});
+ await markModelCallStarted();
+ const response=await agent.stream(JSON.stringify(directorContext(understanding,messages)),{structuredOutput:{schema:GuidanceDecisionSchema,jsonPromptInjection:env.MODEL_PROVIDER==='openai-compatible',errorStrategy:'strict'},maxSteps:1,modelSettings:{maxOutputTokens,maxRetries:0},abortSignal:AbortSignal.timeout(120000)});
+ let emitted='',streamError:unknown;
+ try{for await(const partial of response.objectStream){
+  if(typeof partial.reply!=='string')continue;
+  // Partial JSON may end at a high surrogate. Publish complete Unicode only.
+  const text=/[\uD800-\uDBFF]$/.test(partial.reply)?partial.reply.slice(0,-1):partial.reply;
+  if(!text.startsWith(emitted))throw Error('DIRECTOR_STREAM_CHANGED');
+  if(text.length>emitted.length){await onDelta(text.slice(emitted.length));emitted=text}
+ }}catch(error){streamError=error}
+ const output=await response.getFullOutput();
+ await recordModelUsage(output.usage);
+ if(streamError)throw streamError;
+ if(output.error)throw output.error;
+ const decision=GuidanceDecisionSchema.parse(output.object);guardGuidance(decision,messages,false,understanding);
+ if(!decision.reply.startsWith(emitted))throw Error('DIRECTOR_STREAM_CHANGED');
+ if(decision.reply.length>emitted.length)await onDelta(decision.reply.slice(emitted.length));
+ return decision;
 }
