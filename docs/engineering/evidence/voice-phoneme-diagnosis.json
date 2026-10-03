@@ -1,0 +1,35 @@
+{
+  "executedAt": "2026-10-03T17:01:37.596Z",
+  "status": "reproduced_pronunciation_frontend_error",
+  "runtimeDigest": "831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64",
+  "packageVersion": "1.2.4",
+  "librarySha256": "8d4826daa6a8a94360ebfa3062b6c491bd3831a83d58d6127fb9481a6f0bef49",
+  "results": [
+    {
+      "text": "适量浇水，润湿大地。",
+      "phonemes": "ㄕ十4ㄌ阳4/ㄐ要1ㄕ为3, ㄖ文4/ㄕ十1/ㄉㄚ4ㄉㄜ5."
+    },
+    {
+      "text": "大地",
+      "phonemes": "ㄉㄚ4ㄉㄜ5"
+    },
+    {
+      "text": "土地",
+      "phonemes": "ㄊㄨ3ㄉㄜ5"
+    },
+    {
+      "text": "慢慢地走",
+      "phonemes": "ㄇㄢ4ㄇㄢ4/ㄉㄜ5/ㄗㄡ3"
+    },
+    {
+      "text": "上海青禾社区",
+      "phonemes": "ㄕㄤ4ㄏㄞ3/ㄑ应1/ㄏㄜ2/ㄕㄜ4ㄑㄩ1"
+    }
+  ],
+  "network": false,
+  "synthesisPerformed": false,
+  "recognitionPerformed": false,
+  "additionalModelCalls": 0,
+  "exitCode": 0,
+  "limits": "Actual pinned offline Docker library; real phonemizer with intercepted tokenizer and generate_from_ids, no model loaded, no synthesized audio or ASR quality claim. Noun 地 should be di4, captured de5 is a frontend defect. Fix and new-runtime real synthesis/recognition remain pending."
+}

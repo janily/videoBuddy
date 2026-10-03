@@ -2,6 +2,8 @@
 
 videoBuddy 已在仓库根目录开发，原 `.git`、origin、design 与交付文档保留；未 push、未生产部署。真实模型已调用并保留历史对账与未知调用记录，费用授权不限次数/上限。当前仍是阶段工程，C0/C1/C2 均未达到。用户已将 Vercel 方案改为完全自托管；以 [自托管架构](self-hosted-architecture.md) 和 [执行计划](self-hosted-plan.md) 为当前部署依据，原规格的产品功能、SSE、持久消息、43 风格及验收范围继续有效。
 
+最新真实新主题：独立种子发芽中文场景走实际 Director stream/原消息归档/preparePreview intent/队列/Worker/pipeline，2次远端调用两条settled，响应SHA与actual usage4992/1893及4290/4737核证。四实际TTS生成，第二句“大地”ASR成“大的”，保持ASR_MISMATCH/failed、无预览或结果。固定语音镜像实际phonemizer将名词“大地/土地”的地无条件转成de5，缺口已定位尚未修；先写实际词法RED、固定新镜像并保留原台词复核，然后继续完整新主题链路，不再只推进journal小切片。见 [新主题验证](evidence/new-theme-validation.md)。原unknown和质量失败不变，费用不是阻断。
+
 最新 T13/T14：正式画面拼接、合成和 postmix/ASR 接入当前项目/operation 持久 Docker journal；画面 cancel 抛错或仍 cancelling 保留 MEDIA_STOP_UNKNOWN。Spec发现缓存绕过unknown，已关闭：五缓存核sameargs completed，ASR同时核固定stdout。102文件533单元、lint/build/构建后types通过。实际隔离诊断20秒1080p stereo、两个completed回执、cold mustExist重读SHA相同、0network/原control不变，见 [正式渲染记录验证](evidence/approved-render-journal-validation.md)。此前 sound/master host SIGKILL后核同资源冷停止证据保留于 [持久资源验证](evidence/docker-journal-validation.md)。本次不是全链物理清理或正式影片QA，公共unknown标记不自动解除；旁白 postmix journal 的实际执行、detached镜头/TTS/抽帧/QA/导出全部资源覆盖仍缺。修改准入、新revision、正式新主题有旁白影片完整QA/发布、全部43风格86基线与最终验收继续未完成。下文按日期保留历史，不把旧通过计作本次验证。
 
 已替换 Blob/Workflow/Sandbox：生产 `FileStore` 使用 Python `fcntl` 跨进程 CAS、原子写入和持久卷；本地持久操作队列与独占 Worker 执行 Director；事件日志支撑 SSE 续流；私有产物使用短期签名下载；Docker 媒体执行器使用固定镜像 ID、无网络和资源约束。本地素材 API 验证实际字节、MIME 签名和同内容重放；Markdown 与文本层 PDF 发布不可变真实文本分析，附件消息持久归档，Director 读取原文并以实际行号/页码引文验证材料来源。独立资料 Worker 在受限容器中解析 PDF；扫描件无文本层时明确失败并解除 pending。现有“添加资料”支持 Markdown/PDF 直传、明确权利确认、失败重试、刷新恢复待发附件和空文本发送。原设计与布局未重做。

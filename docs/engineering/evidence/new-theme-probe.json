@@ -1,0 +1,265 @@
+{
+  "executedAt": "2026-10-03T16:54:27.575Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-QXv7yx",
+  "projectId": "4fb6af6a-4d14-49b2-b791-291615b489da",
+  "model": "gemini-3.8-flash",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000,
+      "startedAt": "2026-10-03T16:54:27.834Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-03T16:54:38.197Z",
+      "responseSha256": "8cfeceb72d255aafddd9ba992649d51c205df6481751e2cfa0c2112cd991c4ac",
+      "responseFile": "model-diagnostics/8cfeceb72d255aafddd9ba992649d51c205df6481751e2cfa0c2112cd991c4ac.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 5000,
+      "startedAt": "2026-10-03T16:54:38.848Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-03T16:55:01.657Z",
+      "responseSha256": "066074a6c53d179272fddfc95be58a160a76c9f8cf93b5e737c2e2bd3fc29523",
+      "responseFile": "model-diagnostics/066074a6c53d179272fddfc95be58a160a76c9f8cf93b5e737c2e2bd3fc29523.json",
+      "usage": {
+        "prompt_tokens": 4290,
+        "completion_tokens": 4737,
+        "total_tokens": 9027,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "stages": {
+    "director": {
+      "action": "suggest_preview",
+      "reply": "已为您整理好视频设定：20秒16:9蜡笔儿童绘本风格科普短片，展现种子播种、适量浇水至发芽的过程，并以“观察成长，耐心照料”收尾。所有要素已就绪，您可以点击下方按钮生成效果预览。",
+      "effect": "update_brief",
+      "understandingPatch": {
+        "baseBriefVersion": 0,
+        "operations": [
+          {
+            "op": "replace_summary",
+            "summary": [
+              "向小学生科普一粒种子经过播种、适量浇水最终长成绿芽的自然过程",
+              "以“观察成长，耐心照料”结束，不承诺具体生长天数，不虚构数字或名称"
+            ],
+            "subject": "一粒种子长成绿芽",
+            "audience": "小学生",
+            "objective": "科普种子萌发过程，传递耐心照料与观察成长的理念",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "durationSec",
+            "value": 20,
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "styleSlug",
+            "value": "crayon-book",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "aspect",
+            "value": "16:9",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "language",
+            "value": "zh-CN",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "voiceMode",
+            "value": "tts",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "captions",
+            "value": "auto",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "musicMode",
+            "value": "composed",
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          },
+          {
+            "op": "add_fact",
+            "fact": {
+              "id": "fact-seed-growth-process",
+              "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束，不承诺具体生长天数，不虚构名称、活动日期或数字。",
+              "sourceRefs": [
+                {
+                  "type": "user_message",
+                  "id": "e6d64bd9-4a19-429f-abfa-c1254587379a"
+                }
+              ],
+              "status": "provided",
+              "mustInclude": true,
+              "critical": true
+            },
+            "sourceMessageIds": [
+              "e6d64bd9-4a19-429f-abfa-c1254587379a"
+            ]
+          }
+        ]
+      },
+      "recommendedStyleId": "crayon-book",
+      "executionIntent": "none",
+      "evidenceMessageIds": [
+        "e6d64bd9-4a19-429f-abfa-c1254587379a"
+      ]
+    },
+    "previewReceipt": {
+      "schemaVersion": 5,
+      "commandId": "12dc8cb2-bec3-44f7-9fc6-652b8bdc8421",
+      "projectId": "4fb6af6a-4d14-49b2-b791-291615b489da",
+      "operationId": "8df6a401-2e79-4cb8-9057-a8b02e9b4070",
+      "controlVersion": 3,
+      "status": "accepted"
+    },
+    "currentStage": "voice",
+    "operation": {
+      "id": "8df6a401-2e79-4cb8-9057-a8b02e9b4070",
+      "projectId": "4fb6af6a-4d14-49b2-b791-291615b489da",
+      "commandId": "12dc8cb2-bec3-44f7-9fc6-652b8bdc8421",
+      "kind": "preview",
+      "status": "failed",
+      "canonicalRunId": "8df6a401-2e79-4cb8-9057-a8b02e9b4070",
+      "streamEpoch": 0,
+      "fence": 0,
+      "revisionId": "1ef05c12-e08a-4461-8400-2547f1038ff0",
+      "previewId": "1f7abd3d-26e8-4eab-a7ae-44a0aa1b6c4f",
+      "briefVersion": 1,
+      "consentEpoch": 0,
+      "understandingRef": {
+        "key": "projects/4fb6af6a-4d14-49b2-b791-291615b489da/understanding/1/f403d7803195ee13f792b582025506c057d86df2f17fde2b2b4249fdb5dfe806",
+        "sha256": "f403d7803195ee13f792b582025506c057d86df2f17fde2b2b4249fdb5dfe806",
+        "bytes": 1070,
+        "mime": "application/json"
+      },
+      "mediaAttemptStarted": true,
+      "stage": "voice",
+      "errorCode": "ASR_MISMATCH"
+    },
+    "control": {
+      "schemaVersion": 5,
+      "projectId": "4fb6af6a-4d14-49b2-b791-291615b489da",
+      "ownerKeyHash": "new-theme-validation",
+      "controlVersion": 5,
+      "briefVersion": 1,
+      "createdAt": "2026-10-03T16:54:27.361Z",
+      "lastUserActivityAt": "2026-10-03T16:54:38.435Z",
+      "expiresAt": "2026-11-02T16:54:38.435Z",
+      "reviewPolicy": "preview_first",
+      "phase": "attention",
+      "understandingRef": {
+        "key": "projects/4fb6af6a-4d14-49b2-b791-291615b489da/understanding/1/f403d7803195ee13f792b582025506c057d86df2f17fde2b2b4249fdb5dfe806",
+        "sha256": "f403d7803195ee13f792b582025506c057d86df2f17fde2b2b4249fdb5dfe806",
+        "bytes": 1070,
+        "mime": "application/json"
+      },
+      "messagesIndexRef": {
+        "key": "projects/4fb6af6a-4d14-49b2-b791-291615b489da/indexes/messages/0bb9f81b898eb24c65275bfaff80e77296897a73a23989e1536b3ee862039d8a",
+        "sha256": "0bb9f81b898eb24c65275bfaff80e77296897a73a23989e1536b3ee862039d8a",
+        "bytes": 281,
+        "mime": "application/json"
+      },
+      "revisionIndexRef": {
+        "key": "projects/4fb6af6a-4d14-49b2-b791-291615b489da/indexes/revisions/29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "sha256": "29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "bytes": 23,
+        "mime": "application/json"
+      },
+      "assets": [],
+      "inputPending": false,
+      "previewState": "none",
+      "receipts": [
+        {
+          "schemaVersion": 5,
+          "commandId": "12dc8cb2-bec3-44f7-9fc6-652b8bdc8421",
+          "projectId": "4fb6af6a-4d14-49b2-b791-291615b489da",
+          "operationId": "8df6a401-2e79-4cb8-9057-a8b02e9b4070",
+          "controlVersion": 3,
+          "status": "accepted"
+        }
+      ],
+      "consentEpoch": 0,
+      "nextOrdinal": 1,
+      "ordinalReservations": {},
+      "activeProduction": null,
+      "previewOutcomes": {},
+      "latestPreviewOutcome": {
+        "operationId": "8df6a401-2e79-4cb8-9057-a8b02e9b4070",
+        "briefVersion": 1,
+        "consentEpoch": 0,
+        "controlVersion": 4
+      }
+    },
+    "modelBudget": {
+      "calls": 2,
+      "inputTokens": 76656,
+      "outputTokens": 13000,
+      "reservations": {
+        "459693734fc742d5772f325fae4a5f4152714bc9870253cb1c3da7495f6e585e": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+        "962506f17f12c6617e945f9a6e02d0bc45abda0a5891e1626c4839d69db6e3ff": "a5d85519a9bbd7f55db5e06676791be7d1bb9ddf342486ee7b84d9f205f54e84"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "459693734fc742d5772f325fae4a5f4152714bc9870253cb1c3da7495f6e585e": {
+          "state": "settled",
+          "startedAt": "2026-10-03T16:54:27.745Z",
+          "inputTokens": 4992,
+          "outputTokens": 1893
+        },
+        "962506f17f12c6617e945f9a6e02d0bc45abda0a5891e1626c4839d69db6e3ff": {
+          "state": "settled",
+          "startedAt": "2026-10-03T16:54:38.766Z",
+          "inputTokens": 4290,
+          "outputTokens": 4737
+        }
+      }
+    },
+    "narrationMismatch": {
+      "expectedSpokenText": "适量浇水，润湿大地。",
+      "recognizedText": "适量浇水、润湿大的。",
+      "sourceVoiceJob": "voice/6078f2b6275c981fb1776330cddff9cce06529942a4e38a52792ccfa5ce86f05/job.json",
+      "sourceAsrTranscript": "asr/58e0b724e542616b5ae5c2314ba5fcb1b58180f471775550afc395c176a35eb4/transcript.json",
+      "classification": "ASR disagrees with frozen text; pronunciation versus recognition error not yet established; failure retained"
+    }
+  },
+  "status": "blocked",
+  "limits": "Independent new-theme acceptance scenario with actual provider and durable production preview pipeline. Unlimited validation authorization persisted; this individual diagnostic allows at most 64 requests, no automatic retries. All unknown effects remain blocked. No formal approval, delivery or 43-style acceptance claim; historical original name/readability/unknown-call failures are unchanged.",
+  "errorCode": "ASR_MISMATCH",
+  "evidenceRefreshedAt": "2026-10-03T16:57:26.401Z",
+  "evidenceRefreshAdditionalModelCalls": 0
+}

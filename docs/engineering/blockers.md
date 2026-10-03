@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 新主题真实验证：2模型响应/用量已完整核证settled，无新增费用unknown。种子发芽四镜头TTS后第二句“润湿大地”识别成“润湿大的”，Worker保持failed/ASR_MISMATCH且不发布。固定镜像phonemizer实际确认“大地/土地”末字地错误de5，修复并重新固定runtime/原台词独立ASR仍待完成；不是缺云凭据或额度，不能改预期文案掩盖。见 [新主题验证](evidence/new-theme-validation.md)。后续原特殊人名、全片质量/正式改稿/全部风格验收继续缺。
+
 2026-10-04 正式拼接/合成/postmix/ASR journal接线与缓存unknown绕过已修复，102files533单元及构建检查通过；实际20秒1080p stereo诊断两completed冷回执不变，0provider。见 [正式渲染验证](evidence/approved-render-journal-validation.md)。这不是完整资源清理：detached镜头/TTS/抽帧/QA/导出协调和公共unknown解除仍缺，旁白postmix journal还须实测；全片QA/正式改稿/newrevision/43风格86真实基线和用户验收仍未过。费用不是阻断，旧未知模型尝试保留冻结。
 
 2026-10-04 持久资源更新：sound/master已接启动前journal及warm/cold真实终态核验，实际宿主SIGKILL后同容器仍running，cold核验stop/removed成功；100文件520单元及构建检查通过。见 [资源验证及失败记录](evidence/docker-journal-validation.md)。下方历史段落中的“持久handle未实现”仅保留为当时记录：当前基础能力已经实现，但图像/TTS/ASR/合成/导出资源的全面接入、自动恢复协调和公共unknown解除仍未完成，不能算T14整体清理通过。0provider/原control账本未改，无push/部署。
