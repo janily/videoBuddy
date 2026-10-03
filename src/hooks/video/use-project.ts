@@ -4,6 +4,8 @@ import {ProjectView} from '@/contracts/video/project';
 import {draftKey,readDraft,saveDraft,useDraft} from './use-draft';
 import {rememberProject} from './recent-projects';
 import {useProjectEvents} from './use-project-events';
+import {useRestoreResult} from './use-restore-result';
+import {useProjectRevalidation} from './use-project-revalidation';
 
 async function api<T>(path:string,body?:unknown):Promise<T>{
  const response=await fetch(path,body===undefined?{cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
@@ -35,8 +37,16 @@ export function useProject(initialProjectId?:string){
  const key=draftKey(projectId),[draft,setDraft]=useDraft(key);
  const attachmentSnapshot=useCallback(()=>projectId?localStorage.getItem(attachmentKey(projectId))||'[]':'[]',[projectId]);
  const attachments=parseAttachments(useSyncExternalStore(subscribeAttachments,attachmentSnapshot,()=> '[]'));
- const refresh=useCallback(async()=>{if(!idRef.current)return;try{const next=await api<ProjectView>(`/api/video/projects/${idRef.current}`);rememberProject(next.projectId);setView(old=>old&&old.controlVersion>next.controlVersion?old:next)}catch(e){setError(e instanceof Error?e.message:'无法恢复项目。')}},[]);
- useEffect(()=>{if(initialProjectId){void refresh()}},[initialProjectId,refresh]);
+ const readProject=useCallback(async(minimumControlVersion=0)=>{
+  const id=idRef.current;if(!id)throw Error('无法读取项目。');
+  const next=await api<ProjectView>(`/api/video/projects/${id}`);
+  if(next.projectId!==id||!Number.isSafeInteger(next.controlVersion)||next.controlVersion<minimumControlVersion)throw Error('最新视频暂时无法读取，请重新连接。');
+  rememberProject(next.projectId);setView(old=>old&&old.controlVersion>next.controlVersion?old:next);
+ },[]);
+ const refresh=useCallback(async()=>{if(!idRef.current)return;try{await readProject()}catch(e){setError(e instanceof Error?e.message:'无法恢复项目。')}},[readProject]);
+ const restoration=useRestoreResult(projectId,readProject);
+ const projectUpdate=useProjectRevalidation(projectId,refresh);
+ useEffect(()=>{if(initialProjectId)void readProject().catch(e=>setError(e instanceof Error?e.message:'无法恢复项目。'))},[initialProjectId,readProject]);
  const stream=useProjectEvents(projectId,view?.activeConversation?.id,view?.activeConversation?.streamEpoch||0,refresh);
  const productionStream=useProjectEvents(projectId,view?.activeProduction?.id,view?.activeProduction?.streamEpoch||0,refresh);
  const pendingAnalysis=attachments.some(attachment=>!view?.assets.some(asset=>asset.id===attachment.id&&['ready','failed'].includes(asset.status)));
@@ -107,5 +117,5 @@ export function useProject(initialProjectId?:string){
   finally{previewBusy.current=false;setPreparingPreview(false)}
  }
  const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send,stopReply,preparePreview,preparingPreview,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send,stopReply,preparePreview,preparingPreview,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
 }

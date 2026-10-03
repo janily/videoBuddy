@@ -2,15 +2,19 @@
 import type{ProjectView}from '@/contracts/video/project';
 import {PreviewPlayer} from './preview-player';
 import {ResultDownloads} from './result-downloads';
+import {ResultHistory} from './result-history';
+import type {useRestoreResult} from '@/hooks/video/use-restore-result';
 const examples=['给我的咖啡店做一支介绍视频','把这份资料讲成一个小故事','做一段让人看懂的知识科普'];
-export function ResultStage({view,onExample,extra,onPreview,preparing=false,activity}:{extra?:React.ReactNode;view:ProjectView|null;onExample:(text:string)=>void;onPreview?:()=>void;preparing?:boolean;activity?:string}){
+export function ResultStage({view,onExample,extra,onPreview,preparing=false,activity,restoration,projectUpdate}:{extra?:React.ReactNode;view:ProjectView|null;onExample:(text:string)=>void;onPreview?:()=>void;preparing?:boolean;activity?:string;restoration?:ReturnType<typeof useRestoreResult>;projectUpdate?:string}){
  if(view?.currentResult){
   const result=view.currentResult;
   return<section className="work" aria-label="视频结果"><div className="work-inner"><span className="eyebrow">把想法带给更多人</span><h1 className="result-title">视频已经准备好了。</h1><p className="intro">播放看看。想调整哪里，继续在右边告诉我。</p>
-   <PreviewPlayer key={`player:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} label="完整视频"/>
+   {projectUpdate&&<p role="status" aria-live="polite">{projectUpdate}</p>}<PreviewPlayer key={`player:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} label="完整视频"/>
    {view.productionFailure&&<p role="alert">{view.productionFailure.message}</p>}
    {view.activeProduction&&<p role="status">{activity||'新版本正在制作，已有视频仍可观看和下载。'}</p>}
-   <ResultDownloads key={`downloads:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} productionActive={Boolean(view.activeProduction)}/>{extra}
+   <ResultDownloads key={`downloads:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} productionActive={Boolean(view.activeProduction)} history={restoration&&<ResultHistory view={view} locked={['submitting','uncertain'].includes(restoration.state.phase)} onRestore={artifactId=>void restoration.restore(artifactId,view)}/>}/>
+   {restoration?.state.message&&<p role={restoration.state.phase==='failed'?'alert':'status'} aria-live="polite">{restoration.state.message}</p>}
+   {restoration?.state.phase==='uncertain'&&<button className="text-button" onClick={()=>void restoration.reconnect()}>重新连接恢复</button>}{extra}
   </div></section>;
  }
  if(view?.currentPreview){

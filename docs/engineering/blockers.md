@@ -77,3 +77,5 @@ Node20直接npm install被engine-strict拒绝，采用本机Node22.23.1匹配工
 2026-10-03 封面阻断更新：poster能力已接入统一Worker/SSE/私有PNG和产品入口，原CAPABILITY_UNAVAILABLE/按钮禁用缺口关闭；真实1920x1080第59帧PNG提取/独立CRC及像素行检查、600/nlink1/拒覆盖与冷恢复通过，源项目仍无qualified final result，公开导出仍RESULT_STALE。379单元/27浏览器通过不替代真实全片QA/公开用户下载闭环；旧模型账本、修改/恢复UI、清理、竖屏媒体与43风格86实测继续待完成。0模型/0付费、原control/ledger未改，未push/部署。证据：evidence/poster-validation.md。
 
 2026-10-03 无上限验证策略已实现并实测迁移：项目/全部历史日完整清单、不可变原快照/计划、historical真实来源、只加正超预约、同计划冷恢复、未知冻结仍生效；诊断副本七次历史project/daily已完整保留，原源账本/control未改。用户追加测试次数/费用无限授权已落地，不是缺凭据。实际全片第一批gemini-3.8-flash多模态调用120秒超时，没返回可核usage，计为unknown，不自动重试，29批未完成、仍无QA通过/结果发布。超时和未知effect恢复是当前独立阻断，见 evidence/approved-whole-critic-probe.json 与 unlimited-validation.md。默认生成开关关闭，未push/部署。
+
+2026-10-03 恢复入口缺口关闭：更多可显式查看历史并调用已有restore，原命令持久重连、确认后视图最低版本、跨标签/focus/visible刷新已实现。396单元与37浏览器通过，截图保留已确认视觉；仍没有真实合格成片可用于完整恢复媒体验收，协议夹具不代替QA。模型第一批超时unknown、自然语言修改/清理及43风格86真实基线仍待完成，0新增模型，本增量未改真实control/ledger，未push/部署。见 evidence/restore-ui-validation.md。
