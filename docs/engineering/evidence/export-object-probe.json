@@ -1,0 +1,21 @@
+{
+  "executedAt": "2026-10-03T11:27:01.879Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/export-object-GpzRYK",
+  "projectId": "574dacc5-9943-4a9c-93e7-82f81ea738a7",
+  "objectPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/export-object-GpzRYK/objects/projects/574dacc5-9943-4a9c-93e7-82f81ea738a7/artifacts/521b36e9-c516-4dd4-aa04-eed28319502c/files/source.zip",
+  "sha256": "6d72359566d6047f3685067bafd397196b1e4ff4e6313b119588339cf098aac1",
+  "bytes": 27307795,
+  "entries": 64,
+  "mode": "0600",
+  "links": 1,
+  "replayIdentical": true,
+  "replacementBlocked": true,
+  "independentZipCrcPassed": true,
+  "realUnqualifiedExportBlocked": "RESULT_STALE",
+  "queuedOperations": 0,
+  "originalControlUnchanged": true,
+  "additionalModelCalls": 0,
+  "finalResultPublished": false,
+  "limits": "Actual existing frozen ZIP persisted and replayed by the new no-follow immutable publisher; no fake QA created. The real preview/diagnostic film lacks a published qualified result and correctly cannot enter the public export flow. Authenticated positive HTTP/worker/SSE/download flow is covered by explicit protocol fixtures, not real final video quality evidence."
+}

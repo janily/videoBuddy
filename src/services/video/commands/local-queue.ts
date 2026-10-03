@@ -4,6 +4,8 @@ import {StoreMissing} from '@/services/video/storage/atomic-store';
 import type {ProjectControl} from '@/contracts/video/project';
 import type {PreviewOperation} from '@/services/video/preview/prepare';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {bindReservedExportCommand} from '@/services/video/exports/intent';
+import type {ExportOperation} from '@/services/video/exports/operation';
 export type QueuedOperation={projectId:string;operationId:string;kind:string};
 interface RecordValue extends QueuedOperation{status:'queued'|'done'}
 export class LocalOperationQueue{
@@ -40,6 +42,32 @@ export class LocalOperationQueue{
   return failure;
  }
  async pending():Promise<QueuedOperation[]>{const value=await this.pendingWithFailures();if(value.failure)throw value.failure;return value.jobs}
+ async reconcileExports(){
+  let failure:unknown;
+  const dirs=await readdir(join(this.root,'projects'),{withFileTypes:true}).catch(error=>{if((error as NodeJS.ErrnoException).code==='ENOENT')return[];throw error});
+  for(const dir of dirs){if(!dir.isDirectory()||!/^[a-f0-9-]{36}$/.test(dir.name))continue;
+   try{
+    if(!this.store.listKeys)throw Error('QUEUE_INVENTORY_UNAVAILABLE');
+    // A request can die after reserving its result slot but before writing the
+    // operation file/enqueue. The slot already binds the authorized frozen input.
+    for(const key of await this.store.listKeys(`projects/${dir.name}/results`,3)){
+     try{
+     if(!/\/results\/[a-f0-9-]{36}\/export-requests\/source_zip$/.test(key))continue;
+     const reserved=(await this.store.readFresh<ExportOperation>(key)).value;
+     if(reserved.projectId!==dir.name||reserved.resultId!==key.split('/')[3]||reserved.kind!=='export'||!/^[a-f0-9-]{36}$/.test(reserved.id))throw Error('QUEUE_RECORD_INVALID');
+     await bindReservedExportCommand(this.store,reserved);
+     await createOrRead(this.store,`projects/${dir.name}/operations/${reserved.id}`,reserved);
+     }catch(error){failure ||= error}
+    }
+    for(const key of await this.store.listKeys(`projects/${dir.name}/operations`,1)){
+     const id=key.split('/').at(-1)!;if(!/^[a-f0-9-]{36}$/.test(id))continue;
+     const op=(await this.store.readFresh<{id:string;projectId:string;kind:string;status:string}>(key)).value;
+     if(op.kind==='export'&&op.id===id&&op.projectId===dir.name&&['reserved','running','cancelling','cancelled','failed','interrupted','superseded','succeeded'].includes(op.status))await this.enqueue(dir.name,id,'export');
+    }
+   }catch(error){failure ||= error}
+  }
+  return failure;
+ }
  async pendingWithFailures():Promise<{jobs:QueuedOperation[];failure?:Error}>{
   let projects;try{projects=await readdir(join(this.root,'queue'),{withFileTypes:true})}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return{jobs:[]};throw error}
   const result:QueuedOperation[]=[];let failure:Error|undefined;

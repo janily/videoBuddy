@@ -2,6 +2,8 @@ import type{ProjectStore}from'@/services/video/storage/project-store';
 import{ObjectRef}from'@/contracts/video/domain';
 import{assertArtifactAccess}from'./export';
 import{issueArtifactToken}from'./local-token';
+import{canonicalHash}from'@/services/video/domain/hash';
+import{StoreMissing}from'@/services/video/storage/atomic-store';
 export interface ArtifactRecord{id:string;revisionId:string;objectRef:ObjectRef;qaPassed:boolean;uploaded:boolean;filename:string}
 export async function inspectArtifact(projects:ProjectStore,owner:string,projectId:string,artifactId:string){
  const control=await projects.access(owner,projectId);
@@ -20,12 +22,19 @@ export async function resolveArtifact(projects:ProjectStore,owner:string,project
  for(const resultId of[control.currentResultId,control.previousResultId])if(resultId&&!published){
   const result=await projects.store.readFresh<{artifactId:string;revisionId:string}>(`projects/${projectId}/results/${resultId}/manifest`);
   published=result.value.artifactId===artifactId&&result.value.revisionId===artifact.revisionId;
+  if(!published&&artifact.objectRef.mime==='application/zip'&&control.publishedExports?.[artifactId]){
+   try{
+    const record=(await projects.store.readFresh<{projectId:string;resultId:string;sourceArtifactId:string;revisionId:string;resultHash:string;artifactId:string;objectRef:ObjectRef;format:string}>(`projects/${projectId}/artifacts/${artifactId}/export-publication`)).value;
+    published=record.projectId===projectId&&record.resultId===resultId&&record.sourceArtifactId===result.value.artifactId&&record.artifactId===artifactId&&record.revisionId===artifact.revisionId&&record.revisionId===result.value.revisionId&&record.resultHash===canonicalHash(result.value)&&record.format==='source_zip'&&canonicalHash(record.objectRef)===canonicalHash(artifact.objectRef)&&canonicalHash(record)===control.publishedExports[artifactId];
+   }catch(error){if(!(error instanceof StoreMissing))throw error}
+  }
  }
  if(!published)throw Error('ACCESS_NOT_FOUND');
  return artifact;
 }
 export async function getArtifactAccess(projects:ProjectStore,owner:string,projectId:string,artifactId:string,purpose:'play'|'download'){
  const artifact=await resolveArtifact(projects,owner,projectId,artifactId),key=process.env.VIDEO_SESSION_SIGNING_KEY;
+ if(purpose==='play'&&artifact.objectRef.mime!=='video/mp4')throw Error('ACCESS_NOT_FOUND');
  if(!key)throw Error('CONFIGURATION_REQUIRED');
  const token=issueArtifactToken({projectId,artifactId,owner,purpose},key),expiresAt=new Date(Date.now()+180000).toISOString();
  return{url:`/api/video/projects/${projectId}/artifacts/${artifactId}/file?purpose=${purpose}&token=${encodeURIComponent(token)}`,expiresAt,mime:artifact.objectRef.mime,filename:artifact.filename,purpose};
