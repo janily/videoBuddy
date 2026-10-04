@@ -1,6 +1,7 @@
+import {prepareBookCaptionLayer,validateBookCaptionStyle,type BookCaptionDescriptor} from './book-caption-layer';
 import {runOwnedDocker} from './owned-docker';
-import {assertDockerCacheReusable,type DockerJournal} from './docker-journal';
-import {compositionProducer,verifyCompositionReceipt} from './composition-receipt';
+import {assertDockerCacheReusable,readDockerInvocation,dockerArgumentsHash,type DockerJournal} from './docker-journal';
+import {compositionProducer,verifyCompositionReceipt,bookCompositionProducer,verifyBookCompositionReceipt} from './composition-receipt';
 import {createHash} from 'node:crypto';
 import {lstat,mkdir,open,readFile} from 'node:fs/promises';
 import {isAbsolute,join} from 'node:path';
@@ -12,13 +13,14 @@ import {measureFinalLoudness} from '@/services/video/audio/loudness';
 import {dockerConfiguration} from './docker-executor';
 import {technicalVideoQa} from './technical-qa';
 
-export interface CaptionStyle{fontSize:number;marginV:number;outline:number;primary:string;outlineColor:string;playResX?:number;playResY?:number}
+export interface CaptionStyle{fontSize:number;marginV:number;outline:number;primary:string;outlineColor:string;playResX?:number;playResY?:number;book?:BookCaptionDescriptor}
 export interface CompositionSpec{width:number;height:number;durationSec:number;fps:24|30|60;bundleHash:string;fence:number}
 function color(value:string){
  if(!/^#[a-fA-F0-9]{6}$/.test(value))throw Error('CAPTION_STYLE_INVALID');
  return`&H00${value.slice(5,7)}${value.slice(3,5)}${value.slice(1,3)}&`.toUpperCase();
 }
 export function validateCaptionStyle(style:CaptionStyle){
+ if(style.book){validateBookCaptionStyle(style);return 'book-caption-layer-v1'}
  if(!Number.isInteger(style.fontSize)||style.fontSize<16||style.fontSize>100||!Number.isInteger(style.marginV)||style.marginV<0||style.marginV>180||!Number.isInteger(style.outline)||style.outline<0||style.outline>5)throw Error('CAPTION_STYLE_INVALID');
  const explicit=style.playResX!==undefined||style.playResY!==undefined;
  if(explicit&&[style.playResX,style.playResY].some(value=>value===undefined||!Number.isInteger(value)||value<64||value>3840||value%2))throw Error('CAPTION_STYLE_INVALID');
@@ -28,15 +30,17 @@ export function composeStageKey(input:{pictureSha256:string;trackSha256:string;t
  const {spec}=input;
  if(!/^[a-f0-9]{64}$/.test(input.pictureSha256)||!/^[a-f0-9]{64}$/.test(input.trackSha256)||input.srtSha256!==null&&!/^[a-f0-9]{64}$/.test(input.srtSha256)||!/^[a-f0-9]{64}$/.test(input.runtimeDigest)||!/^[a-f0-9]{64}$/.test(spec.bundleHash)||!Number.isSafeInteger(spec.fence)||spec.fence<0)throw Error('COMPOSITION_INVALID');
  if(input.style)validateCaptionStyle(input.style);
- return createHash('sha256').update(JSON.stringify([input.pictureSha256,input.trackSha256,input.trackSilent,input.srtSha256,input.style,input.runtimeDigest,spec,producerReceipt?'composition-v4-'+createHash('sha256').update(compositionProducer).digest('hex'):'composition-v3-compressor-loudnorm'])).digest('hex');
+ return createHash('sha256').update(JSON.stringify([input.pictureSha256,input.trackSha256,input.trackSilent,input.srtSha256,input.style,input.runtimeDigest,spec,input.style?.book?'composition-book-v1-'+createHash('sha256').update(bookCompositionProducer).digest('hex'):producerReceipt?'composition-v4-'+createHash('sha256').update(compositionProducer).digest('hex'):'composition-v3-compressor-loudnorm'])).digest('hex');
 }
-export function composeDockerArguments(image:string,user:string,key:string,picturePath:string,trackPath:string,srtPath:string|null,outputDir:string,style:CaptionStyle|null,trackSilent:boolean,channels:1|2=1){
+export function composeDockerArguments(image:string,user:string,key:string,picturePath:string,trackPath:string,srtPath:string|null,outputDir:string,style:CaptionStyle|null,trackSilent:boolean,channels:1|2=1,captionLayerPath?:string){
  if(!/^sha256:[a-f0-9]{64}$/.test(image)||!/^\d+:\d+$/.test(user)||!/^[a-f0-9]{64}$/.test(key)||[picturePath,trackPath,outputDir,...(srtPath?[srtPath]:[])].some(path=>!isAbsolute(path)||!/^\/[A-Za-z0-9_./-]+$/.test(path))||Boolean(srtPath)!==Boolean(style))throw Error('COMPOSITION_INVALID');
- if(channels!==1&&channels!==2)throw Error('COMPOSITION_INVALID');
+ if(channels!==1&&channels!==2||Boolean(style?.book)!==Boolean(captionLayerPath)||captionLayerPath&&(!isAbsolute(captionLayerPath)||!/^\/[A-Za-z0-9_./-]+$/.test(captionLayerPath)))throw Error('COMPOSITION_INVALID');
  const args=['run','--rm','--name',`vb-compose-${key.slice(0,24)}`,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','2g','--memory-swap','2g','--user',user,'--tmpfs','/tmp:rw,nosuid,size=128m','--mount',`type=bind,src=${picturePath},dst=/input/picture.mp4,readonly`,'--mount',`type=bind,src=${trackPath},dst=/input/track.wav,readonly`];
  if(srtPath)args.push('--mount',`type=bind,src=${srtPath},dst=/input/subtitles.srt,readonly`);
+ if(captionLayerPath)args.push('--mount',`type=bind,src=${captionLayerPath},dst=/input/captions.mov,readonly`);
  args.push('--mount',`type=bind,src=${outputDir},dst=/output`,image,'ffmpeg','-hide_banner','-loglevel','error','-xerror','-nostdin','-y','-threads','2','-filter_threads','2','-i','/input/picture.mp4','-i','/input/track.wav','-map','0:v:0','-map','1:a:0');
- if(style){args.push('-vf',`subtitles=filename=/input/subtitles.srt:force_style='${validateCaptionStyle(style)}'`,'-c:v','libx264','-preset','medium','-crf','18')}
+ if(style?.book){validateBookCaptionStyle(style);args.splice(args.indexOf('-map'),4);args.push('-i','/input/captions.mov','-filter_complex','[0:v][2:v]overlay=shortest=1:format=auto[v]','-map','[v]','-map','1:a:0','-c:v','libx264','-preset','medium','-crf','18')}
+ else if(style){args.push('-vf',`subtitles=filename=/input/subtitles.srt:force_style='${validateCaptionStyle(style)}'`,'-c:v','libx264','-preset','medium','-crf','18')}
  else args.push('-c:v','copy');
  args.push('-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709');
  if(!trackSilent)args.push('-af','acompressor=threshold=0.08:ratio=4:attack=2:release=100:detection=peak,loudnorm=I=-14:TP=-1.5:LRA=11');
@@ -55,11 +59,12 @@ export async function composeVideo(root:string,pictureStageDir:string,track:Comp
  const trackProbe=track.wav.channels===2?await inspectStereoTrackWav(track.outputPath,spec.durationSec*48000,track.wav.silence):await inspectTrackWav(track.outputPath,spec.durationSec*48000,track.wav.silence);
  if(trackProbe.sha256!==track.wav.sha256||trackProbe.silence!==track.wav.silence||track.runtimeDigest!==config.runtimeDigest)throw Error('COMPOSITION_SOURCE_CHANGED');
  const srt=formatSrt(cues),srtSha256=srt?createHash('sha256').update(srt).digest('hex'):null;
- if(cues.length){
+ if(cues.length&&!style?.book){
   const font=await readPinnedSubtitleFont(env);
   for(const cue of cues)for(const char of cue.text)if(!/\s/.test(char)&&!font.glyphs.has(char))throw Error('FONT_GLYPH_MISSING');
   if(font.runtimeDigest!==config.runtimeDigest)throw Error('COMPOSITION_SOURCE_CHANGED');
  }
+ const captionLayer=style?.book?await prepareBookCaptionLayer(root,cues,style,spec,env,options):null;
  const key=composeStageKey({pictureSha256:picture.sha256,trackSha256:trackProbe.sha256,trackSilent:trackProbe.silence,srtSha256,style,runtimeDigest:config.runtimeDigest,spec},options.producerReceipt),stageDir=join(root,'composition',key),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'final.mp4');
  const receiptInput={stageKey:key,pictureSha256:picture.sha256,trackSha256:trackProbe.sha256,srtSha256};
  if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
@@ -68,15 +73,21 @@ export async function composeVideo(root:string,pictureStageDir:string,track:Comp
  let exists=false;try{await lstat(outputPath);exists=true}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
  await options.assertActive?.();
  if(!exists&&options.mustExist)throw Error('COMPOSITION_STAGE_MISSING');
- const args=composeDockerArguments(config.image,config.user,key,picturePath,track.outputPath,srtPath,outputDir,style,trackProbe.silence,trackProbe.channels);
+ const args=composeDockerArguments(config.image,config.user,key,picturePath,track.outputPath,srtPath,outputDir,style,trackProbe.silence,trackProbe.channels,captionLayer?.outputPath);
   // Invocation identity belongs to this execution, independent of cached output.
   args.splice(args.indexOf('--name'),2);
-  if(options.producerReceipt){const imageIndex=args.indexOf(config.image),argv=args.splice(imageIndex+1);args.push('python3','-c',compositionProducer,JSON.stringify({...receiptInput,argv}))}
+  if(options.producerReceipt||captionLayer){const imageIndex=args.indexOf(config.image),argv=args.splice(imageIndex+1);args.push('python3','-c',captionLayer?bookCompositionProducer:compositionProducer,JSON.stringify({...receiptInput,...(captionLayer?{captionLayerSha256:captionLayer.sha256}:{}),argv}))}
  if(exists&&options.journal)await assertDockerCacheReusable(options.journal,args,config.image);
  if(!exists)await runOwnedDocker(args,config.timeoutSeconds*1000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
  await options.assertActive?.();
  const qa=await technicalVideoQa(stageDir,config.image,'output/final.mp4',{width:spec.width,height:spec.height,durationSec:spec.durationSec,fps:spec.fps,audio:true,...(trackProbe.channels===2?{audioChannels:2 as const}:{})});
- if(options.producerReceipt)await verifyCompositionReceipt(join(outputDir,'composition-receipt.json'),receiptInput,qa);
+ if(captionLayer){
+  if(!options.journal)throw Error('COMPOSITION_PRODUCER_UNKNOWN');
+  const completed=await readDockerInvocation(options.journal,dockerArgumentsHash(args,config.image),config.image);
+  if(completed.state!=='completed'||completed.output===undefined)throw Error('COMPOSITION_PRODUCER_UNKNOWN');
+  await verifyBookCompositionReceipt(join(outputDir,'composition-receipt.json'),{...receiptInput,captionLayerSha256:captionLayer.sha256},qa,completed.output);
+ }
+ else if(options.producerReceipt)await verifyCompositionReceipt(join(outputDir,'composition-receipt.json'),receiptInput,qa);
  const loudness=await measureFinalLoudness(root,{outputPath,sha256:qa.sha256,durationMs:spec.durationSec*1000,technicalQa:'pass'},trackProbe.silence,env);
  if(loudness.status==='fail')throw Error(`COMPOSITION_LOUDNESS_FAILED: ${JSON.stringify({integratedLufs:loudness.integratedLufs,truePeakDbtp:loudness.truePeakDbtp})}`);
  await options.assertActive?.();
