@@ -28,7 +28,8 @@ async function readRef(store:AtomicStore,ref:ObjectRef,prefix:string){
 }
 function contextBinding(context:PostMixReviewContext){
  const {film,plan,lineId,window,transcript}=context,line=plan.lines.find(item=>item.lineId===lineId);
- if(!line||new Set(plan.lines.map(item=>item.lineId)).size!==plan.lines.length||plan.durationMs!==film.durationMs||window.startMs!==line.startMs||window.lengthMs>line.reservedMs||window.startMs+window.lengthMs>film.durationMs||transcript.language!==line.language)throw Error('POSTMIX_REVIEW_CHANGED');
+ const nextStart=Math.min(film.durationMs,...plan.lines.filter(item=>line&&item.startMs>line.startMs).map(item=>item.startMs));
+ if(!line||new Set(plan.lines.map(item=>item.lineId)).size!==plan.lines.length||plan.durationMs!==film.durationMs||window.startMs!==line.startMs||window.lengthMs>line.reservedMs+300||window.startMs+window.lengthMs>nextStart||transcript.language!==line.language)throw Error('POSTMIX_REVIEW_CHANGED');
  return {planSha256:canonicalHash(plan),lineId,language:line.language,spokenText:line.spokenText,displayText:line.displayText,expectedAsrText:line.expectedAsrText,filmSha256:film.sha256,filmDurationMs:film.durationMs,...window,mixedWavSha256:transcript.voiceSha256,transcriptSha256:canonicalHash(transcript),wordTimingsSha256:canonicalHash(transcript.segments.flatMap(segment=>segment.words)),recognizedText:transcript.recognizedText,asrModel:transcript.model,asrRuntimeDigest:transcript.runtimeDigest};
 }
 function checkedWords(context:PostMixReviewContext){

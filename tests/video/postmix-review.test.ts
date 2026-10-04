@@ -19,7 +19,7 @@ import {createPostMixReviewChallenge,confirmPostMixReview,loadConfirmedPostMixRe
 async function fixture(root:string){
  const projects=new ProjectStore(new FileStore(root)),owner='mixed-review-owner';
  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),revisionId=randomUUID();
- const plan:NarrationPlan={durationMs:20000,lines:[{lineId:'line_2',language:'zh-CN',spokenText:'洒下适量的水，润湿土壤。',displayText:'洒下适量的水，润湿土壤。',expectedAsrText:'洒下适量的水，润湿土壤。',startMs:5000,reservedMs:5000}]};
+ const plan:NarrationPlan={durationMs:20000,lines:[{lineId:'line_2',language:'zh-CN',spokenText:'洒下适量的水，润湿土壤。',displayText:'洒下适量的水，润湿土壤。',expectedAsrText:'洒下适量的水，润湿土壤。',startMs:5000,reservedMs:800}]};
  // Synthetic container and PCM test ownership/hash boundaries, not real speech QA.
  const filmDir=join(root,'composition','fixture');await mkdir(filmDir,{recursive:true});const bytes=Buffer.alloc(2048,1),outputPath=join(filmDir,'final.mp4');await writeFile(outputPath,bytes);
  const film={outputPath,sha256:createHash('sha256').update(bytes).digest('hex'),durationMs:20000,technicalQa:'pass' as const};
@@ -54,6 +54,10 @@ it('does not accept source-WAV confirmation, repeated message rebinding or broke
   await confirmPostMixReview(f.projects,f.owner,f.projectId,f.challenge,f.messageId);
   const changed={...f.context,plan:{...f.context.plan,lines:[{...f.context.plan.lines[0],displayText:'其他文本'}]}};
   const other=await createPostMixReviewChallenge(f.projects,root,f.projectId,f.revisionId,changed);await expect(confirmPostMixReview(f.projects,f.owner,f.projectId,other,f.messageId)).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
+  const beyondNext={...f.context,plan:{...f.context.plan,lines:[...f.context.plan.lines,{...f.context.plan.lines[0],lineId:'line_3',startMs:5900,reservedMs:5000}]}};
+  await expect(createPostMixReviewChallenge(f.projects,root,f.projectId,f.revisionId,beyondNext)).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
+  const beyondTail={...f.context,window:{...f.context.window,lengthMs:1200}};
+  await expect(createPostMixReviewChallenge(f.projects,root,f.projectId,f.revisionId,beyondTail)).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
   const zero=structuredClone(f.context);zero.transcript.segments[0].words[0].endMs=0;
   await expect(createPostMixReviewChallenge(f.projects,root,f.projectId,f.revisionId,zero)).rejects.toThrow('ASR_TIMINGS_UNAVAILABLE');
   const missing=structuredClone(f.context);missing.transcript.segments[0].words=[];
