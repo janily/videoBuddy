@@ -1,5 +1,8 @@
 # 当前工程交接（更新至2026-10-04）
 
+2026-10-04 T10/T11 字幕坐标修正：新policy2/CaptionPackage2固定横1920×1080/竖1080×1920逻辑画布，full/preview/probe同样式等比缩放，PlayRes进入合成hash；旧policy1完整graph冷读不改/跨schema错配拒绝，Composite先核mustExist冻结包。3新测试及FilmPackage/Composite接线实际RED→GREEN，108文件571项53.35s、lint/build/types通过，双轴clean。原生六profile及原画面frame51尺寸诊断通过：首unknown保留，v2 completed后宿主depth错误保留，严格同args冷回执恢复0producer/0model、七PNG hash核证、原project状态/SRT/picture不改。仅单位修正，白字黑边仍不符crayon-book；下一步真实手写字体/许可/纸底/安全区/事实及新完整影片QA，公共UI与43风格等范围仍缺，C0/C1/C2未达到，无push/部署。见 [坐标验证](evidence/caption-coordinate-validation.md)。
+
+
 2026-10-04 T10/T11 冻结影片新operation技术继续：同revision/同film绑定来源与command、所有已有创作stage mustExist，实际Composite/四句最终混音/Excerpt通过，0新增创作镜头/TTS/全片混音（Excerpt另行提取）；真实Critic一HTTP200却额外$schema，失败未发布，粗大字幕/根系遮挡/事实not_checked线索保留。实际9409/6687原响应精确结算，12调用全settled，旧failed/started不改；SDK格式拒绝前usage修复。cached frozenFilm身份绕过实际RED→GREEN关闭，双轴clean；107文件568测试50.92s及lint/build/构建后types/diffcheck通过。原生字幕单位诊断确认PlayResY288造成2.5倍放大，显式720诊断字形1053×85→421×34，原SRT不改/0model，未改生产或算QA通过。下一步版本化风格字幕、安全区/关键事实及新片QA；公共review/retry UI和完整项目仍缺，C0/C1/C2未达到，无push/部署。见 [冻结继续验证](evidence/frozen-preview-validation.md)。
 
 

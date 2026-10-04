@@ -1,0 +1,54 @@
+{
+  "executedAt": "2026-10-04T11:43:54.771Z",
+  "status": "started",
+  "diagnosticOnly": true,
+  "deliveryEligible": false,
+  "formalProductionApproval": false,
+  "newModelCalls": 0,
+  "sourceProjectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceRevisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "legacyPolicy": "v5.1-package-1",
+  "sourceSrtSha256": "a2aa6def31aa3ec631cc188559bfbf8cd65b035224d4f00955bbdfb9e56e31cd",
+  "sourcePictureSha256": "04c956d95605833b8b371553182d891f25f96b7444a82fd4a3c8d530c59edcce",
+  "runtime": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "cases": [
+    {
+      "name": "landscape-full",
+      "width": 1920,
+      "height": 1080,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'"
+    },
+    {
+      "name": "landscape-preview",
+      "width": 1280,
+      "height": 720,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'"
+    },
+    {
+      "name": "landscape-probe",
+      "width": 320,
+      "height": 180,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'"
+    },
+    {
+      "name": "portrait-full",
+      "width": 1080,
+      "height": 1920,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'"
+    },
+    {
+      "name": "portrait-preview",
+      "width": 720,
+      "height": 1280,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'"
+    },
+    {
+      "name": "portrait-probe",
+      "width": 180,
+      "height": 320,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'"
+    }
+  ],
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/caption-coordinates/probe-viYbvX",
+  "journalPrefix": "projects/22421f53-0445-482d-b0fa-a9d2b8d85a6f/operations/9d12b7a8-43bd-4b64-8259-1b899b44f962/media-effects"
+}

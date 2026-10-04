@@ -1,0 +1,172 @@
+{
+  "executedAt": "2026-10-04T11:45:22.631Z",
+  "status": "logical_caption_coordinates_verified",
+  "diagnosticOnly": true,
+  "deliveryEligible": false,
+  "formalProductionApproval": false,
+  "newModelCalls": 0,
+  "newNativeProducers": 0,
+  "sourceProjectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceRevisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "legacyPolicy": "v5.1-package-1",
+  "sourceSrtSha256": "a2aa6def31aa3ec631cc188559bfbf8cd65b035224d4f00955bbdfb9e56e31cd",
+  "sourcePictureSha256": "04c956d95605833b8b371553182d891f25f96b7444a82fd4a3c8d530c59edcce",
+  "runtime": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "cases": [
+    {
+      "name": "landscape-full",
+      "width": 1920,
+      "height": 1080,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'"
+    },
+    {
+      "name": "landscape-preview",
+      "width": 1280,
+      "height": 720,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'"
+    },
+    {
+      "name": "landscape-probe",
+      "width": 320,
+      "height": 180,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'"
+    },
+    {
+      "name": "portrait-full",
+      "width": 1080,
+      "height": 1920,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'"
+    },
+    {
+      "name": "portrait-preview",
+      "width": 720,
+      "height": 1280,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'"
+    },
+    {
+      "name": "portrait-probe",
+      "width": 180,
+      "height": 320,
+      "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'"
+    }
+  ],
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/caption-coordinates/probe-viYbvX",
+  "journalPrefix": "projects/22421f53-0445-482d-b0fa-a9d2b8d85a6f/operations/9d12b7a8-43bd-4b64-8259-1b899b44f962/media-effects",
+  "results": {
+    "cases": [
+      {
+        "name": "landscape-full",
+        "width": 1920,
+        "height": 1080,
+        "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'",
+        "bbox": [
+          677,
+          952,
+          1214,
+          1001
+        ],
+        "bboxKind": "dark-glyph-and-outline",
+        "pngName": "landscape-full.png",
+        "pngSha256": "4ec619b085e803cb2eb284d665fea785294cf7a2841f12ee77bc0c5ed12cb3a8",
+        "pngBytes": 27610
+      },
+      {
+        "name": "landscape-preview",
+        "width": 1280,
+        "height": 720,
+        "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'",
+        "bbox": [
+          451,
+          634,
+          810,
+          668
+        ],
+        "bboxKind": "dark-glyph-and-outline",
+        "pngName": "landscape-preview.png",
+        "pngSha256": "7039d29b05e9eccab823fe73d48ea49ce54c26c4c5d630b9792bd68323734e2e",
+        "pngBytes": 17619
+      },
+      {
+        "name": "landscape-probe",
+        "width": 320,
+        "height": 180,
+        "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'",
+        "bbox": [
+          113,
+          158,
+          203,
+          167
+        ],
+        "bboxKind": "dark-glyph-and-outline",
+        "pngName": "landscape-probe.png",
+        "pngSha256": "750665fffe8d538ae92c6fab32733549dd54600a042948bc66ac930aaaaf3d03",
+        "pngBytes": 2892
+      },
+      {
+        "name": "portrait-full",
+        "width": 1080,
+        "height": 1920,
+        "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'",
+        "bbox": [
+          257,
+          1792,
+          794,
+          1841
+        ],
+        "bboxKind": "dark-glyph-and-outline",
+        "pngName": "portrait-full.png",
+        "pngSha256": "86029398b6bee7588ac0f34d37c0e3353721ba2bf7f3508912024f975dfe47c8",
+        "pngBytes": 28909
+      },
+      {
+        "name": "portrait-preview",
+        "width": 720,
+        "height": 1280,
+        "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'",
+        "bbox": [
+          171,
+          1194,
+          530,
+          1228
+        ],
+        "bboxKind": "dark-glyph-and-outline",
+        "pngName": "portrait-preview.png",
+        "pngSha256": "00025b4be40a022747d21b6dff8deda933c25eb255bc4ca18ebd6ad9fc014178",
+        "pngBytes": 18568
+      },
+      {
+        "name": "portrait-probe",
+        "width": 180,
+        "height": 320,
+        "filter": "subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'",
+        "bbox": [
+          43,
+          298,
+          133,
+          307
+        ],
+        "bboxKind": "dark-glyph-and-outline",
+        "pngName": "portrait-probe.png",
+        "pngSha256": "82498c689543be4452facefc2c6740ea60738ec567c380e5faf944d3da4c4289",
+        "pngBytes": 3099
+      }
+    ],
+    "actualPicture": {
+      "pngName": "actual-picture-caption.png",
+      "pngSha256": "dc49730f0eaf8fad2e92a1f739fe9e6e60239e7580e680db55be821eb2d7b97a",
+      "pngBytes": 1151878,
+      "frame": 51
+    }
+  },
+  "sourceStateUnchanged": true,
+  "invocations": [
+    {
+      "schemaVersion": 1,
+      "invocation": "952c01cd-b2da-4ab3-bbd5-44a9a800dc63",
+      "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+      "argsSha256": "47045f0ea1077bd42e9bc667cea85fe5e0d63ba4a986f1602bca640521e069f2",
+      "state": "completed",
+      "output": "{\"cases\": [{\"name\": \"landscape-full\", \"width\": 1920, \"height\": 1080, \"filter\": \"subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'\", \"bbox\": [677, 952, 1214, 1001], \"bboxKind\": \"dark-glyph-and-outline\", \"pngName\": \"landscape-full.png\", \"pngSha256\": \"4ec619b085e803cb2eb284d665fea785294cf7a2841f12ee77bc0c5ed12cb3a8\", \"pngBytes\": 27610}, {\"name\": \"landscape-preview\", \"width\": 1280, \"height\": 720, \"filter\": \"subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'\", \"bbox\": [451, 634, 810, 668], \"bboxKind\": \"dark-glyph-and-outline\", \"pngName\": \"landscape-preview.png\", \"pngSha256\": \"7039d29b05e9eccab823fe73d48ea49ce54c26c4c5d630b9792bd68323734e2e\", \"pngBytes\": 17619}, {\"name\": \"landscape-probe\", \"width\": 320, \"height\": 180, \"filter\": \"subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1920,PlayResY=1080'\", \"bbox\": [113, 158, 203, 167], \"bboxKind\": \"dark-glyph-and-outline\", \"pngName\": \"landscape-probe.png\", \"pngSha256\": \"750665fffe8d538ae92c6fab32733549dd54600a042948bc66ac930aaaaf3d03\", \"pngBytes\": 2892}, {\"name\": \"portrait-full\", \"width\": 1080, \"height\": 1920, \"filter\": \"subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'\", \"bbox\": [257, 1792, 794, 1841], \"bboxKind\": \"dark-glyph-and-outline\", \"pngName\": \"portrait-full.png\", \"pngSha256\": \"86029398b6bee7588ac0f34d37c0e3353721ba2bf7f3508912024f975dfe47c8\", \"pngBytes\": 28909}, {\"name\": \"portrait-preview\", \"width\": 720, \"height\": 1280, \"filter\": \"subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'\", \"bbox\": [171, 1194, 530, 1228], \"bboxKind\": \"dark-glyph-and-outline\", \"pngName\": \"portrait-preview.png\", \"pngSha256\": \"00025b4be40a022747d21b6dff8deda933c25eb255bc4ca18ebd6ad9fc014178\", \"pngBytes\": 18568}, {\"name\": \"portrait-probe\", \"width\": 180, \"height\": 320, \"filter\": \"subtitles=filename=/input/subtitles.srt:force_style='FontName=Noto Sans CJK SC,FontSize=68,PrimaryColour=&H00FFFFFF&,OutlineColour=&H00000000&,Outline=3,Alignment=2,MarginV=72,PlayResX=1080,PlayResY=1920'\", \"bbox\": [43, 298, 133, 307], \"bboxKind\": \"dark-glyph-and-outline\", \"pngName\": \"portrait-probe.png\", \"pngSha256\": \"82498c689543be4452facefc2c6740ea60738ec567c380e5faf944d3da4c4289\", \"pngBytes\": 3099}], \"actualPicture\": {\"pngName\": \"actual-picture-caption.png\", \"pngSha256\": \"dc49730f0eaf8fad2e92a1f739fe9e6e60239e7580e680db55be821eb2d7b97a\", \"pngBytes\": 1151878, \"frame\": 51}}"
+    }
+  ]
+}

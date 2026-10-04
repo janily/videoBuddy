@@ -1,0 +1,19 @@
+{
+  "executedAt": "2026-10-04T11:46:50.360547+00:00",
+  "status": "original_unknown_preserved",
+  "originalProbeReportSha256": "d5c2a0cdcce3c71fcbafcc51de6310970eb57beef9ba561d8ee34d4e5c1e96f9",
+  "originalReportStatus": "started",
+  "recordPath": ".video-local/caption-coordinates/probe-Exwqbc/projects/28cb9ff0-0d6b-4a04-bcf7-d210c957043c/operations/923e4a86-0f05-4498-a6e5-b42baf7a0ffe/media-effects/4603913f0b4053a37893a5f402ca764a601dc1dec41957c115a24ead21a61b69.json",
+  "recordSha256": "1f00b23435b3520fd6ec22a65c112877c953ec03787c1a726548a1d7ec51f038",
+  "record": {
+    "schemaVersion": 1,
+    "invocation": "746a7535-51f3-4607-9721-ae1e4a3e344f",
+    "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+    "argsSha256": "4603913f0b4053a37893a5f402ca764a601dc1dec41957c115a24ead21a61b69",
+    "state": "unknown"
+  },
+  "observedHostProbeExitCode": 1,
+  "observedHostProbeError": "INVALID_KEY",
+  "finalReportMissing": true,
+  "limits": "Original stdout/underlying producer error not captured in the final report. Do not infer a terminal media result from the two existing PNGs. Preserve unknown; no replay/reset. Revised v2 uses a different producer and private journal; v2 completed receipt can be recovered without a producer. Diagnostic only, no production approval."
+}
