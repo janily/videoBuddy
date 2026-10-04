@@ -1,5 +1,6 @@
 import {readBookTimingFont,assertBookCaptionGlyphs} from '../audio/book-font';
-import {findConfirmedPostMixReview} from '@/services/video/audio/postmix-review';
+import {resolvePreviewPostMixReview} from './postmix-review';
+import type {PostMixReviewContext} from '@/services/video/audio/postmix-review';
 import type {FilmSpec} from '@/contracts/video/film';
 import {prepareFilmPackageStage} from './film-package-stage';
 import {createHash} from 'node:crypto';
@@ -96,7 +97,8 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const postMixOptions={assertActive:async()=>{
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
- },journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`},resolveReview:(context:Parameters<typeof findConfirmedPostMixReview>[2])=>findConfirmedPostMixReview(projects.store,projectId,context)};
+ },journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}};
+ const resolveReview=(mustExist:boolean)=>(context:PostMixReviewContext)=>resolvePreviewPostMixReview(projects,root,projectId,revisionId,context,{mustExist});
  const expected={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,audio:true,...(masterWav.channels===2?{audioChannels:2 as const}:{})};
  async function verify(record:CompositeStageRecord,checkPostMix=true){
   if(record.schemaVersion!==4||record.audioPlanSha256!==audioPlanSha256||record.audioExecutionSha256!==audioExecutionSha256||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.pictureSequenceHash!==canonicalHash(picture)||record.voiceVerifiedSha256!==voice.verifiedRef.sha256||record.narrationPackageSha256!==narrationPackage.packageRef.sha256||record.profile!==profile||record.stageKey!==stageKey||record.outputPath!==outputPath||canonicalHash(record.captionStyle)!==canonicalHash(captionStyle)||record.qualityStatus!=='semantic_not_checked'||record.postMix.filmSha256!==record.technicalQa.sha256||record.loudness.filmSha256!==record.technicalQa.sha256)throw Error('COMPOSITE_STAGE_CONFLICT');
@@ -105,7 +107,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   if(options.frozenFilm&&(options.frozenFilm.outputPath!==outputPath||options.frozenFilm.durationMs!==timing.durationMs||options.frozenFilm.sha256!==actual.sha256))throw Error('FROZEN_PREVIEW_CHANGED');
   if(checkPostMix){
    const film={outputPath,sha256:actual.sha256,durationMs:timing.durationMs,technicalQa:'pass' as const};
-   const recovered=executionRef&&verified.lines.length===0&&!masterWav.silence?await verifyPostMixNoNarration(projects.store,dataRoot,film,projectId,revisionId,executionRef,audio.planRef,timingRecord.draftRef):await (options.postMix||verifyPostMixNarration)(dataRoot,film,originalPlan,verified,env,undefined,{...postMixOptions,mustExist:true});
+   const recovered=executionRef&&verified.lines.length===0&&!masterWav.silence?await verifyPostMixNoNarration(projects.store,dataRoot,film,projectId,revisionId,executionRef,audio.planRef,timingRecord.draftRef):await (options.postMix||verifyPostMixNarration)(dataRoot,film,originalPlan,verified,env,undefined,{...postMixOptions,mustExist:true,resolveReview:resolveReview(true)});
    if(canonicalHash(recovered)!==canonicalHash(record.postMix))throw Error('COMPOSITE_POSTMIX_CHANGED');
   }
   await postMixOptions.assertActive();
@@ -123,7 +125,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const actual=await qa(stageDir,config.image,'output/final.mp4',expected);
  if(canonicalHash(actual)!==canonicalHash(composed.technicalQa))throw Error('COMPOSITE_OUTPUT_CHANGED');
  const film={outputPath,sha256:actual.sha256,durationMs:timing.durationMs,technicalQa:'pass' as const};
- const postMix=executionRef&&verified.lines.length===0&&!masterWav.silence?await verifyPostMixNoNarration(projects.store,root,film,projectId,revisionId,executionRef,audio.planRef,timingRecord.draftRef):await (options.postMix||verifyPostMixNarration)(root,film,originalPlan,verified,env,undefined,postMixOptions);
+ const postMix=executionRef&&verified.lines.length===0&&!masterWav.silence?await verifyPostMixNoNarration(projects.store,root,film,projectId,revisionId,executionRef,audio.planRef,timingRecord.draftRef):await (options.postMix||verifyPostMixNarration)(root,film,originalPlan,verified,env,undefined,{...postMixOptions,resolveReview:resolveReview(false)});
  if(postMix.filmSha256!==actual.sha256||postMix.status!==(verified.lines.length===0?'not_applicable':'pass')||postMix.lines.length!==verified.lines.length)throw Error('COMPOSITE_POSTMIX_FAILED');
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});

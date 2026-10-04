@@ -2,7 +2,7 @@ import type {Understanding,ObjectRef} from './domain';
 import type {AssetReservation} from '@/services/video/assets/reservations';
 import type {Receipt} from '@/services/video/commands/submit';
 import type {FeedbackTarget} from './commands';
-export interface ArchivedMessage{id:string;ordinal:number;role:'user'|'assistant';text:string;attachmentIds?:string[];target?:FeedbackTarget|null;status:'completed'|'stopped'|'interrupted';contentVersion:number;operationId?:string;clientMessageId?:string}
+export interface ArchivedMessage{speechReviewAction?:{scope:'single_postmix_wav';challengeSha256:string;decision:'pronunciation_correct'};id:string;ordinal:number;role:'user'|'assistant';text:string;attachmentIds?:string[];target?:FeedbackTarget|null;status:'completed'|'stopped'|'interrupted';contentVersion:number;operationId?:string;clientMessageId?:string}
 export interface ProjectControl{
  unresolvedMediaStops?:Record<string,'preview'|'render'>;
  pendingFeedbackIndexRef?:ObjectRef;

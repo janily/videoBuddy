@@ -7,6 +7,7 @@ import {verifyPostMixNarration} from '@/services/video/audio/postmix-asr';
 import type {ProjectControl} from '@/contracts/video/project';
 import {updateJson} from '@/services/video/storage/atomic-store';
 import {findConfirmedPostMixReview} from '@/services/video/audio/postmix-review';
+import {resolvePreviewPostMixReview} from '@/services/video/preview/postmix-review';
 import {FileStore} from '@/services/video/storage/file-store';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {canonicalHash} from '@/services/video/domain/hash';
@@ -14,7 +15,7 @@ import type {NarrationPlan} from '@/services/video/audio/narration';
 import type {AsrTranscript} from '@/services/video/audio/asr';
 import {verifySpokenText,type VerifiedNarrationManifest} from '@/services/video/audio/asr';
 import {inspectVoiceWav} from '@/services/video/audio/wav';
-import {createPostMixReviewChallenge,confirmPostMixReview,loadConfirmedPostMixReview,verifyReviewedPostMixText} from '@/services/video/audio/postmix-review';
+import {assertPostMixReviewChallenge,createPostMixReviewChallenge,confirmPostMixReview,loadConfirmedPostMixReview,verifyReviewedPostMixText} from '@/services/video/audio/postmix-review';
 
 async function fixture(root:string){
  const projects=new ProjectStore(new FileStore(root)),owner='mixed-review-owner';
@@ -88,5 +89,47 @@ it('uses the final-mix proof through the real cold verifier without changing raw
   await updateJson(f.projects.store,`projects/${f.projectId}/control`,(control:ProjectControl)=>({...control,consentEpoch:control.consentEpoch+1}));
   await expect(findConfirmedPostMixReview(store,f.projectId,f.context)).resolves.toBeUndefined();
   await expect(verifyPostMixNarration(root,f.context.film,f.context.plan,verified,env,undefined,{mustExist:true,resolveReview:context=>findConfirmedPostMixReview(store,f.projectId,context)})).rejects.toThrow('POSTMIX_ASR_MISMATCH');
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('persists a final-mix listening challenge on mismatch, with read-only recovery producing no new challenge',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-preview-mixed-challenge-'));
+ try{
+  const f=await fixture(root),otherRevision=randomUUID(),prefix=`projects/${f.projectId}/postmix-review-challenges`;
+  const before=await f.projects.store.listKeys!(prefix,1);
+  await expect(resolvePreviewPostMixReview(f.projects,root,f.projectId,otherRevision,f.context,{mustExist:true})).resolves.toBeUndefined();
+  expect(await f.projects.store.listKeys!(prefix,1)).toEqual(before);
+  await expect(resolvePreviewPostMixReview(f.projects,root,f.projectId,otherRevision,f.context)).resolves.toBeUndefined();
+  const after=await f.projects.store.listKeys!(prefix,1);expect(after).toHaveLength(before.length+1);
+  const stored=await Promise.all(after.map(async key=>(await f.projects.store.readFresh<{sourceRevisionId:string;filmSha256:string;recognizedText:string}>(key)).value));
+  expect(stored.find(c=>c.sourceRevisionId===otherRevision)).toMatchObject({filmSha256:f.context.film.sha256,recognizedText:f.context.transcript.recognizedText});
+  await confirmPostMixReview(f.projects,f.owner,f.projectId,f.challenge,f.messageId);
+  await expect(resolvePreviewPostMixReview(f.projects,root,f.projectId,otherRevision,f.context)).resolves.toMatchObject({challenge:{sourceRevisionId:f.revisionId}});
+  expect(await f.projects.store.listKeys!(prefix,1)).toEqual(after);
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('preserves an explicit owner action and its actual free-form message, bound to one exact challenge',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-postmix-owner-action-'));
+ try{
+  const f=await fixture(root),id=randomUUID(),text='读音正确，音频这快就全部通过，不需要每一个影片都来验证';
+  await f.projects.archiveMessage(f.projectId,{id,ordinal:2,role:'user',text,status:'completed',contentVersion:1,clientMessageId:id,speechReviewAction:{scope:'single_postmix_wav',challengeSha256:f.challenge.sha256,decision:'pronunciation_correct'}});
+  const ref=await confirmPostMixReview(f.projects,f.owner,f.projectId,f.challenge,id);
+  expect(verifyReviewedPostMixText(f.context,await loadConfirmedPostMixReview(new FileStore(root),f.projectId,ref)).status).toBe('trusted_review');
+  expect((await f.projects.messages(await f.projects.access(f.owner,f.projectId))).find(m=>m.id===id)?.text).toBe(text);
+  expect((await f.projects.view(f.owner,f.projectId)).messages.find(m=>m.id===id)).not.toHaveProperty('speechReviewAction');
+  const other=await createPostMixReviewChallenge(f.projects,root,f.projectId,randomUUID(),f.context);
+  await expect(confirmPostMixReview(f.projects,f.owner,f.projectId,other,id)).rejects.toThrow('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
+  const ordinary=randomUUID();await f.projects.archiveMessage(f.projectId,{id:ordinary,ordinal:3,role:'user',text,status:'completed',contentVersion:1,clientMessageId:ordinary});
+  await expect(confirmPostMixReview(f.projects,f.owner,f.projectId,f.challenge,ordinary)).rejects.toThrow('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('validates the exact mixed challenge context before an owner decision can be archived',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-mix-preconfirm-binding-'));
+ try{
+  const f=await fixture(root);await expect(assertPostMixReviewChallenge(f.projects.store,f.projectId,f.challenge,f.revisionId,f.context)).resolves.toBeUndefined();
+  await expect(assertPostMixReviewChallenge(f.projects.store,f.projectId,f.challenge,randomUUID(),f.context)).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
+  await expect(assertPostMixReviewChallenge(f.projects.store,f.projectId,f.challenge,f.revisionId,{...f.context,film:{...f.context.film,sha256:'e'.repeat(64)}})).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
  }finally{await rm(root,{recursive:true,force:true})}
 });

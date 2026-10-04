@@ -1,0 +1,38 @@
+{
+  "executedAt": "2026-10-04T13:35:02.353Z",
+  "status": "verified_film_frames_extracted",
+  "image": "sha256:46a3a937735e1f0472fecc8e32b78da99c7da187aa1faac7017c523b92911dfb",
+  "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+  "sourceReportSha256": "8d7fdb4af4853b0258bb67ffb3320a6b5de3b807a1a21505e3e2370ad112764c",
+  "newModelCalls": 0,
+  "deliveryEligible": false,
+  "formalProductionApproval": false,
+  "journalPrefix": "projects/a0b20af6-073d-4a6c-bfca-8155a6a8e226/operations/6c39e12f-fb42-47c4-8f38-029bb0f2eb7f/media-effects",
+  "result": {
+    "frames": [
+      {
+        "frame": 51,
+        "pngName": "frame-51.png",
+        "sha256": "7ea154502ea0068d5a2bbdfc6f2d135e3c21dfb1573288736cbb4c59b7efd071",
+        "bytes": 1117225
+      },
+      {
+        "frame": 405,
+        "pngName": "frame-405.png",
+        "sha256": "6837cfe8972312a172e50dba763f7413b1b5e153bf584cccb51e14f5d73eb656",
+        "bytes": 1016044
+      }
+    ]
+  },
+  "output": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/book-preview-review-frames",
+  "invocations": [
+    {
+      "schemaVersion": 1,
+      "invocation": "555c8d5b-d50c-41f5-a5ac-949cf71ba83c",
+      "image": "sha256:46a3a937735e1f0472fecc8e32b78da99c7da187aa1faac7017c523b92911dfb",
+      "argsSha256": "7b10869802a8f70f784676f02fc19c7bf030c4718de2e2ab2d4964986a2c3a7a",
+      "state": "completed",
+      "output": "{\"frames\": [{\"frame\": 51, \"pngName\": \"frame-51.png\", \"sha256\": \"7ea154502ea0068d5a2bbdfc6f2d135e3c21dfb1573288736cbb4c59b7efd071\", \"bytes\": 1117225}, {\"frame\": 405, \"pngName\": \"frame-405.png\", \"sha256\": \"6837cfe8972312a172e50dba763f7413b1b5e153bf584cccb51e14f5d73eb656\", \"bytes\": 1016044}]}"
+    }
+  ]
+}

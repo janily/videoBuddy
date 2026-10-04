@@ -1,0 +1,205 @@
+{
+  "executedAt": "2026-10-04T13:33:38.010Z",
+  "status": "exact_new_book_mix_mismatch_ready_for_listening",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "9dca5e9b-fee2-477c-816b-220d55cf597c",
+  "sourceRevisionId": "659f25cc-ba1a-41da-8391-88e0771aa906",
+  "newModelCalls": 0,
+  "deliveryEligible": false,
+  "formalProductionApproval": false,
+  "composed": {
+    "stageKey": "450e8af5d78807c26378345b2e93c2995ffadbc716dc105fc026b68d59d1e8e6",
+    "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/450e8af5d78807c26378345b2e93c2995ffadbc716dc105fc026b68d59d1e8e6/output/final.mp4",
+    "subtitlesPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/450e8af5d78807c26378345b2e93c2995ffadbc716dc105fc026b68d59d1e8e6/subtitles.srt",
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+      "bytes": 13047106,
+      "width": 1280,
+      "height": 720,
+      "durationSec": 20,
+      "fps": 24,
+      "frames": 480,
+      "audio": true,
+      "audioChannels": 2
+    },
+    "loudness": {
+      "status": "pass",
+      "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+      "runtimeDigest": "46a3a937735e1f0472fecc8e32b78da99c7da187aa1faac7017c523b92911dfb",
+      "integratedLufs": -13.86,
+      "truePeakDbtp": -1.65,
+      "targetLufs": -14,
+      "toleranceLu": 1,
+      "maxTruePeakDbtp": -1.2
+    },
+    "qaStatus": "semantic_not_checked"
+  },
+  "context": {
+    "film": {
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/450e8af5d78807c26378345b2e93c2995ffadbc716dc105fc026b68d59d1e8e6/output/final.mp4",
+      "sha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+      "durationMs": 20000,
+      "technicalQa": "pass"
+    },
+    "plan": {
+      "durationMs": 20000,
+      "lines": [
+        {
+          "lineId": "line_1",
+          "language": "zh-CN",
+          "spokenText": "把小种子轻轻放进泥土里。",
+          "displayText": "把小种子轻轻放进泥土里。",
+          "expectedAsrText": "把小种子轻轻放进泥土里。",
+          "startMs": 0,
+          "reservedMs": 5000
+        },
+        {
+          "lineId": "line_2",
+          "language": "zh-CN",
+          "spokenText": "洒下适量的水，润湿土壤。",
+          "displayText": "洒下适量的水，润湿土壤。",
+          "expectedAsrText": "洒下适量的水，润湿土壤。",
+          "startMs": 5000,
+          "reservedMs": 5000
+        },
+        {
+          "lineId": "line_3",
+          "language": "zh-CN",
+          "spokenText": "泥土里探出了嫩绿的小芽。",
+          "displayText": "泥土里探出了嫩绿的小芽。",
+          "expectedAsrText": "泥土里探出了嫩绿的小芽。",
+          "startMs": 10000,
+          "reservedMs": 5000
+        },
+        {
+          "lineId": "line_4",
+          "language": "zh-CN",
+          "spokenText": "观察成长，耐心照料。",
+          "displayText": "观察成长，耐心照料。",
+          "expectedAsrText": "观察成长，耐心照料。",
+          "startMs": 15000,
+          "reservedMs": 5000
+        }
+      ]
+    },
+    "lineId": "line_2",
+    "window": {
+      "startMs": 5000,
+      "lengthMs": 3675,
+      "mediaRuntimeDigest": "46a3a937735e1f0472fecc8e32b78da99c7da187aa1faac7017c523b92911dfb"
+    },
+    "transcript": {
+      "language": "zh-CN",
+      "model": "Systran/faster-whisper-medium",
+      "segments": [
+        {
+          "text": "撒下适量的水 润湿土壤",
+          "startMs": 0,
+          "endMs": 2840,
+          "words": [
+            {
+              "text": "撒",
+              "startMs": 0,
+              "endMs": 600,
+              "probability": 0.9156143963336945
+            },
+            {
+              "text": "下",
+              "startMs": 600,
+              "endMs": 840,
+              "probability": 0.9899817109107971
+            },
+            {
+              "text": "适",
+              "startMs": 840,
+              "endMs": 1000,
+              "probability": 0.7705732583999634
+            },
+            {
+              "text": "量",
+              "startMs": 1000,
+              "endMs": 1180,
+              "probability": 0.9996435642242432
+            },
+            {
+              "text": "的",
+              "startMs": 1180,
+              "endMs": 1360,
+              "probability": 0.9924792051315308
+            },
+            {
+              "text": "水",
+              "startMs": 1360,
+              "endMs": 1640,
+              "probability": 0.9993627667427063
+            },
+            {
+              "text": " 润",
+              "startMs": 1780,
+              "endMs": 1960,
+              "probability": 0.9954282939434052
+            },
+            {
+              "text": "湿",
+              "startMs": 1960,
+              "endMs": 2160,
+              "probability": 0.8607006072998047
+            },
+            {
+              "text": "土",
+              "startMs": 2160,
+              "endMs": 2460,
+              "probability": 0.9685400724411011
+            },
+            {
+              "text": "壤",
+              "startMs": 2460,
+              "endMs": 2840,
+              "probability": 0.9970053434371948
+            }
+          ]
+        }
+      ],
+      "voiceSha256": "628619a30ab755b7d308d95f4abf5e616c1a30ef50a160d721693a07f6207253",
+      "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "recognizedText": "撒下适量的水 润湿土壤"
+    }
+  },
+  "challengeRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-review-challenges/23992e3b6e790ef6e68179a0b4beab777e44a249f5ecf3e43f64c18123172ef4",
+    "sha256": "23992e3b6e790ef6e68179a0b4beab777e44a249f5ecf3e43f64c18123172ef4",
+    "bytes": 1129,
+    "mime": "application/json"
+  },
+  "filmSpecRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/659f25cc-ba1a-41da-8391-88e0771aa906/film/bab1a0327241438692b613a6d6412881022ebb2993f0d257824c513f487af0a0",
+    "sha256": "bab1a0327241438692b613a6d6412881022ebb2993f0d257824c513f487af0a0",
+    "bytes": 2626,
+    "mime": "application/json"
+  },
+  "audioFile": "docs/engineering/evidence/new-theme-book-postmix-spoken-review.wav",
+  "audioBytes": 352914,
+  "planRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/659f25cc-ba1a-41da-8391-88e0771aa906/voice-plan/24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+    "sha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+    "bytes": 947,
+    "mime": "application/json"
+  },
+  "verifiedRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/659f25cc-ba1a-41da-8391-88e0771aa906/voice-verified/c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+    "sha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+    "bytes": 9709,
+    "mime": "application/json"
+  },
+  "treatmentRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/659f25cc-ba1a-41da-8391-88e0771aa906/treatment-plan/baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+    "sha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+    "bytes": 4115,
+    "mime": "application/json"
+  },
+  "nativeInvocationCountBefore": 10,
+  "nativeInvocationCountAfter": 10,
+  "sourceStateUnchanged": true
+}

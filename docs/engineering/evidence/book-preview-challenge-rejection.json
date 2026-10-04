@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "executedAt": "2026-10-04T14:02:58.693793+00:00",
+  "caseRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/book-ref-rejection/challenge-xkroighs",
+  "mutation": "Replace challengeRef in private copied input with another real same-project challenge for a different film; actual answer and current context unchanged",
+  "exitCode": 1,
+  "errorCode": "POSTMIX_REVIEW_CHANGED",
+  "sourceStateUnchanged": true,
+  "nativeJournalUnchanged": true,
+  "confirmationProofsUnchanged": true,
+  "reviewWritten": false,
+  "newModelCalls": 0
+}

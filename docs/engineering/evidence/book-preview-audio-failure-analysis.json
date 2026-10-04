@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "executedAt": "2026-10-04T13:25:48.836916+00:00",
+  "sourceReport": "docs/engineering/evidence/new-theme-book-caption-preview-probe.json",
+  "operationId": "41b15ddd-81b3-42c0-bd74-424552f2a8b8",
+  "revisionId": "6a71bc40-f99a-4d54-9693-73d2c4668396",
+  "rawResponseSha256": "d5f0d85573bc1dff907f8051474f6ff2c6ab40f678651307deff999926c956d5",
+  "httpStatus": 200,
+  "usage": {
+    "prompt_tokens": 9758,
+    "completion_tokens": 8576,
+    "total_tokens": 18334,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "completion_tokens_details": null
+  },
+  "schemaResult": "pass",
+  "domainResult": "AUDIO_EVENT_INVALID",
+  "missingSources": [
+    {
+      "eventId": "fol-04-paper-turn",
+      "source": "src-foley-paper-turn"
+    }
+  ],
+  "unusedSources": [
+    "src-foley-page"
+  ],
+  "originalFailureCode": "PROVIDER_UNAVAILABLE",
+  "originalOperationChanged": false,
+  "originalEffectChanged": false,
+  "additionalModelCalls": 0,
+  "limits": "Offline replay of exact saved response. No field correction, dropping events, relabeling sources, or promoting historical started effect. Original failed operation remains failed."
+}

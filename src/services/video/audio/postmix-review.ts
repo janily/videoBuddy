@@ -17,6 +17,14 @@ import {verifiedFilmHash,type PostMixFilm} from './postmix-asr';
 const digest=z.string().regex(/^[a-f0-9]{64}$/);
 const ChallengeSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('postmix_review_challenge'),projectId:z.uuid(),sourceRevisionId:z.uuid(),planSha256:digest,lineId:z.string().regex(/^[-a-zA-Z0-9_]{1,80}$/),language:z.enum(['zh-CN','en']),spokenText:z.string().min(1).max(250),displayText:z.string().min(1).max(500),expectedAsrText:z.string().min(1).max(500),filmSha256:digest,filmDurationMs:z.number().int().min(20000).max(120000),startMs:z.number().nonnegative(),lengthMs:z.number().min(200).max(30000),mediaRuntimeDigest:digest,mixedWavSha256:digest,transcriptSha256:digest,wordTimingsSha256:digest,recognizedText:z.string().min(1).max(2000),asrModel:z.string().regex(/^Systran\/faster-whisper-(?:small|medium)$/),asrRuntimeDigest:digest,scope:z.literal('single_postmix_wav')});
 const ConfirmationSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('confirmed_postmix_review'),projectId:z.uuid(),challengeRef:ObjectRefSchema,sourceMessageRef:ObjectRefSchema,ownerKeyHash:z.string().min(1),consentEpoch:z.number().int().nonnegative(),decision:z.literal('pronunciation_correct'),confirmedAt:z.iso.datetime()});
+const ownerActionSchema=z.strictObject({scope:z.literal('single_postmix_wav'),challengeSha256:digest,decision:z.literal('pronunciation_correct')});
+function explicitMessage(message:ArchivedMessage,challengeRef:ObjectRef){
+ if(message.role!=='user'||message.status!=='completed')return false;
+ const action=ownerActionSchema.safeParse(message.speechReviewAction);
+ // Only owner command handlers may attach this action; ordinary chat and Agent
+ // output cannot supply it. Keep the actual wording of a human reply intact.
+ return message.speechReviewAction===undefined?message.text==='读音正确，确认这句最终混音试听复核':action.success&&action.data.challengeSha256===challengeRef.sha256;
+}
 const authority=Symbol('loaded-owned-postmix-confirmation');
 export type ConfirmedPostMixReview={readonly ref:ObjectRef;readonly challenge:z.infer<typeof ChallengeSchema>;readonly [authority]:true};
 export interface PostMixReviewContext{film:PostMixFilm;plan:NarrationPlan;lineId:string;window:{startMs:number;lengthMs:number;mediaRuntimeDigest:string};transcript:AsrTranscript}
@@ -50,6 +58,14 @@ export async function createPostMixReviewChallenge(projects:ProjectStore,root:st
  const challenge=ChallengeSchema.parse({schemaVersion:1,kind:'postmix_review_challenge',projectId,sourceRevisionId,...binding,scope:'single_postmix_wav'});
  return projects.index.immutable(`projects/${projectId}/postmix-review-challenges`,challenge);
 }
+/** Check the exact requested audio context before archiving an owner decision. */
+export async function assertPostMixReviewChallenge(store:AtomicStore,projectId:string,challengeRef:ObjectRef,sourceRevisionId:string,context:PostMixReviewContext){
+ const challenge=ChallengeSchema.parse(await readRef(store,challengeRef,`projects/${projectId}/postmix-review-challenges/`));
+ const {schemaVersion,kind,projectId:storedProject,sourceRevisionId:storedRevision,scope,...binding}=challenge;
+ void schemaVersion;void kind;void scope;
+ if(storedProject!==projectId||storedRevision!==sourceRevisionId||canonicalHash(binding)!==canonicalHash(contextBinding(context)))throw Error('POSTMIX_REVIEW_CHANGED');
+ checkedWords(context);
+}
 export async function confirmPostMixReview(projects:ProjectStore,owner:string,projectId:string,challengeRef:ObjectRef,sourceMessageId:string){
  const control=await projects.access(owner,projectId),prefix=`projects/${projectId}/`;
  const challenge=ChallengeSchema.parse(await readRef(projects.store,challengeRef,prefix+'postmix-review-challenges/'));
@@ -57,7 +73,7 @@ export async function confirmPostMixReview(projects:ProjectStore,owner:string,pr
  const entry=(await projects.index.all(control.messagesIndexRef)).find(item=>item.id===sourceMessageId);
  if(!entry)throw Error('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
  const message=await readRef(projects.store,entry.ref,prefix+'messages/') as ArchivedMessage;
- if(message.id!==sourceMessageId||message.role!=='user'||message.status!=='completed'||message.text!=='读音正确，确认这句最终混音试听复核')throw Error('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
+ if(message.id!==sourceMessageId||!explicitMessage(message,challengeRef))throw Error('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
  const input={schemaVersion:1 as const,kind:'confirmed_postmix_review' as const,projectId,challengeRef,sourceMessageRef:entry.ref,ownerKeyHash:owner,consentEpoch:control.consentEpoch,decision:'pronunciation_correct' as const};
  // An explicit confirmation message can bind only one challenge. This is an
  // owned user action, never an Agent tool or an inference from ordinary chat.
@@ -76,7 +92,7 @@ export async function loadConfirmedPostMixReview(store:AtomicStore,projectId:str
  if(record.projectId!==projectId||record.ownerKeyHash!==control.ownerKeyHash||record.consentEpoch>control.consentEpoch)throw Error('POSTMIX_REVIEW_CHANGED');
  const challenge=ChallengeSchema.parse(await readRef(store,record.challengeRef,prefix+'postmix-review-challenges/'));
  const message=await readRef(store,record.sourceMessageRef,prefix+'messages/') as ArchivedMessage;
- if(challenge.projectId!==projectId||!z.uuid().safeParse(message.id).success||message.role!=='user'||message.status!=='completed'||message.text!=='读音正确，确认这句最终混音试听复核')throw Error('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
+ if(challenge.projectId!==projectId||!z.uuid().safeParse(message.id).success||!explicitMessage(message,record.challengeRef))throw Error('POSTMIX_REVIEW_CONFIRMATION_REQUIRED');
  let slot:unknown;try{slot=(await store.readFresh(`${prefix}postmix-review-confirmations/${message.id}`)).value}catch(error){if(error instanceof StoreMissing)throw Error('POSTMIX_REVIEW_CHANGED');throw error}
  if(canonicalHash(ConfirmationSchema.parse(slot))!==canonicalHash(record))throw Error('POSTMIX_REVIEW_CHANGED');
  const entry=(await new IndexStore(store).all(control.messagesIndexRef)).find(item=>item.id===message.id);

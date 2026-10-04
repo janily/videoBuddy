@@ -169,6 +169,9 @@ it.each([
  ['PICTURE_RENDER_FAILED','画面渲染未通过，资料和已有内容已保留。'],
  ['ASR_TIMINGS_UNAVAILABLE','声音时序核验未通过，资料和已有片段已保留。'],
  ['MODEL_OUTPUT_INVALID','创作结果格式未通过核验，资料和已有内容已保留。'],
+ ['AUDIO_EVENT_INVALID','音乐或音效的编排未通过核验，资料和已有声音已保留。'],
+ ['AUDIO_PLAN_INVALID','音乐或音效的编排未通过核验，资料和已有声音已保留。'],
+ ['AUDIO_TIMELINE_INVALID','音乐或音效的编排未通过核验，资料和已有声音已保留。'],
  ['POSTMIX_ASR_MISMATCH','声音核验未通过，资料和已有片段已保留。'],
 ])('persists %s as the real failure category without leaking native diagnostic details',async(code,message)=>{
  const f=await setup();try{

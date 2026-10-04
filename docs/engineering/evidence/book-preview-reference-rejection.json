@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "executedAt": "2026-10-04T13:53:41.338466+00:00",
+  "caseRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/book-ref-rejection/case-912p9iyr",
+  "mutation": "same verifiedRef.key, SHA replaced and bytes incremented in private copied input only",
+  "exitCode": 1,
+  "errorCode": "NARRATION_REF_CHANGED",
+  "reviewWritten": false,
+  "sourceStateUnchanged": true,
+  "nativeJournalUnchanged": true,
+  "newModelCalls": 0
+}

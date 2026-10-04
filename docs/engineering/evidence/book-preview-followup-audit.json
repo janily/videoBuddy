@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "executedAt": "2026-10-04T13:50:03.784118+00:00",
+  "sourceOperationId": "9dca5e9b-fee2-477c-816b-220d55cf597c",
+  "sourceOperationUnchanged": true,
+  "budgetUnchanged": true,
+  "allModelCallsSettled": true,
+  "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+    "bytes": 13047106,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2
+  },
+  "loudness": {
+    "status": "pass",
+    "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+    "runtimeDigest": "46a3a937735e1f0472fecc8e32b78da99c7da187aa1faac7017c523b92911dfb",
+    "integratedLufs": -13.86,
+    "truePeakDbtp": -1.65,
+    "targetLufs": -14,
+    "toleranceLu": 1,
+    "maxTruePeakDbtp": -1.2
+  },
+  "nativeInvocations": 14,
+  "nativeAllCompleted": true,
+  "asrOutputs": [
+    {
+      "argsSha256": "2a0883661031eb5f422d89474be1372740c74702d6839a829833ce80882ecaa6",
+      "state": "completed",
+      "model": "Systran/faster-whisper-medium",
+      "recognizedText": "撒下适量的水 润湿土壤",
+      "wordCount": 10
+    },
+    {
+      "argsSha256": "08bbf551076358a3d9dc29180efdb63d40808234a580764be8ade0422fd4f74c",
+      "state": "completed",
+      "model": "Systran/faster-whisper-medium",
+      "recognizedText": "泥土里探出了嫩绿的小芽",
+      "wordCount": 11
+    },
+    {
+      "argsSha256": "835338b266db9b6aa066c8e0e592413e2162ede434ae82b38971384c75353252",
+      "state": "completed",
+      "model": "Systran/faster-whisper-medium",
+      "recognizedText": "把小种子轻轻放进泥土里",
+      "wordCount": 11
+    },
+    {
+      "argsSha256": "e4e581d564a1ce0061186cdab2b14a7b30494bd645ce674251198700472c8113",
+      "state": "completed",
+      "model": "Systran/faster-whisper-medium",
+      "recognizedText": "观察成长 内心照料",
+      "wordCount": 8
+    }
+  ],
+  "ownedLine2ReviewRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-reviews/dd4c2b94ddcee93d4d6556b5d0ba7deb8377a23928394a2a33952f6fdab8c473",
+    "sha256": "dd4c2b94ddcee93d4d6556b5d0ba7deb8377a23928394a2a33952f6fdab8c473",
+    "bytes": 814,
+    "mime": "application/json"
+  },
+  "fullPostmixStatus": "failed",
+  "fullPostmixError": "POSTMIX_ASR_MISMATCH: line_4",
+  "standingPreferenceRecorded": true,
+  "standingRuntimePolicyImplemented": false,
+  "additionalListeningQuestionsSent": 0,
+  "previewPublished": false,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "limits": "Independent read-only follow-up audit; original failed operation and budget unchanged. Line2 actual user confirmation is owned and precise; line4 remains the recognizer mismatch 耐心→内心. User requests no per-film repeat questions; automate same-source pronunciation policy next, preserve raw ASR and technical checks."
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-04T13:42:45.502260+00:00",
+  "authority": "actual_workspace_user_reply",
+  "questionItemId": "[\"request_user_input_async\",\"call_eBDDyhrtoiQTmR63WXgtR6XE\",0]",
+  "answer": "读音正确，音频这快就全部通过，不需要每一个影片都来验证",
+  "decision": "pronunciation_correct",
+  "scope": "single_postmix_wav",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "9dca5e9b-fee2-477c-816b-220d55cf597c",
+  "sourceRevisionId": "659f25cc-ba1a-41da-8391-88e0771aa906",
+  "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "lineId": "line_2",
+  "spokenText": "洒下适量的水，润湿土壤。",
+  "mixedWavSha256": "628619a30ab755b7d308d95f4abf5e616c1a30ef50a160d721693a07f6207253",
+  "transcriptSha256": "97a54cafc64cfabd224067976e56c1e30941744d2508166ef6d75760f6c7e561",
+  "audioFile": "docs/engineering/evidence/new-theme-book-postmix-spoken-review.wav",
+  "preference": {
+    "repeatListeningRequestForEveryFilm": false,
+    "reuseTrustedPronunciationForSameSource": true,
+    "automaticTechnicalChecks": true
+  },
+  "formalProductionApproval": false,
+  "limits": "Actual user confirms this new mixed sentence and requests no repetitive per-film listening questions. Future same-source pronunciation reuse is authorized; automatic ASR, word timing, decode, truncation and loudness checks remain. Preference is recorded, standing runtime policy still to be implemented."
+}

@@ -1,0 +1,25 @@
+{
+  "executedAt": "2026-10-04T13:42:45.793Z",
+  "status": "failed",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "9dca5e9b-fee2-477c-816b-220d55cf597c",
+  "sourceRevisionId": "659f25cc-ba1a-41da-8391-88e0771aa906",
+  "film": {
+    "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/450e8af5d78807c26378345b2e93c2995ffadbc716dc105fc026b68d59d1e8e6/output/final.mp4",
+    "sha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+    "durationMs": 20000,
+    "technicalQa": "pass"
+  },
+  "newModelCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "reviewRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-reviews/dd4c2b94ddcee93d4d6556b5d0ba7deb8377a23928394a2a33952f6fdab8c473",
+    "sha256": "dd4c2b94ddcee93d4d6556b5d0ba7deb8377a23928394a2a33952f6fdab8c473",
+    "bytes": 814,
+    "mime": "application/json"
+  },
+  "confirmationMessageId": "6308a760-5027-44d4-b27e-5f88b9f7a40a",
+  "errorCode": "POSTMIX_ASR_MISMATCH: line_4"
+}
