@@ -50,6 +50,7 @@ async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Pro
 export async function prepareCompositeStage(projects:ProjectStore,projectId:string,revisionId:string,operationId:string,expectedConsentEpoch:number,treatmentRef:ObjectRef,options:Options={}):Promise<CompositeStageRecord>{
  const env=options.env||process.env,root=options.root||env.VIDEO_DATA_DIR,profile=options.profile||'full';
  if(!root||!isAbsolute(root)||!['full','preview','probe'].includes(profile))throw Error('CONFIGURATION_REQUIRED: VIDEO_DATA_DIR');
+ const dataRoot=root;
  const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(control,projectId,operationId,expectedConsentEpoch);
@@ -94,7 +95,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   const actual=await qa(stageDir,config.image,'output/final.mp4',expected);
   if(canonicalHash(actual)!==canonicalHash(record.technicalQa))throw Error('COMPOSITE_OUTPUT_CHANGED');
   if(record.postMix.lines.some(line=>line.status==='trusted_review')){
-   const recovered=await (options.postMix||verifyPostMixNarration)(root,{outputPath,sha256:actual.sha256,durationMs:timing.durationMs,technicalQa:'pass'},originalPlan,verified,env,undefined,{...postMixOptions,mustExist:true});
+   const recovered=await (options.postMix||verifyPostMixNarration)(dataRoot,{outputPath,sha256:actual.sha256,durationMs:timing.durationMs,technicalQa:'pass'},originalPlan,verified,env,undefined,{...postMixOptions,mustExist:true});
    if(canonicalHash(recovered)!==canonicalHash(record.postMix))throw Error('COMPOSITE_POSTMIX_CHANGED');
   }
   await postMixOptions.assertActive();
