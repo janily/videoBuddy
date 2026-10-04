@@ -1,0 +1,74 @@
+{
+  "executedAt": "2026-10-04T14:26:00.166Z",
+  "status": "same_source_audio_verified_without_repeated_listening",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "9dca5e9b-fee2-477c-816b-220d55cf597c",
+  "sourceRevisionId": "659f25cc-ba1a-41da-8391-88e0771aa906",
+  "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+  "sourceReplyQuestionItemId": "[\"request_user_input_async\",\"call_eBDDyhrtoiQTmR63WXgtR6XE\",0]",
+  "newModelCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "policyRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/narration-policies/398b55a00d7323cbf13c33ebffb7164edd39a01459d4764d89aeb7c49b1ad5b8",
+    "sha256": "398b55a00d7323cbf13c33ebffb7164edd39a01459d4764d89aeb7c49b1ad5b8",
+    "bytes": 1179,
+    "mime": "application/json"
+  },
+  "sourceMessageId": "af1e93af-0a3a-4f02-a58a-63fb2571e040",
+  "result": {
+    "status": "pass",
+    "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+    "lines": [
+      {
+        "lineId": "line_1",
+        "recognizedText": "把小种子轻轻放进泥土里",
+        "sourceSha256": "45a957cbb3bbe9aad2ff3da85449d374f141d50187bd08ff5846d9499a05fa7e",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_2",
+        "recognizedText": "撒下适量的水 润湿土壤",
+        "sourceSha256": "628619a30ab755b7d308d95f4abf5e616c1a30ef50a160d721693a07f6207253",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 10,
+        "status": "trusted_review",
+        "speechReviewRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-reviews/dd4c2b94ddcee93d4d6556b5d0ba7deb8377a23928394a2a33952f6fdab8c473",
+          "sha256": "dd4c2b94ddcee93d4d6556b5d0ba7deb8377a23928394a2a33952f6fdab8c473",
+          "bytes": 814,
+          "mime": "application/json"
+        }
+      },
+      {
+        "lineId": "line_3",
+        "recognizedText": "泥土里探出了嫩绿的小芽",
+        "sourceSha256": "7c8d50ee826c45a293c1d0b4d90db800377d767bf9356afc18ae1ec1ea7f2aab",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_4",
+        "recognizedText": "观察成长 内心照料",
+        "sourceSha256": "b822130b37ccd613bfc2cc75143d5e131365ad5e7693093338209713f78c5020",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 8,
+        "status": "trusted_policy",
+        "narrationPolicyRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/narration-policies/398b55a00d7323cbf13c33ebffb7164edd39a01459d4764d89aeb7c49b1ad5b8",
+          "sha256": "398b55a00d7323cbf13c33ebffb7164edd39a01459d4764d89aeb7c49b1ad5b8",
+          "bytes": 1179,
+          "mime": "application/json"
+        }
+      }
+    ]
+  },
+  "coldMatches": true,
+  "newNativeCalls": 0,
+  "originalOperationAndBudgetUnchanged": true,
+  "standingRuntimePolicyImplemented": true
+}

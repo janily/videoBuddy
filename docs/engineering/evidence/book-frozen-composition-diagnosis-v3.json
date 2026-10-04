@@ -1,0 +1,10 @@
+{
+  "executedAt": "2026-10-04T14:33:18.193Z",
+  "mode": "readonly_control_overlay_all_writes_forbidden",
+  "newModelCalls": 0,
+  "status": "exact_failure_reproduced",
+  "errorCode": "BOOK_CAPTION_PRODUCER_UNKNOWN",
+  "stack": "Error: BOOK_CAPTION_PRODUCER_UNKNOWN\n    at prepareBookCaptionLayer (/Users/janily/Desktop/dev/videoBuddy/src/services/video/media/book-caption-layer.ts:57:110)\n    at async composeVideo (/Users/janily/Desktop/dev/videoBuddy/src/services/video/media/compose.ts:67:33)\n    at async prepareCompositeStage (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-stage.ts:122:17)\n    at async main (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-book-frozen-composition.ts:16:6)",
+  "originalControlUnchanged": true,
+  "originalNativeJournalUnchanged": true
+}

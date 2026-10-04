@@ -1,3 +1,4 @@
+import {compositionMediaJournal} from './composite-journal';
 import {readBookTimingFont,assertBookCaptionGlyphs} from '../audio/book-font';
 import {resolvePreviewPostMixReview} from './postmix-review';
 import type {PostMixReviewContext} from '@/services/video/audio/postmix-review';
@@ -58,6 +59,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`;
  const control=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(control,projectId,operationId,expectedConsentEpoch);
+ const mediaJournal=await compositionMediaJournal(projects,root,projectId,revisionId,operationId,expectedConsentEpoch,options.frozenFilm);
  const understanding=await readRef<Understanding>(projects,control.understandingRef,`${prefix}/understanding/`);
  const voice=await prepareVoiceStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const [originalPlan,verified]=await Promise.all([readRef<NarrationPlan>(projects,voice.planRef,revisionPrefix),readRef<VerifiedNarrationManifest>(projects,voice.verifiedRef,revisionPrefix)]);
@@ -80,7 +82,7 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const cues:SubtitleCue[]=timing.captions.map(cue=>({...cue,startMs:Math.round(cue.startFrame*1000/timing.fps),endMs:Math.round(cue.endFrame*1000/timing.fps)}));
  if(Boolean(cues.length)!==Boolean(timing.font)||cues.length&&understanding.preferences.captions!=='auto'||!cues.length&&understanding.preferences.captions==='auto'&&verified.lines.length>0)throw Error('COMPOSITE_CAPTION_CHANGED');
  if(timing.font?.family==='Crayon Book Handwriting'){
-  const actual=await readBookTimingFont(env,{assertActive:async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef}),journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}});
+  const actual=await readBookTimingFont(env,{assertActive:async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef}),journal:mediaJournal});
   if(canonicalHash(actual.font)!==canonicalHash(timing.font))throw Error('COMPOSITE_FONT_CHANGED');assertBookCaptionGlyphs(cues.map(c=>c.text),actual.glyphsById);
  }else if(timing.font){
   const font=await (options.readFont||readPinnedSubtitleFont)(env);
@@ -97,8 +99,8 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const postMixOptions={assertActive:async()=>{
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
- },journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}};
- const resolveReview=(mustExist:boolean)=>(context:PostMixReviewContext)=>resolvePreviewPostMixReview(projects,root,projectId,revisionId,context,{mustExist});
+ },journal:mediaJournal};
+ const resolveReview=(mustExist:boolean)=>(context:PostMixReviewContext)=>resolvePreviewPostMixReview(projects,root,projectId,revisionId,context,{mustExist,verified});
  const expected={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,audio:true,...(masterWav.channels===2?{audioChannels:2 as const}:{})};
  async function verify(record:CompositeStageRecord,checkPostMix=true){
   if(record.schemaVersion!==4||record.audioPlanSha256!==audioPlanSha256||record.audioExecutionSha256!==audioExecutionSha256||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.pictureSequenceHash!==canonicalHash(picture)||record.voiceVerifiedSha256!==voice.verifiedRef.sha256||record.narrationPackageSha256!==narrationPackage.packageRef.sha256||record.profile!==profile||record.stageKey!==stageKey||record.outputPath!==outputPath||canonicalHash(record.captionStyle)!==canonicalHash(captionStyle)||record.qualityStatus!=='semantic_not_checked'||record.postMix.filmSha256!==record.technicalQa.sha256||record.loudness.filmSha256!==record.technicalQa.sha256)throw Error('COMPOSITE_STAGE_CONFLICT');

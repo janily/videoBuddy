@@ -1,0 +1,14 @@
+{
+  "executedAt": "2026-10-04T14:32:30.942Z",
+  "mode": "readonly_control_overlay_all_writes_forbidden",
+  "newModelCalls": 0,
+  "status": "exact_failure_reproduced",
+  "errorCode": "MEDIA_STOP_UNKNOWN",
+  "stack": "Error: MEDIA_STOP_UNKNOWN\n    at reserveDockerInvocation (/Users/janily/Desktop/dev/videoBuddy/src/services/video/media/docker-journal.ts:31:135)\n    at async runOwnedDocker (/Users/janily/Desktop/dev/videoBuddy/src/services/video/media/owned-docker.ts:7:23)\n    at async readPinnedStyleFont (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/style-font.ts:26:12)\n    at async readBookTimingFont (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/book-font.ts:22:76)\n    at async prepareCompositeStage (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-stage.ts:83:16)\n    at async main (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-book-frozen-composition.ts:16:6)",
+  "cause": {
+    "message": "DIAGNOSTIC_WRITE_FORBIDDEN",
+    "stack": "Error: DIAGNOSTIC_WRITE_FORBIDDEN\n    at Object.create (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-book-frozen-composition.ts:12:244)\n    at reserveDockerInvocation (/Users/janily/Desktop/dev/videoBuddy/src/services/video/media/docker-journal.ts:31:26)\n    at runOwnedDocker (/Users/janily/Desktop/dev/videoBuddy/src/services/video/media/owned-docker.ts:7:29)\n    at async readPinnedStyleFont (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/style-font.ts:26:12)\n    at async readBookTimingFont (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/book-font.ts:22:76)\n    at async prepareCompositeStage (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-stage.ts:83:16)\n    at async main (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-book-frozen-composition.ts:16:6)"
+  },
+  "originalControlUnchanged": true,
+  "originalNativeJournalUnchanged": true
+}

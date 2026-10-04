@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "status": "actual_critic_blocks_ambiguous_caption_glyph",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceRevisionId": "659f25cc-ba1a-41da-8391-88e0771aa906",
+  "continuationOperationId": "031ef5cd-e44f-4dc6-8845-ddd4cb3f80dc",
+  "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+  "model": "gemini-3.8-flash",
+  "httpStatus": 200,
+  "responseSha256": "4996d43f9140c07f4ff6b932b7e0aa97d358c6024179e7268249b92096432296",
+  "actualInputTokens": 9411,
+  "actualOutputTokens": 4223,
+  "accountingState": "settled",
+  "review": {
+    "schemaVersion": 1,
+    "filmSha256": "c84f066a5a875650c2fa0a2e75215688de512779c88d3f49abb8988563dc0cf7",
+    "filmSpecSha256": "bab1a0327241438692b613a6d6412881022ebb2993f0d257824c513f487af0a0",
+    "frameSetSha256": "e830f030122f0fac6cf2b1a2632e210cc185f04515e55d254487206b504a0c96",
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "round": 1,
+    "scope": "sampled_frames",
+    "observations": [
+      {
+        "frameId": "frame-55",
+        "visibleText": [
+          "把小种子轻轻放进泥土里。"
+        ],
+        "issues": []
+      },
+      {
+        "frameId": "frame-235",
+        "visibleText": [],
+        "issues": []
+      },
+      {
+        "frameId": "frame-355",
+        "visibleText": [],
+        "issues": []
+      },
+      {
+        "frameId": "frame-409",
+        "visibleText": [
+          "观察成长，耐心照科。"
+        ],
+        "issues": [
+          {
+            "kind": "fact_conflict",
+            "severity": "blocking",
+            "description": "底部文字出现错别字，实际显示字形为“观察成长，耐心照科。”（“料”被误写为“科”），与事实要求的“观察成长，耐心照料”不符。"
+          }
+        ]
+      }
+    ],
+    "facts": [
+      {
+        "result": "fail",
+        "frameIds": [
+          "frame-55",
+          "frame-235",
+          "frame-355",
+          "frame-409"
+        ],
+        "reason": "画面虽然完整展现了放种播种、浇水滋润、破土发芽至长出新叶的过程，且无虚构天数或活动信息，但在结尾帧 frame-409 中，底部文字实际字形为“观察成长，耐心照科。”，末字“料”字形被误写为“科”，未能完整正确显示事实原文“观察成长，耐心照料”。",
+        "factId": "fact-seed-sprout-flow"
+      }
+    ],
+    "style": {
+      "result": "pass",
+      "frameIds": [
+        "frame-55",
+        "frame-235",
+        "frame-355",
+        "frame-409"
+      ],
+      "reason": "画面严格遵循蜡笔绘本风格规范：暖米白纸张底纹清晰，深褐色蜡笔勾线而非死黑，泥土与植物采用蜡笔交叉排线与边缘轻微溢色，浇水时带有水彩湿润晕染质感，地下根系展现白蜡笔排线抗水效果，字幕以撕纸衬底手写体呈现，视觉统一无风格漂移。"
+    },
+    "readability": {
+      "result": "pass",
+      "frameIds": [
+        "frame-55",
+        "frame-409"
+      ],
+      "reason": "文字均置于底部米色浅色衬底之上，深色手写字迹边缘清晰锐利，对比度充足，无遮挡、裁切或模糊难读问题。"
+    }
+  },
+  "sourceOperationUnchanged": true,
+  "published": false,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "nextAction": "Resolve visible hand-written caption glyph ambiguity without rewriting the original review or bypassing its quality gate."
+}

@@ -1,6 +1,7 @@
 import {expect,it} from 'vitest';
+import {confirmNarrationReusePolicy,findNarrationPolicyReview,verifyPolicyPostMixText} from '@/services/video/audio/narration-policy';
 import {createHash,randomUUID} from 'node:crypto';
-import {mkdir,mkdtemp,rm,writeFile} from 'node:fs/promises';
+import {mkdir,mkdtemp,rm,writeFile,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {verifyPostMixNarration} from '@/services/video/audio/postmix-asr';
@@ -131,5 +132,33 @@ it('validates the exact mixed challenge context before an owner decision can be 
   const f=await fixture(root);await expect(assertPostMixReviewChallenge(f.projects.store,f.projectId,f.challenge,f.revisionId,f.context)).resolves.toBeUndefined();
   await expect(assertPostMixReviewChallenge(f.projects.store,f.projectId,f.challenge,randomUUID(),f.context)).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
   await expect(assertPostMixReviewChallenge(f.projects.store,f.projectId,f.challenge,f.revisionId,{...f.context,film:{...f.context.film,sha256:'e'.repeat(64)}})).rejects.toThrow('POSTMIX_REVIEW_CHANGED');
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('cold reuses only an explicit owner policy for exact verified source and preserves mismatched final ASR',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-narration-policy-'));
+ try{
+  const f=await fixture(root),line=f.context.plan.lines[0],voiceDir=join(root,'voice','policy');await mkdir(voiceDir,{recursive:true});
+  const pcm=Buffer.from((await readFile(f.mixedPath)).subarray(0,44+16800*4));pcm.writeUInt32LE(pcm.length-8,4);pcm.writeUInt32LE(pcm.length-44,40);
+  const voicePath=join(voiceDir,'line.wav');await writeFile(voicePath,pcm);const wav=await inspectVoiceWav(voicePath);
+  const verified:VerifiedNarrationManifest={durationMs:20000,lines:[{...line,durationMs:700,asrStatus:'pass',wordTimingsStatus:'available',voice:{lineId:line.lineId,language:'zh-CN',voice:'zf_001',provider:'kokoro-js',model:'fixture',modelLicense:'Apache-2.0',runtimeDigest:'c'.repeat(64),outputPath:voicePath,wav},asr:{model:f.context.transcript.model,runtimeDigest:f.context.transcript.runtimeDigest,voiceSha256:wav.sha256},recognizedText:line.spokenText,wordTimings:[{text:line.spokenText,startMs:0,endMs:700,probability:0.95}]}]};
+  const prefix=`projects/${f.projectId}/revisions/${f.revisionId}/`,planRef=await f.projects.index.immutable(prefix+'voice-plan',f.context.plan),verifiedRef=await f.projects.index.immutable(prefix+'voice-verified',verified);
+  await expect(findNarrationPolicyReview(f.projects,root,f.projectId,f.context.plan,verified,f.context)).resolves.toBeUndefined();
+  await expect(confirmNarrationReusePolicy(f.projects,root,f.owner,f.projectId,f.revisionId,planRef,verifiedRef,f.messageId)).rejects.toThrow();
+  const id=randomUUID();await f.projects.archiveMessage(f.projectId,{id,ordinal:2,role:'user',text:'读音正确，音频这快就全部通过，不需要每一个影片都来验证',status:'completed',contentVersion:1,clientMessageId:id,narrationPolicyAction:{scope:'same_verified_narration',planSha256:planRef.sha256,verifiedSha256:verifiedRef.sha256,decision:'reuse_pronunciation_without_repeated_listening'}});
+  await expect(confirmNarrationReusePolicy(f.projects,root,'other',f.projectId,f.revisionId,planRef,verifiedRef,id)).rejects.toThrow('ACCESS_NOT_FOUND');
+  const ref=await confirmNarrationReusePolicy(f.projects,root,f.owner,f.projectId,f.revisionId,planRef,verifiedRef,id),cold=new ProjectStore(new FileStore(root)),proof=(await findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,verified,f.context))!;
+  const archived=structuredClone(verified);archived.lines[0].voice.outputPath=join(root,'objects','archived.wav');
+  await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,archived,f.context)).resolves.toMatchObject({kind:'owner_narration_reuse_policy'});
+  const altered=structuredClone(archived);altered.lines[0].voice.runtimeDigest='d'.repeat(64);await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,altered,f.context)).resolves.toBeUndefined();
+  expect(verifyPolicyPostMixText(f.context,proof)).toMatchObject({status:'trusted_policy',recognizedText:f.context.transcript.recognizedText,narrationPolicyRef:ref});
+  expect(()=>verifyPolicyPostMixText(f.context,JSON.parse(JSON.stringify(proof)))).toThrow('NARRATION_POLICY_CHANGED');
+  expect(()=>verifyReviewedPostMixText(f.context,proof as never)).toThrow('POSTMIX_REVIEW_UNTRUSTED');
+  expect((await cold.view(f.owner,f.projectId)).messages.find(m=>m.id===id)).not.toHaveProperty('narrationPolicyAction');
+  await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,verified,{...f.context,transcript:{...f.context.transcript,recognizedText:'洒下适量的水'}})).rejects.toThrow();
+  await expect(confirmNarrationReusePolicy(cold,root,f.owner,f.projectId,f.revisionId,{...planRef,sha256:'0'.repeat(64)},verifiedRef,id)).rejects.toThrow('NARRATION_REF_CHANGED');
+  await writeFile(voicePath,Buffer.alloc(pcm.length));await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,verified,f.context)).rejects.toThrow();await writeFile(voicePath,pcm);
+  await updateJson(f.projects.store,`projects/${f.projectId}/control`,(control:ProjectControl)=>({...control,consentEpoch:control.consentEpoch+1}));
+  await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,verified,f.context)).resolves.toBeUndefined();
  }finally{await rm(root,{recursive:true,force:true})}
 });

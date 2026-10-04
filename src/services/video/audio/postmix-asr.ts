@@ -1,3 +1,4 @@
+import {verifyPolicyPostMixText,type NarrationPolicyProof} from './narration-policy';
 import {verifyReviewedPostMixText,type ConfirmedPostMixReview,type PostMixReviewContext} from './postmix-review';
 import {hasVerifiedNarrationStatus} from './asr';
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
@@ -43,7 +44,7 @@ export async function verifyPostMixNoNarration(store:AtomicStore,root:string,fil
  await verifiedFilmHash(root,film);
  return{status:'not_applicable' as const,reason:'no_narration' as const,filmSha256:film.sha256,executionSha256:executionRef.sha256,voiceTrackSha256:voice.sha256,lines:[]};
 }
-export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal;resolveReview?:(context:PostMixReviewContext)=>Promise<ConfirmedPostMixReview|undefined>}={}){
+export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal;resolveReview?:(context:PostMixReviewContext)=>Promise<ConfirmedPostMixReview|NarrationPolicyProof|undefined>}={}){
  await options.assertActive?.();
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
  await verifiedFilmHash(root,film);
@@ -65,7 +66,7 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
  }
  const config=dockerConfiguration(env,'postmix-asr'),source=new Map(originalPlan.lines.map(line=>[line.lineId,line]));
  if(source.size!==originalPlan.lines.length||new Set(verified.lines.map(line=>line.lineId)).size!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
- const ordered=[...verified.lines].sort((a,b)=>a.startMs-b.startMs),results=[];
+ const ordered=[...verified.lines].sort((a,b)=>a.startMs-b.startMs),results:Array<{lineId:string;recognizedText:string;sourceSha256:string;asrRuntimeDigest:string;wordCount:number;status:'pass'|'trusted_review'|'trusted_policy';speechReviewRef?:ObjectRef;narrationPolicyRef?:ObjectRef}>=[];
  for(const [index,line] of ordered.entries()){
   await options.assertActive?.();
   const original=source.get(line.lineId);
@@ -84,16 +85,16 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   await options.assertActive?.();
   const transcript=await transcribeAudio(root,{language:line.language,outputPath,wav},'postmix',env,options);
   await options.assertActive?.();
-  let checked:ReturnType<typeof verifySpokenText>;
+  let checked:ReturnType<typeof verifySpokenText>|ReturnType<typeof verifyPolicyPostMixText>;
   try{checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript)}
   catch(error){
    if((error as Error).message!=='ASR_MISMATCH')throw error;
    const context:PostMixReviewContext={film,plan:originalPlan,lineId:line.lineId,window:{startMs:line.startMs,lengthMs,mediaRuntimeDigest:config.runtimeDigest},transcript},proof=await options.resolveReview?.(context);
    await options.assertActive?.();
    if(!proof){onMismatch?.(line.lineId,transcript.recognizedText);throw Error(`POSTMIX_ASR_MISMATCH: ${line.lineId}`)}
-   checked=verifyReviewedPostMixText(context,proof);
+   checked='kind' in proof&&proof.kind==='owner_narration_reuse_policy'?verifyPolicyPostMixText(context,proof):verifyReviewedPostMixText(context,proof as ConfirmedPostMixReview);
   }
-  results.push({lineId:line.lineId,recognizedText:checked.recognizedText,sourceSha256:wav.sha256,asrRuntimeDigest:transcript.runtimeDigest,wordCount:checked.words.length,status:checked.status,...(checked.status==='trusted_review'?{speechReviewRef:checked.speechReviewRef}:{})});
+  results.push({lineId:line.lineId,recognizedText:checked.recognizedText,sourceSha256:wav.sha256,asrRuntimeDigest:transcript.runtimeDigest,wordCount:checked.words.length,status:checked.status,...(checked.status==='trusted_review'?{speechReviewRef:checked.speechReviewRef}:checked.status==='trusted_policy'?{narrationPolicyRef:checked.narrationPolicyRef}:{})});
  }
  return{status:'pass' as const,filmSha256:film.sha256,lines:results};
 }

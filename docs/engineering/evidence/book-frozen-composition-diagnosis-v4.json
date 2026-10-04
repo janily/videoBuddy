@@ -1,0 +1,10 @@
+{
+  "executedAt": "2026-10-04T14:35:49.035Z",
+  "mode": "readonly_control_overlay_all_writes_forbidden",
+  "newModelCalls": 0,
+  "status": "exact_failure_reproduced",
+  "errorCode": "DIAGNOSTIC_WRITE_FORBIDDEN",
+  "stack": "Error: DIAGNOSTIC_WRITE_FORBIDDEN\n    at Object.create (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-book-frozen-composition.ts:12:319)\n    at async createOrRead (/Users/janily/Desktop/dev/videoBuddy/src/services/video/storage/atomic-store.ts:19:6)\n    at async prepareCompositeStage (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-stage.ts:135:15)\n    at async main (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-book-frozen-composition.ts:16:6)",
+  "originalControlUnchanged": true,
+  "originalNativeJournalUnchanged": true
+}

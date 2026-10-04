@@ -1,0 +1,9 @@
+{
+  "executedAt": "2026-10-04T14:31:39.844Z",
+  "mode": "readonly_control_overlay_all_writes_forbidden",
+  "newModelCalls": 0,
+  "status": "exact_failure_reproduced",
+  "errorCode": "MEDIA_STOP_UNKNOWN",
+  "originalControlUnchanged": true,
+  "originalNativeJournalUnchanged": true
+}

@@ -35,7 +35,7 @@ export class ProjectStore{
   });
  }
  async messages(control:ProjectControl){const entries=await this.index.all(control.messagesIndexRef);return Promise.all(entries.map(async e=>(await this.store.readFresh<ArchivedMessage>(e.ref.key)).value))}
- async publicMessages(control:ProjectControl){return(await this.messages(control)).map(message=>{const publicMessage={...message};delete publicMessage.speechReviewAction;return publicMessage})}
+ async publicMessages(control:ProjectControl){return(await this.messages(control)).map(message=>{const publicMessage={...message};delete publicMessage.speechReviewAction;delete publicMessage.narrationPolicyAction;return publicMessage})}
  async operation(projectId:string,id?:string|null):Promise<PublicOperation|null>{if(!id)return null;const o=(await this.store.readFresh<PublicOperation>(`projects/${projectId}/operations/${id}`)).value;return{id:o.id,kind:o.kind,status:o.status,streamEpoch:o.streamEpoch,stage:o.stage}}
  async view(owner:string,id:string):Promise<ProjectView>{
   const c=await this.access(owner,id);const u=(await this.store.readFresh<Understanding>(c.understandingRef.key)).value;const meta=(await this.store.readFresh<{title:string}>(`projects/${id}/metadata`)).value;
