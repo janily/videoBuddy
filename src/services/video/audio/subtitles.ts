@@ -48,7 +48,8 @@ export async function readPinnedSubtitleFontFileHash(runtimeDigest:string){
  if(code!==0||size>512||!new RegExp('^[a-f0-9]{64}  '+path+'\\n$').test(raw))throw Error('FONT_RUNTIME_UNAVAILABLE');
  return raw.slice(0,64);
 }
-export function compileSubtitles(manifest:VerifiedNarrationManifest,fps:24|30|60,glyphs:Set<string>):SubtitleCue[]{
+export function compileSubtitles(manifest:VerifiedNarrationManifest,fps:24|30|60,glyphs:Set<string>,options:{revealMs?:0|350}={}):SubtitleCue[]{
+ if(options.revealMs!==undefined&&options.revealMs!==0&&options.revealMs!==350)throw Error('CAPTION_PLAN_INVALID');
  if(!Number.isSafeInteger(manifest.durationMs)||manifest.durationMs<20000||manifest.durationMs>120000||![24,30,60].includes(fps)||manifest.lines.length>120)throw Error('CAPTION_PLAN_INVALID');
  const ordered=[...manifest.lines].sort((a,b)=>a.startMs-b.startMs),totalFrames=manifest.durationMs*fps/1000,cues:SubtitleCue[]=[];
  if(!Number.isSafeInteger(totalFrames))throw Error('CAPTION_PLAN_INVALID');
@@ -59,11 +60,11 @@ export function compileSubtitles(manifest:VerifiedNarrationManifest,fps:24|30|60
   const lastWord=Math.max(0,...line.wordTimings.map(word=>word.endMs));
   if(line.wordTimings.length===0||line.wordTimings.some(word=>!Number.isSafeInteger(word.startMs)||!Number.isSafeInteger(word.endMs)||word.startMs<0||word.endMs<=word.startMs)||lastWord>line.durationMs+1000)throw Error('CAPTION_PLAN_INVALID');
   const requestedEnd=line.startMs+Math.max(1800,line.durationMs+600,lastWord+600,readingMs);
-  const startFrame=Math.floor(line.startMs*fps/1000),endFrame=Math.ceil(requestedEnd*fps/1000);
+  const startFrame=Math.floor(line.startMs*fps/1000),endFrame=Math.ceil(requestedEnd*fps/1000)+Math.ceil((options.revealMs||0)*fps/1000);
   if(startFrame<0||endFrame>totalFrames||endFrame<=startFrame||startFrame<(cues.at(-1)?.endFrame??0))throw Error('CAPTION_CONFLICT');
   cues.push({lineId:line.lineId,text,startFrame,endFrame,startMs:Math.round(startFrame*1000/fps),endMs:Math.round(endFrame*1000/fps),voiceSha256:line.voice.wav.sha256});
  }
- validateCaptions(cues.map(cue=>({text:cue.text,startFrame:cue.startFrame,endFrame:cue.endFrame})),fps,glyphs);
+ validateCaptions(cues.map(cue=>({text:cue.text,startFrame:cue.startFrame+Math.ceil((options.revealMs||0)*fps/1000),endFrame:cue.endFrame})),fps,glyphs);
  return cues;
 }
 function stamp(ms:number){

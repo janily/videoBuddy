@@ -1,3 +1,5 @@
+import {bookFontReceiptKey} from '../audio/book-font-receipt';
+import {trustedStyleFont} from '../media/font-catalog';
 import {constants} from 'node:fs';
 import {open,realpath} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
@@ -73,9 +75,19 @@ export async function prepareFrozenSourceArchive(projects:ProjectStore,owner:str
   add('state/'+key+'.json',Buffer.from(canonicalJson((await projects.store.readFresh(key)).value)));
  }
  for(const file of runtimeFiles)add('runtime/media/'+file,await safeFile(join(process.cwd(),'runtime/media'),file,archiveByteLimit-total));
- const captionFontReceipt=frozen.sourceManifest.captionStyles.length?`runtime-receipts/${frozen.filmSpec.runtimeDigest}/subtitle-font`:null;
+ const bookFont=frozen.timing.font?.family==='Crayon Book Handwriting'?frozen.timing.font:null;
+ const captionFontReceipt=frozen.sourceManifest.captionStyles.length?(bookFont?bookFontReceiptKey(frozen.filmSpec.runtimeDigest):`runtime-receipts/${frozen.filmSpec.runtimeDigest}/subtitle-font`):null;
  if(captionFontReceipt)add('state/'+captionFontReceipt+'.json',Buffer.from(canonicalJson((await projects.store.readFresh(captionFontReceipt)).value)));
- add('font-fetch-manifest.json',Buffer.from(canonicalJson({schemaVersion:1,fontBinariesIncluded:false,runtimeDigest:frozen.filmSpec.runtimeDigest,fonts:[{family:'Noto Sans CJK',runtimePath:'/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',frozenCaptionSha256s:bundle.renderInputs.fontSha256s,captionReceiptKey:captionFontReceipt,sourceUrl:'https://github.com/notofonts/noto-cjk',licenseUrl:'https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE',acquisition:'Obtain Noto Sans CJK through the official download guides or the fonts-noto-cjk package in the pinned Debian media image. Read the applicable license before installation. Match every frozen caption SHA-256; a current upstream download may have different bytes.',verification:'Caption hashes are frozen only when captions are present. No independent digest is asserted for browser fallback fonts; acquire the original pinned image for its font environment.'}]})));
+ if(bookFont){
+  const fonts=bookFont.faces.map(face=>{const locked=trustedStyleFont(face.id);return{...face,runtimePath:locked.runtimePath,sourceUrl:locked.font.url,licenseUrl:locked.licenseFile.url,metadataUrl:locked.metadata.url}});
+  add('font-fetch-manifest.json',Buffer.from(canonicalJson({schemaVersion:2,fontBinariesIncluded:false,runtimeDigest:frozen.filmSpec.runtimeDigest,captionReceiptKey:captionFontReceipt,rendererSha256:bookFont.rendererSha256,producerSha256:bookFont.producerSha256,fonts,verification:'Acquire exactly the locked files and pinned media runtime. Verify font, notice, metadata and renderer digests before rebuilding; no font or model binaries are bundled.'})));
+  for(const name of ['book-caption.mjs','book-caption-producer.mjs','fonts.lock.json','FONTS.md']){
+   const bytes=await safeFile(join(process.cwd(),'runtime/media'),name,1048576);
+   const expected=name==='book-caption.mjs'?bookFont.rendererSha256:name==='book-caption-producer.mjs'?bookFont.producerSha256:null;
+   if(expected&&createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('SOURCE_CAPTION_RUNTIME_CHANGED');
+   add('runtime/media/'+name,bytes);
+  }
+ }else add('font-fetch-manifest.json',Buffer.from(canonicalJson({schemaVersion:1,fontBinariesIncluded:false,runtimeDigest:frozen.filmSpec.runtimeDigest,fonts:[{family:'Noto Sans CJK',runtimePath:'/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc',frozenCaptionSha256s:bundle.renderInputs.fontSha256s,captionReceiptKey:captionFontReceipt,sourceUrl:'https://github.com/notofonts/noto-cjk',licenseUrl:'https://github.com/notofonts/noto-cjk/blob/main/Sans/LICENSE',acquisition:'Obtain Noto Sans CJK through the official download guides or the fonts-noto-cjk package in the pinned Debian media image. Read the applicable license before installation. Match every frozen caption SHA-256; a current upstream download may have different bytes.',verification:'Caption hashes are frozen only when captions are present. No independent digest is asserted for browser fallback fonts; acquire the original pinned image for its font environment.'}]})));
  add('TREATMENT.json',Buffer.from(canonicalJson(frozen.treatment)));
  add('timeline.json',Buffer.from(canonicalJson(frozen.timeline)));
  add('CREDITS.json',Buffer.from(canonicalJson({schemaVersion:1,sources:frozen.audioManifest.sources,runtimeLicenseFile:'runtime/media/LICENSES.md',redistribution:'No user assets included; none are referenced.',fontBinariesIncluded:false,modelWeightsIncluded:false})));

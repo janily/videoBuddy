@@ -1,3 +1,6 @@
+import {readBookTimingFont,assertBookCaptionGlyphs} from '../audio/book-font';
+import {recordBookFontReceipt} from '../audio/book-font-receipt';
+import type {TimingFont} from './timing-draft';
 import {isAbsolute,join,relative} from 'node:path';
 import {z} from 'zod';
 import type {ObjectRef,Understanding} from '@/contracts/video/domain';
@@ -60,8 +63,15 @@ export async function prepareTimingStage(projects:ProjectStore,projectId:string,
  }
  if(options.mustExist)throw Error('TIMING_STAGE_MISSING');
  const track=await (options.buildTrack||((dir,manifest)=>buildNarrationTrack(dir,manifest,env)))(root,verified);
- const font=understanding.preferences.captions==='auto'&&verified.lines.length?await (options.readFont||(()=>readPinnedSubtitleFont(env)))():null;
- const cues=font?compileSubtitles(verified,treatmentPlan.fps,font.glyphs):[];
+ let font:TimingFont|null=null,glyphs=new Set<string>();
+ if(understanding.preferences.captions==='auto'&&verified.lines.length){
+  if(treatmentPlan.styleSlug==='crayon-book'&&!options.readFont){
+   const installed=await readBookTimingFont(env,{assertActive:async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef}),journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}});
+   assertBookCaptionGlyphs(verified.lines.map(line=>line.displayText),installed.glyphsById);font=installed.font;glyphs=new Set([...installed.glyphsById.values()].flatMap(chars=>[...chars]));
+   await recordBookFontReceipt(projects.store,installed.font);
+  }else{const installed=await (options.readFont||(()=>readPinnedSubtitleFont(env)))();font={family:installed.family,runtimeDigest:installed.runtimeDigest,charsetSha256:installed.charsetSha256};glyphs=installed.glyphs}
+ }
+ const cues=font?compileSubtitles(verified,treatmentPlan.fps,glyphs,{revealMs:font.family==='Crayon Book Handwriting'?350:0}):[];
  const draft=compileTimingDraft(treatment,understanding,voicePlan,verified,cues,track,font);
  await assertTrack(root,draft);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;

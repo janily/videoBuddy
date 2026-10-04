@@ -1,3 +1,4 @@
+import {frozenBookFontHashes} from '../audio/book-font-receipt';
 import {isAbsolute} from 'node:path';
 import {z} from 'zod';
 import type {ProjectControl} from '@/contracts/video/project';
@@ -65,7 +66,7 @@ export async function publishPreparedPreview(projects:ProjectStore,raw:z.input<t
  const evidenceRef=await projects.index.immutable(revisionPrefix+'preview-quality-evidence',evidence);
  const assetSha256s=[] as string[];
  for(const asset of frozen.assetManifest.assets){const analysis=await readNarrationJson(projects.store,asset.analysisRef,prefix+'/');const value=z.object({sha256:z.string().regex(/^[a-f0-9]{64}$/)}).parse(analysis);assetSha256s.push(value.sha256)}
- const fontSha256s=frozen.sourceManifest.captionStyles.length?[await recordSubtitleFontReceipt(projects.store,spec.runtimeDigest,await readPinnedSubtitleFontFileHash(spec.runtimeDigest))]:[];
+ const fontSha256s=frozen.sourceManifest.captionStyles.length?(frozen.timing.font?.family==='Crayon Book Handwriting'?await frozenBookFontHashes(projects.store,frozen.timing.font):[await recordSubtitleFontReceipt(projects.store,spec.runtimeDigest,await readPinnedSubtitleFontFileHash(spec.runtimeDigest))]):[];
  const facts=frozen.facts.facts.map(f=>({text:f.text,source:f.status==='confirmed'?'用户确认':'用户提供'}));
  const bundle=createPreviewBundle({previewId,revisionId,briefVersion:spec.briefVersion,filmSpecRef:{...filmRecord.filmSpecRef,mime:'application/json'},
   renderInputs:{sourceCodeSha256:canonicalHash(frozen.sourceManifest.modules.map(m=>({id:m.id,sha256:m.sourceRef.sha256}))),timelineSha256:spec.timelineRef.sha256,audioSha256:spec.audioManifestRef.sha256,assetSha256s,fontSha256s,profile:{width:spec.output.width,height:spec.output.height,fps:spec.output.fps},runtimeDigests:{media:spec.runtimeDigest},qualityPolicySha256:filmRecord.qualityPolicyRef.sha256},

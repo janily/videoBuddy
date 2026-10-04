@@ -1,3 +1,4 @@
+import {readBookTimingFont,assertBookCaptionGlyphs} from '../audio/book-font';
 import {isAbsolute} from 'node:path';
 import {z} from 'zod';
 import {ObjectRefSchema,UnderstandingSchema,type ObjectRef} from '@/contracts/video/domain';
@@ -20,7 +21,7 @@ import {createOrRead,StoreMissing} from '@/services/video/storage/atomic-store';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {getStyle} from '@/services/video/styles/registry';
 import {revisionSeed} from '@/services/video/timeline/seed';
-import {filmPackagePolicyVersion,captionStyleId,frozenCaptions,narrationSilence} from '@/services/video/timeline/package';
+import {filmPackagePolicyVersion,bookFilmPackagePolicyVersion,captionStyleId,frozenCaptions,narrationSilence} from '@/services/video/timeline/package';
 import {prepareAudioPlanStage} from './audio-plan-stage';
 import {assertPreviewProductionFence} from './fence';
 import {NarrationPackageDataSchema,prepareNarrationPackageStage} from './narration-package-stage';
@@ -43,12 +44,13 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  let existing:unknown;
  try{existing=(await projects.store.readFresh<unknown>(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(existing===undefined&&options.mustExist)throw Error('FILM_PACKAGE_MISSING');
- const policyVersion=existing===undefined?filmPackagePolicyVersion:FilmSpecSchema.parse(await readNarrationJson(projects.store,RecordSchema.parse(existing).filmSpecRef,`${revisionPrefix}film/`)).qualityPolicyVersion;
+ let policyVersion=existing===undefined?filmPackagePolicyVersion:FilmSpecSchema.parse(await readNarrationJson(projects.store,RecordSchema.parse(existing).filmSpecRef,`${revisionPrefix}film/`)).qualityPolicyVersion;
  const understanding=UnderstandingSchema.parse(await readNarrationJson(projects.store,control.understandingRef,`${prefix}/understanding/`));
  if(understanding.briefVersion!==control.briefVersion||!understanding.preferences.styleSlug)throw Error('FILM_BRIEF_CHANGED');
  const style=getStyle(understanding.preferences.styleSlug),treatment=guardTreatment(await readNarrationJson(projects.store,treatmentRef,`${revisionPrefix}treatment-plan/`),understanding,style.rulesHash);
  const timingRecord=await prepareTimingStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true});
  const timing=TimingDraftSchema.parse(await readNarrationJson(projects.store,timingRecord.draftRef,`${revisionPrefix}timing-draft/`));
+ if(existing===undefined&&timing.font?.family==='Crayon Book Handwriting')policyVersion=bookFilmPackagePolicyVersion;
  const audioRecord=await prepareAudioPlanStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true}),seed=revisionSeed(projectId,revisionId);
  const audio=guardAudioPlan(await readNarrationJson(projects.store,audioRecord.planRef,`${revisionPrefix}audio-plan/`),understanding,treatment,timing,timingRecord.draftRef.sha256,seed);
  const runtime=dockerConfiguration(env,operationId);
@@ -57,7 +59,10 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  try{executionRef=(await prepareAudioExecutionStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true})).packageRef}
  catch(error){if((error as Error).message!=='AUDIO_EXECUTION_MISSING')throw error;if(audio.music.length||audio.foley.length||audio.mix.voiceGainDb!==0)throw Error('FILM_AUDIO_EXECUTION_NOT_READY')}
  const executed=executionRef?await loadAudioExecution(projects.store,root,projectId,revisionId,executionRef,audioRecord.planRef,timingRecord.draftRef):null;
- if(timing.font){
+ if(timing.font?.family==='Crayon Book Handwriting'){
+  const actual=await readBookTimingFont(env,{assertActive:async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef}),journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}});
+  if(canonicalHash(actual.font)!==canonicalHash(timing.font))throw Error('FILM_FONT_CHANGED');assertBookCaptionGlyphs(timing.captions.map(c=>c.text),actual.glyphsById);
+ }else if(timing.font){
   const font=await (options.readFont||(()=>readPinnedSubtitleFont(env)))();
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||timing.captions.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('FILM_FONT_CHANGED');
  }

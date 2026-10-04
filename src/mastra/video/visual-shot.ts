@@ -1,3 +1,4 @@
+import {bookCaptionSafeBox} from '@/services/video/timeline/package';
 import {markModelCallStarted,recordModelUsage} from '@/services/video/budget/model-call';
 import type {Understanding} from '@/contracts/video/domain';
 import {guardTreatment} from '@/contracts/video/treatment';
@@ -18,7 +19,7 @@ export async function runVisualShot(understanding:Understanding,rawTreatment:unk
  if(canonicalHash(timing)!==expectedTimingHash)throw Error('VISUAL_BASELINE_CHANGED');
  const shot=treatment.shots.find(item=>item.id===shotId);if(!shot)throw Error('VISUAL_BASELINE_CHANGED');
  if(!Number.isSafeInteger(seed)||seed<0||seed>0xffffffff)throw Error('VISUAL_INPUT_INVALID');
- const context=JSON.stringify({understanding,treatment:{summary:treatment.summary,selectedOptionId:treatment.selectedOptionId,selectionReason:treatment.selectionReason,shots:treatment.shots,script:treatment.script},timingDraftHash:expectedTimingHash,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},currentShot:shot,seed,style:{slug:style.slug,packVersion:style.packVersion,rulesHash:knowledge.sha256,rules:knowledge.rules},requirements:{logicalSize:understanding.preferences.aspect==='16:9'?[1920,1080]:[1080,1920],absoluteTime:true,offline:true,direction:'Declare actual shot purpose, framing, camera and actor IDs from this source; return the given seed unchanged.'}});
+ const context=JSON.stringify({understanding,treatment:{summary:treatment.summary,selectedOptionId:treatment.selectedOptionId,selectionReason:treatment.selectionReason,shots:treatment.shots,script:treatment.script},timingDraftHash:expectedTimingHash,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},currentShot:shot,seed,style:{slug:style.slug,packVersion:style.packVersion,rulesHash:knowledge.sha256,rules:knowledge.rules},requirements:{...(timing.font?.family==='Crayon Book Handwriting'?{captionReservedRegion:{...bookCaptionSafeBox(understanding.preferences.aspect==='16:9'?{width:1920,height:1080}:{width:1080,height:1920}),instruction:'Keep all actors, roots, critical fact labels and their motion entirely outside this reserved paper-caption area for the whole shot. Do not draw captions or a blank plate yourself. Compose the scene above it; this requirement does not prove QA.'}}:{}),logicalSize:understanding.preferences.aspect==='16:9'?[1920,1080]:[1080,1920],absoluteTime:true,offline:true,direction:'Declare actual shot purpose, framing, camera and actor IDs from this source; return the given seed unchanged.'}});
  if(Buffer.byteLength(context)>180000)throw Error('CONTEXT_LIMIT');
  const agent=createVideoAgent('visual',instructions,env);
  await markModelCallStarted();

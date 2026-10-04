@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 T10/T11/T14 绘本字体与冻结接线：新 book 自动字幕实读两固定字体及许可/metadata/charset，Timing保留旧schema并新增book；CaptionPackage3/policy3绑定renderer/producer/两字体SHA，发布冷读与工程ZIP同步核验，旧policy1/2不迁移且book降级拒绝。350ms显现独立占9帧，Visual明确底部纸底预留区。实际两native completed，原四句cue变0–110/120–230/240–350/360–459，冷字体receipt一致，原项目不改/0model。114文件588测试49.73s及额外中英混排负例3项、lint/build/构建后types通过。真实旧画面根系仍被纸底遮挡，需重新生成镜头及新最终混音/事实/全片QA；公共复核/正式制作及43风格完整范围未完，C0/C1/C2未达到，无push/部署。见 [冻结接线验证](evidence/book-timing-validation.md)。
+
 2026-10-04 T10/T11 实际绘本字幕合成接线：受信任alpha MOV生产器锁字体/源码与job、bundle/fence/时序/profile，compose叠加一次保留SRT；显现后阅读不足拒绝。实测原四镜头/音乐旁白master经新runtime实际导入，新派生cue延长9帧，20秒480帧720p stereo AAC SHA1daff…11262567bytes/full decode/−14.29LUFS/−4.05dBTP通过。真实frame405纸底仍挡根，视觉QA不通过。层及最终MP4可重签回执两漏洞经隔离RED→GREEN关闭，层/最终固定stdout与实际回执严格绑定/有界读取；最终新native1条completed(5→6)冷0producer，源状态不改，0model。113文件585项50.66s及lint/build/构建后types通过，5fd7ad2与固定审查8ff808d同树双轴clean。仍需公开冻结新policy/font/时间轴、镜头预留区、新音频/事实/全片QA及全项目验收，C0/C1/C2未达到，无push/部署。见 [合成验证](evidence/book-composition-validation.md)。
 
 2026-10-04 T10/T11 绘本字幕绘制器：52px真实测量中英手写、墨棕/撕边浅纸/固定纸纹、350ms逐字/12fps字形抖动，显式safeBox严格溢出拒绝。纸纹相关线视觉修复，独立Spec纸边±2.5越界加6px余量修复；实际advance52.000045的诊断盒修正不放宽布局。v6三completed/16PNG哈希及正反序/12fps/alpha区域/紧界实际通过；首次配置失败、v2纹理问题、v4unknown、v5诊断OVERFLOW均保留，0model。111文件579项53.88s及最终4项、lint/build/构建后types通过，代码4dba5ed与审查快照6f8f7ec同树，双轴clean。尚未生产接线/全片QA；下一步新冻结字幕policy/字体与源码身份/安全区及新影片，项目范围不变，C0/C1/C2未达到，无push/部署。见 [绘本字幕验证](evidence/book-caption-validation.md)。

@@ -1,4 +1,6 @@
-import {expect,it} from 'vitest';
+import {expect,it,vi} from 'vitest';
+// Protocol fixture: synthetic PCM and mocked font metadata are never native QA.
+vi.mock('@/services/video/audio/style-font',()=>({readPinnedStyleFont:async(_env:unknown,id:string)=>{const {trustedStyleFont}=await import('@/services/video/media/font-catalog');const f=trustedStyleFont(id);return{id,family:f.family,runtimeDigest:'a'.repeat(64),fontSha256:f.font.sha256,fontBytes:f.font.bytes,licenseSha256:f.licenseFile.sha256,metadataSha256:f.metadata.sha256,charsetSha256:(id==='mashanzheng'?'d':'e').repeat(64),glyphs:new Set('欢迎参加。')}}}));
 import {createHash,randomUUID} from 'node:crypto';
 import {mkdtemp,mkdir,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -46,7 +48,7 @@ function wav(){
  return result;
 }
 
-it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/faster-whisper-medium',trusted:false},{model:'Systran/faster-whisper-medium',trusted:true}] as const)('T10/T11 persists frozen voice with $model and trusted=$trusted through a private excerpt and detects tampering',async({model,trusted})=>{
+it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:'Systran/faster-whisper-medium',trusted:false,book:false},{model:'Systran/faster-whisper-medium',trusted:true,book:false},{model:'Systran/faster-whisper-medium',trusted:false,book:true}] as const)('T10/T11 persists frozen voice with $model and trusted=$trusted book=$book through a private excerpt and detects tampering',async({model,trusted,book})=>{
  const root=await mkdtemp(join(tmpdir(),'vb-voice-stage-'));
  try{
   const projects=new ProjectStore(new FileStore(root)),created=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
@@ -86,10 +88,10 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/fa
   const trackBytes=Buffer.alloc(44+960000*4);trackBytes.write('RIFF',0);trackBytes.writeUInt32LE(trackBytes.length-8,4);trackBytes.write('WAVEfmt ',8);trackBytes.writeUInt32LE(16,16);trackBytes.writeUInt16LE(3,20);trackBytes.writeUInt16LE(1,22);trackBytes.writeUInt32LE(48000,24);trackBytes.writeUInt32LE(192000,28);trackBytes.writeUInt16LE(4,32);trackBytes.writeUInt16LE(32,34);trackBytes.write('data',36);trackBytes.writeUInt32LE(960000*4,40);for(let index=0;index<48000;index++)trackBytes.writeFloatLE(Math.sin(index*0.1)*0.1,44+index*4);
   const timingOptions={root,buildTrack:async()=>{mixed++;await mkdir(join(root,'audio','fixture'),{recursive:true});await writeFile(trackPath,trackBytes);return{outputPath:trackPath,runtimeDigest:'a'.repeat(64),wav:probeTrackWav(trackBytes,960000,false),kind:'narration_only' as const,qaStatus:'not_checked' as const}},readFont:async()=>{fontReads++;return{family:'Noto Sans CJK SC' as const,runtimeDigest:'a'.repeat(64),charsetSha256:'d'.repeat(64),glyphs:new Set(Array.from('欢迎参加。'))}}};
   await expect(prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('TIMING_STAGE_MISSING');
-  const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions);
+  const timing=await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,book?{...timingOptions,readFont:undefined,env:{VIDEO_MEDIA_IMAGE_REF:'sha256:'+'a'.repeat(64),VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'60'}}:timingOptions);
   expect((await projects.store.readFresh<{totalFrames:number;narration:unknown[];captions:unknown[]}>(timing.draftRef.key)).value).toMatchObject({totalFrames:480,narration:[{}],captions:[{}]});
   expect(await prepareTimingStage(projects,projectId,revisionId,operationId,0,treatmentRef,timingOptions)).toEqual(timing);
-  expect([mixed,fontReads]).toEqual([1,1]);
+  expect([mixed,fontReads]).toEqual([1,book?0:1]);
   await expect(prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('NARRATION_PACKAGE_MISSING');
   const narrationPackage=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
   expect(await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).toEqual(narrationPackage);
@@ -132,7 +134,7 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/fa
   await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:timingOptions.readFont})).rejects.toThrow('FILM_VISUAL_SOURCE_INCOMPLETE');
   await updateJson(projects.store,visualKey,()=>visual);
   await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:{...packageEnv,VIDEO_MEDIA_IMAGE_REF:`sha256:${'b'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'b'.repeat(64)}})).rejects.toThrow('FILM_RUNTIME_CHANGED');
-  await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:async()=>({...await timingOptions.readFont(),glyphs:new Set()})})).rejects.toThrow('FILM_FONT_CHANGED');
+  if(!book) await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:async()=>({...await timingOptions.readFont(),glyphs:new Set()})})).rejects.toThrow('FILM_FONT_CHANGED');
   const filmPackage=await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:timingOptions.readFont});
   expect(filmPackage.qualityStatus).toBe('semantic_not_checked');
   expect(await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,mustExist:true,readFont:timingOptions.readFont})).toEqual(filmPackage);
@@ -140,9 +142,14 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/fa
   const frozen=await loadVerifiedFilmPackage(projects.store,spec,root);
   const captionRef=frozen.sourceManifest.captionStyles[0].styleRef;
   const captionPackage=CaptionPackageSchema.parse((await projects.store.readFresh(captionRef.key)).value);
-  expect(captionPackage.schemaVersion).toBe(2);
+  expect(captionPackage.schemaVersion).toBe(book?3:2);
   expect(captionPackage.profiles.preview).toEqual(captionPackage.profiles.full);
   await expect(loadVerifiedFilmPackage(projects.store,{...spec,qualityPolicyVersion:'v5.1-package-1'},root)).rejects.toThrow('FILM_CAPTION_CHANGED');
+  if(book){
+   expect(()=>expectedCaptionPackage(captionPackage.font,spec.output,'v5.1-package-1')).toThrow('FILM_CAPTION_CHANGED');
+   expect(()=>expectedCaptionPackage(captionPackage.font,spec.output,'v5.1-package-2-caption-coordinates')).toThrow('FILM_CAPTION_CHANGED');
+   expect(frozen.timeline.captions[0].stableReadableStartFrame).toBe(frozen.timeline.captions[0].startFrame+9);
+  }else{
   const legacyCaptionRef=await projects.index.immutable(`${revisionPrefix}caption-styles`,expectedCaptionPackage(captionPackage.font,spec.output,'v5.1-package-1'));
   const legacySourceRef=await projects.index.immutable(`${revisionPrefix}source-manifest`,{...frozen.sourceManifest,captionStyles:[{...frozen.sourceManifest.captionStyles[0],styleRef:legacyCaptionRef}]});
   const legacySpec={...spec,sourceManifestRef:legacySourceRef,qualityPolicyVersion:'v5.1-package-1'};
@@ -152,6 +159,7 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/fa
   await updateJson(projects.store,`${revisionPrefix}film-package-v2-stage`,()=>legacyStage);
   expect(await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,mustExist:true,readFont:timingOptions.readFont})).toEqual(legacyStage);
   await updateJson(projects.store,`${revisionPrefix}film-package-v2-stage`,()=>filmPackage);
+  }
   await expect(loadVerifiedFilmPackage(projects.store,{...spec,qualityPolicyVersion:'v1'},root)).rejects.toThrow('FILM_POLICY_UNSUPPORTED');
   expect(spec).toMatchObject({seed:revisionSeed(projectId,revisionId),output:{width:1920,height:1080,totalFrames:480}});
   expect(frozen.timeline.narration[0].audioRef.mime).toBe('audio/wav');expect(frozen.timeline.shots[0].camera).toBe('固定画布坐标');

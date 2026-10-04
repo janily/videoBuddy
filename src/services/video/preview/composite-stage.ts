@@ -1,3 +1,4 @@
+import {readBookTimingFont,assertBookCaptionGlyphs} from '../audio/book-font';
 import {findConfirmedPostMixReview} from '@/services/video/audio/postmix-review';
 import type {FilmSpec} from '@/contracts/video/film';
 import {prepareFilmPackageStage} from './film-package-stage';
@@ -77,7 +78,10 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const audioPlanSha256=audio.planRef.sha256,audioExecutionSha256=executionRef?.sha256||null;
  const cues:SubtitleCue[]=timing.captions.map(cue=>({...cue,startMs:Math.round(cue.startFrame*1000/timing.fps),endMs:Math.round(cue.endFrame*1000/timing.fps)}));
  if(Boolean(cues.length)!==Boolean(timing.font)||cues.length&&understanding.preferences.captions!=='auto'||!cues.length&&understanding.preferences.captions==='auto'&&verified.lines.length>0)throw Error('COMPOSITE_CAPTION_CHANGED');
- if(timing.font){
+ if(timing.font?.family==='Crayon Book Handwriting'){
+  const actual=await readBookTimingFont(env,{assertActive:async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef}),journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}});
+  if(canonicalHash(actual.font)!==canonicalHash(timing.font))throw Error('COMPOSITE_FONT_CHANGED');assertBookCaptionGlyphs(cues.map(c=>c.text),actual.glyphsById);
+ }else if(timing.font){
   const font=await (options.readFont||readPinnedSubtitleFont)(env);
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||cues.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('COMPOSITE_FONT_CHANGED');
  }

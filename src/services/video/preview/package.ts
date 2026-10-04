@@ -1,3 +1,4 @@
+import {frozenBookFontHashes} from '../audio/book-font-receipt';
 import{z}from'zod';
 import{canonicalHash,canonicalJson}from'@/services/video/domain/hash';
 import{loadVerifiedFilmPackage}from'@/contracts/video/film-package';
@@ -25,7 +26,7 @@ export async function verifyPreviewPackage(projects:ProjectStore,projectId:strin
    inputs.sourceCodeSha256!==canonicalHash(sourceManifest.modules.map(item=>({id:item.id,sha256:item.sourceRef.sha256}))))throw Error('PREVIEW_PACKAGE_INVALID');
   const digest=z.string().regex(/^[a-f0-9]{64}$/),assetHashes=[] as string[];
   for(const asset of assetManifest.assets){const analysis=(await projects.store.readFresh<unknown>(asset.analysisRef.key)).value,found=z.object({sha256:digest}).safeParse(analysis);if(!found.success)throw Error('PREVIEW_PACKAGE_INVALID');assetHashes.push(found.data.sha256)}
-  const fontHashes=sourceManifest.captionStyles.length?[await readSubtitleFontReceipt(projects.store,filmSpec.runtimeDigest)]:[];
+  const fontHashes=sourceManifest.captionStyles.length?(verified.timing.font?.family==='Crayon Book Handwriting'?await frozenBookFontHashes(projects.store,verified.timing.font):[await readSubtitleFontReceipt(projects.store,filmSpec.runtimeDigest)]):[];
   if(canonicalHash(assetHashes)!==canonicalHash(inputs.assetSha256s)||canonicalHash(fontHashes)!==canonicalHash(inputs.fontSha256s))throw Error('PREVIEW_PACKAGE_INVALID');
   validatePreviewSegments(bundle.excerptMap,bundle.sourceDurationMs,filmSpec.output.fps);
   const shots=new Map(timeline.shots.map(shot=>[shot.id,shot]));
