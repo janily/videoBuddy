@@ -11,6 +11,7 @@ import type {ProjectStore} from '@/services/video/storage/project-store';
 import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
 import {assertPreviewProductionFence} from './fence';
 
+import {readReviewedTreatment} from './reviewed-treatment';
 import {withAccountedModel} from '@/services/video/budget/model-call';
 
 type Decide = (understanding:Understanding, maxOutputTokens:number, env:Environment)=>Promise<unknown>;
@@ -23,6 +24,11 @@ export async function prepareTreatmentStage(projects:ProjectStore, projectId:str
  const understanding=(await projects.store.readFresh<Understanding>(control.understandingRef.key)).value;
  if (canonicalHash(understanding)!==control.understandingRef.sha256||understanding.briefVersion!==control.briefVersion||!understanding.preferences.styleSlug||!understanding.subject.trim()||understanding.unresolvedConflictIds.length) throw Error('TREATMENT_BASELINE_CHANGED');
  const knowledge=await loadStageKnowledge(understanding.preferences.styleSlug,'style');
+ const reused=await readReviewedTreatment(projects,projectId,operationId,revisionId,expectedConsentEpoch);
+ if(reused){
+  guardTreatment(reused.plan,understanding,knowledge.sha256);
+  return projects.index.immutable(`${prefix}/revisions/${revisionId}/treatment-plan`,reused.plan);
+ }
  const env=options.env||process.env;
  if (!options.decide) requireGeneration(readConfiguration(env));
  const contextBytes=Buffer.byteLength(canonicalJson({understanding,styleRules:knowledge.rules}));

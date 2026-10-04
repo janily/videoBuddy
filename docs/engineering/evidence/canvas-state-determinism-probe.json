@@ -1,0 +1,669 @@
+{
+  "executedAt": "2026-10-04T10:27:09.080Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/scene-determinism/probe-29dqyy",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "df5b5a6e-173d-4e69-aaa3-15ce765cfb0b",
+  "diagnosticOperationId": "3e661d13-f5ee-435f-b3c0-db3bd43dc9e8",
+  "scriptSha256": "94ff7059e73568f1549c2e1443a071a156a66f618d94a262fb1a415e70e88dea",
+  "status": "diagnosed",
+  "scenarios": [
+    {
+      "schemaVersion": 1,
+      "mode": "readback",
+      "sceneSha256": "023a786c1f09323466c028ccbf82986dcd14457b22fcac42ed963150a7bcd6e5",
+      "status": "non_deterministic",
+      "frames": [
+        {
+          "round": 0,
+          "frame": 120,
+          "file": "round-0-frame-120.png",
+          "pngSha256": "7ca060af7e866238bc0d5b1733f73f6a6fd1eb06c44c91db26481909ca86a004",
+          "canvases": [
+            {
+              "sha256": "44982bd03e569b41fe3769f788c8315020d976260a0081e6542103f9e012be3b",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 0,
+          "frame": 180,
+          "file": "round-0-frame-180.png",
+          "pngSha256": "8eb063392efe3c15c3d264cc8630b46b15bbf0518f3a1fc0404a56db8908a5ef",
+          "canvases": [
+            {
+              "sha256": "0ccafb79ca2d261520d5bf6101945552d5989433f669b50c1deec6efd32c262a",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 0,
+          "frame": 239,
+          "file": "round-0-frame-239.png",
+          "pngSha256": "d782a243369822f5d9b6ccadfdba1708b5b7520065939925a659d7beecae5f0d",
+          "canvases": [
+            {
+              "sha256": "c42310c63e5df535ee2976f433f68054b6623cd6ddd664f20e3f2bc3272b7636",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 1,
+          "frame": 239,
+          "file": "round-1-frame-239.png",
+          "pngSha256": "d782a243369822f5d9b6ccadfdba1708b5b7520065939925a659d7beecae5f0d",
+          "canvases": [
+            {
+              "sha256": "c42310c63e5df535ee2976f433f68054b6623cd6ddd664f20e3f2bc3272b7636",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 1,
+          "frame": 180,
+          "file": "round-1-frame-180.png",
+          "pngSha256": "8eb063392efe3c15c3d264cc8630b46b15bbf0518f3a1fc0404a56db8908a5ef",
+          "canvases": [
+            {
+              "sha256": "0ccafb79ca2d261520d5bf6101945552d5989433f669b50c1deec6efd32c262a",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 1,
+          "frame": 120,
+          "file": "round-1-frame-120.png",
+          "pngSha256": "089888feda7ba8f58ab02fb8e7d75cb27c5f6f898972f3633e0c6d9167ffedf0",
+          "canvases": [
+            {
+              "sha256": "de60ff859b3bed7f358ba26f24e25daec81c67c4eae2390e5536501c4f042ac4",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frame": 120,
+          "file": "round-2-frame-120.png",
+          "pngSha256": "089888feda7ba8f58ab02fb8e7d75cb27c5f6f898972f3633e0c6d9167ffedf0",
+          "canvases": [
+            {
+              "sha256": "de60ff859b3bed7f358ba26f24e25daec81c67c4eae2390e5536501c4f042ac4",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frame": 180,
+          "file": "round-2-frame-180.png",
+          "pngSha256": "8eb063392efe3c15c3d264cc8630b46b15bbf0518f3a1fc0404a56db8908a5ef",
+          "canvases": [
+            {
+              "sha256": "0ccafb79ca2d261520d5bf6101945552d5989433f669b50c1deec6efd32c262a",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frame": 239,
+          "file": "round-2-frame-239.png",
+          "pngSha256": "d782a243369822f5d9b6ccadfdba1708b5b7520065939925a659d7beecae5f0d",
+          "canvases": [
+            {
+              "sha256": "c42310c63e5df535ee2976f433f68054b6623cd6ddd664f20e3f2bc3272b7636",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "differingFrames": [
+        {
+          "round": 1,
+          "frame": 120
+        },
+        {
+          "round": 2,
+          "frame": 120
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "mode": "reset",
+      "sceneSha256": "023a786c1f09323466c028ccbf82986dcd14457b22fcac42ed963150a7bcd6e5",
+      "status": "deterministic",
+      "frames": [
+        {
+          "round": 0,
+          "frame": 120,
+          "file": "round-0-frame-120.png",
+          "pngSha256": "7ca060af7e866238bc0d5b1733f73f6a6fd1eb06c44c91db26481909ca86a004",
+          "canvases": [
+            {
+              "sha256": "44982bd03e569b41fe3769f788c8315020d976260a0081e6542103f9e012be3b",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 0,
+          "frame": 180,
+          "file": "round-0-frame-180.png",
+          "pngSha256": "310ff3e1fe6078291139e96da90d251d9fcbb2d1c98a3d3358a3da871ee8cbda",
+          "canvases": [
+            {
+              "sha256": "f87e8de137526ef6805ef7a7ab9257ab216d628fedc4ce9f1baeb2f04ea82dfa",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 0,
+          "frame": 239,
+          "file": "round-0-frame-239.png",
+          "pngSha256": "c2b45d9dd8319ccadc614058e65a24f7c182365f91976da464ac6b18eb6300cf",
+          "canvases": [
+            {
+              "sha256": "433da234e8d74e1d93b12455ed2a7b4220e62a7633598b41b8b7ec257f4b1907",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 1,
+          "frame": 239,
+          "file": "round-1-frame-239.png",
+          "pngSha256": "c2b45d9dd8319ccadc614058e65a24f7c182365f91976da464ac6b18eb6300cf",
+          "canvases": [
+            {
+              "sha256": "433da234e8d74e1d93b12455ed2a7b4220e62a7633598b41b8b7ec257f4b1907",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 1,
+          "frame": 180,
+          "file": "round-1-frame-180.png",
+          "pngSha256": "310ff3e1fe6078291139e96da90d251d9fcbb2d1c98a3d3358a3da871ee8cbda",
+          "canvases": [
+            {
+              "sha256": "f87e8de137526ef6805ef7a7ab9257ab216d628fedc4ce9f1baeb2f04ea82dfa",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 1,
+          "frame": 120,
+          "file": "round-1-frame-120.png",
+          "pngSha256": "7ca060af7e866238bc0d5b1733f73f6a6fd1eb06c44c91db26481909ca86a004",
+          "canvases": [
+            {
+              "sha256": "44982bd03e569b41fe3769f788c8315020d976260a0081e6542103f9e012be3b",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frame": 120,
+          "file": "round-2-frame-120.png",
+          "pngSha256": "7ca060af7e866238bc0d5b1733f73f6a6fd1eb06c44c91db26481909ca86a004",
+          "canvases": [
+            {
+              "sha256": "44982bd03e569b41fe3769f788c8315020d976260a0081e6542103f9e012be3b",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frame": 180,
+          "file": "round-2-frame-180.png",
+          "pngSha256": "310ff3e1fe6078291139e96da90d251d9fcbb2d1c98a3d3358a3da871ee8cbda",
+          "canvases": [
+            {
+              "sha256": "f87e8de137526ef6805ef7a7ab9257ab216d628fedc4ce9f1baeb2f04ea82dfa",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frame": 239,
+          "file": "round-2-frame-239.png",
+          "pngSha256": "c2b45d9dd8319ccadc614058e65a24f7c182365f91976da464ac6b18eb6300cf",
+          "canvases": [
+            {
+              "sha256": "433da234e8d74e1d93b12455ed2a7b4220e62a7633598b41b8b7ec257f4b1907",
+              "state": {
+                "font": "10px sans-serif",
+                "globalAlpha": 1,
+                "composite": "source-over",
+                "filter": "none",
+                "transform": [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "differingFrames": []
+    }
+  ],
+  "sourceStateUnchanged": true
+}

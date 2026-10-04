@@ -1,0 +1,29 @@
+{
+  "executedAt": "2026-10-04T10:28:23.418Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/scene-reset-render/probe-KubpZS",
+  "sourceOperationId": "df5b5a6e-173d-4e69-aaa3-15ce765cfb0b",
+  "diagnosticOperationId": "88c8a9c8-abc4-459d-b9c6-ce7d728405eb",
+  "sourceSha256": "023a786c1f09323466c028ccbf82986dcd14457b22fcac42ed963150a7bcd6e5",
+  "repairedSourceSha256": "a66f457a39b6e4bc467a3b9c149b5b4636ddd7b3e8e1486920b8d5abe646007b",
+  "stageKey": "9a2c93e98d233548837877c8b031dc8f78605fe64a7d198a8163c0c2d430e944",
+  "repairDiff": {
+    "before": "ctx.clearRect(0, 0, 1920, 1080);",
+    "after": "ctx.reset(); // Technical repair: reset full per-frame Canvas state."
+  },
+  "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "status": "passed",
+  "technicalProbeOnly": true,
+  "deliveryEligible": false,
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "bc8d48ffc939f2aa471d81a0284ae7ecc88a3ea533343cdb93571406c632d957",
+    "bytes": 1490562,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 5,
+    "fps": 24,
+    "frames": 120,
+    "audio": false
+  },
+  "sourceStateUnchanged": true
+}
