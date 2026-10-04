@@ -1,0 +1,177 @@
+{
+  "executedAt": "2026-10-04T09:57:55.185Z",
+  "status": "trusted_review",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+  "challengeRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/speech-review-challenges/381a0978f076301890bbcc35ebf74b8bc6a213f8133426014d8d66a19aba9993",
+    "sha256": "381a0978f076301890bbcc35ebf74b8bc6a213f8133426014d8d66a19aba9993",
+    "bytes": 995,
+    "mime": "application/json"
+  },
+  "reviewRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/speech-reviews/5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c",
+    "sha256": "5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c",
+    "bytes": 811,
+    "mime": "application/json"
+  },
+  "confirmationMessageId": "298f2c92-9a95-4d76-9851-e6d1a9d51bc5",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "voiceSha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+  "transcript": {
+    "language": "zh-CN",
+    "model": "Systran/faster-whisper-medium",
+    "segments": [
+      {
+        "text": "撒下适量的水,润湿土壤。",
+        "startMs": 0,
+        "endMs": 2700,
+        "words": [
+          {
+            "text": "撒",
+            "startMs": 0,
+            "endMs": 600,
+            "probability": 0.8934174478054047
+          },
+          {
+            "text": "下",
+            "startMs": 600,
+            "endMs": 840,
+            "probability": 0.9881206750869751
+          },
+          {
+            "text": "适",
+            "startMs": 840,
+            "endMs": 1000,
+            "probability": 0.7709666192531586
+          },
+          {
+            "text": "量",
+            "startMs": 1000,
+            "endMs": 1180,
+            "probability": 0.999661922454834
+          },
+          {
+            "text": "的",
+            "startMs": 1180,
+            "endMs": 1360,
+            "probability": 0.9948176741600037
+          },
+          {
+            "text": "水,",
+            "startMs": 1360,
+            "endMs": 1620,
+            "probability": 0.9996065497398376
+          },
+          {
+            "text": "润",
+            "startMs": 1780,
+            "endMs": 1960,
+            "probability": 0.9920819699764252
+          },
+          {
+            "text": "湿",
+            "startMs": 1960,
+            "endMs": 2160,
+            "probability": 0.8786864876747131
+          },
+          {
+            "text": "土",
+            "startMs": 2160,
+            "endMs": 2460,
+            "probability": 0.9445828795433044
+          },
+          {
+            "text": "壤。",
+            "startMs": 2460,
+            "endMs": 2700,
+            "probability": 0.9954196512699127
+          }
+        ]
+      }
+    ],
+    "voiceSha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+    "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+    "recognizedText": "撒下适量的水,润湿土壤。"
+  },
+  "verified": {
+    "status": "trusted_review",
+    "model": "Systran/faster-whisper-medium",
+    "voiceSha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+    "recognizedText": "撒下适量的水,润湿土壤。",
+    "words": [
+      {
+        "text": "撒",
+        "startMs": 0,
+        "endMs": 600,
+        "probability": 0.8934174478054047
+      },
+      {
+        "text": "下",
+        "startMs": 600,
+        "endMs": 840,
+        "probability": 0.9881206750869751
+      },
+      {
+        "text": "适",
+        "startMs": 840,
+        "endMs": 1000,
+        "probability": 0.7709666192531586
+      },
+      {
+        "text": "量",
+        "startMs": 1000,
+        "endMs": 1180,
+        "probability": 0.999661922454834
+      },
+      {
+        "text": "的",
+        "startMs": 1180,
+        "endMs": 1360,
+        "probability": 0.9948176741600037
+      },
+      {
+        "text": "水,",
+        "startMs": 1360,
+        "endMs": 1620,
+        "probability": 0.9996065497398376
+      },
+      {
+        "text": "润",
+        "startMs": 1780,
+        "endMs": 1960,
+        "probability": 0.9920819699764252
+      },
+      {
+        "text": "湿",
+        "startMs": 1960,
+        "endMs": 2160,
+        "probability": 0.8786864876747131
+      },
+      {
+        "text": "土",
+        "startMs": 2160,
+        "endMs": 2460,
+        "probability": 0.9445828795433044
+      },
+      {
+        "text": "壤。",
+        "startMs": 2460,
+        "endMs": 2700,
+        "probability": 0.9954196512699127
+      }
+    ],
+    "speechReviewRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/speech-reviews/5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c",
+      "sha256": "5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c",
+      "bytes": 811,
+      "mime": "application/json"
+    }
+  },
+  "literalAsrMatch": false,
+  "formalProductionApproval": false,
+  "networkCalls": 0,
+  "operationAndBudgetUnchanged": true,
+  "limits": "Actual workspace-user confirmation archived as an owned user message and immutable single-WAV review. Existing original TTS/ASR evidence read with mustExist only, cold proof loaded; no media/model producer, script/transcript rewrite, failed-operation reset or preview/formal approval. The voice pipeline/package integration and other two unverified lines remain outstanding."
+}

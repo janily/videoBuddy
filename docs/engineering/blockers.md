@@ -1,5 +1,8 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 T10/T11/T14 可信试听复核增量：负责人实际单句确认已持久化并绑定原WAV/完整plan/transcript/词时间，生产Voice阶段及冷包可区分ASR pass/trusted_review，原洒→撒识别与失败op不改；最终AAC仍独立核。原四WAV实测3匹配+1明确复核、两新增ASR completed/冷恢复归档通过，0network/provider，原control/budget/operation未改。固定确认槽防JSON迁移、取消保留历史事实、新lookup仍当前epoch、首import消环、ZIP非授权审计/无owner/chat及FilmSpec完整plan绑定已实际RED→修复，双轴复审clean。最终103文件551项、lint/build/构建后types/diffcheck通过，见 [试听复核验证](evidence/spoken-review-validation.md)。公共试听入口/完整预览后续链仍待接，C0/C1/C2未达到；不重置旧failed/unknown，无push/部署。
+
+
 2026-10-04 升级语音新主题终态：独立seed-oD7Sxk / project4a5c6131…，真实Director stream与Treatment两调用settled（4993/2509、4346/3350），四原TTS完成。第1句ASR通过，第2句洒下→撒下保留ASR_MISMATCH，后两句未核；operation failed/attention/no preview。旧项目与unknown未改，不覆盖旧new-theme报告。AT079试听复核的实际原音频已准备，等待负责人判断；费用授权不代替豁免。继续独立功能，见 [新主题结果](evidence/new-theme-upgraded-validation.md)。
 
 

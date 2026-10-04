@@ -1,0 +1,664 @@
+{
+  "executedAt": "2026-10-04T09:58:23.762Z",
+  "status": "source_narration_verified",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+  "sourceRevisionId": "6c44bcea-b727-4aee-9368-cac9299e7e45",
+  "diagnosticRevisionId": "80386cdf-c046-459d-8e13-8694371a52ef",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "journalPrefix": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/80386cdf-c046-459d-8e13-8694371a52ef/media-effects",
+  "mustExist": false,
+  "verified": {
+    "durationMs": 20000,
+    "lines": [
+      {
+        "lineId": "line_1",
+        "language": "zh-CN",
+        "spokenText": "把小种子轻轻放进泥土里。",
+        "displayText": "把小种子轻轻放进泥土里。",
+        "expectedAsrText": "把小种子轻轻放进泥土里。",
+        "startMs": 0,
+        "reservedMs": 5000,
+        "durationMs": 3600,
+        "voice": {
+          "lineId": "line_1",
+          "language": "zh-CN",
+          "voice": "zf_001",
+          "provider": "kokoro-js",
+          "model": "onnx-community/Kokoro-82M-v1.1-zh-ONNX@6cc0f0d2ebe369a68b0df87c2b65c1af8c0ac3e3",
+          "modelLicense": "Apache-2.0",
+          "runtimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+          "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/voice/7f949e6f0dcc4e2982ff90dc308de1b5d0a855618baffb19f12ff2f8c9b632b8/output/narration.wav",
+          "wav": {
+            "codec": "pcm_f32le",
+            "sampleRate": 24000,
+            "channels": 1,
+            "samples": 86400,
+            "durationMs": 3600,
+            "bytes": 345644,
+            "sha256": "e1392e0e195735978df21fedc35d0c7d235834109a4e42b7121cd9f349715a7a",
+            "peakDbfs": -8.136141291317664,
+            "rmsDbfs": -24.21122877786146
+          }
+        },
+        "asrStatus": "pass",
+        "wordTimingsStatus": "available",
+        "asr": {
+          "model": "Systran/faster-whisper-medium",
+          "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "voiceSha256": "e1392e0e195735978df21fedc35d0c7d235834109a4e42b7121cd9f349715a7a"
+        },
+        "recognizedText": "把小種子輕輕放進泥土裡。",
+        "wordTimings": [
+          {
+            "text": "把",
+            "startMs": 0,
+            "endMs": 520,
+            "probability": 0.8569846749305725
+          },
+          {
+            "text": "小",
+            "startMs": 520,
+            "endMs": 780,
+            "probability": 0.9968867897987366
+          },
+          {
+            "text": "種",
+            "startMs": 780,
+            "endMs": 1020,
+            "probability": 0.7151435613632202
+          },
+          {
+            "text": "子",
+            "startMs": 1020,
+            "endMs": 1300,
+            "probability": 0.9989525079727173
+          },
+          {
+            "text": "輕",
+            "startMs": 1300,
+            "endMs": 1620,
+            "probability": 0.9402843117713928
+          },
+          {
+            "text": "輕",
+            "startMs": 1620,
+            "endMs": 1820,
+            "probability": 0.9903203845024109
+          },
+          {
+            "text": "放",
+            "startMs": 1820,
+            "endMs": 2080,
+            "probability": 0.9872547388076782
+          },
+          {
+            "text": "進",
+            "startMs": 2080,
+            "endMs": 2280,
+            "probability": 0.9849882125854492
+          },
+          {
+            "text": "泥",
+            "startMs": 2280,
+            "endMs": 2480,
+            "probability": 0.9974905848503113
+          },
+          {
+            "text": "土",
+            "startMs": 2480,
+            "endMs": 2680,
+            "probability": 0.9980816841125488
+          },
+          {
+            "text": "裡。",
+            "startMs": 2680,
+            "endMs": 2940,
+            "probability": 0.835821807384491
+          }
+        ]
+      },
+      {
+        "lineId": "line_2",
+        "language": "zh-CN",
+        "spokenText": "洒下适量的水，润湿土壤。",
+        "displayText": "洒下适量的水，润湿土壤。",
+        "expectedAsrText": "洒下适量的水，润湿土壤。",
+        "startMs": 5000,
+        "reservedMs": 5000,
+        "durationMs": 3375,
+        "voice": {
+          "lineId": "line_2",
+          "language": "zh-CN",
+          "voice": "zf_001",
+          "provider": "kokoro-js",
+          "model": "onnx-community/Kokoro-82M-v1.1-zh-ONNX@6cc0f0d2ebe369a68b0df87c2b65c1af8c0ac3e3",
+          "modelLicense": "Apache-2.0",
+          "runtimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+          "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/voice/840927688c56deb79dddaa5383d8e88322e449335a214fd176d82e744af70198/output/narration.wav",
+          "wav": {
+            "codec": "pcm_f32le",
+            "sampleRate": 24000,
+            "channels": 1,
+            "samples": 81000,
+            "durationMs": 3375,
+            "bytes": 324044,
+            "sha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+            "peakDbfs": -8.82340578897107,
+            "rmsDbfs": -24.214137905377623
+          }
+        },
+        "asrStatus": "trusted_review",
+        "wordTimingsStatus": "available",
+        "speechReview": {
+          "ref": {
+            "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/speech-reviews/5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c",
+            "sha256": "5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c",
+            "bytes": 811,
+            "mime": "application/json"
+          },
+          "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+          "transcript": {
+            "language": "zh-CN",
+            "model": "Systran/faster-whisper-medium",
+            "segments": [
+              {
+                "text": "撒下适量的水,润湿土壤。",
+                "startMs": 0,
+                "endMs": 2700,
+                "words": [
+                  {
+                    "text": "撒",
+                    "startMs": 0,
+                    "endMs": 600,
+                    "probability": 0.8934174478054047
+                  },
+                  {
+                    "text": "下",
+                    "startMs": 600,
+                    "endMs": 840,
+                    "probability": 0.9881206750869751
+                  },
+                  {
+                    "text": "适",
+                    "startMs": 840,
+                    "endMs": 1000,
+                    "probability": 0.7709666192531586
+                  },
+                  {
+                    "text": "量",
+                    "startMs": 1000,
+                    "endMs": 1180,
+                    "probability": 0.999661922454834
+                  },
+                  {
+                    "text": "的",
+                    "startMs": 1180,
+                    "endMs": 1360,
+                    "probability": 0.9948176741600037
+                  },
+                  {
+                    "text": "水,",
+                    "startMs": 1360,
+                    "endMs": 1620,
+                    "probability": 0.9996065497398376
+                  },
+                  {
+                    "text": "润",
+                    "startMs": 1780,
+                    "endMs": 1960,
+                    "probability": 0.9920819699764252
+                  },
+                  {
+                    "text": "湿",
+                    "startMs": 1960,
+                    "endMs": 2160,
+                    "probability": 0.8786864876747131
+                  },
+                  {
+                    "text": "土",
+                    "startMs": 2160,
+                    "endMs": 2460,
+                    "probability": 0.9445828795433044
+                  },
+                  {
+                    "text": "壤。",
+                    "startMs": 2460,
+                    "endMs": 2700,
+                    "probability": 0.9954196512699127
+                  }
+                ]
+              }
+            ],
+            "voiceSha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+            "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+            "recognizedText": "撒下适量的水,润湿土壤。"
+          }
+        },
+        "asr": {
+          "model": "Systran/faster-whisper-medium",
+          "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "voiceSha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02"
+        },
+        "recognizedText": "撒下适量的水,润湿土壤。",
+        "wordTimings": [
+          {
+            "text": "撒",
+            "startMs": 0,
+            "endMs": 600,
+            "probability": 0.8934174478054047
+          },
+          {
+            "text": "下",
+            "startMs": 600,
+            "endMs": 840,
+            "probability": 0.9881206750869751
+          },
+          {
+            "text": "适",
+            "startMs": 840,
+            "endMs": 1000,
+            "probability": 0.7709666192531586
+          },
+          {
+            "text": "量",
+            "startMs": 1000,
+            "endMs": 1180,
+            "probability": 0.999661922454834
+          },
+          {
+            "text": "的",
+            "startMs": 1180,
+            "endMs": 1360,
+            "probability": 0.9948176741600037
+          },
+          {
+            "text": "水,",
+            "startMs": 1360,
+            "endMs": 1620,
+            "probability": 0.9996065497398376
+          },
+          {
+            "text": "润",
+            "startMs": 1780,
+            "endMs": 1960,
+            "probability": 0.9920819699764252
+          },
+          {
+            "text": "湿",
+            "startMs": 1960,
+            "endMs": 2160,
+            "probability": 0.8786864876747131
+          },
+          {
+            "text": "土",
+            "startMs": 2160,
+            "endMs": 2460,
+            "probability": 0.9445828795433044
+          },
+          {
+            "text": "壤。",
+            "startMs": 2460,
+            "endMs": 2700,
+            "probability": 0.9954196512699127
+          }
+        ]
+      },
+      {
+        "lineId": "line_3",
+        "language": "zh-CN",
+        "spokenText": "泥土里探出了嫩绿的小芽。",
+        "displayText": "泥土里探出了嫩绿的小芽。",
+        "expectedAsrText": "泥土里探出了嫩绿的小芽。",
+        "startMs": 10000,
+        "reservedMs": 5000,
+        "durationMs": 3325,
+        "voice": {
+          "lineId": "line_3",
+          "language": "zh-CN",
+          "voice": "zf_001",
+          "provider": "kokoro-js",
+          "model": "onnx-community/Kokoro-82M-v1.1-zh-ONNX@6cc0f0d2ebe369a68b0df87c2b65c1af8c0ac3e3",
+          "modelLicense": "Apache-2.0",
+          "runtimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+          "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/voice/4ca2972b8f6740d0112faa81681d6b6e020b1ea3d2613de8112efc2f27a28a9e/output/narration.wav",
+          "wav": {
+            "codec": "pcm_f32le",
+            "sampleRate": 24000,
+            "channels": 1,
+            "samples": 79800,
+            "durationMs": 3325,
+            "bytes": 319244,
+            "sha256": "763ccf341f8a75793fa1be3ec50888b775d16bdfbff94abf166bb0e31b68e310",
+            "peakDbfs": -8.044868139262743,
+            "rmsDbfs": -24.33998322478397
+          }
+        },
+        "asrStatus": "pass",
+        "wordTimingsStatus": "available",
+        "asr": {
+          "model": "Systran/faster-whisper-medium",
+          "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "voiceSha256": "763ccf341f8a75793fa1be3ec50888b775d16bdfbff94abf166bb0e31b68e310"
+        },
+        "recognizedText": "泥土里探出了嫩绿的小芽",
+        "wordTimings": [
+          {
+            "text": "泥",
+            "startMs": 0,
+            "endMs": 500,
+            "probability": 0.9955228269100189
+          },
+          {
+            "text": "土",
+            "startMs": 500,
+            "endMs": 720,
+            "probability": 0.9965274930000305
+          },
+          {
+            "text": "里",
+            "startMs": 720,
+            "endMs": 980,
+            "probability": 0.6062018871307373
+          },
+          {
+            "text": "探",
+            "startMs": 980,
+            "endMs": 1260,
+            "probability": 0.9496580958366394
+          },
+          {
+            "text": "出",
+            "startMs": 1260,
+            "endMs": 1500,
+            "probability": 0.9953932762145996
+          },
+          {
+            "text": "了",
+            "startMs": 1500,
+            "endMs": 1720,
+            "probability": 0.9832990765571594
+          },
+          {
+            "text": "嫩",
+            "startMs": 1720,
+            "endMs": 1840,
+            "probability": 0.9968976080417633
+          },
+          {
+            "text": "绿",
+            "startMs": 1840,
+            "endMs": 2020,
+            "probability": 0.8537506759166718
+          },
+          {
+            "text": "的",
+            "startMs": 2020,
+            "endMs": 2240,
+            "probability": 0.9836000204086304
+          },
+          {
+            "text": "小",
+            "startMs": 2240,
+            "endMs": 2420,
+            "probability": 0.9892596006393433
+          },
+          {
+            "text": "芽",
+            "startMs": 2420,
+            "endMs": 2680,
+            "probability": 0.9513845145702362
+          }
+        ]
+      },
+      {
+        "lineId": "line_4",
+        "language": "zh-CN",
+        "spokenText": "观察成长，耐心照料。",
+        "displayText": "观察成长，耐心照料。",
+        "expectedAsrText": "观察成长，耐心照料。",
+        "startMs": 15000,
+        "reservedMs": 5000,
+        "durationMs": 3000,
+        "voice": {
+          "lineId": "line_4",
+          "language": "zh-CN",
+          "voice": "zf_001",
+          "provider": "kokoro-js",
+          "model": "onnx-community/Kokoro-82M-v1.1-zh-ONNX@6cc0f0d2ebe369a68b0df87c2b65c1af8c0ac3e3",
+          "modelLicense": "Apache-2.0",
+          "runtimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+          "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/voice/2d626d9e26e278388eb95bd67adcdc098a00006c81b25b16c680084164d9f552/output/narration.wav",
+          "wav": {
+            "codec": "pcm_f32le",
+            "sampleRate": 24000,
+            "channels": 1,
+            "samples": 72000,
+            "durationMs": 3000,
+            "bytes": 288044,
+            "sha256": "8fb3651a37e778766fbb8daf45e38811bf9b47baafe7385d9643439ef670f0da",
+            "peakDbfs": -6.675911881410297,
+            "rmsDbfs": -24.399927386808592
+          }
+        },
+        "asrStatus": "pass",
+        "wordTimingsStatus": "available",
+        "asr": {
+          "model": "Systran/faster-whisper-medium",
+          "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "voiceSha256": "8fb3651a37e778766fbb8daf45e38811bf9b47baafe7385d9643439ef670f0da"
+        },
+        "recognizedText": "觀察成長 耐心照料",
+        "wordTimings": [
+          {
+            "text": "觀",
+            "startMs": 0,
+            "endMs": 580,
+            "probability": 0.6739479899406433
+          },
+          {
+            "text": "察",
+            "startMs": 580,
+            "endMs": 800,
+            "probability": 0.9993625283241272
+          },
+          {
+            "text": "成",
+            "startMs": 800,
+            "endMs": 1080,
+            "probability": 0.9928103685379028
+          },
+          {
+            "text": "長",
+            "startMs": 1080,
+            "endMs": 1320,
+            "probability": 0.9976280331611633
+          },
+          {
+            "text": " 耐",
+            "startMs": 1500,
+            "endMs": 1620,
+            "probability": 0.9957105815410614
+          },
+          {
+            "text": "心",
+            "startMs": 1620,
+            "endMs": 1840,
+            "probability": 0.9988987445831299
+          },
+          {
+            "text": "照",
+            "startMs": 1840,
+            "endMs": 2080,
+            "probability": 0.9923036098480225
+          },
+          {
+            "text": "料",
+            "startMs": 2080,
+            "endMs": 2300,
+            "probability": 0.9931119680404663
+          }
+        ]
+      }
+    ]
+  },
+  "packaged": {
+    "lines": [
+      {
+        "lineId": "line_1",
+        "displayText": "把小种子轻轻放进泥土里。",
+        "spokenText": "把小种子轻轻放进泥土里。",
+        "expectedAsrText": "把小种子轻轻放进泥土里。",
+        "voiceConfigHash": "ff0218d8223fd2cd7a744134a1db138b1586a42e779714eb7168cef701bdf802",
+        "audioRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/audio-files/e1392e0e195735978df21fedc35d0c7d235834109a4e42b7121cd9f349715a7a.wav",
+          "sha256": "e1392e0e195735978df21fedc35d0c7d235834109a4e42b7121cd9f349715a7a",
+          "bytes": 345644,
+          "mime": "audio/wav"
+        },
+        "startSample": 0,
+        "endSample": 172800,
+        "wordTimingsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-words/60d3e753beac552b694916ba1d4ec36e4e9e376a15b2c5e1177eeeb5865806c6",
+          "sha256": "60d3e753beac552b694916ba1d4ec36e4e9e376a15b2c5e1177eeeb5865806c6",
+          "bytes": 1144,
+          "mime": "application/json"
+        }
+      },
+      {
+        "lineId": "line_2",
+        "displayText": "洒下适量的水，润湿土壤。",
+        "spokenText": "洒下适量的水，润湿土壤。",
+        "expectedAsrText": "洒下适量的水，润湿土壤。",
+        "voiceConfigHash": "ff0218d8223fd2cd7a744134a1db138b1586a42e779714eb7168cef701bdf802",
+        "audioRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/audio-files/3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02.wav",
+          "sha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+          "bytes": 324044,
+          "mime": "audio/wav"
+        },
+        "startSample": 240000,
+        "endSample": 402000,
+        "wordTimingsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-words/f2b0280ac650aa5970a76b8e16b80071a227786ec2d6a8e921ab43d68bd7af82",
+          "sha256": "f2b0280ac650aa5970a76b8e16b80071a227786ec2d6a8e921ab43d68bd7af82",
+          "bytes": 2562,
+          "mime": "application/json"
+        }
+      },
+      {
+        "lineId": "line_3",
+        "displayText": "泥土里探出了嫩绿的小芽。",
+        "spokenText": "泥土里探出了嫩绿的小芽。",
+        "expectedAsrText": "泥土里探出了嫩绿的小芽。",
+        "voiceConfigHash": "ff0218d8223fd2cd7a744134a1db138b1586a42e779714eb7168cef701bdf802",
+        "audioRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/audio-files/763ccf341f8a75793fa1be3ec50888b775d16bdfbff94abf166bb0e31b68e310.wav",
+          "sha256": "763ccf341f8a75793fa1be3ec50888b775d16bdfbff94abf166bb0e31b68e310",
+          "bytes": 319244,
+          "mime": "audio/wav"
+        },
+        "startSample": 480000,
+        "endSample": 639600,
+        "wordTimingsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-words/2a2d31ed4267de8e6b26d868ee0db12d7ba493e1788026fae8bd6f77fc4f9bc9",
+          "sha256": "2a2d31ed4267de8e6b26d868ee0db12d7ba493e1788026fae8bd6f77fc4f9bc9",
+          "bytes": 1137,
+          "mime": "application/json"
+        }
+      },
+      {
+        "lineId": "line_4",
+        "displayText": "观察成长，耐心照料。",
+        "spokenText": "观察成长，耐心照料。",
+        "expectedAsrText": "观察成长，耐心照料。",
+        "voiceConfigHash": "ff0218d8223fd2cd7a744134a1db138b1586a42e779714eb7168cef701bdf802",
+        "audioRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/audio-files/8fb3651a37e778766fbb8daf45e38811bf9b47baafe7385d9643439ef670f0da.wav",
+          "sha256": "8fb3651a37e778766fbb8daf45e38811bf9b47baafe7385d9643439ef670f0da",
+          "bytes": 288044,
+          "mime": "audio/wav"
+        },
+        "startSample": 720000,
+        "endSample": 864000,
+        "wordTimingsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-words/cb7305bd4efb23089e4e0648096b116567519905d2c89da8592503c3597095d2",
+          "sha256": "cb7305bd4efb23089e4e0648096b116567519905d2c89da8592503c3597095d2",
+          "bytes": 904,
+          "mime": "application/json"
+        }
+      }
+    ],
+    "sources": [
+      {
+        "id": "voice-line_1",
+        "kind": "generated",
+        "sourceRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-source/3c45b34b6df76f07e424f020033cc6090b855c7a9e9bc02d850d64819f1ac868",
+          "sha256": "3c45b34b6df76f07e424f020033cc6090b855c7a9e9bc02d850d64819f1ac868",
+          "bytes": 1489,
+          "mime": "application/json"
+        },
+        "rightsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-rights/859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "sha256": "859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "bytes": 236,
+          "mime": "application/json"
+        }
+      },
+      {
+        "id": "voice-line_2",
+        "kind": "generated",
+        "sourceRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-source/bb0e0eb607992bbb26fb040d1869546c820b5c7721e955fe934c6a15fb07c12b",
+          "sha256": "bb0e0eb607992bbb26fb040d1869546c820b5c7721e955fe934c6a15fb07c12b",
+          "bytes": 1494,
+          "mime": "application/json"
+        },
+        "rightsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-rights/859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "sha256": "859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "bytes": 236,
+          "mime": "application/json"
+        }
+      },
+      {
+        "id": "voice-line_3",
+        "kind": "generated",
+        "sourceRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-source/7c70fd559ed8660df75966d2ddf4980c557fc7b5b9a7ffd16f029f8f1f6f9cef",
+          "sha256": "7c70fd559ed8660df75966d2ddf4980c557fc7b5b9a7ffd16f029f8f1f6f9cef",
+          "bytes": 1494,
+          "mime": "application/json"
+        },
+        "rightsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-rights/859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "sha256": "859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "bytes": 236,
+          "mime": "application/json"
+        }
+      },
+      {
+        "id": "voice-line_4",
+        "kind": "generated",
+        "sourceRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-source/c81138800f09c6bf0ef2b65b2df93c1eeb343fb5b4283d811a61b78737337bf2",
+          "sha256": "c81138800f09c6bf0ef2b65b2df93c1eeb343fb5b4283d811a61b78737337bf2",
+          "bytes": 1476,
+          "mime": "application/json"
+        },
+        "rightsRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/80386cdf-c046-459d-8e13-8694371a52ef/narration-rights/859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "sha256": "859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb",
+          "bytes": 236,
+          "mime": "application/json"
+        }
+      }
+    ]
+  },
+  "networkCalls": 0,
+  "sourceOperationAndBudgetUnchanged": true,
+  "sourceControlUnchanged": true,
+  "limits": "Independent source-WAV check and cold packaging only. One explicit human review applies to line_2 only. Original failed preview operation remains failed. No Treatment/Director rerun, TTS synthesis, final mix, picture, Critic, preview or formal approval."
+}

@@ -1,3 +1,4 @@
+import {hasVerifiedNarrationStatus} from './asr';
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
 import {assertDockerCacheReusable,type DockerJournal} from '@/services/video/media/docker-journal';
 import {createHash} from 'node:crypto';
@@ -67,7 +68,7 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
  for(const [index,line] of ordered.entries()){
   await options.assertActive?.();
   const original=source.get(line.lineId);
-  if(!original||original.language!==line.language||original.spokenText!==line.spokenText||original.displayText!==line.displayText||original.expectedAsrText!==line.expectedAsrText||original.startMs!==line.startMs||original.reservedMs!==line.reservedMs||line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||line.durationMs<=0)throw Error('POSTMIX_PLAN_CHANGED');
+  if(!original||original.language!==line.language||original.spokenText!==line.spokenText||original.displayText!==line.displayText||original.expectedAsrText!==line.expectedAsrText||original.startMs!==line.startMs||original.reservedMs!==line.reservedMs||!hasVerifiedNarrationStatus(line)||line.wordTimingsStatus!=='available'||line.durationMs<=0)throw Error('POSTMIX_PLAN_CHANGED');
   const nextStart=ordered[index+1]?.startMs??film.durationMs,lengthMs=Math.min(line.durationMs+300,nextStart-line.startMs,film.durationMs-line.startMs);
   if(lengthMs<line.durationMs||lengthMs>30000)throw Error('POSTMIX_PLAN_CHANGED');
   const key=createHash('sha256').update(JSON.stringify([film.sha256,line.lineId,line.language,line.startMs,lengthMs,config.runtimeDigest,'postmix-v1'])).digest('hex');

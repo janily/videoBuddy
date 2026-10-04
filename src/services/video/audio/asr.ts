@@ -8,13 +8,17 @@ import {Environment} from '@/services/video/config/environment';
 import {VoiceResult} from './voice';
 import {NarrationManifest,NarrationPlan} from './narration';
 import {inspectVoiceWav,VoiceWavProbe} from './wav';
+import {canonicalHash} from '@/services/video/domain/hash';
 import {assertAsrExpected} from '@/services/video/timeline/compile';
+import {assertSpeechReview,assertSpeechReviewLine,type ConfirmedSpeechReview} from './spoken-review';
 
 const wordSchema=z.strictObject({text:z.string().max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)});
 const segmentSchema=z.strictObject({text:z.string().max(1000),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),words:z.array(wordSchema).max(200)});
 export const AsrModelSchema=z.enum(['Systran/faster-whisper-small','Systran/faster-whisper-medium']);
 const transcriptSchema=z.strictObject({language:z.enum(['zh-CN','en']),model:AsrModelSchema,segments:z.array(segmentSchema).max(100)});
-export type AsrTranscript=z.infer<typeof transcriptSchema> & {voiceSha256:string;runtimeDigest:string;recognizedText:string};
+export const AsrTranscriptSchema=transcriptSchema.extend({voiceSha256:z.string().regex(/^[a-f0-9]{64}$/),runtimeDigest:z.string().regex(/^[a-f0-9]{64}$/),recognizedText:z.string().min(1).max(2000)});
+export type AsrTranscript=z.infer<typeof AsrTranscriptSchema>;
+export type SpeechReviewEvidence={ref:import('@/contracts/video/domain').ObjectRef;planSha256:string;transcript:AsrTranscript};
 
 export function asrConfiguration(env:Environment){
  const image=env.VIDEO_ASR_IMAGE_REF,digest=env.VIDEO_ASR_RUNTIME_DIGEST;
@@ -75,16 +79,20 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
 export async function transcribeVoice(root:string,voice:VoiceResult,env:Environment=process.env):Promise<AsrTranscript>{
  return transcribeAudio(root,voice,'voice',env);
 }
-export function verifySpokenText(originalExpectedAsrText:string,proposedExpectedAsrText:string,transcript:AsrTranscript){
- assertAsrExpected(originalExpectedAsrText,proposedExpectedAsrText,transcript.recognizedText);
+export function verifySpokenText(originalExpectedAsrText:string,proposedExpectedAsrText:string,transcript:AsrTranscript,review?:ConfirmedSpeechReview){
+ let status:'pass'|'trusted_review'='pass';
+ try{assertAsrExpected(originalExpectedAsrText,proposedExpectedAsrText,transcript.recognizedText)}catch(error){
+  if((error as Error).message!=='ASR_MISMATCH'||!review)throw error;
+  assertSpeechReview(originalExpectedAsrText,transcript,review);status='trusted_review';
+ }
  const words=transcript.segments.flatMap(segment=>segment.words);
  if(words.length===0||words.some(word=>!word.text.trim()||word.endMs<=word.startMs))throw Error('ASR_TIMINGS_UNAVAILABLE');
  for(let i=1;i<words.length;i++)if(words[i].startMs<words[i-1].endMs)throw Error('ASR_TIMINGS_UNAVAILABLE');
- return{status:'pass' as const,model:transcript.model,voiceSha256:transcript.voiceSha256,recognizedText:transcript.recognizedText,words};
+ return{status,model:transcript.model,voiceSha256:transcript.voiceSha256,recognizedText:transcript.recognizedText,words,...(status==='trusted_review'?{speechReviewRef:review!.ref}:{})};
 }
 
-export type VerifiedNarrationManifest={durationMs:number;lines:Array<Omit<NarrationManifest['lines'][number],'asrStatus'|'wordTimingsStatus'> & {asrStatus:'pass';wordTimingsStatus:'available';asr:{model:AsrTranscript['model'];runtimeDigest:string;voiceSha256:string};recognizedText:string;wordTimings:Array<{text:string;startMs:number;endMs:number;probability:number}>}>};
-export async function verifyNarration(originalPlan:NarrationPlan,manifest:NarrationManifest,root:string,recognize:(root:string,voice:VoiceResult)=>Promise<AsrTranscript>=transcribeVoice):Promise<VerifiedNarrationManifest>{
+export type VerifiedNarrationManifest={durationMs:number;lines:Array<Omit<NarrationManifest['lines'][number],'asrStatus'|'wordTimingsStatus'> & {asrStatus:'pass'|'trusted_review';speechReview?:SpeechReviewEvidence;wordTimingsStatus:'available';asr:{model:AsrTranscript['model'];runtimeDigest:string;voiceSha256:string};recognizedText:string;wordTimings:Array<{text:string;startMs:number;endMs:number;probability:number}>}>};
+export async function verifyNarration(originalPlan:NarrationPlan,manifest:NarrationManifest,root:string,recognize:(root:string,voice:VoiceResult)=>Promise<AsrTranscript>=transcribeVoice,resolveReview?:(line:NarrationPlan['lines'][number],voice:VoiceResult,transcript:AsrTranscript)=>Promise<ConfirmedSpeechReview|undefined>):Promise<VerifiedNarrationManifest>{
  if(originalPlan.durationMs!==manifest.durationMs||originalPlan.lines.length!==manifest.lines.length)throw Error('NARRATION_PLAN_CHANGED');
  const original=new Map(originalPlan.lines.map(line=>[line.lineId,line]));
  if(original.size!==originalPlan.lines.length||new Set(manifest.lines.map(line=>line.lineId)).size!==manifest.lines.length)throw Error('NARRATION_PLAN_CHANGED');
@@ -96,8 +104,16 @@ export async function verifyNarration(originalPlan:NarrationPlan,manifest:Narrat
   const transcript=await recognize(root,line.voice);
   if(transcript.voiceSha256!==line.voice.wav.sha256)throw Error('ASR_SOURCE_CHANGED');
   if(transcript.language!==line.language)throw Error('ASR_OUTPUT_INVALID');
-  const verified=verifySpokenText(source.expectedAsrText,line.expectedAsrText,transcript);
-  lines.push({...line,asrStatus:'pass',wordTimingsStatus:'available',asr:{model:transcript.model,runtimeDigest:transcript.runtimeDigest,voiceSha256:transcript.voiceSha256},recognizedText:verified.recognizedText,wordTimings:verified.words});
+  const review=await resolveReview?.(source,line.voice,transcript);
+  if(review)assertSpeechReviewLine(review,source,line.voice.runtimeDigest,canonicalHash(originalPlan));
+  const verified=verifySpokenText(source.expectedAsrText,line.expectedAsrText,transcript,review);
+  lines.push({...line,asrStatus:verified.status,...(verified.status==='trusted_review'?{speechReview:{ref:review!.ref,planSha256:canonicalHash(originalPlan),transcript}}:{}),wordTimingsStatus:'available',asr:{model:transcript.model,runtimeDigest:transcript.runtimeDigest,voiceSha256:transcript.voiceSha256},recognizedText:verified.recognizedText,wordTimings:verified.words});
  }
  return{durationMs:manifest.durationMs,lines};
+}
+
+// Structural guard only. Durable stage/package boundaries additionally load the
+// owner-bound confirmation and validate its audio, plan and transcript hashes.
+export function hasVerifiedNarrationStatus(line:VerifiedNarrationManifest['lines'][number]){
+ return line.asrStatus==='pass'&&!line.speechReview||line.asrStatus==='trusted_review'&&Boolean(line.speechReview);
 }

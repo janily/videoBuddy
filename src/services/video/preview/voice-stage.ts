@@ -3,8 +3,9 @@ import {z} from 'zod';
 import type {ObjectRef,Understanding} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
 import {type NarrationPlan,prepareNarration} from '@/services/video/audio/narration';
-import {AsrModelSchema,asrConfiguration,transcribeVoice,verifyNarration,type AsrTranscript,type VerifiedNarrationManifest} from '@/services/video/audio/asr';
+import {hasVerifiedNarrationStatus,AsrModelSchema,asrConfiguration,transcribeAudio,verifyNarration,type AsrTranscript,type VerifiedNarrationManifest} from '@/services/video/audio/asr';
 import {synthesizeVoice,voiceConfiguration,type VoiceJob,type VoiceResult} from '@/services/video/audio/voice';
+import {assertVerifiedSpeechReview,findConfirmedSpeechReview,createSpeechReviewChallenge} from '@/services/video/audio/spoken-review';
 import {inspectVoiceWav} from '@/services/video/audio/wav';
 import type {Environment} from '@/services/video/config/environment';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
@@ -27,7 +28,7 @@ async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Pro
 async function assertVoiceFiles(root:string,verified:VerifiedNarrationManifest){
  for(const line of verified.lines){
   const path=line.voice.outputPath,inside=relative(join(root,'voice'),path);
-  if(!isAbsolute(path)||inside.startsWith('..')||isAbsolute(inside)||!inside||line.asrStatus!=='pass'||line.wordTimingsStatus!=='available')throw Error('VOICE_SOURCE_CHANGED');
+  if(!isAbsolute(path)||inside.startsWith('..')||isAbsolute(inside)||!inside||!hasVerifiedNarrationStatus(line)||line.wordTimingsStatus!=='available')throw Error('VOICE_SOURCE_CHANGED');
   let actual;try{actual=await inspectVoiceWav(path)}catch{throw Error('VOICE_SOURCE_CHANGED')}
   if(canonicalHash(actual)!==canonicalHash(line.voice.wav))throw Error('VOICE_SOURCE_CHANGED');
  }
@@ -36,7 +37,7 @@ function assertManifest(plan:NarrationPlan,verified:VerifiedNarrationManifest){
  if(verified.durationMs!==plan.durationMs||verified.lines.length!==plan.lines.length)throw Error('VOICE_STAGE_REF_CHANGED');
  for(const [index,line] of verified.lines.entries()){
   const expected=plan.lines[index];
-  if(line.lineId!==expected.lineId||line.language!==expected.language||line.spokenText!==expected.spokenText||line.displayText!==expected.displayText||line.expectedAsrText!==expected.expectedAsrText||line.startMs!==expected.startMs||line.reservedMs!==expected.reservedMs||line.durationMs<=0||line.durationMs>line.reservedMs||line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||line.wordTimings.length===0||line.asr?.voiceSha256!==line.voice.wav.sha256||!AsrModelSchema.safeParse(line.asr.model).success||!/^([a-f0-9]{64})$/.test(line.asr.runtimeDigest))throw Error('VOICE_STAGE_REF_CHANGED');
+  if(line.lineId!==expected.lineId||line.language!==expected.language||line.spokenText!==expected.spokenText||line.displayText!==expected.displayText||line.expectedAsrText!==expected.expectedAsrText||line.startMs!==expected.startMs||line.reservedMs!==expected.reservedMs||line.durationMs<=0||line.durationMs>line.reservedMs||!hasVerifiedNarrationStatus(line)||line.wordTimingsStatus!=='available'||line.wordTimings.length===0||line.asr?.voiceSha256!==line.voice.wav.sha256||!AsrModelSchema.safeParse(line.asr.model).success||!/^([a-f0-9]{64})$/.test(line.asr.runtimeDigest))throw Error('VOICE_STAGE_REF_CHANGED');
  }
 }
 
@@ -57,16 +58,29 @@ export async function prepareVoiceStage(projects:ProjectStore,projectId:string,r
   if(!matching(existing))throw Error('VOICE_STAGE_CONFLICT');
   const [storedPlan,verified]=await Promise.all([readRef<NarrationPlan>(projects,existing.planRef,revisionPrefix),readRef<VerifiedNarrationManifest>(projects,existing.verifiedRef,revisionPrefix)]);
   if(canonicalHash(storedPlan)!==canonicalHash(plan))throw Error('VOICE_STAGE_CONFLICT');
-  assertManifest(storedPlan,verified);await assertVoiceFiles(root,verified);
+  assertManifest(storedPlan,verified);for(const line of verified.lines)await assertVerifiedSpeechReview(projects.store,projectId,storedPlan,line);await assertVoiceFiles(root,verified);
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
   return existing;
  }
  if(options.mustExist)throw Error('VOICE_STAGE_MISSING');
  if(plan.lines.length){if(!options.generate)voiceConfiguration(env);if(!options.recognize)asrConfiguration(env)}
- const prepared=await prepareNarration(plan,root,options.generate||((dir,job)=>synthesizeVoice(dir,job,env)));
- const verified=await verifyNarration(plan,prepared,root,options.recognize||((dir,voice)=>transcribeVoice(dir,voice,env)));
- assertManifest(plan,verified);await assertVoiceFiles(root,verified);
+ const assertActive=async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
+ const prepared=await prepareNarration(plan,root,async(dir,job)=>{
+  await assertActive();const result=await (options.generate?options.generate(dir,job):synthesizeVoice(dir,job,env));await assertActive();return result;
+ });
+ const verified=await verifyNarration(plan,prepared,root,async(dir,voice)=>{
+  await assertActive();const result=await (options.recognize?options.recognize(dir,voice):transcribeAudio(dir,voice,'voice',env,{assertActive,journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}}));await assertActive();return result;
+ },async(line,voice,transcript)=>{
+  await assertActive();
+  const review=await findConfirmedSpeechReview(projects.store,projectId,plan,line,voice,transcript);
+  if(!review){
+   try{await createSpeechReviewChallenge(projects,root,projectId,revisionId,plan,line.lineId,voice,transcript)}
+   catch(error){if((error as Error).message!=='SPEECH_REVIEW_NOT_NEEDED')throw error}
+  }
+  return review;
+ });
+ assertManifest(plan,verified);for(const line of verified.lines)await assertVerifiedSpeechReview(projects.store,projectId,plan,line);await assertVoiceFiles(root,verified);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
  const record:VoiceStageRecord={schemaVersion:1,briefVersion:control.briefVersion,understandingSha256:control.understandingRef.sha256,treatmentSha256:treatmentRef.sha256,

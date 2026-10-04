@@ -8,6 +8,8 @@ import type {ProjectStore} from '@/services/video/storage/project-store';
 import {readPreviewBundle} from '@/services/video/preview/commit';
 import {verifyPreviewPackage} from '@/services/video/preview/package';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
+import {WordTimingManifestSchema} from '@/services/video/audio/narration-package';
+import {speechReviewExportAudit} from '@/services/video/audio/spoken-review';
 import {archiveByteLimit,encodeSourceArchive,type SourceArchiveEntry} from './source-zip';
 
 const runtimeFiles=['Dockerfile','package.json','package-lock.json','LICENSES.md','render.mjs','runner.py','sound.py','master.py','analyze-pdf.mjs'] as const;
@@ -51,7 +53,15 @@ export async function prepareFrozenSourceArchive(projects:ProjectStore,owner:str
    const value=(await projects.store.readFresh(ref.key)).value;bytes=Buffer.from(canonicalJson(value));
    path=ref.key===bundle.filmSpecRef.key?'film.json':'state/'+ref.key+'.json';
    if(value&&typeof value==='object'&&'html' in value&&typeof value.html==='string')add('source/'+ref.sha256+'.html',Buffer.from(value.html));
-   pending.push(...references(value));
+   const narrationWords=ref.key.startsWith(revision+'narration-words/')?WordTimingManifestSchema.safeParse(value):undefined;
+   if(narrationWords?.success&&narrationWords.data.speechReview){
+    const {ref:reviewRef,...publicEvidence}=narrationWords.data.speechReview;
+    const auditPath=`audit/speech-reviews/${reviewRef.sha256}.json`;
+    if(!entries.some(entry=>entry.path===auditPath))add(auditPath,Buffer.from(canonicalJson(await speechReviewExportAudit(projects.store,projectId,reviewRef))));
+    // Preserve original JSON bytes/hashes, but do not traverse the private
+    // authority reference into owner data or the user's chat history.
+    pending.push(...references({...narrationWords.data,speechReview:publicEvidence}));
+   }else pending.push(...references(value));
   }else if(ref.mime==='audio/wav'&&ref.key.startsWith(revision)&&/\/(?:audio-files|sound-files)\/[a-f0-9]{64}\.wav$/.test(ref.key)){
    bytes=await safeFile(join(root,'objects'),ref.key,archiveByteLimit-total);path='objects/'+ref.key;
   }else throw Error('ARCHIVE_SOURCE_CHANGED');
@@ -70,7 +80,7 @@ export async function prepareFrozenSourceArchive(projects:ProjectStore,owner:str
  add('timeline.json',Buffer.from(canonicalJson(frozen.timeline)));
  add('CREDITS.json',Buffer.from(canonicalJson({schemaVersion:1,sources:frozen.audioManifest.sources,runtimeLicenseFile:'runtime/media/LICENSES.md',redistribution:'No user assets included; none are referenced.',fontBinariesIncluded:false,modelWeightsIncluded:false})));
  add('runtime-lock.json',Buffer.from(canonicalJson({schemaVersion:1,mediaImageDigest:frozen.filmSpec.runtimeDigest,seed:frozen.filmSpec.seed,profile:frozen.filmSpec.output,implementationFiles:'Bundled runtime source is the current reference implementation; use the pinned image for the original execution environment.'})));
- add('REBUILD.md',Buffer.from('# Frozen VideoBuddy source project\n\nfilm.json is the root. JSON ObjectRefs are in state/<key>.json (the root film reference is film.json); WAV ObjectRefs are in objects/<key>. Each reference preserves its original SHA-256 and byte count. source/ contains the shot HTML copied from the frozen source documents. timeline.json and TREATMENT.json are convenience copies.\n\nInspect runtime-lock.json for the pinned media image, seed and frame profile. The runtime/media source, dependency lock and license notice are included as a reference implementation; their identity with a historical image has not been independently attested. Obtain the pinned image to reproduce the original renderer. Generated shot code must run in an isolated, credential-free Chromium container with network access disabled; do not execute it on the web host. Use the sourceModule references and startFrame/endFrame in the timeline, then compose the pictures with the frozen audio tracks and caption timing.\n\nThis is a source archive, not a quality approval or a final video. Font binaries, voice/ASR model weights, credentials and caches are excluded. Install dependencies and acquire those resources under their licenses if rerendering requires them. The archive does not promise a single-click or fully offline rebuild. No new model calls are required to inspect these frozen sources.\n'));
+ add('REBUILD.md',Buffer.from('# Frozen VideoBuddy source project\n\nfilm.json is the root. JSON ObjectRefs are in state/<key>.json (the root film reference is film.json); WAV ObjectRefs are in objects/<key>. Each reference preserves its original SHA-256 and byte count. Private speech-review authority ObjectRefs are intentionally external: audit/speech-reviews/<confirmation-sha>.json supplies a non-authorizing listening audit, without owner credentials or chat messages. It cannot grant a new review or production approval. source/ contains the shot HTML copied from the frozen source documents. timeline.json and TREATMENT.json are convenience copies.\n\nInspect runtime-lock.json for the pinned media image, seed and frame profile. The runtime/media source, dependency lock and license notice are included as a reference implementation; their identity with a historical image has not been independently attested. Obtain the pinned image to reproduce the original renderer. Generated shot code must run in an isolated, credential-free Chromium container with network access disabled; do not execute it on the web host. Use the sourceModule references and startFrame/endFrame in the timeline, then compose the pictures with the frozen audio tracks and caption timing.\n\nThis is a source archive, not a quality approval or a final video. Font binaries, voice/ASR model weights, credentials and caches are excluded. Install dependencies and acquire those resources under their licenses if rerendering requires them. The archive does not promise a single-click or fully offline rebuild. No new model calls are required to inspect these frozen sources.\n'));
  const manifest={schemaVersion:1,projectId,revisionId:bundle.revisionId,previewId,bundleHash:bundle.bundleHash,entries:entries.map(entry=>({path:entry.path,bytes:entry.bytes.length,sha256:sha(entry.bytes)})).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0)};
  add('archive-manifest.json',Buffer.from(canonicalJson(manifest)));
  const bytes=encodeSourceArchive(entries),after=await projects.access(owner,projectId);

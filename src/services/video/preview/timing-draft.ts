@@ -1,3 +1,4 @@
+import {hasVerifiedNarrationStatus} from '@/services/video/audio/asr';
 import {z} from 'zod';
 import type {Understanding} from '@/contracts/video/domain';
 import {guardTreatment} from '@/contracts/video/treatment';
@@ -29,7 +30,7 @@ export function compileTimingDraft(rawTreatment:unknown,understanding:Understand
  const narration:TimingDraft['narration']=[];
  for(const [index,line] of verified.lines.entries()){
   const expected=voicePlan.lines[index];
-  if(line.lineId!==expected.lineId||line.spokenText!==expected.spokenText||line.displayText!==expected.displayText||line.expectedAsrText!==expected.expectedAsrText||line.startMs!==expected.startMs||line.reservedMs!==expected.reservedMs||line.language!==expected.language||line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||line.asr?.voiceSha256!==line.voice.wav.sha256||line.wordTimings.length===0||line.voice.wav.sampleRate!==24000||line.voice.wav.samples<=0||line.voice.wav.durationMs!==line.durationMs)throw Error('TIMING_VOICE_PLAN_CHANGED');
+  if(line.lineId!==expected.lineId||line.spokenText!==expected.spokenText||line.displayText!==expected.displayText||line.expectedAsrText!==expected.expectedAsrText||line.startMs!==expected.startMs||line.reservedMs!==expected.reservedMs||line.language!==expected.language||!hasVerifiedNarrationStatus(line)||line.wordTimingsStatus!=='available'||line.asr?.voiceSha256!==line.voice.wav.sha256||line.wordTimings.length===0||line.voice.wav.sampleRate!==24000||line.voice.wav.samples<=0||line.voice.wav.durationMs!==line.durationMs)throw Error('TIMING_VOICE_PLAN_CHANGED');
   const startSample=line.startMs*48,endSample=startSample+line.voice.wav.samples*2;
   if(!Number.isSafeInteger(startSample)||!Number.isSafeInteger(endSample)||endSample>totalSamples||line.durationMs>line.reservedMs)throw Error('TIMING_AUDIO_RANGE');
   narration.push({lineId:line.lineId,spokenText:line.spokenText,displayText:line.displayText,expectedAsrText:line.expectedAsrText,startSample,endSample,voiceSha256:line.voice.wav.sha256,voiceRuntimeDigest:line.voice.runtimeDigest,asrRuntimeDigest:line.asr.runtimeDigest});

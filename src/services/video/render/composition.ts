@@ -22,7 +22,7 @@ async function archivedNarration(projects:ProjectStore,root:string,inputs:Approv
  for(const line of plan.lines){
   const entry=frozen.audioManifest.sources.find(source=>source.id==='voice-'+line.lineId);if(!entry)throw Error('FILM_NARRATION_CHANGED');
   const {source,words}=await loadPackagedNarration(projects.store,root,projectId,bundle.revisionId,entry.sourceRef);
-  lines.push({...line,durationMs:source.wav.durationMs,voice:{lineId:line.lineId,...source.voiceConfig,outputPath:join(root,'objects',source.audioRef.key),wav:source.wav},asrStatus:'pass',wordTimingsStatus:'available',asr:{model:words.asrModel,runtimeDigest:words.asrRuntimeDigest,voiceSha256:words.voiceSha256},recognizedText:words.recognizedText,wordTimings:words.words});
+  lines.push({...line,durationMs:source.wav.durationMs,voice:{lineId:line.lineId,...source.voiceConfig,outputPath:join(root,'objects',source.audioRef.key),wav:source.wav},asrStatus:words.speechReview?'trusted_review':'pass',...(words.speechReview?{speechReview:words.speechReview}:{}),wordTimingsStatus:'available',asr:{model:words.asrModel,runtimeDigest:words.asrRuntimeDigest,voiceSha256:words.voiceSha256},recognizedText:words.recognizedText,wordTimings:words.words});
  }
  return{plan,verified:{durationMs:plan.durationMs,lines}};
 }

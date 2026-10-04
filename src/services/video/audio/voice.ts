@@ -25,7 +25,11 @@ export function voiceDockerArguments(config:ReturnType<typeof voiceConfiguration
  return['run','--rm','--name',`vb-voice-${key.slice(0,24)}`,'--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','4g','--memory-swap','4g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=256m','--mount',`type=bind,src=${stageDir}/job.json,dst=/work/job.json,readonly`,'--mount',`type=bind,src=${stageDir}/output,dst=/output`,config.image,'node','/opt/videobuddy/voice/synth.mjs','/work/job.json'];
 }
 function id(value:string){return /^[a-f0-9]{64}$/.test(value)}
-async function writeOnce(path:string,value:string){
+async function writeOnce(path:string,value:string,mustExist=false){
+ if(mustExist){
+  let info;try{info=await lstat(path)}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')throw Error('VOICE_EVIDENCE_MISSING');throw error}
+  if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('VOICE_STAGE_UNKNOWN');return;
+ }
  try{const file=await open(path,'wx',0o600);try{await file.writeFile(value);await file.sync()}finally{await file.close()}}
  catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;
   const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('VOICE_STAGE_UNKNOWN')}
@@ -40,15 +44,16 @@ async function runDocker(args:string[]){
  return Buffer.concat(output).toString('utf8').trim();
 }
 const resultSchema=z.strictObject({lineId:z.string(),language:z.enum(['zh-CN','en']),voice:z.enum(['zf_001','af_maple']),bytes:z.number().int().positive()});
-export async function synthesizeVoice(root:string,job:VoiceJob,env:Environment=process.env):Promise<VoiceResult>{
+export async function synthesizeVoice(root:string,job:VoiceJob,env:Environment=process.env,options:{mustExist?:boolean}={}):Promise<VoiceResult>{
  if(!isAbsolute(root))throw Error('VOICE_DATA_DIR_INVALID');
  const input=jobSchema.parse(job),config=voiceConfiguration(env),key=voiceStageKey(input,config.runtimeDigest);
  const stageDir=join(root,'voice',key),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'narration.wav');
- await mkdir(outputDir,{recursive:true,mode:0o700});
- await writeOnce(join(stageDir,'job.json'),JSON.stringify(input));
+ if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
+ await writeOnce(join(stageDir,'job.json'),JSON.stringify(input),options.mustExist);
  let wav:VoiceWavProbe;
  try{wav=await inspectVoiceWav(outputPath)}catch(error){
   if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
+  if(options.mustExist)throw Error('VOICE_EVIDENCE_MISSING');
   const response=resultSchema.parse(JSON.parse(await runDocker(voiceDockerArguments(config,stageDir,key))));
   if(response.lineId!==input.lineId||response.language!==input.language||response.voice!==(input.language==='zh-CN'?'zf_001':'af_maple'))throw Error('VOICE_OUTPUT_INVALID');
   wav=await inspectVoiceWav(outputPath);

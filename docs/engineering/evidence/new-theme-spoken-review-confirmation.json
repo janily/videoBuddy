@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-04T09:09:48.915052+00:00",
+  "authority": "actual_workspace_user_reply",
+  "questionItemId": "[\"request_user_input_async\",\"call_xr7PZxISWSt7gVVwyN5MTMbq\",0]",
+  "answer": "读音正确，确认这句试听复核",
+  "decision": "pronunciation_correct",
+  "scope": "single_original_wav",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+  "sourceRevisionId": "6c44bcea-b727-4aee-9368-cac9299e7e45",
+  "lineId": "line_2",
+  "spokenText": "洒下适量的水，润湿土壤。",
+  "expectedAsrText": "洒下适量的水，润湿土壤。",
+  "recognizedText": "撒下适量的水,润湿土壤。",
+  "voiceSha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02",
+  "audioFile": "docs/engineering/evidence/new-theme-spoken-review.wav",
+  "voiceRuntimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+  "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+  "literalAsrMatch": false,
+  "formalProductionApproval": false,
+  "limits": "Actual user listened to this original WAV and confirmed pronunciation. This records only the explicit reply, not an implemented verification bypass or full-film listening/ASR pass. No script/transcript/operation/unknown record has been rewritten. Other WAVs, final AAC and other contexts need independent checks."
+}

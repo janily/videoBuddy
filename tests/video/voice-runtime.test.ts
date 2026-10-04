@@ -1,9 +1,9 @@
 import {describe,expect,it} from 'vitest';
-import {mkdtemp,rm,writeFile} from 'node:fs/promises';
+import {mkdir,mkdtemp,readFile,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {probeVoiceWav,inspectVoiceWav} from '@/services/video/audio/wav';
-import {voiceConfiguration,voiceStageKey,voiceDockerArguments} from '@/services/video/audio/voice';
+import {voiceConfiguration,voiceStageKey,voiceDockerArguments,synthesizeVoice} from '@/services/video/audio/voice';
 
 function wav(samples=24000,amplitude=0.1){
  const data=Buffer.alloc(samples*4);for(let i=0;i<samples;i++)data.writeFloatLE(Math.sin(i*0.1)*amplitude,i*4);
@@ -12,6 +12,15 @@ function wav(samples=24000,amplitude=0.1){
  result.writeUInt16LE(4,32);result.writeUInt16LE(32,34);result.write('data',36);result.writeUInt32LE(data.length,40);data.copy(result,44);return result;
 }
 describe('offline voice output',()=>{
+ it('does not create a missing job when reading existing audio as evidence',async()=>{
+  const root=await mkdtemp(join(tmpdir(),'vb-voice-readonly-'));
+  try{
+   const digest='a'.repeat(64),job={lineId:'line_1',language:'zh-CN' as const,text:'十月八日开始。'},key=voiceStageKey(job,digest),stage=join(root,'voice',key);
+   await mkdir(join(stage,'output'),{recursive:true});await writeFile(join(stage,'output/narration.wav'),wav());
+   await expect(synthesizeVoice(root,job,{VIDEO_VOICE_IMAGE_REF:'sha256:'+digest,VIDEO_VOICE_RUNTIME_DIGEST:digest},{mustExist:true})).rejects.toThrow('VOICE_EVIDENCE_MISSING');
+   await expect(readFile(join(stage,'job.json'))).rejects.toMatchObject({code:'ENOENT'});
+  }finally{await rm(root,{recursive:true,force:true})}
+ });
  it('measures the actual float WAV samples and rejects silence and NaN',()=>{
   expect(probeVoiceWav(wav()).durationMs).toBe(1000);
   expect(probeVoiceWav(wav()).sampleRate).toBe(24000);

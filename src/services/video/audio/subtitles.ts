@@ -1,3 +1,4 @@
+import {hasVerifiedNarrationStatus} from './asr';
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {Environment} from '@/services/video/config/environment';
@@ -53,7 +54,7 @@ export function compileSubtitles(manifest:VerifiedNarrationManifest,fps:24|30|60
  if(!Number.isSafeInteger(totalFrames))throw Error('CAPTION_PLAN_INVALID');
  for(const line of ordered){
   const text=validateText(line.displayText);
-  if(line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||!Number.isSafeInteger(line.startMs)||line.startMs<0||!Number.isSafeInteger(line.durationMs)||line.durationMs<=0||line.durationMs!==line.voice.wav.durationMs||!line.voice.wav.sha256)throw Error('CAPTION_PLAN_INVALID');
+  if(!hasVerifiedNarrationStatus(line)||line.wordTimingsStatus!=='available'||!Number.isSafeInteger(line.startMs)||line.startMs<0||!Number.isSafeInteger(line.durationMs)||line.durationMs<=0||line.durationMs!==line.voice.wav.durationMs||!line.voice.wav.sha256)throw Error('CAPTION_PLAN_INVALID');
   const chars=Array.from(text).filter(char=>!/\s/.test(char)).length,readingMs=Math.ceil((chars/(/\p{Script=Han}/u.test(text)?4.5:15)+1.5)*1000);
   const lastWord=Math.max(0,...line.wordTimings.map(word=>word.endMs));
   if(line.wordTimings.length===0||line.wordTimings.some(word=>!Number.isSafeInteger(word.startMs)||!Number.isSafeInteger(word.endMs)||word.startMs<0||word.endMs<=word.startMs)||lastWord>line.durationMs+1000)throw Error('CAPTION_PLAN_INVALID');

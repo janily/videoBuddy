@@ -130,6 +130,7 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  for(const [index,line] of timeline.narration.entries()){
   const expected=expectedVoice.lines[index],source=narrationSources.get(line.lineId);
   if(!source||canonicalHash(source.timelineLine)!==canonicalHash(line)||line.lineId!==expected.lineId||line.displayText!==expected.displayText||line.spokenText!==expected.spokenText||line.expectedAsrText!==expected.expectedAsrText||line.startSample!==expected.startMs*48||line.endSample>48*(expected.startMs+expected.reservedMs)||source.source.voiceConfig.language!==expected.language)throw Error('FILM_NARRATION_CHANGED');
+   if(source.words.speechReview&&source.words.speechReview.planSha256!==canonicalHash(expectedVoice))throw Error('FILM_NARRATION_CHANGED');
    const frozen=timing.narration[index];
    if(!frozen||frozen.lineId!==line.lineId||frozen.startSample!==line.startSample||frozen.endSample!==line.endSample||frozen.spokenText!==line.spokenText||frozen.displayText!==line.displayText||frozen.expectedAsrText!==line.expectedAsrText||frozen.voiceSha256!==line.audioRef.sha256||frozen.voiceRuntimeDigest!==source.source.voiceConfig.runtimeDigest||frozen.asrRuntimeDigest!==source.words.asrRuntimeDigest)throw Error('FILM_NARRATION_CHANGED');
  }

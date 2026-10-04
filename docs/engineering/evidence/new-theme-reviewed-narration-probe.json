@@ -1,0 +1,17 @@
+{
+  "executedAt": "2026-10-04T09:57:55.345Z",
+  "status": "failed",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+  "sourceRevisionId": "6c44bcea-b727-4aee-9368-cac9299e7e45",
+  "diagnosticRevisionId": "ed2b4a3e-c963-403a-9cbb-2e535b16501c",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "journalPrefix": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/diagnostic-speech-checks/ed2b4a3e-c963-403a-9cbb-2e535b16501c/media-effects",
+  "mustExist": false,
+  "errorCode": "MEDIA_STOP_UNKNOWN",
+  "networkCalls": 0,
+  "sourceOperationAndBudgetUnchanged": true,
+  "sourceControlUnchanged": true,
+  "limits": "Independent source-WAV check and cold packaging only. One explicit human review applies to line_2 only. Original failed preview operation remains failed. No Treatment/Director rerun, TTS synthesis, final mix, picture, Critic, preview or formal approval."
+}

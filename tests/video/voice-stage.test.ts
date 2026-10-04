@@ -15,6 +15,8 @@ import {prepareVoiceStage} from '@/services/video/preview/voice-stage';
 import {prepareTimingStage} from '@/services/video/preview/timing-stage';
 import {prepareNarrationPackageStage} from '@/services/video/preview/narration-package-stage';
 import {prepareAudioPlanStage} from '@/services/video/preview/audio-plan-stage';
+import {confirmSpeechReview} from '@/services/video/audio/spoken-review';
+import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {revisionSeed} from '@/services/video/timeline/seed';
 import {prepareFilmPackageStage} from '@/services/video/preview/film-package-stage';
 import {prepareAudioExecutionStage} from '@/services/video/preview/audio-execution-stage';
@@ -44,7 +46,7 @@ function wav(){
  return result;
 }
 
-it.each(['Systran/faster-whisper-small','Systran/faster-whisper-medium'] as const)('T10/T11 persists frozen voice with %s through a private excerpt and detects tampering',async model=>{
+it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/faster-whisper-medium',trusted:false},{model:'Systran/faster-whisper-medium',trusted:true}] as const)('T10/T11 persists frozen voice with $model and trusted=$trusted through a private excerpt and detects tampering',async({model,trusted})=>{
  const root=await mkdtemp(join(tmpdir(),'vb-voice-stage-'));
  try{
   const projects=new ProjectStore(new FileStore(root)),created=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
@@ -64,13 +66,22 @@ it.each(['Systran/faster-whisper-small','Systran/faster-whisper-medium'] as cons
    generated++;await mkdir(join(root,'voice','fixture'),{recursive:true});const bytes=wav();await writeFile(voicePath,bytes);
    return{lineId:job.lineId,language:job.language,voice:'zf_001' as const,provider:'kokoro-js' as const,model:'test-runtime',modelLicense:'Apache-2.0' as const,runtimeDigest:'a'.repeat(64),outputPath:voicePath,wav:probeVoiceWav(bytes)};
   },recognize:async(_root:string,voice:{wav:{sha256:string}})=>{
-   recognized++;return{language:'zh-CN' as const,model,segments:[{text:'欢迎参加。',startMs:0,endMs:700,words:[{text:'欢迎参加',startMs:0,endMs:700,probability:0.9}]}],voiceSha256:voice.wav.sha256,runtimeDigest:'b'.repeat(64),recognizedText:'欢迎参加。'};
+   recognized++;const recognizedText=trusted?'欢迎参家。':'欢迎参加。';return{language:'zh-CN' as const,model,segments:[{text:recognizedText,startMs:0,endMs:700,words:[{text:recognizedText,startMs:0,endMs:700,probability:0.9}]}],voiceSha256:voice.wav.sha256,runtimeDigest:'b'.repeat(64),recognizedText};
   }};
+  if(trusted){
+   await expect(prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options)).rejects.toThrow('ASR_MISMATCH');
+   const keys=await projects.store.listKeys?.(`projects/${projectId}/speech-review-challenges`,1);expect(keys).toHaveLength(1);
+   const challenge=(await projects.store.readFresh(keys![0])).value;
+   const challengeRef={key:keys![0],sha256:canonicalHash(challenge),bytes:Buffer.byteLength(canonicalJson(challenge)),mime:'application/json'},messageId=randomUUID();
+   // Protocol fixture only: synthetic PCM does not establish real pronunciation.
+   await projects.archiveMessage(projectId,{id:messageId,ordinal:1,role:'user',text:'读音正确，确认这句试听复核',status:'completed',contentVersion:1,clientMessageId:messageId});
+   await confirmSpeechReview(projects,'owner',projectId,challengeRef,messageId);
+  }
   const first=await prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options);
   expect(first.verifiedRef.sha256).toMatch(/^[a-f0-9]{64}$/);
-  expect((await projects.store.readFresh<{lines:Array<{asrStatus:string}>}>(first.verifiedRef.key)).value.lines[0].asrStatus).toBe('pass');
+  expect((await projects.store.readFresh<{lines:Array<{asrStatus:string}>}>(first.verifiedRef.key)).value.lines[0].asrStatus).toBe(trusted?'trusted_review':'pass');
   expect(await prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options)).toEqual(first);
-  expect([generated,recognized]).toEqual([1,1]);
+  expect([generated,recognized]).toEqual([trusted?2:1,trusted?2:1]);
   const trackPath=join(root,'audio','fixture','track.wav');let mixed=0,fontReads=0;
   const trackBytes=Buffer.alloc(44+960000*4);trackBytes.write('RIFF',0);trackBytes.writeUInt32LE(trackBytes.length-8,4);trackBytes.write('WAVEfmt ',8);trackBytes.writeUInt32LE(16,16);trackBytes.writeUInt16LE(3,20);trackBytes.writeUInt16LE(1,22);trackBytes.writeUInt32LE(48000,24);trackBytes.writeUInt32LE(192000,28);trackBytes.writeUInt16LE(4,32);trackBytes.writeUInt16LE(32,34);trackBytes.write('data',36);trackBytes.writeUInt32LE(960000*4,40);for(let index=0;index<48000;index++)trackBytes.writeFloatLE(Math.sin(index*0.1)*0.1,44+index*4);
   const timingOptions={root,buildTrack:async()=>{mixed++;await mkdir(join(root,'audio','fixture'),{recursive:true});await writeFile(trackPath,trackBytes);return{outputPath:trackPath,runtimeDigest:'a'.repeat(64),wav:probeTrackWav(trackBytes,960000,false),kind:'narration_only' as const,qaStatus:'not_checked' as const}},readFont:async()=>{fontReads++;return{family:'Noto Sans CJK SC' as const,runtimeDigest:'a'.repeat(64),charsetSha256:'d'.repeat(64),glyphs:new Set(Array.from('欢迎参加。'))}}};
@@ -82,7 +93,7 @@ it.each(['Systran/faster-whisper-small','Systran/faster-whisper-medium'] as cons
   await expect(prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('NARRATION_PACKAGE_MISSING');
   const narrationPackage=await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root});
   expect(await prepareNarrationPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).toEqual(narrationPackage);
-  expect([generated,recognized,mixed]).toEqual([1,1,1]);
+  expect([generated,recognized,mixed]).toEqual([trusted?2:1,trusted?2:1,1]);
   await expect(prepareAudioPlanStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).rejects.toThrow('AUDIO_STAGE_MISSING');
   let audioCalls=0;
   const audioOptions={root,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:40000,dailyCalls:10},decide:async()=>{audioCalls++;return{schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,seed:revisionSeed(projectId,revisionId),sections:[{id:'whole',startFrame:0,endFrame:480,bpm:120,beatsPerBar:4,beatUnit:4,barOffset:0}],cues:[],sources:[],music:[],foley:[],intentionalSilenceRanges:[{startSample:0,endSample:960000,buses:['music','foley']}],mix:{targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2,voiceGainDb:0,duck:{thresholdDb:-24,ratio:4,attackMs:10,releaseMs:180}},reasoning:'此测试明确无配乐与拟音，只有旁白；节拍网格是声明的计时信息。'}}};

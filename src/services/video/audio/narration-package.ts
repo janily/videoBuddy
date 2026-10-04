@@ -10,14 +10,15 @@ import type {AtomicStore} from '@/services/video/storage/atomic-store';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {assertAsrExpected} from '@/services/video/timeline/compile';
 import type {TimingDraft} from '@/services/video/preview/timing-draft';
-import {AsrModelSchema,type VerifiedNarrationManifest} from './asr';
+import {AsrModelSchema,AsrTranscriptSchema,type VerifiedNarrationManifest} from './asr';
+import {assertSpeechReview,assertSpeechReviewLine,loadConfirmedSpeechReview} from './spoken-review';
 import {probeVoiceWav,type VoiceWavProbe} from './wav';
 
 const digest=z.string().regex(/^[a-f0-9]{64}$/),lineId=z.string().regex(/^[-a-zA-Z0-9_]{1,80}$/),sample=z.number().int().nonnegative();
 const voiceConfig=z.strictObject({language:z.enum(['zh-CN','en']),voice:z.enum(['zf_001','af_maple']),provider:z.literal('kokoro-js'),model:z.string().min(1).max(500),modelLicense:z.literal('Apache-2.0'),runtimeDigest:digest});
 export const NarrationSourceSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('generated_narration'),lineId,displayText:z.string().min(1).max(500),spokenText:z.string().min(1).max(250),expectedAsrText:z.string().min(1).max(500),voiceConfig,voiceConfigHash:digest,audioRef:ObjectRefSchema,wordTimingsRef:ObjectRefSchema,startSample:sample,endSample:sample,
  wav:z.strictObject({codec:z.literal('pcm_f32le'),sampleRate:z.literal(24000),channels:z.literal(1),samples:z.number().int().positive(),durationMs:z.number().positive(),bytes:z.number().int().positive(),sha256:digest,peakDbfs:z.number().finite(),rmsDbfs:z.number().finite()})});
-export const WordTimingManifestSchema=z.strictObject({schemaVersion:z.literal(1),lineId,voiceSha256:digest,asrModel:AsrModelSchema,asrRuntimeDigest:digest,recognizedText:z.string().min(1).max(2000),words:z.array(z.strictObject({text:z.string().min(1).max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)})).min(1).max(1000)});
+export const WordTimingManifestSchema=z.strictObject({schemaVersion:z.literal(1),lineId,voiceSha256:digest,asrModel:AsrModelSchema,asrRuntimeDigest:digest,recognizedText:z.string().min(1).max(2000),speechReview:z.strictObject({ref:ObjectRefSchema,planSha256:digest,transcript:AsrTranscriptSchema}).optional(),words:z.array(z.strictObject({text:z.string().min(1).max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)})).min(1).max(1000)});
 type NarrationSource=z.infer<typeof NarrationSourceSchema>;
 type WordTimingManifest=z.infer<typeof WordTimingManifestSchema>;
 type AudioSource={id:string;kind:'generated';sourceRef:ObjectRef;rightsRef:ObjectRef};
@@ -45,9 +46,14 @@ async function readSafeVoice(path:string,base:string):Promise<{bytes:Buffer;wav:
   }finally{await file.close()}
  }catch{throw Error('NARRATION_AUDIO_CHANGED')}
 }
-function assertWords(words:WordTimingManifest,source:Pick<NarrationSource,'lineId'|'wav'|'expectedAsrText'>){
+async function assertWords(store:AtomicStore,projectId:string,words:WordTimingManifest,source:Pick<NarrationSource,'lineId'|'wav'|'expectedAsrText'|'spokenText'|'displayText'|'voiceConfig'>){
  if(words.lineId!==source.lineId||words.voiceSha256!==source.wav.sha256)throw Error('NARRATION_ASR_CHANGED');
- assertAsrExpected(source.expectedAsrText,source.expectedAsrText,words.recognizedText);
+ if(words.speechReview){
+  const {ref,planSha256,transcript}=words.speechReview,proof=await loadConfirmedSpeechReview(store,projectId,ref);
+  assertSpeechReviewLine(proof,{...source,language:source.voiceConfig.language},source.voiceConfig.runtimeDigest,planSha256);
+  assertSpeechReview(source.expectedAsrText,transcript,proof);
+  if(words.voiceSha256!==transcript.voiceSha256||words.asrModel!==transcript.model||words.asrRuntimeDigest!==transcript.runtimeDigest||words.recognizedText!==transcript.recognizedText||canonicalHash(words.words)!==proof.challenge.wordTimingsSha256)throw Error('SPEECH_REVIEW_CHANGED');
+ }else assertAsrExpected(source.expectedAsrText,source.expectedAsrText,words.recognizedText);
  assertAsrExpected(words.recognizedText,words.recognizedText,words.words.map(word=>word.text).join(''));
  let end=0;
  for(const word of words.words){
@@ -69,7 +75,7 @@ export async function loadPackagedNarration(store:AtomicStore,root:string,projec
  if(source.audioRef.key!==expectedKey||source.audioRef.mime!=='audio/wav'||source.audioRef.bytes!==source.wav.bytes||source.audioRef.sha256!==source.wav.sha256||source.voiceConfigHash!==canonicalHash(source.voiceConfig)||source.endSample!==source.startSample+source.wav.samples*2||source.voiceConfig.voice!==(source.voiceConfig.language==='zh-CN'?'zf_001':'af_maple'))throw Error('NARRATION_AUDIO_CHANGED');
  const parsedWords=WordTimingManifestSchema.safeParse(await readNarrationJson(store,source.wordTimingsRef,`${prefix}narration-words/`));
  if(!parsedWords.success)throw Error('NARRATION_ASR_CHANGED');
- const words=parsedWords.data;assertWords(words,source);
+ const words=parsedWords.data;await assertWords(store,projectId,words,source);
  await runObjectHelper(root,'verify',expectedKey,source.audioRef.bytes);
  const actual=await readSafeVoice(join(root,'objects',expectedKey),join(root,'objects'));
  if(canonicalHash(actual.wav)!==canonicalHash(source.wav))throw Error('NARRATION_AUDIO_CHANGED');
@@ -92,17 +98,21 @@ export async function archiveVerifiedNarration(projects:ProjectStore,root:string
  if(verified.lines.length!==narration.length||new Set(verified.lines.map(line=>line.lineId)).size!==verified.lines.length)throw Error('NARRATION_TIMING_CHANGED');
  for(const [index,line] of verified.lines.entries()){
   const timing=narration[index],voice=line.voice,asr=line.asr;
-  if(line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||!asr||asr.voiceSha256!==voice.wav.sha256||line.lineId!==voice.lineId||line.language!==voice.language||line.durationMs!==voice.wav.durationMs||line.durationMs>line.reservedMs||line.startMs+line.reservedMs>verified.durationMs||timing.lineId!==line.lineId||timing.displayText!==line.displayText||timing.spokenText!==line.spokenText||timing.expectedAsrText!==line.expectedAsrText||timing.voiceSha256!==voice.wav.sha256||timing.voiceRuntimeDigest!==voice.runtimeDigest||timing.asrRuntimeDigest!==asr.runtimeDigest||timing.startSample!==line.startMs*48||timing.endSample!==timing.startSample+voice.wav.samples*2)throw Error('NARRATION_TIMING_CHANGED');
+  if(!['pass','trusted_review'].includes(line.asrStatus)||Boolean(line.speechReview)!==(line.asrStatus==='trusted_review')||line.wordTimingsStatus!=='available'||!asr||asr.voiceSha256!==voice.wav.sha256||line.lineId!==voice.lineId||line.language!==voice.language||line.durationMs!==voice.wav.durationMs||line.durationMs>line.reservedMs||line.startMs+line.reservedMs>verified.durationMs||timing.lineId!==line.lineId||timing.displayText!==line.displayText||timing.spokenText!==line.spokenText||timing.expectedAsrText!==line.expectedAsrText||timing.voiceSha256!==voice.wav.sha256||timing.voiceRuntimeDigest!==voice.runtimeDigest||timing.asrRuntimeDigest!==asr.runtimeDigest||timing.startSample!==line.startMs*48||timing.endSample!==timing.startSample+voice.wav.samples*2)throw Error('NARRATION_TIMING_CHANGED');
   const inside=relative(join(root,'voice'),voice.outputPath);
   if(!isAbsolute(voice.outputPath)||!inside||inside.startsWith('..')||isAbsolute(inside))throw Error('NARRATION_AUDIO_CHANGED');
   const actual=await readSafeVoice(voice.outputPath,join(root,'voice'));
   if(canonicalHash(actual.wav)!==canonicalHash(voice.wav))throw Error('NARRATION_AUDIO_CHANGED');
   const config=voiceConfig.parse({language:line.language,voice:voice.voice,provider:voice.provider,model:voice.model,modelLicense:voice.modelLicense,runtimeDigest:voice.runtimeDigest});
-  const words=WordTimingManifestSchema.parse({schemaVersion:1,lineId:line.lineId,voiceSha256:actual.wav.sha256,asrModel:asr.model,asrRuntimeDigest:asr.runtimeDigest,recognizedText:line.recognizedText,words:line.wordTimings});
+  const words=WordTimingManifestSchema.parse({schemaVersion:1,lineId:line.lineId,voiceSha256:actual.wav.sha256,asrModel:asr.model,asrRuntimeDigest:asr.runtimeDigest,recognizedText:line.recognizedText,...(line.speechReview?{speechReview:line.speechReview}:{}),words:line.wordTimings});
   const key=`${prefix}audio-files/${actual.wav.sha256}.wav`,audioRef:ObjectRef={key,sha256:actual.wav.sha256,bytes:actual.wav.bytes,mime:'audio/wav'};
   // Validate before writing any package reference. Model license is provenance, not a listening/rights QA pass.
   const candidate={schemaVersion:1 as const,kind:'generated_narration' as const,lineId:line.lineId,displayText:line.displayText,spokenText:line.spokenText,expectedAsrText:line.expectedAsrText,voiceConfig:config,voiceConfigHash:canonicalHash(config),audioRef,startSample:timing.startSample,endSample:timing.endSample,wav:actual.wav};
-  NarrationSourceSchema.omit({wordTimingsRef:true}).parse(candidate);assertWords(words,candidate);
+  if(line.speechReview){
+   const plan={durationMs:verified.durationMs,lines:verified.lines.map(({lineId,language,spokenText,displayText,expectedAsrText,startMs,reservedMs})=>({lineId,language,spokenText,displayText,expectedAsrText,startMs,reservedMs}))};
+   if(line.speechReview.planSha256!==canonicalHash(plan))throw Error('SPEECH_REVIEW_CHANGED');
+  }
+  NarrationSourceSchema.omit({wordTimingsRef:true}).parse(candidate);await assertWords(projects.store,projectId,words,candidate);
   await runObjectHelper(root,'publish',key,actual.bytes.length,actual.bytes);
   const source=NarrationSourceSchema.parse({...candidate,wordTimingsRef:await projects.index.immutable(`${prefix}narration-words`,words)});
   const sourceRef=await projects.index.immutable(`${prefix}narration-source`,source),rightsRef=await projects.index.immutable(`${prefix}narration-rights`,{basis:'generated',source:`${config.provider}; ${config.model}; voice=${config.voice}; modelLicense=${config.modelLicense}; runtime=${config.runtimeDigest}`});
