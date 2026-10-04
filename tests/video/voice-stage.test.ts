@@ -201,6 +201,9 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/fa
    await expect(prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).rejects.toThrow('COMPOSITE_POSTMIX_CHANGED');
   }
   await updateJson(projects.store,compositeKey,()=>composite);
+  for(const frozenFilm of [{outputPath:composite.outputPath,sha256:'a'.repeat(64),durationMs:20000,technicalQa:'pass' as const},{outputPath:composite.outputPath+'/other',sha256:filmHash,durationMs:20000,technicalQa:'pass' as const},{outputPath:composite.outputPath,sha256:filmHash,durationMs:21000,technicalQa:'pass' as const}]){
+   await expect(prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,{...compositeOptions,frozenFilm})).rejects.toThrow('FROZEN_PREVIEW_CHANGED');
+  }
   const segments:ExcerptSegment[]=[{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:5000,shotId:'shot'},{previewStartMs:5000,previewEndMs:7000,sourceStartMs:10000,sourceEndMs:12000,shotId:'shot'},{previewStartMs:7000,previewEndMs:9000,sourceStartMs:16000,sourceEndMs:18000,shotId:'shot'}];
   let excerptCalls=0,previewSha='c'.repeat(64);
   const excerptOptions={root,profile:'full' as const,env:pictureOptions.env,composite:compositeOptions,
