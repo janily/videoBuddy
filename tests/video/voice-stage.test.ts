@@ -184,14 +184,23 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false},{model:'Systran/fa
    compose:async(_root:string,_pictureDir:string,track:{wav:{sha256:string;silence:boolean}},cues:Parameters<typeof formatSrt>[0],captionStyle:Parameters<typeof composeStageKey>[0]['style'],spec:Parameters<typeof composeStageKey>[0]['spec'])=>{
     compositionCalls++;const srt=formatSrt(cues),stageKey=composeStageKey({pictureSha256:qaHash,trackSha256:track.wav.sha256,trackSilent:track.wav.silence,srtSha256:srt?createHash('sha256').update(srt).digest('hex'):null,style:captionStyle,runtimeDigest:'a'.repeat(64),spec});
     return{stageKey,outputPath:join(root,'composition',stageKey,'output','final.mp4'),subtitlesPath:join(root,'composition',stageKey,'subtitles.srt'),technicalQa:{result:'pass' as const,sha256:filmHash,bytes:4321,width:1920,height:1080,durationSec:20,fps:24,frames:480,audio:true},loudness:{status:'pass' as const,filmSha256:filmHash,runtimeDigest:'a'.repeat(64),integratedLufs:-14,truePeakDbtp:-1.5,targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2},qaStatus:'semantic_not_checked' as const};
-   },postMix:async(_root:string,film:{sha256:string})=>{postMixCalls++;return{status:'pass' as const,filmSha256:film.sha256,lines:[{lineId:'line_1',recognizedText:'欢迎参加。',sourceSha256:'b'.repeat(64),asrRuntimeDigest:'b'.repeat(64),wordCount:1,status:'pass' as const}]}}};
+   },postMix:async(_root:string,film:{sha256:string})=>{postMixCalls++;return{status:'pass' as const,filmSha256:film.sha256,lines:[{lineId:'line_1',recognizedText:'欢迎参加。',sourceSha256:'b'.repeat(64),asrRuntimeDigest:'b'.repeat(64),wordCount:1,status:trusted?'trusted_review' as const:'pass' as const,...(trusted?{speechReviewRef:{key:`projects/${projectId}/postmix-reviews/${'b'.repeat(64)}`,sha256:'b'.repeat(64),bytes:100,mime:'application/json'}}:{})}]}}};
   const composite=await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions);
   expect(composite.qualityStatus).toBe('semantic_not_checked');
   expect(composite.narrationPackageSha256).toBe(narrationPackage.packageRef.sha256);
   expect(composite.audioPlanSha256).toBe(audio.planRef.sha256);
   expect(composite.audioExecutionSha256).toBeNull();
   expect(await prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).toEqual(composite);
-  expect([compositionCalls,postMixCalls]).toEqual([1,1]);
+  const compositeKey=`projects/${projectId}/revisions/${revisionId}/composite-v4/full`;
+  await updateJson(projects.store,compositeKey,()=>({...composite,postMix:{...composite.postMix,lines:[]}}));
+  await expect(prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).rejects.toThrow('COMPOSITE_POSTMIX_CHANGED');
+  expect([compositionCalls,postMixCalls]).toEqual([1,3]);
+  if(trusted){
+   const downgraded={...composite,postMix:{...composite.postMix,lines:composite.postMix.lines.map(line=>{const {speechReviewRef,...rest}=line;void speechReviewRef;return{...rest,status:'pass' as const}})}};
+   await updateJson(projects.store,compositeKey,()=>downgraded);
+   await expect(prepareCompositeStage(projects,projectId,revisionId,operationId,0,treatmentRef,compositeOptions)).rejects.toThrow('COMPOSITE_POSTMIX_CHANGED');
+  }
+  await updateJson(projects.store,compositeKey,()=>composite);
   const segments:ExcerptSegment[]=[{previewStartMs:0,previewEndMs:5000,sourceStartMs:0,sourceEndMs:5000,shotId:'shot'},{previewStartMs:5000,previewEndMs:7000,sourceStartMs:10000,sourceEndMs:12000,shotId:'shot'},{previewStartMs:7000,previewEndMs:9000,sourceStartMs:16000,sourceEndMs:18000,shotId:'shot'}];
   let excerptCalls=0,previewSha='c'.repeat(64);
   const excerptOptions={root,profile:'full' as const,env:pictureOptions.env,composite:compositeOptions,

@@ -90,12 +90,13 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
  },journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`},resolveReview:(context:Parameters<typeof findConfirmedPostMixReview>[2])=>findConfirmedPostMixReview(projects.store,projectId,context)};
  const expected={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,audio:true,...(masterWav.channels===2?{audioChannels:2 as const}:{})};
- async function verify(record:CompositeStageRecord){
+ async function verify(record:CompositeStageRecord,checkPostMix=true){
   if(record.schemaVersion!==4||record.audioPlanSha256!==audioPlanSha256||record.audioExecutionSha256!==audioExecutionSha256||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.pictureSequenceHash!==canonicalHash(picture)||record.voiceVerifiedSha256!==voice.verifiedRef.sha256||record.narrationPackageSha256!==narrationPackage.packageRef.sha256||record.profile!==profile||record.stageKey!==stageKey||record.outputPath!==outputPath||canonicalHash(record.captionStyle)!==canonicalHash(captionStyle)||record.qualityStatus!=='semantic_not_checked'||record.postMix.filmSha256!==record.technicalQa.sha256||record.loudness.filmSha256!==record.technicalQa.sha256)throw Error('COMPOSITE_STAGE_CONFLICT');
   const actual=await qa(stageDir,config.image,'output/final.mp4',expected);
   if(canonicalHash(actual)!==canonicalHash(record.technicalQa))throw Error('COMPOSITE_OUTPUT_CHANGED');
-  if(record.postMix.lines.some(line=>line.status==='trusted_review')){
-   const recovered=await (options.postMix||verifyPostMixNarration)(dataRoot,{outputPath,sha256:actual.sha256,durationMs:timing.durationMs,technicalQa:'pass'},originalPlan,verified,env,undefined,{...postMixOptions,mustExist:true});
+  if(checkPostMix){
+   const film={outputPath,sha256:actual.sha256,durationMs:timing.durationMs,technicalQa:'pass' as const};
+   const recovered=executionRef&&verified.lines.length===0&&!masterWav.silence?await verifyPostMixNoNarration(projects.store,dataRoot,film,projectId,revisionId,executionRef,audio.planRef,timingRecord.draftRef):await (options.postMix||verifyPostMixNarration)(dataRoot,film,originalPlan,verified,env,undefined,{...postMixOptions,mustExist:true});
    if(canonicalHash(recovered)!==canonicalHash(record.postMix))throw Error('COMPOSITE_POSTMIX_CHANGED');
   }
   await postMixOptions.assertActive();
@@ -115,5 +116,5 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  const record:CompositeStageRecord={schemaVersion:4,audioPlanSha256,audioExecutionSha256,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256,narrationPackageSha256:narrationPackage.packageRef.sha256,profile,stageKey,outputPath,captionStyle,technicalQa:actual,loudness:composed.loudness,postMix,qualityStatus:'semantic_not_checked'};
  const stored=await createOrRead(projects.store,key,record);
  if(canonicalHash(stored)!==canonicalHash(record))throw Error('COMPOSITE_STAGE_CONFLICT');
- return verify(stored);
+ return verify(stored,false);
 }
