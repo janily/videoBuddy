@@ -12,7 +12,7 @@ import{guardAudioPlan,compileAudioCues}from'./audio-plan';
 import{CompleteVisualShotSchema,guardVisualShot}from'./visual-shot';
 import{TimingDraftSchema}from'@/services/video/preview/timing-draft';
 import{revisionSeed}from'@/services/video/timeline/seed';
-import{filmPackagePolicyVersion,captionStyleId,captionStyleForProfile,frozenCaptions,narrationSilence}from'@/services/video/timeline/package';
+import{filmPackagePolicyVersion,legacyFilmPackagePolicyVersion,captionStyleId,captionStyleForProfile,frozenCaptions,narrationSilence}from'@/services/video/timeline/package';
 import{LocalAssetBytes}from'@/services/video/assets/local-bytes';
 
 const id=z.string().min(1).max(120);
@@ -23,7 +23,14 @@ export const SourceManifestSchema=z.strictObject({schemaVersion:z.literal(1),mod
 export const AudioManifestSchema=z.strictObject({schemaVersion:z.literal(1),sources:z.array(z.strictObject({id,kind:z.enum(['generated','licensed','user_supplied']),sourceRef:ObjectRefSchema,rightsRef:ObjectRefSchema})),buses:z.array(z.strictObject({id})).min(1),planRef:ObjectRefSchema,timingDraftRef:ObjectRefSchema,executionRef:ObjectRefSchema.optional()});
 export const SourceCodeSchema=z.strictObject({html:z.string().min(1),visualSourceRef:ObjectRefSchema,timingDraftRef:ObjectRefSchema});
 const captionStyle=z.strictObject({fontSize:z.number().int(),marginV:z.number().int(),outline:z.number().int(),primary:z.string(),outlineColor:z.string()});
-export const CaptionPackageSchema=z.strictObject({schemaVersion:z.literal(1),font:TimingDraftSchema.shape.font.unwrap(),profiles:z.strictObject({full:captionStyle,preview:captionStyle,probe:captionStyle})});
+const logicalCaptionStyle=captionStyle.extend({playResX:z.number().int().min(64).max(3840),playResY:z.number().int().min(64).max(3840)});
+export const CaptionPackageSchema=z.discriminatedUnion('schemaVersion',[
+ z.strictObject({schemaVersion:z.literal(1),font:TimingDraftSchema.shape.font.unwrap(),profiles:z.strictObject({full:captionStyle,preview:captionStyle,probe:captionStyle})}),
+ z.strictObject({schemaVersion:z.literal(2),font:TimingDraftSchema.shape.font.unwrap(),profiles:z.strictObject({full:logicalCaptionStyle,preview:logicalCaptionStyle,probe:logicalCaptionStyle})}),
+]);
+export function expectedCaptionPackage(font:z.infer<typeof TimingDraftSchema>['font'],output:{width:number;height:number},policyVersion:string){
+ return CaptionPackageSchema.parse({schemaVersion:policyVersion===legacyFilmPackagePolicyVersion?1:2,font,profiles:{full:captionStyleForProfile('full',output,policyVersion),preview:captionStyleForProfile('preview',output,policyVersion),probe:captionStyleForProfile('probe',output,policyVersion)}});
+}
 const RightsSchema=z.strictObject({basis:z.enum(['generated','licensed','user_supplied']),source:z.string().min(1)});
 
 function unique(values:string[]){return new Set(values).size===values.length}
@@ -37,7 +44,7 @@ function parse<T>(schema:z.ZodType<T>,raw:unknown,errorCode='FILM_MANIFEST_INVAL
 
 export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknown,audioRoot=process.env.VIDEO_DATA_DIR){
  const parsed=FilmSpecSchema.safeParse(untrusted);if(!parsed.success)throw Error('FILM_SPEC_INVALID');
- if(parsed.data.qualityPolicyVersion!==filmPackagePolicyVersion)throw Error('FILM_POLICY_UNSUPPORTED');
+ if(![filmPackagePolicyVersion,legacyFilmPackagePolicyVersion].includes(parsed.data.qualityPolicyVersion))throw Error('FILM_POLICY_UNSUPPORTED');
  const spec=parsed.data,projectPrefix=`projects/${spec.projectId}/`,revisionPrefix=`${projectPrefix}revisions/${spec.revisionId}/`;
  const top=[spec.understandingRef,spec.treatmentRef,spec.factsRef,spec.timelineRef,spec.assetManifestRef,spec.sourceManifestRef,spec.audioManifestRef];
  if(!unique(top.map(ref=>ref.key)))throw Error('FILM_SPEC_INVALID');
@@ -88,7 +95,7 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  for(const style of sources.captionStyles){
   const raw=await readVerifiedJson(store,style.styleRef,revisionPrefix);
   {
-   const expected={schemaVersion:1,font:timing.font,profiles:{full:captionStyleForProfile('full'),preview:captionStyleForProfile('preview'),probe:captionStyleForProfile('probe')}};
+   const expected=expectedCaptionPackage(timing.font,spec.output,spec.qualityPolicyVersion);
    if(style.id!==captionStyleId||canonicalHash(parse(CaptionPackageSchema,raw))!==canonicalHash(expected))throw Error('FILM_CAPTION_CHANGED');
   }
  }

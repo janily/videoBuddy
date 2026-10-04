@@ -2,7 +2,7 @@ import {isAbsolute} from 'node:path';
 import {z} from 'zod';
 import {ObjectRefSchema,UnderstandingSchema,type ObjectRef} from '@/contracts/video/domain';
 import {FilmSpecSchema,FilmTimelineSchema} from '@/contracts/video/film';
-import {loadVerifiedFilmPackage,AssetManifestSchema,AudioManifestSchema,SourceManifestSchema,TreatmentSchema,FactsManifestSchema,CaptionPackageSchema,SourceCodeSchema} from '@/contracts/video/film-package';
+import {loadVerifiedFilmPackage,AssetManifestSchema,AudioManifestSchema,SourceManifestSchema,TreatmentSchema,FactsManifestSchema,expectedCaptionPackage,SourceCodeSchema} from '@/contracts/video/film-package';
 import {guardTreatment} from '@/contracts/video/treatment';
 import {guardAudioPlan,compileAudioCues} from '@/contracts/video/audio-plan';
 import {CompleteVisualShotSchema} from '@/contracts/video/visual-shot';
@@ -20,7 +20,7 @@ import {createOrRead,StoreMissing} from '@/services/video/storage/atomic-store';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {getStyle} from '@/services/video/styles/registry';
 import {revisionSeed} from '@/services/video/timeline/seed';
-import {filmPackagePolicyVersion,captionStyleId,captionStyleForProfile,frozenCaptions,narrationSilence} from '@/services/video/timeline/package';
+import {filmPackagePolicyVersion,captionStyleId,frozenCaptions,narrationSilence} from '@/services/video/timeline/package';
 import {prepareAudioPlanStage} from './audio-plan-stage';
 import {assertPreviewProductionFence} from './fence';
 import {NarrationPackageDataSchema,prepareNarrationPackageStage} from './narration-package-stage';
@@ -43,6 +43,7 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  let existing:unknown;
  try{existing=(await projects.store.readFresh<unknown>(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(existing===undefined&&options.mustExist)throw Error('FILM_PACKAGE_MISSING');
+ const policyVersion=existing===undefined?filmPackagePolicyVersion:FilmSpecSchema.parse(await readNarrationJson(projects.store,RecordSchema.parse(existing).filmSpecRef,`${revisionPrefix}film/`)).qualityPolicyVersion;
  const understanding=UnderstandingSchema.parse(await readNarrationJson(projects.store,control.understandingRef,`${prefix}/understanding/`));
  if(understanding.briefVersion!==control.briefVersion||!understanding.preferences.styleSlug)throw Error('FILM_BRIEF_CHANGED');
  const style=getStyle(understanding.preferences.styleSlug),treatment=guardTreatment(await readNarrationJson(projects.store,treatmentRef,`${revisionPrefix}treatment-plan/`),understanding,style.rulesHash);
@@ -85,7 +86,8 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
   for(const id of visual.direction.actorIds)if(!actors.has(id))actors.set(id,moduleId);
   shots.push({id:shot.id,startFrame:shot.startFrame,endFrame:shot.endFrame,...visual.direction,sourceModule:moduleId,transitionIn:{kind:'cut' as const,overlapFrames:0},transitionOut:{kind:'cut' as const,overlapFrames:0},factIds:shot.factIds});
  }
- const captions=frozenCaptions(timing,treatment),captionStyles=captions.length?[{id:captionStyleId,styleRef:document('caption-styles',CaptionPackageSchema.parse({schemaVersion:1,font:timing.font,profiles:{full:captionStyleForProfile('full'),preview:captionStyleForProfile('preview'),probe:captionStyleForProfile('probe')}}))}]:[];
+ const landscape=understanding.preferences.aspect==='16:9',logicalOutput={width:landscape?1920:1080,height:landscape?1080:1920};
+ const captions=frozenCaptions(timing,treatment),captionStyles=captions.length?[{id:captionStyleId,styleRef:document('caption-styles',expectedCaptionPackage(timing.font,logicalOutput,policyVersion))}]:[];
  const facts=FactsManifestSchema.parse({schemaVersion:1,facts:understanding.facts.filter(fact=>['provided','confirmed'].includes(fact.status))});
  const soundSources=executed?await archiveSynthSources(projects,projectId,revisionId,audioRecord.planRef,audio,runtime.runtimeDigest):[];
  const manifests={
@@ -95,9 +97,8 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
   sources:SourceManifestSchema.parse({schemaVersion:1,modules,actors:[...actors].map(([id,sourceModuleId])=>({id,sourceModuleId})),captionStyles}),
   audio:AudioManifestSchema.parse({schemaVersion:1,sources:[...narration.sources,...soundSources],buses:[{id:'voice'},{id:'music'},{id:'foley'}],planRef:audioRecord.planRef,timingDraftRef:timingRecord.draftRef,...(executionRef?{executionRef}:{})}),
  };
- const landscape=understanding.preferences.aspect==='16:9';
  const spec=FilmSpecSchema.parse({schemaVersion:5,projectId,revisionId,briefVersion:control.briefVersion,style:{slug:style.slug,packVersion:style.packVersion,upstreamCommit:style.upstreamCommit},output:{width:landscape?1920:1080,height:landscape?1080:1920,fps:timing.fps,totalFrames:timing.totalFrames,sampleRate:48000},seed,understandingRef:control.understandingRef,
-  treatmentRef:document('treatment',manifests.treatment),factsRef:document('facts',facts),timelineRef:document('timeline',manifests.timeline),assetManifestRef:document('asset-manifest',manifests.assets),sourceManifestRef:document('source-manifest',manifests.sources),audioManifestRef:document('audio-manifest',manifests.audio),runtimeDigest:runtime.runtimeDigest,qualityPolicyVersion:filmPackagePolicyVersion});
+  treatmentRef:document('treatment',manifests.treatment),factsRef:document('facts',facts),timelineRef:document('timeline',manifests.timeline),assetManifestRef:document('asset-manifest',manifests.assets),sourceManifestRef:document('source-manifest',manifests.sources),audioManifestRef:document('audio-manifest',manifests.audio),runtimeDigest:runtime.runtimeDigest,qualityPolicyVersion:policyVersion});
  const policy:DeliveryPolicy={schemaVersion:1,audioIntent:narration.lines.length?'voiced':audio.music.length||audio.foley.length?'music':'silent',captions:Boolean(captions.length),requiredRules:[...mandatoryDeliveryRules]};
  const expected=RecordSchema.parse({schemaVersion:2,briefVersion:control.briefVersion,filmSpecRef:document('film',spec),qualityPolicyRef:document('quality-policy',policy),qualityStatus:'semantic_not_checked'});
  async function fence(){

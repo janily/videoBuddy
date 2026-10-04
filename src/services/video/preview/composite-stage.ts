@@ -1,4 +1,6 @@
 import {findConfirmedPostMixReview} from '@/services/video/audio/postmix-review';
+import type {FilmSpec} from '@/contracts/video/film';
+import {prepareFilmPackageStage} from './film-package-stage';
 import {createHash} from 'node:crypto';
 import {isAbsolute,join} from 'node:path';
 import type {ObjectRef,Understanding} from '@/contracts/video/domain';
@@ -79,7 +81,9 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
   const font=await (options.readFont||readPinnedSubtitleFont)(env);
   if(font.family!==timing.font.family||font.runtimeDigest!==timing.font.runtimeDigest||font.charsetSha256!==timing.font.charsetSha256||cues.some(cue=>[...cue.text].some(char=>!/\s/.test(char)&&!font.glyphs.has(char))))throw Error('COMPOSITE_FONT_CHANGED');
  }
- const captionStyle:CaptionStyle|null=cues.length?captionStyleForProfile(profile):null;
+ const filmPackage=await prepareFilmPackageStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,{root,env,mustExist:true,...(options.readFont?{readFont:()=>options.readFont!(env)}:{})});
+ const filmSpec=await readRef<FilmSpec>(projects,filmPackage.filmSpecRef,revisionPrefix+'film/');
+ const captionStyle:CaptionStyle|null=cues.length?captionStyleForProfile(profile,filmSpec.output,filmSpec.qualityPolicyVersion):null;
  const bundleHash=canonicalHash({projectId,revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,pictureSequenceHash:canonicalHash(picture),voiceVerifiedSha256:voice.verifiedRef.sha256,narrationPackageSha256:narrationPackage.packageRef.sha256,audioPlanSha256,audioExecutionSha256});
  const spec={width,height,durationSec:timing.durationMs/1000,fps:timing.fps,bundleHash,fence:expectedConsentEpoch};
  const srt=formatSrt(cues),srtSha256=srt?createHash('sha256').update(srt).digest('hex'):null;

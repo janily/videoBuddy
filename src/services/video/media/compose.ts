@@ -12,7 +12,7 @@ import {measureFinalLoudness} from '@/services/video/audio/loudness';
 import {dockerConfiguration} from './docker-executor';
 import {technicalVideoQa} from './technical-qa';
 
-export interface CaptionStyle{fontSize:number;marginV:number;outline:number;primary:string;outlineColor:string}
+export interface CaptionStyle{fontSize:number;marginV:number;outline:number;primary:string;outlineColor:string;playResX?:number;playResY?:number}
 export interface CompositionSpec{width:number;height:number;durationSec:number;fps:24|30|60;bundleHash:string;fence:number}
 function color(value:string){
  if(!/^#[a-fA-F0-9]{6}$/.test(value))throw Error('CAPTION_STYLE_INVALID');
@@ -20,7 +20,9 @@ function color(value:string){
 }
 export function validateCaptionStyle(style:CaptionStyle){
  if(!Number.isInteger(style.fontSize)||style.fontSize<16||style.fontSize>100||!Number.isInteger(style.marginV)||style.marginV<0||style.marginV>180||!Number.isInteger(style.outline)||style.outline<0||style.outline>5)throw Error('CAPTION_STYLE_INVALID');
- return`FontName=Noto Sans CJK SC,FontSize=${style.fontSize},PrimaryColour=${color(style.primary)},OutlineColour=${color(style.outlineColor)},Outline=${style.outline},Alignment=2,MarginV=${style.marginV}`;
+ const explicit=style.playResX!==undefined||style.playResY!==undefined;
+ if(explicit&&[style.playResX,style.playResY].some(value=>value===undefined||!Number.isInteger(value)||value<64||value>3840||value%2))throw Error('CAPTION_STYLE_INVALID');
+ return`FontName=Noto Sans CJK SC,FontSize=${style.fontSize},PrimaryColour=${color(style.primary)},OutlineColour=${color(style.outlineColor)},Outline=${style.outline},Alignment=2,MarginV=${style.marginV}`+(explicit?`,PlayResX=${style.playResX},PlayResY=${style.playResY}`:'');
 }
 export function composeStageKey(input:{pictureSha256:string;trackSha256:string;trackSilent:boolean;srtSha256:string|null;style:CaptionStyle|null;runtimeDigest:string;spec:CompositionSpec},producerReceipt=false){
  const {spec}=input;
