@@ -1,5 +1,8 @@
 # 当前工程交接（更新至2026-10-04）
 
+2026-10-04 T10/T11 冻结影片新operation技术继续：同revision/同film绑定来源与command、所有已有创作stage mustExist，实际Composite/四句最终混音/Excerpt通过，0新增创作镜头/TTS/全片混音（Excerpt另行提取）；真实Critic一HTTP200却额外$schema，失败未发布，粗大字幕/根系遮挡/事实not_checked线索保留。实际9409/6687原响应精确结算，12调用全settled，旧failed/started不改；SDK格式拒绝前usage修复。cached frozenFilm身份绕过实际RED→GREEN关闭，双轴clean；107文件568测试50.92s及lint/build/构建后types/diffcheck通过。原生字幕单位诊断确认PlayResY288造成2.5倍放大，显式720诊断字形1053×85→421×34，原SRT不改/0model，未改生产或算QA通过。下一步版本化风格字幕、安全区/关键事实及新片QA；公共review/retry UI和完整项目仍缺，C0/C1/C2未达到，无push/部署。见 [冻结继续验证](evidence/frozen-preview-validation.md)。
+
+
 2026-10-04 T10/T11 最终混音可信复核：实际负责人最终AAC单句确认已归档owned消息和独立single_postmix_wav proof，绑定完整film/plan/window/WAV/transcript/词时间/owner/epoch；源TTS与最终混音proof不能互换。生产postmix与Composite冷读接入查证/fence/journal。原20秒实片四句3pass+1trusted_review（保留洒→撒原识别）；原root3/4句新增4native completed，冷完整结果一致，0model/network，原control/budget/failed op不改。首汇总INVALID_KEY失败报告保留，独立mustExist恢复通过，未重复producer。106文件564测试（52.12s）、lint/build/构建后types/diffcheck通过；Spec两项P2（合法尾窗、缓存降级绕过）已RED→GREEN修复，最终双轴clean；公共review及新op同冻结影片技术重试/Excerpt/Critic/发布仍待实现，C0/C1/C2未达到，无push/部署。见 [验证](evidence/postmix-review-validation.md)。
 
 
