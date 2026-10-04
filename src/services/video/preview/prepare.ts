@@ -1,3 +1,4 @@
+import {FrozenPreviewSchema,validateFrozenPreview,type FrozenPreview} from './frozen-preview';
 import {userActivity} from '@/services/video/commands/user-activity';
 import {randomUUID} from 'node:crypto';
 import {PreparePreviewRequestSchema,type PreparePreviewRequest} from '@/contracts/video/commands';
@@ -11,22 +12,25 @@ import type {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {StartFailed,type Receipt} from '@/services/video/commands/submit';
 import {assertMediaStopsResolved} from '@/services/video/media/stop-state';
 import {ReviewedTreatmentSchema,validateReviewedTreatment,persistReviewedTreatment,type ReviewedTreatment} from './reviewed-treatment';
-interface Intent{reviewedTreatmentRequest?:PreparePreviewRequest;reviewedTreatment?:ReviewedTreatment;hash:string;revisionId:string;previewId:string;receipt:Receipt}
+interface Intent{frozenPreview?:FrozenPreview;frozenPreviewRequest?:PreparePreviewRequest;reviewedTreatmentRequest?:PreparePreviewRequest;reviewedTreatment?:ReviewedTreatment;hash:string;revisionId:string;previewId:string;receipt:Receipt}
 export interface PreviewOperation{
  id:string;projectId:string;commandId:string;kind:'preview';status:string;canonicalRunId:string|null;streamEpoch:number;fence:number;
  revisionId:string;previewId:string;briefVersion:number;consentEpoch:number;understandingRef:ObjectRef;
- mediaAttemptStarted?:boolean;reviewedTreatmentSha256?:string;
+ mediaAttemptStarted?:boolean;frozenPreviewSha256?:string;reviewedTreatmentSha256?:string;
 }
 const terminal=new Set(['succeeded','failed','cancelled','interrupted','superseded']);
-export async function preparePreview(projects:ProjectStore,queue:LocalOperationQueue,owner:string,projectId:string,untrusted:PreparePreviewRequest,options:{reviewedTreatment?:ReviewedTreatment}={}):Promise<Receipt>{
+export async function preparePreview(projects:ProjectStore,queue:LocalOperationQueue,owner:string,projectId:string,untrusted:PreparePreviewRequest,options:{reviewedTreatment?:ReviewedTreatment;frozenPreview?:FrozenPreview;root?:string}={}):Promise<Receipt>{
  const request=PreparePreviewRequestSchema.parse(untrusted),prefix='projects/'+projectId;
  await projects.access(owner,projectId);
  const reviewedTreatment=options.reviewedTreatment?ReviewedTreatmentSchema.parse(options.reviewedTreatment):undefined;
- const intentKey=prefix+'/commands/'+request.clientCommandId,hash=canonicalHash({kind:'prepare_preview',body:request,...(reviewedTreatment?{reviewedTreatment}:{})});
+ const frozenPreview=options.frozenPreview?FrozenPreviewSchema.parse(options.frozenPreview):undefined;
+ if(frozenPreview&&(!options.root||reviewedTreatment))throw Error('FROZEN_PREVIEW_CHANGED');
+ const intentKey=prefix+'/commands/'+request.clientCommandId,hash=canonicalHash({kind:'prepare_preview',body:request,...(reviewedTreatment?{reviewedTreatment}:{}),...(frozenPreview?{frozenPreview}:{})});
  let existing:Intent|undefined;try{existing=(await projects.store.readFresh<Intent>(intentKey)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(!existing&&reviewedTreatment)await validateReviewedTreatment(projects,projectId,await projects.access(owner,projectId),reviewedTreatment);
- const intent=existing||await createOrRead<Intent>(projects.store,intentKey,{hash,...(reviewedTreatment?{reviewedTreatment,reviewedTreatmentRequest:request}:{}),revisionId:randomUUID(),previewId:randomUUID(),receipt:{schemaVersion:5,commandId:request.clientCommandId,projectId,operationId:randomUUID(),controlVersion:0,status:'reserved'}});
- if(intent.hash!==hash||canonicalHash(intent.reviewedTreatment??null)!==canonicalHash(reviewedTreatment??null))throw Error('IDEMPOTENCY_CONFLICT');
+ const frozenSource=!existing&&frozenPreview?await validateFrozenPreview(projects,options.root!,projectId,await projects.access(owner,projectId),frozenPreview):undefined;
+ const intent=existing||await createOrRead<Intent>(projects.store,intentKey,{hash,...(reviewedTreatment?{reviewedTreatment,reviewedTreatmentRequest:request}:{}),...(frozenPreview?{frozenPreview,frozenPreviewRequest:request}:{}),revisionId:frozenSource?.source.revisionId||randomUUID(),previewId:randomUUID(),receipt:{schemaVersion:5,commandId:request.clientCommandId,projectId,operationId:randomUUID(),controlVersion:0,status:'reserved'}});
+ if(canonicalHash(intent.frozenPreview??null)!==canonicalHash(frozenPreview??null)||intent.hash!==hash||canonicalHash(intent.reviewedTreatment??null)!==canonicalHash(reviewedTreatment??null))throw Error('IDEMPOTENCY_CONFLICT');
  async function dispatch(receipt:Receipt){
   const control=await projects.access(owner,projectId);
   if(control.activeProduction!==receipt.operationId)return;
@@ -40,6 +44,7 @@ export async function preparePreview(projects:ProjectStore,queue:LocalOperationQ
   const receipt=previous||intent.receipt;if(receipt.operationId!==intent.receipt.operationId)throw Error('IDEMPOTENCY_CONFLICT');
   await updateJson(projects.store,intentKey,(value:Intent)=>({...value,receipt}));await dispatch(receipt);return{...receipt,status:'replayed'};
  }
+ if(frozenPreview)await validateFrozenPreview(projects,options.root!,projectId,control,frozenPreview);
  if(reviewedTreatment)await validateReviewedTreatment(projects,projectId,control,reviewedTreatment);
  assertMediaStopsResolved(control);
  const understanding=UnderstandingSchema.parse((await projects.store.readFresh(control.understandingRef.key)).value);
@@ -55,11 +60,11 @@ export async function preparePreview(projects:ProjectStore,queue:LocalOperationQ
   if(!['collecting','preview_ready','ready','attention','cancelled'].includes(current.phase)||current.briefVersion!==request.expectedBriefVersion||canonicalHash(current.understandingRef)!==canonicalHash(control.understandingRef)||current.consentEpoch!==control.consentEpoch)throw Error('PREVIEW_STALE');
  };
  assertBaseline(control);
- const operation:PreviewOperation={id:intent.receipt.operationId,projectId,commandId:request.clientCommandId,kind:'preview',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,revisionId:intent.revisionId,previewId:intent.previewId,briefVersion:control.briefVersion,consentEpoch:control.consentEpoch,understandingRef:control.understandingRef,...(reviewedTreatment?{reviewedTreatmentSha256:canonicalHash(reviewedTreatment)}:{})};
+ const operation:PreviewOperation={id:intent.receipt.operationId,projectId,commandId:request.clientCommandId,kind:'preview',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,revisionId:intent.revisionId,previewId:intent.previewId,briefVersion:control.briefVersion,consentEpoch:control.consentEpoch,understandingRef:control.understandingRef,...(frozenPreview?{frozenPreviewSha256:canonicalHash(frozenPreview)}:{}),...(reviewedTreatment?{reviewedTreatmentSha256:canonicalHash(reviewedTreatment)}:{})};
  const stored=await createOrRead(projects.store,prefix+'/operations/'+operation.id,operation);
  // A duplicate may race a worker claim/cancel. Compare immutable inputs only.
  for(const field of ['id','projectId','commandId','kind','revisionId','previewId','briefVersion','consentEpoch','understandingRef'] as const)if(canonicalHash(stored[field])!==canonicalHash(operation[field]))throw Error('IDEMPOTENCY_CONFLICT');
- if(stored.reviewedTreatmentSha256!==operation.reviewedTreatmentSha256)throw Error('IDEMPOTENCY_CONFLICT');
+ if(stored.frozenPreviewSha256!==operation.frozenPreviewSha256||stored.reviewedTreatmentSha256!==operation.reviewedTreatmentSha256)throw Error('IDEMPOTENCY_CONFLICT');
  const updated=await updateJson(projects.store,prefix+'/control',(current:ProjectControl)=>{
   if(current.receipts.some(receipt=>receipt.commandId===request.clientCommandId))return current;
   assertBaseline(current);const receipt={...intent.receipt,status:'accepted' as const,controlVersion:current.controlVersion+1};

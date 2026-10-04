@@ -1,0 +1,246 @@
+{
+  "executedAt": "2026-10-04T11:17:39.755Z",
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+  "sourceRevisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000,
+      "startedAt": "2026-10-04T11:18:37.200Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T11:19:23.189Z",
+      "responseSha256": "fe9e5c369f26ca18311ea7363fa9a9f0e83ba9defbc7c34dff073d9873f715ba",
+      "responseFile": "model-diagnostics/fe9e5c369f26ca18311ea7363fa9a9f0e83ba9defbc7c34dff073d9873f715ba.json",
+      "usage": {
+        "prompt_tokens": 9409,
+        "completion_tokens": 6687,
+        "total_tokens": 16096,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "receipt": {
+    "schemaVersion": 5,
+    "commandId": "18520b53-8d08-4fad-b202-b2fd737c6aa3",
+    "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+    "operationId": "39b2ac82-b50d-45ca-88ff-91dcc036296a",
+    "controlVersion": 21,
+    "status": "accepted"
+  },
+  "budget": {
+    "calls": 12,
+    "inputTokens": 353592,
+    "outputTokens": 129000,
+    "reservations": {
+      "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+      "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+      "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+      "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+      "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+      "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+      "f95b7a9de25fa8ea7ab4e53a6012ad8dab55f0ddf08b9ea56fea582183c90589": "a91e5ffc13a8ff6c0094f514c491a05d8712b3475daef5cd4154d3524ca6ac3e",
+      "d40c1ee002b909c8601d3f9f8b9a84e1aa6aa5db4b07c3ba0447f5b62e1fe8d1": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+      "8866cfcab10821fb875a27eab7cd0af4c09d831a63107982b462dea9ebe63bd2": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+      "e40e1f3ca49e3ebfde743e433c333c956e31f47afed0b6f60ba007e4259002cb": "896d3460e288afaa584cf0a9516b50dc5be6cf4bcdad766272399650556c2ce7",
+      "66a6fdd1ced8786c8dfa3db2ade8e986c89a1c13d1cc7fa60cbd5aeefffe0959": "7e78cdb0ac4126f66630687c9824667b9106db94b157a3f721052bf3b20d5d2e",
+      "7dbaafa127fed9f7080c219535a8866c7140da74c4aee9fbaafe80fb10c339e0": "85fd222fb8fa796bf5a1c1ebedad6ebb13bc9b90ef466e3ae9b62baa39395ac9"
+    },
+    "accountingVersion": 2,
+    "accounting": {
+      "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+        "state": "settled",
+        "startedAt": "2026-10-04T08:55:46.195Z",
+        "inputTokens": 4993,
+        "outputTokens": 2509
+      },
+      "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+        "state": "settled",
+        "startedAt": "2026-10-04T08:56:00.722Z",
+        "inputTokens": 4346,
+        "outputTokens": 3350
+      },
+      "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:17:00.666Z",
+        "inputTokens": 9042,
+        "outputTokens": 7048
+      },
+      "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:17:30.346Z",
+        "inputTokens": 7216,
+        "outputTokens": 5707
+      },
+      "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:18:19.782Z",
+        "inputTokens": 7209,
+        "outputTokens": 10458
+      },
+      "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:32:42.453Z",
+        "inputTokens": 9048,
+        "outputTokens": 4233
+      },
+      "f95b7a9de25fa8ea7ab4e53a6012ad8dab55f0ddf08b9ea56fea582183c90589": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:37:16.380Z",
+        "inputTokens": 9063,
+        "outputTokens": 6625
+      },
+      "d40c1ee002b909c8601d3f9f8b9a84e1aa6aa5db4b07c3ba0447f5b62e1fe8d1": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:37:41.658Z",
+        "inputTokens": 7342,
+        "outputTokens": 8437
+      },
+      "8866cfcab10821fb875a27eab7cd0af4c09d831a63107982b462dea9ebe63bd2": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:38:59.981Z",
+        "inputTokens": 7330,
+        "outputTokens": 9171
+      },
+      "e40e1f3ca49e3ebfde743e433c333c956e31f47afed0b6f60ba007e4259002cb": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:40:05.439Z",
+        "inputTokens": 7327,
+        "outputTokens": 9692
+      },
+      "66a6fdd1ced8786c8dfa3db2ade8e986c89a1c13d1cc7fa60cbd5aeefffe0959": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:41:33.745Z",
+        "inputTokens": 7319,
+        "outputTokens": 9371
+      },
+      "7dbaafa127fed9f7080c219535a8866c7140da74c4aee9fbaafe80fb10c339e0": {
+        "state": "unknown",
+        "startedAt": "2026-10-04T11:18:36.904Z"
+      }
+    }
+  },
+  "currentStage": "critic",
+  "operation": {
+    "id": "39b2ac82-b50d-45ca-88ff-91dcc036296a",
+    "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+    "commandId": "18520b53-8d08-4fad-b202-b2fd737c6aa3",
+    "kind": "preview",
+    "status": "failed",
+    "canonicalRunId": "39b2ac82-b50d-45ca-88ff-91dcc036296a",
+    "streamEpoch": 0,
+    "fence": 0,
+    "revisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+    "previewId": "6db36ee2-063a-49dd-aabf-8f97bac5ed05",
+    "briefVersion": 1,
+    "consentEpoch": 0,
+    "understandingRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+      "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+      "bytes": 1272,
+      "mime": "application/json"
+    },
+    "frozenPreviewSha256": "5868a391d785e3c5c3654d71403506bb231328b1821681ae5271fa9148413be2",
+    "mediaAttemptStarted": true,
+    "stage": "critic",
+    "errorCode": "PROVIDER_UNAVAILABLE"
+  },
+  "control": {
+    "schemaVersion": 5,
+    "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+    "ownerKeyHash": "new-theme-validation",
+    "controlVersion": 23,
+    "briefVersion": 1,
+    "createdAt": "2026-10-04T08:55:45.728Z",
+    "lastUserActivityAt": "2026-10-04T11:17:40.393Z",
+    "expiresAt": "2026-11-03T11:17:40.393Z",
+    "reviewPolicy": "preview_first",
+    "phase": "attention",
+    "understandingRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+      "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+      "bytes": 1272,
+      "mime": "application/json"
+    },
+    "messagesIndexRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/messages/8e2a92e5dfc2d6b3c73586fd7b03c8b1e0bfac5b81619d45fa3b236f8acbbeb0",
+      "sha256": "8e2a92e5dfc2d6b3c73586fd7b03c8b1e0bfac5b81619d45fa3b236f8acbbeb0",
+      "bytes": 282,
+      "mime": "application/json"
+    },
+    "revisionIndexRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/revisions/29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+      "sha256": "29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+      "bytes": 23,
+      "mime": "application/json"
+    },
+    "assets": [],
+    "inputPending": false,
+    "previewState": "none",
+    "receipts": [
+      {
+        "schemaVersion": 5,
+        "commandId": "e78aada9-177c-409d-b287-b35a51c930b5",
+        "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+        "operationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+        "controlVersion": 3,
+        "status": "accepted"
+      },
+      {
+        "schemaVersion": 5,
+        "commandId": "7683c638-26c4-49b6-9e87-15c3dab3dd8d",
+        "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+        "operationId": "df5b5a6e-173d-4e69-aaa3-15ce765cfb0b",
+        "controlVersion": 9,
+        "status": "accepted"
+      },
+      {
+        "schemaVersion": 5,
+        "commandId": "2849be3f-39ce-43c4-b352-bfac3d2fd434",
+        "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+        "operationId": "dafc18d9-5419-4367-ad29-db65e0361604",
+        "controlVersion": 12,
+        "status": "accepted"
+      },
+      {
+        "schemaVersion": 5,
+        "commandId": "fdb62617-3f02-46d7-92a0-e608695493c0",
+        "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+        "operationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+        "controlVersion": 15,
+        "status": "accepted"
+      },
+      {
+        "schemaVersion": 5,
+        "commandId": "18520b53-8d08-4fad-b202-b2fd737c6aa3",
+        "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+        "operationId": "39b2ac82-b50d-45ca-88ff-91dcc036296a",
+        "controlVersion": 21,
+        "status": "accepted"
+      }
+    ],
+    "consentEpoch": 0,
+    "nextOrdinal": 4,
+    "ordinalReservations": {},
+    "activeProduction": null,
+    "previewOutcomes": {},
+    "latestPreviewOutcome": {
+      "operationId": "39b2ac82-b50d-45ca-88ff-91dcc036296a",
+      "briefVersion": 1,
+      "consentEpoch": 0,
+      "controlVersion": 22
+    }
+  },
+  "errorCode": "PROVIDER_UNAVAILABLE",
+  "sourceOperationUnchanged": true
+}

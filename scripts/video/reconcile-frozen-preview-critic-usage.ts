@@ -1,0 +1,41 @@
+import {createHash} from 'node:crypto';
+import {readFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {z} from 'zod';
+import {FileStore} from '../../src/services/video/storage/file-store';
+import {canonicalHash,canonicalJson} from '../../src/services/video/domain/hash';
+import {settleModelUsage,type ModelReservation} from '../../src/services/video/budget/model-budget';
+import {readNarrationJson} from '../../src/services/video/audio/narration-package';
+import {loadVerifiedFilmPackage} from '../../src/contracts/video/film-package';
+import {visualReviewContext,VisualReviewSchema} from '../../src/contracts/video/visual-review';
+import {selectPreviewExcerpt} from '../../src/services/video/preview/select-excerpt';
+import type {FilmPackageStageRecord} from '../../src/services/video/preview/film-package-stage';
+import type {CompositeStageRecord} from '../../src/services/video/preview/composite-stage';
+import {loadStageKnowledge} from '../../src/services/video/styles/knowledge-loader';
+import {extractVisualFrames} from '../../src/services/video/quality/visual-evidence';
+import {claimProbeReport,persistProbeReport} from './helpers/probe-report';
+async function main(){
+ if(!process.argv.includes('--reconcile-captured-critic-usage'))throw Error('EXPLICIT_RECONCILIATION_REQUIRED');
+ const evidence=JSON.parse(await readFile('docs/engineering/evidence/frozen-preview-continuation-probe.json','utf8')),op=evidence.operation;
+ if(evidence.status!=='blocked'||op.status!=='failed'||op.stage!=='critic'||evidence.requests.length!==1)throw Error('SINGLE_TERMINAL_REQUEST_REQUIRED');
+ const request=evidence.requests[0];if(request.status!==200||request.model!=='gemini-3.8-flash'||!/^model-diagnostics\/[a-f0-9]{64}\.json$/.test(request.responseFile))throw Error('RAW_RESPONSE_REQUIRED');
+ const bytes=await readFile(join(evidence.root,request.responseFile));if(createHash('sha256').update(bytes).digest('hex')!==request.responseSha256)throw Error('RAW_RESPONSE_CHANGED');
+ const raw=JSON.parse(bytes.toString()),usage=z.strictObject({inputTokens:z.number().int().nonnegative(),outputTokens:z.number().int().nonnegative()}).parse({inputTokens:raw.usage?.prompt_tokens,outputTokens:raw.usage?.completion_tokens});
+ if(raw.model!==request.model||raw.choices.length!==1||raw.choices[0].finish_reason!=='stop'||raw.usage.total_tokens!==usage.inputTokens+usage.outputTokens||canonicalHash(raw.usage)!==canonicalHash(request.usage))throw Error('RAW_RESPONSE_AMBIGUOUS');
+ const store=new FileStore(evidence.root),prefix=`projects/${op.projectId}`,revisionPrefix=`${prefix}/revisions/${op.revisionId}/`,record=(await store.readFresh<FilmPackageStageRecord>(revisionPrefix+'film-package-v2-stage')).value,frozen=await loadVerifiedFilmPackage(store,await readNarrationJson(store,record.filmSpecRef,revisionPrefix+'film/'),evidence.root),movie=(await store.readFresh<CompositeStageRecord>(revisionPrefix+'composite-v4/preview')).value;
+ const segments=selectPreviewExcerpt(frozen.timeline,frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(f=>f.id)),frames=[...new Set(segments.map(s=>Math.floor((s.sourceStartMs!+s.sourceEndMs!)*frozen.timeline.fps/2000)))].sort((a,b)=>a-b);
+ const actual=await extractVisualFrames(evidence.root,{outputPath:movie.outputPath,sha256:movie.technicalQa.sha256,width:movie.technicalQa.width,height:movie.technicalQa.height,totalFrames:frozen.filmSpec.output.totalFrames},frames,'sha256:'+frozen.filmSpec.runtimeDigest,{mustExist:true});
+ const knowledge=await loadStageKnowledge(frozen.filmSpec.style.slug,'style'),context=visualReviewContext({filmSha256:movie.technicalQa.sha256,filmSpecSha256:record.filmSpecRef.sha256,styleSlug:frozen.filmSpec.style.slug,styleRulesHash:knowledge.sha256,round:1,frames:actual.frames.map(({id,frame,sha256,bytes})=>({id,frame,sha256,bytes})),facts:frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(({id,text})=>({id,text}))});
+ const output=JSON.parse(raw.choices[0].message.content.replace(/^```json\s*/,'').replace(/\s*```$/,''));
+ if(output.$schema!=='http://json-schema.org/draft-07/schema#'||output.filmSha256!==context.filmSha256||output.filmSpecSha256!==context.filmSpecSha256||output.frameSetSha256!==context.frameSetSha256||output.styleRulesHash!==context.styleRulesHash||output.round!==context.round||VisualReviewSchema.safeParse(output).success)throw Error('RAW_RESPONSE_CONTEXT_CHANGED');
+ const stageKey=canonicalHash({filmSpecSha256:record.filmSpecRef.sha256,compositeSha256:canonicalHash(movie),frames,round:1,runtimeDigest:frozen.filmSpec.runtimeDigest}),stage=op.id+'-critic-'+stageKey,id=canonicalHash({projectId:op.projectId,stage}),cost={inputTokens:Buffer.byteLength(canonicalJson({context,styleRules:knowledge.rules}))+4096+frames.length*8192,outputTokens:8000},hash=canonicalHash(cost),intent=(await store.readFresh<{day:string;hash:string;mode:'unlimited_validation'}>(prefix+'/budget-intents/'+id)).value;
+ if(intent.hash!==hash||intent.mode!=='unlimited_validation')throw Error('RESERVATION_CHANGED');
+ const budget=(await store.readFresh<{accounting:Record<string,{state:string;startedAt:string}>}>(prefix+'/budget')).value,entry=budget.accounting[id];
+ if(entry?.state!=='unknown'||Math.abs(Date.parse(request.startedAt)-Date.parse(entry.startedAt))>1000)throw Error('REQUEST_BINDING_CHANGED');
+ const keys=[prefix+'/control',prefix+'/operations/'+op.id,prefix+'/operations/'+op.id+'/effects/visual-critic/'+stageKey],before=await Promise.all(keys.map(async key=>canonicalHash((await store.readFresh(key)).value)));
+ if(before[1]!==canonicalHash(op)||(await store.readFresh<{status:string}>(keys[2])).value.status!=='started')throw Error('SOURCE_STATE_CHANGED');
+ const path='docs/engineering/evidence/frozen-preview-critic-usage-reconciliation.json',reservation:ModelReservation={projectId:op.projectId,stage,id,day:intent.day,hash,cost,mode:intent.mode},report:{[key:string]:unknown}={executedAt:new Date().toISOString(),status:'started',projectId:op.projectId,operationId:op.id,reservationId:id,responseSha256:request.responseSha256,usage,context,reviewDiagnostics:{authorizing:false,acceptedAsReview:false,style:output.style,facts:output.facts,observations:output.observations},policy:'Known HTTP200 usage only; preserve invalid output/started effect/failed operation and actual reported quality concerns. No retry, refund, sanitized review acceptance or preview publication.'};
+ await claimProbeReport(path,report);try{report.settlement=await settleModelUsage(store,reservation,usage);report.status='usage_settled';report.budget=(await store.readFresh(prefix+'/budget')).value;report.gate=(await store.readFresh('budgets/model-gate')).value}catch(error){report.status='blocked';report.errorCode=(error as Error).message;process.exitCode=1}
+ report.sourceStateUnchanged=canonicalHash(before)===canonicalHash(await Promise.all(keys.map(async key=>canonicalHash((await store.readFresh(key)).value))));await persistProbeReport(path,report);console.log(JSON.stringify({status:report.status,usage,sourceStateUnchanged:report.sourceStateUnchanged,errorCode:report.errorCode}));
+}
+main().catch(error=>{console.error(JSON.stringify({status:'blocked',errorCode:error.message}));process.exitCode=1});

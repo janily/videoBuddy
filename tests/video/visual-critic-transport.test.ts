@@ -50,3 +50,16 @@ it('checks cancellation after durable model accounting before making a transport
   expect((await store.readFresh<{accounting:Record<string,{state:string}>}>('projects/project/budget')).value.accounting[reservation.id].state).toBe('unknown');
  }finally{vi.unstubAllGlobals();await rm(root,{recursive:true,force:true})}
 });
+it('rejects Critic schema metadata while settling known provider usage without retrying',async()=>{
+ const image=await readFile('docs/engineering/evidence/native-frame-3.png'),style=getStyle('crayon-book'),context=visualReviewContext({filmSha256:'b'.repeat(64),filmSpecSha256:'a'.repeat(64),styleSlug:style.slug,styleRulesHash:style.rulesHash,round:1,frames:[{id:'frame-324',frame:324,sha256:createHash('sha256').update(image).digest('hex'),bytes:image.length}],facts:[]});
+ const {frames,...fields}=context;void frames;
+ const invalid={$schema:'http://json-schema.org/draft-07/schema#',schemaVersion:1,...fields,scope:'sampled_frames',observations:[{frameId:'frame-324',visibleText:[],issues:[]}],style:{result:'not_checked',frameIds:['frame-324'],reason:'样本不足'},readability:{result:'not_checked',frameIds:['frame-324'],reason:'样本不足'}};
+ let calls=0;const server=createServer(async(req,res)=>{calls++;for await(const part of req)void part;res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({id:'critic-invalid',object:'chat.completion',created:1,model:'local-unit',choices:[{index:0,message:{role:'assistant',content:'```json\n'+JSON.stringify(invalid)+'\n```'},finish_reason:'stop'}],usage:{prompt_tokens:120,completion_tokens:60,total_tokens:180}}))});
+ await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));const address=server.address();if(!address||typeof address==='string')throw Error('LOCAL_SERVER_FAILED');
+ const root=await mkdtemp(join(tmpdir(),'vb-critic-invalid-'));
+ try{
+ const env={MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:'http://127.0.0.1:'+address.port+'/v1',MODEL_API_KEY:'local-unit-only',VIDEO_CRITIC_MODEL:'local-unit'},store=new FileStore(root),reservation=(await reserveModelBudget(store,'project','critic-invalid',{inputTokens:1000,outputTokens:1000},{projectCalls:1,projectInputTokens:10000,projectOutputTokens:10000,dailyCalls:1})).reservation;
+ await expect(withAccountedModel(store,reservation,()=>runVisualCritic(context,new Map([['frame-324',image]]),1000,env))).rejects.toThrow('MODEL_OUTPUT_INVALID');
+ expect(calls).toBe(1);expect((await store.readFresh<{accounting:Record<string,unknown>}>('projects/project/budget')).value.accounting[reservation.id]).toMatchObject({state:'settled',inputTokens:120,outputTokens:60});
+ }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
+});

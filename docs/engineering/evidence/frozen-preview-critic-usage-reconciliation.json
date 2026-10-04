@@ -1,0 +1,227 @@
+{
+  "executedAt": "2026-10-04T11:23:15.429Z",
+  "status": "usage_settled",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "operationId": "39b2ac82-b50d-45ca-88ff-91dcc036296a",
+  "reservationId": "7dbaafa127fed9f7080c219535a8866c7140da74c4aee9fbaafe80fb10c339e0",
+  "responseSha256": "fe9e5c369f26ca18311ea7363fa9a9f0e83ba9defbc7c34dff073d9873f715ba",
+  "usage": {
+    "inputTokens": 9409,
+    "outputTokens": 6687
+  },
+  "context": {
+    "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+    "filmSpecSha256": "291f036efb6746a86eeaf1217838273bee201a5a5bab8aeb6532e7dce99ff1d4",
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "round": 1,
+    "frames": [
+      {
+        "id": "frame-51",
+        "frame": 51,
+        "sha256": "1e05674d48267adfc46032f4e16c91bac998fa2184a971f9955761bd691d43b1",
+        "bytes": 1071749
+      },
+      {
+        "id": "frame-231",
+        "frame": 231,
+        "sha256": "6b7797bc0aa6ff6aed9993795dde6c6ec015f40081b56ff87e5548599bfa2285",
+        "bytes": 1551588
+      },
+      {
+        "id": "frame-351",
+        "frame": 351,
+        "sha256": "9625006100bb2c12b1a9743bf806a29d7478557797911436ad1d47b252197f64",
+        "bytes": 928021
+      },
+      {
+        "id": "frame-405",
+        "frame": 405,
+        "sha256": "11228730cb26a41b8f45dec61ce3d7be0c36f679173e08b7970b813f870491c2",
+        "bytes": 827696
+      }
+    ],
+    "facts": [
+      {
+        "id": "fact-seed-sprout-flow",
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。"
+      }
+    ],
+    "frameSetSha256": "05063223b7f54f8d67103aca482fbbfbdd05fbeb6c8031a77e08c851942cc3dc"
+  },
+  "reviewDiagnostics": {
+    "authorizing": false,
+    "acceptedAsReview": false,
+    "style": {
+      "result": "fail",
+      "frameIds": [
+        "frame-51",
+        "frame-405"
+      ],
+      "reason": "frame-51 与 frame-405 中的字幕严重偏离 crayon-book 规范：使用了常规的视频字幕数码字体加粗重黑色描边，而非规范指定的带有笔触感、轮廓色手写体（Patrick Hand）及撕边纸张镂空底衬，构成 blocking 级别的 style_drift。"
+    },
+    "facts": [
+      {
+        "factId": "fact-seed-sprout-flow",
+        "result": "not_checked",
+        "frameIds": [
+          "frame-51",
+          "frame-231",
+          "frame-351",
+          "frame-405"
+        ],
+        "reason": "虽画面依次呈现播种、浇水、发芽并在末尾显示‘观察成长，耐心照料。’，但没有任何单张抽帧完整显示该事实条目的完整原文，根据核验规则（必须至少一张引用帧完整显示该事实原文，否则 fail 或 not_checked），判定为 not_checked。"
+      }
+    ],
+    "observations": [
+      {
+        "frameId": "frame-51",
+        "visibleText": [
+          "把小种子轻轻放进泥土里。"
+        ],
+        "issues": [
+          {
+            "kind": "style_drift",
+            "severity": "blocking",
+            "description": "字幕字体采用白字黑粗描边的常规数码黑体，未遵循 crayon-book 规范中手写体（如 Patrick Hand）、轮廓色渲染及不规则破损底衬（ragged knock-out patch）的要求。"
+          }
+        ]
+      },
+      {
+        "frameId": "frame-231",
+        "visibleText": [],
+        "issues": []
+      },
+      {
+        "frameId": "frame-351",
+        "visibleText": [],
+        "issues": []
+      },
+      {
+        "frameId": "frame-405",
+        "visibleText": [
+          "观察成长，耐心照料。"
+        ],
+        "issues": [
+          {
+            "kind": "style_drift",
+            "severity": "blocking",
+            "description": "字幕依然采用带粗黑描边的现代数码印刷黑体，脱离了蜡笔绘本风格的手写质感与排版规范。"
+          },
+          {
+            "kind": "occlusion",
+            "severity": "warning",
+            "description": "字幕‘观察成长，耐心照料。’叠放于画面底部的植物根系位置，遮挡了部分地下根系细节。"
+          }
+        ]
+      }
+    ]
+  },
+  "policy": "Known HTTP200 usage only; preserve invalid output/started effect/failed operation and actual reported quality concerns. No retry, refund, sanitized review acceptance or preview publication.",
+  "settlement": {
+    "state": "settled",
+    "usage": {
+      "inputTokens": 9409,
+      "outputTokens": 6687
+    }
+  },
+  "budget": {
+    "calls": 12,
+    "inputTokens": 353592,
+    "outputTokens": 129000,
+    "reservations": {
+      "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+      "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+      "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+      "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+      "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+      "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+      "f95b7a9de25fa8ea7ab4e53a6012ad8dab55f0ddf08b9ea56fea582183c90589": "a91e5ffc13a8ff6c0094f514c491a05d8712b3475daef5cd4154d3524ca6ac3e",
+      "d40c1ee002b909c8601d3f9f8b9a84e1aa6aa5db4b07c3ba0447f5b62e1fe8d1": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+      "8866cfcab10821fb875a27eab7cd0af4c09d831a63107982b462dea9ebe63bd2": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+      "e40e1f3ca49e3ebfde743e433c333c956e31f47afed0b6f60ba007e4259002cb": "896d3460e288afaa584cf0a9516b50dc5be6cf4bcdad766272399650556c2ce7",
+      "66a6fdd1ced8786c8dfa3db2ade8e986c89a1c13d1cc7fa60cbd5aeefffe0959": "7e78cdb0ac4126f66630687c9824667b9106db94b157a3f721052bf3b20d5d2e",
+      "7dbaafa127fed9f7080c219535a8866c7140da74c4aee9fbaafe80fb10c339e0": "85fd222fb8fa796bf5a1c1ebedad6ebb13bc9b90ef466e3ae9b62baa39395ac9"
+    },
+    "accountingVersion": 2,
+    "accounting": {
+      "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+        "state": "settled",
+        "startedAt": "2026-10-04T08:55:46.195Z",
+        "inputTokens": 4993,
+        "outputTokens": 2509
+      },
+      "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+        "state": "settled",
+        "startedAt": "2026-10-04T08:56:00.722Z",
+        "inputTokens": 4346,
+        "outputTokens": 3350
+      },
+      "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:17:00.666Z",
+        "inputTokens": 9042,
+        "outputTokens": 7048
+      },
+      "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:17:30.346Z",
+        "inputTokens": 7216,
+        "outputTokens": 5707
+      },
+      "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:18:19.782Z",
+        "inputTokens": 7209,
+        "outputTokens": 10458
+      },
+      "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:32:42.453Z",
+        "inputTokens": 9048,
+        "outputTokens": 4233
+      },
+      "f95b7a9de25fa8ea7ab4e53a6012ad8dab55f0ddf08b9ea56fea582183c90589": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:37:16.380Z",
+        "inputTokens": 9063,
+        "outputTokens": 6625
+      },
+      "d40c1ee002b909c8601d3f9f8b9a84e1aa6aa5db4b07c3ba0447f5b62e1fe8d1": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:37:41.658Z",
+        "inputTokens": 7342,
+        "outputTokens": 8437
+      },
+      "8866cfcab10821fb875a27eab7cd0af4c09d831a63107982b462dea9ebe63bd2": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:38:59.981Z",
+        "inputTokens": 7330,
+        "outputTokens": 9171
+      },
+      "e40e1f3ca49e3ebfde743e433c333c956e31f47afed0b6f60ba007e4259002cb": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:40:05.439Z",
+        "inputTokens": 7327,
+        "outputTokens": 9692
+      },
+      "66a6fdd1ced8786c8dfa3db2ade8e986c89a1c13d1cc7fa60cbd5aeefffe0959": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:41:33.745Z",
+        "inputTokens": 7319,
+        "outputTokens": 9371
+      },
+      "7dbaafa127fed9f7080c219535a8866c7140da74c4aee9fbaafe80fb10c339e0": {
+        "state": "settled",
+        "startedAt": "2026-10-04T11:18:36.904Z",
+        "inputTokens": 9409,
+        "outputTokens": 6687
+      }
+    }
+  },
+  "gate": {
+    "schemaVersion": 1,
+    "active": null
+  },
+  "sourceStateUnchanged": true
+}

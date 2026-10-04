@@ -1,3 +1,4 @@
+import {readFrozenPreview} from './frozen-preview';
 import {UnderstandingSchema} from '@/contracts/video/domain';
 import {guardTreatment} from '@/contracts/video/treatment';
 import {loadVerifiedFilmPackage} from '@/contracts/video/film-package';
@@ -42,19 +43,20 @@ export async function buildPreviewPipeline(projects:ProjectStore,input:Parameter
   assertPreviewProductionFence(c,projectId,operationId,expectedConsentEpoch,{briefVersion:baseline.briefVersion,understandingRef:baseline.understandingRef});
   await assertPreviewOperation(projects,c,operationId,revisionId,input.previewId,expectedConsentEpoch);await activity(name,label);
  }
+ const retry=await readFrozenPreview(projects,root,projectId,operationId,revisionId,expectedConsentEpoch),mustExist=Boolean(retry);
  await stage('treatment','正在构思故事');
- const treatmentRef=await prepareTreatmentStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env});
+ const treatmentRef=retry?.treatmentRef||await prepareTreatmentStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env});
  const treatment=guardTreatment(await readNarrationJson(projects.store,treatmentRef,revisionPrefix+'treatment-plan/'),understanding,getStyle(understanding.preferences.styleSlug!).rulesHash);
  const args=[projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef] as const;
- await stage('voice','正在制作和核验声音');await prepareVoiceStage(...args,{root,env});
- await stage('timing','正在安排画面和字幕');await prepareTimingStage(...args,{root,env});await prepareNarrationPackageStage(...args,{root,env});
- await stage('audio','正在编排音乐和音效');await prepareAudioPlanStage(...args,{root,env});await prepareAudioExecutionStage(...args,{root,env});
+ await stage('voice','正在制作和核验声音');await prepareVoiceStage(...args,{root,env,mustExist});
+ await stage('timing','正在安排画面和字幕');await prepareTimingStage(...args,{root,env,mustExist});await prepareNarrationPackageStage(...args,{root,env,mustExist});
+ await stage('audio','正在编排音乐和音效');await prepareAudioPlanStage(...args,{root,env,mustExist});await prepareAudioExecutionStage(...args,{root,env,mustExist});
  for(const [index,shot] of treatment.shots.entries()){
-  await stage('visual',`正在创作第 ${index+1} 段画面`);await prepareVisualShotStage(...args,shot.id,{root,env});
-  await stage('picture',`正在生成第 ${index+1} 段画面`);await preparePictureShotStage(...args,shot.id,{root,env,profile:'preview'});
+  await stage('visual',`正在创作第 ${index+1} 段画面`);await prepareVisualShotStage(...args,shot.id,{root,env,mustExist});
+  await stage('picture',`正在生成第 ${index+1} 段画面`);await preparePictureShotStage(...args,shot.id,{root,env,profile:'preview',mustExist});
  }
- await stage('composition','正在合成画面和声音');await preparePictureSequenceStage(...args,{root,env,profile:'preview'});
- const film=await prepareFilmPackageStage(...args,{root,env});await prepareCompositeStage(...args,{root,env,profile:'preview'});
+ await stage('composition','正在合成画面和声音');await preparePictureSequenceStage(...args,{root,env,profile:'preview',mustExist});
+ const film=await prepareFilmPackageStage(...args,{root,env,mustExist});await prepareCompositeStage(...args,{root,env,profile:'preview',frozenFilm:retry?.film});
  const frozen=await loadVerifiedFilmPackage(projects.store,await readNarrationJson(projects.store,film.filmSpecRef,revisionPrefix+'film/'),root);
  const segments=selectPreviewExcerpt(frozen.timeline,frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(f=>f.id));
  await stage('excerpt','正在准备效果片段');await preparePreviewExcerptStage(...args,segments,{root,env});

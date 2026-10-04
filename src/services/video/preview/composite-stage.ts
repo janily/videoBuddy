@@ -33,7 +33,7 @@ type Qa=typeof technicalVideoQa;
 type Compose=typeof composeVideo;
 type PostMix=typeof verifyPostMixNarration;
 type Font=typeof readPinnedSubtitleFont;
-interface Options{root?:string;env?:Environment;profile?:Profile;pictureQa?:Qa;filmQa?:Qa;compose?:Compose;postMix?:PostMix;readFont?:Font;mustExist?:boolean}
+interface Options{root?:string;env?:Environment;profile?:Profile;pictureQa?:Qa;filmQa?:Qa;compose?:Compose;postMix?:PostMix;readFont?:Font;mustExist?:boolean;frozenFilm?:import('@/services/video/audio/postmix-asr').PostMixFilm}
 export interface CompositeStageRecord{
  schemaVersion:4;audioPlanSha256:string;audioExecutionSha256:string|null;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;pictureSequenceHash:string;voiceVerifiedSha256:string;narrationPackageSha256:string;
  profile:Profile;stageKey:string;outputPath:string;captionStyle:CaptionStyle|null;technicalQa:Awaited<ReturnType<Qa>>;
@@ -104,7 +104,12 @@ export async function prepareCompositeStage(projects:ProjectStore,projectId:stri
  }
  try{return await verify((await projects.store.readFresh<CompositeStageRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(options.mustExist)throw Error('COMPOSITE_STAGE_MISSING');
- const composed=await (options.compose||composeVideo)(root,join(root,'picture-sequence',picture.stageKey),track,cues,captionStyle,spec,env);
+ if(options.frozenFilm){
+  if(options.frozenFilm.outputPath!==outputPath||options.frozenFilm.durationMs!==timing.durationMs)throw Error('FROZEN_PREVIEW_CHANGED');
+  await import('@/services/video/audio/postmix-asr').then(module=>module.verifiedFilmHash(root,options.frozenFilm!));
+ }
+ const composed=await (options.compose||composeVideo)(root,join(root,'picture-sequence',picture.stageKey),track,cues,captionStyle,spec,env,{assertActive:postMixOptions.assertActive,mustExist:Boolean(options.frozenFilm),journal:postMixOptions.journal});
+ if(options.frozenFilm&&composed.technicalQa.sha256!==options.frozenFilm.sha256)throw Error('FROZEN_PREVIEW_CHANGED');
  if(composed.stageKey!==stageKey||composed.outputPath!==outputPath||composed.qaStatus!=='semantic_not_checked'||composed.technicalQa.audio!==true||composed.technicalQa.frames!==timing.totalFrames||composed.loudness.status!==(masterWav.silence?'not_applicable':'pass'))throw Error('COMPOSITE_OUTPUT_INVALID');
  const actual=await qa(stageDir,config.image,'output/final.mp4',expected);
  if(canonicalHash(actual)!==canonicalHash(composed.technicalQa))throw Error('COMPOSITE_OUTPUT_CHANGED');
