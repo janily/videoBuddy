@@ -1,5 +1,8 @@
 # 当前工程交接（更新至2026-10-04）
 
+2026-10-04 T10/T11 最终混音可信复核：实际负责人最终AAC单句确认已归档owned消息和独立single_postmix_wav proof，绑定完整film/plan/window/WAV/transcript/词时间/owner/epoch；源TTS与最终混音proof不能互换。生产postmix与Composite冷读接入查证/fence/journal。原20秒实片四句3pass+1trusted_review（保留洒→撒原识别）；原root3/4句新增4native completed，冷完整结果一致，0model/network，原control/budget/failed op不改。首汇总INVALID_KEY失败报告保留，独立mustExist恢复通过，未重复producer。106文件564测试（52.12s）、lint/build/构建后types/diffcheck通过；Spec两项P2（合法尾窗、缓存降级绕过）已RED→GREEN修复，最终双轴clean；公共review及新op同冻结影片技术重试/Excerpt/Critic/发布仍待实现，C0/C1/C2未达到，无push/部署。见 [验证](evidence/postmix-review-validation.md)。
+
+
 2026-10-04 T06/T10/T11 最终混音增量：Visual ctx.reset/合成器字幕规则后四实际镜头480帧通过；Audio SDK格式拒绝前usage结算修复，真实HTTP协议RED→GREEN，safe错误分类4例持久SSE/冷读通过。首次$schema失败9048/4233原响应严格对账settled，failed/started不改。新preview五200请求38381/43296全部settled，20秒720p双声道实片SHA7c381b…10492984字节，独立全解码/−14.29LUFS/−4.05dBTP通过，最终ASR第1/3/4句pass，第2洒→撒仍阻断；未Excerpt/Critic/发布。负责人已明确确认最终AAC提取的单句WAV e768…，事实JSON绑定精确question/fullPlan/film/transcript，非正式批准，运行时final proof及同冻结影片的新operation技术继续仍待实现。105文件560测试，lint/build/types通过，两轴clean，完整引用guard已补；见 [验证](evidence/accounted-preview-validation.md)。C0/C1/C2未达到，旧failed/unknown不重置，无push/部署。
 
 
