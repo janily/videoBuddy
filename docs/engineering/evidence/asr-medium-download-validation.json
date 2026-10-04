@@ -1,0 +1,48 @@
+{
+  "initialDownload": {
+    "repository": "Systran/faster-whisper-medium",
+    "revision": "08e178d48790749d25932bbc082711ddcfdfbc4f",
+    "modelCard": "https://huggingface.co/Systran/faster-whisper-medium",
+    "files": {
+      "config.json": {
+        "sha256": "3622a2ddc41ec0e0fd4e68c13c6830f03b90c38d89aaad184de02c8c642cf807",
+        "bytes": 2257
+      },
+      "tokenizer.json": {
+        "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+        "bytes": 2203239
+      },
+      "vocabulary.txt": {
+        "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913",
+        "bytes": 459861
+      }
+    },
+    "startedAt": "2026-10-03T18:09:19.733455+00:00",
+    "status": "failed",
+    "errorType": "ValueError"
+  },
+  "initialBytes": 1360907045,
+  "initialSha256": "13b7f68eb82b39e7f4e0737a29a660ce801e43370dc6ab93b2aa3ec445139e14",
+  "verifiedRange": "bytes 1360907045-1527906377/1527906378",
+  "httpStatus": 206,
+  "completion": {
+    "status": "complete",
+    "bytes": 1527906378,
+    "sha256": "9b45e1009dcc4ab601eff815b61d80e60ce3fd8c74c1a14f4a282258286b51ae",
+    "resumeOffset": 1360907045
+  },
+  "cacheVerificationExitCode": 0,
+  "boundaries": {
+    "finalSymlink": "rejected_target_unchanged",
+    "finalHardlink": "rejected_target_unchanged",
+    "manifestSymlink": "rejected_target_unchanged",
+    "manifestHardlink": "rejected_target_unchanged",
+    "legacyPartSymlink": "ignored_target_unchanged"
+  },
+  "checks": {
+    "pythonCompile": 0,
+    "lint": 0,
+    "build": 0,
+    "postBuildTypes": 0
+  }
+}

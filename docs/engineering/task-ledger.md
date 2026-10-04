@@ -1,5 +1,8 @@
 # 开发任务与证据
 
+2026-10-04 medium 真实诊断：原第三句綠芽及词时间通过；原20秒完整上下文文本正确，但芽14840–14840零长度，保留 ASR_TIMINGS_UNAVAILABLE。两个持久回执completed、0network、原WAV/control/预算未改；固定模型四SHA已核，最初下载截断/官方206补齐证据保留。未提升生产ASR/发布预览，C0/C1/C2未达到；下一步固定medium运行时逐句核全部原音频。见 [medium验证](evidence/asr-medium-validation.md)。
+
+
 2026-10-04 T06/T10/T11 实际新主题：独立种子发芽中文20秒crayon-book，实际Director stream/归档原消息/preparePreview intent+queue+worker/pipeline；2paidcalls原始SHA核证、2settled actual4992/1893+4290/4737。四TTS WAV，第二句“大地”ASR识别“大的”失败，worker failed/ASR_MISMATCH、未预览/批准/发布。实际固定镜像无网phonemizer证明名词地错转de5，未生成新语音或豁免ASR；修复未完成。新诊断 env 类型RED退出2后类型/lint通过，两轴只读真实SHA/账目/失败来源核证clean。生产功能无新改、此前533单元不作新影片QA；0原项目变化、旧unknown保留。见 [新主题证据](evidence/new-theme-validation.md)。下一步实际词法RED→修复/新固定镜像→原台词TTS/ASR→全片，全部项目/43风格86基线未交付，无push/部署。
 
 2026-10-04 T13/T14 正式渲染 journal 接线：拼接/合成/postmix提取及ASR同真实store/project/operation记录；cancel失败或cancelling保留MEDIA_STOP_UNKNOWN。Spec发现缓存直接QA绕过started/unknown，已修：同args completed核验、ASR固定stdout，StoreMissing仅历史缓存复用不伪造journal。停止和上下文RED→GREEN、helper4RED→GREEN、真实FileStore缓存5通过，相关35，最终102files533单元55.32s/lint/build/构建后types/diffcheck通过。实际独立诊断20秒1920×1080/24fps/480frames/AACstereo，两completed、43来源检查、coldmustExist重读sameSHA b1c9e6c6…、−14.08LUFS/−1.5dBTP、0network/control未改，见 [正式渲染验证](evidence/approved-render-journal-validation.md)。未测真实旁白postmix journal/livecancel/全资源协调/视听许可QA，不计正式影片或43风格；修改准入/newrevision/发布及最终验收继续未完成，C0/C1/C2未达，无push/部署。

@@ -1,0 +1,397 @@
+{
+  "executedAt": "2026-10-03T18:28:16.493Z",
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-inference/probe-AYVXYo",
+  "modelManifest": {
+    "repository": "Systran/faster-whisper-medium",
+    "revision": "08e178d48790749d25932bbc082711ddcfdfbc4f",
+    "modelCard": "https://huggingface.co/Systran/faster-whisper-medium",
+    "files": {
+      "config.json": {
+        "sha256": "3622a2ddc41ec0e0fd4e68c13c6830f03b90c38d89aaad184de02c8c642cf807",
+        "bytes": 2257
+      },
+      "model.bin": {
+        "sha256": "9b45e1009dcc4ab601eff815b61d80e60ce3fd8c74c1a14f4a282258286b51ae",
+        "bytes": 1527906378
+      },
+      "tokenizer.json": {
+        "sha256": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+        "bytes": 2203239
+      },
+      "vocabulary.txt": {
+        "sha256": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913",
+        "bytes": 459861
+      }
+    },
+    "startedAt": "2026-10-03T18:28:09.994174+00:00",
+    "status": "verified",
+    "finishedAt": "2026-10-03T18:28:10.509771+00:00"
+  },
+  "runtimeImage": "sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+  "scriptSha256": "fc6cd5e54fbe89882320479d232586fd40be08f05e15a848cc52027ed33e0aa6",
+  "journalPrefix": "projects/c6b14ad8-320f-45ab-a4eb-531de83dd798/operations/d98ab9cf-296a-4590-832d-16529ad16c19/media-effects",
+  "networkCalls": 0,
+  "cases": [
+    {
+      "id": "original_line_3",
+      "expectedAsrText": "种子醒来了，探出绿芽。",
+      "recognizedText": "種子醒來了 探出綠芽",
+      "sourceWav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 79800,
+        "durationMs": 3325,
+        "bytes": 319244,
+        "sha256": "fc0ffd605a9034915c9f133eeb4971b513d8fcc89e7be4f105059d2524649e4c",
+        "peakDbfs": -5.517251851628617,
+        "rmsDbfs": -24.391039827950266
+      },
+      "transcript": {
+        "model": "Systran/faster-whisper-medium",
+        "revision": "08e178d48790749d25932bbc082711ddcfdfbc4f",
+        "modelWeightsSha256": "9b45e1009dcc4ab601eff815b61d80e60ce3fd8c74c1a14f4a282258286b51ae",
+        "language": "zh-CN",
+        "segments": [
+          {
+            "text": "種子醒來了 探出綠芽",
+            "startMs": 0,
+            "endMs": 2640,
+            "words": [
+              {
+                "text": "種",
+                "startMs": 0,
+                "endMs": 580,
+                "probability": 0.5996307134628296
+              },
+              {
+                "text": "子",
+                "startMs": 580,
+                "endMs": 780,
+                "probability": 0.9994682669639587
+              },
+              {
+                "text": "醒",
+                "startMs": 780,
+                "endMs": 1060,
+                "probability": 0.9970734119415283
+              },
+              {
+                "text": "來了",
+                "startMs": 1060,
+                "endMs": 1560,
+                "probability": 0.9306649565696716
+              },
+              {
+                "text": " 探",
+                "startMs": 1820,
+                "endMs": 1980,
+                "probability": 0.9599997401237488
+              },
+              {
+                "text": "出",
+                "startMs": 1980,
+                "endMs": 2180,
+                "probability": 0.9990559220314026
+              },
+              {
+                "text": "綠",
+                "startMs": 2180,
+                "endMs": 2420,
+                "probability": 0.9953173696994781
+              },
+              {
+                "text": "芽",
+                "startMs": 2420,
+                "endMs": 2640,
+                "probability": 0.9788020551204681
+              }
+            ]
+          }
+        ]
+      },
+      "elapsedMs": 6757,
+      "status": "pass"
+    },
+    {
+      "id": "unchanged_full_context",
+      "expectedAsrText": "把种子轻轻埋进泥土。 适量浇水，润湿大地。 种子醒来了，探出绿芽。 一起观察成长，耐心照料。",
+      "recognizedText": "把种子轻轻埋进泥土适量浇水润湿大地种子醒来了 探出绿芽一起观察成长 耐心照料",
+      "sourceWav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 480000,
+        "durationMs": 20000,
+        "bytes": 1920114,
+        "sha256": "0b2123795c4c0c39453337cdab1c29d0ee8d0fffbb0a724692668d7ddddc46d4",
+        "peakDbfs": -5.517251851628617,
+        "rmsDbfs": -25.9974813476885
+      },
+      "transcript": {
+        "model": "Systran/faster-whisper-medium",
+        "revision": "08e178d48790749d25932bbc082711ddcfdfbc4f",
+        "modelWeightsSha256": "9b45e1009dcc4ab601eff815b61d80e60ce3fd8c74c1a14f4a282258286b51ae",
+        "language": "zh-CN",
+        "segments": [
+          {
+            "text": "把种子轻轻埋进泥土",
+            "startMs": 0,
+            "endMs": 3840,
+            "words": [
+              {
+                "text": "把",
+                "startMs": 0,
+                "endMs": 540,
+                "probability": 0.9783722758293152
+              },
+              {
+                "text": "种",
+                "startMs": 540,
+                "endMs": 740,
+                "probability": 0.6283511519432068
+              },
+              {
+                "text": "子",
+                "startMs": 740,
+                "endMs": 1020,
+                "probability": 0.9985713958740234
+              },
+              {
+                "text": "轻",
+                "startMs": 1020,
+                "endMs": 1360,
+                "probability": 0.9772279560565948
+              },
+              {
+                "text": "轻",
+                "startMs": 1360,
+                "endMs": 1560,
+                "probability": 0.9994441866874695
+              },
+              {
+                "text": "埋",
+                "startMs": 1560,
+                "endMs": 1800,
+                "probability": 0.9981840252876282
+              },
+              {
+                "text": "进",
+                "startMs": 1800,
+                "endMs": 1980,
+                "probability": 0.9899023771286011
+              },
+              {
+                "text": "泥",
+                "startMs": 1980,
+                "endMs": 2260,
+                "probability": 0.9871088862419128
+              },
+              {
+                "text": "土",
+                "startMs": 2260,
+                "endMs": 3840,
+                "probability": 0.9995336532592773
+              }
+            ]
+          },
+          {
+            "text": "适量浇水润湿大地",
+            "startMs": 4900,
+            "endMs": 9780,
+            "words": [
+              {
+                "text": "适",
+                "startMs": 4900,
+                "endMs": 5500,
+                "probability": 0.701494887471199
+              },
+              {
+                "text": "量",
+                "startMs": 5500,
+                "endMs": 5740,
+                "probability": 0.9998594522476196
+              },
+              {
+                "text": "浇",
+                "startMs": 5740,
+                "endMs": 5980,
+                "probability": 0.9791646003723145
+              },
+              {
+                "text": "水",
+                "startMs": 5980,
+                "endMs": 6320,
+                "probability": 0.9997569918632507
+              },
+              {
+                "text": "润",
+                "startMs": 6320,
+                "endMs": 6640,
+                "probability": 0.8741547167301178
+              },
+              {
+                "text": "湿",
+                "startMs": 6640,
+                "endMs": 6800,
+                "probability": 0.9119789302349091
+              },
+              {
+                "text": "大",
+                "startMs": 6800,
+                "endMs": 7140,
+                "probability": 0.9977558255195618
+              },
+              {
+                "text": "地",
+                "startMs": 7140,
+                "endMs": 9780,
+                "probability": 0.9984509944915771
+              }
+            ]
+          },
+          {
+            "text": "种子醒来了 探出绿芽",
+            "startMs": 9780,
+            "endMs": 14840,
+            "words": [
+              {
+                "text": "种",
+                "startMs": 9780,
+                "endMs": 10600,
+                "probability": 0.944532036781311
+              },
+              {
+                "text": "子",
+                "startMs": 10600,
+                "endMs": 10780,
+                "probability": 0.9999538660049438
+              },
+              {
+                "text": "醒",
+                "startMs": 10780,
+                "endMs": 11060,
+                "probability": 0.997603714466095
+              },
+              {
+                "text": "来了",
+                "startMs": 11060,
+                "endMs": 11580,
+                "probability": 0.9869228005409241
+              },
+              {
+                "text": " 探",
+                "startMs": 11860,
+                "endMs": 11980,
+                "probability": 0.9920029044151306
+              },
+              {
+                "text": "出",
+                "startMs": 11980,
+                "endMs": 12180,
+                "probability": 0.9987382292747498
+              },
+              {
+                "text": "绿",
+                "startMs": 12180,
+                "endMs": 14840,
+                "probability": 0.9953614771366119
+              },
+              {
+                "text": "芽",
+                "startMs": 14840,
+                "endMs": 14840,
+                "probability": 0.9423683285713196
+              }
+            ]
+          },
+          {
+            "text": "一起观察成长 耐心照料",
+            "startMs": 14840,
+            "endMs": 18260,
+            "words": [
+              {
+                "text": "一起",
+                "startMs": 14840,
+                "endMs": 15700,
+                "probability": 0.8638614416122437
+              },
+              {
+                "text": "观",
+                "startMs": 15700,
+                "endMs": 16120,
+                "probability": 0.9981536269187927
+              },
+              {
+                "text": "察",
+                "startMs": 16120,
+                "endMs": 16260,
+                "probability": 0.9997815489768982
+              },
+              {
+                "text": "成",
+                "startMs": 16260,
+                "endMs": 16580,
+                "probability": 0.9949910044670105
+              },
+              {
+                "text": "长",
+                "startMs": 16580,
+                "endMs": 16880,
+                "probability": 0.9994164705276489
+              },
+              {
+                "text": " 耐",
+                "startMs": 17240,
+                "endMs": 17320,
+                "probability": 0.9994361698627472
+              },
+              {
+                "text": "心",
+                "startMs": 17320,
+                "endMs": 17520,
+                "probability": 0.9998008608818054
+              },
+              {
+                "text": "照",
+                "startMs": 17520,
+                "endMs": 17820,
+                "probability": 0.9878353476524353
+              },
+              {
+                "text": "料",
+                "startMs": 17820,
+                "endMs": 18260,
+                "probability": 0.9954351782798767
+              }
+            ]
+          }
+        ]
+      },
+      "elapsedMs": 7288,
+      "status": "fail",
+      "errorCode": "ASR_TIMINGS_UNAVAILABLE"
+    }
+  ],
+  "limits": "Actual independent CPU int8 medium-model diagnostic using pinned engine image plus SHA-verified model files and frozen script. Original rejected single-line and unchanged full-context WAV; no expected/initial_prompt supplied to recognizer, no TTS/model API call or automatic retry. This does not integrate or promote a production ASR runtime, override small-model failure, validate other lines or publish a preview.",
+  "sourceUnchanged": true,
+  "receipts": [
+    {
+      "schemaVersion": 1,
+      "invocation": "96682308-4f4d-4daf-aec7-220e11cadbb8",
+      "image": "sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "argsSha256": "74ed25a3c2392dfa1e5ab0a50056f12d8e2070989c2f1ae8e3ad4fd7333788ae",
+      "state": "completed",
+      "output": "{\"model\": \"Systran/faster-whisper-medium\", \"revision\": \"08e178d48790749d25932bbc082711ddcfdfbc4f\", \"modelWeightsSha256\": \"9b45e1009dcc4ab601eff815b61d80e60ce3fd8c74c1a14f4a282258286b51ae\", \"language\": \"zh-CN\", \"segments\": [{\"text\": \"種子醒來了 探出綠芽\", \"startMs\": 0, \"endMs\": 2640, \"words\": [{\"text\": \"種\", \"startMs\": 0, \"endMs\": 580, \"probability\": 0.5996307134628296}, {\"text\": \"子\", \"startMs\": 580, \"endMs\": 780, \"probability\": 0.9994682669639587}, {\"text\": \"醒\", \"startMs\": 780, \"endMs\": 1060, \"probability\": 0.9970734119415283}, {\"text\": \"來了\", \"startMs\": 1060, \"endMs\": 1560, \"probability\": 0.9306649565696716}, {\"text\": \" 探\", \"startMs\": 1820, \"endMs\": 1980, \"probability\": 0.9599997401237488}, {\"text\": \"出\", \"startMs\": 1980, \"endMs\": 2180, \"probability\": 0.9990559220314026}, {\"text\": \"綠\", \"startMs\": 2180, \"endMs\": 2420, \"probability\": 0.9953173696994781}, {\"text\": \"芽\", \"startMs\": 2420, \"endMs\": 2640, \"probability\": 0.9788020551204681}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "90ad18c5-e0a2-4aac-a79b-498332ca4a77",
+      "image": "sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c",
+      "argsSha256": "f8c9f5c14b35617b88dbc21050e836e359ec2e5c18b15fafb81b336bfa3f027e",
+      "state": "completed",
+      "output": "{\"model\": \"Systran/faster-whisper-medium\", \"revision\": \"08e178d48790749d25932bbc082711ddcfdfbc4f\", \"modelWeightsSha256\": \"9b45e1009dcc4ab601eff815b61d80e60ce3fd8c74c1a14f4a282258286b51ae\", \"language\": \"zh-CN\", \"segments\": [{\"text\": \"把种子轻轻埋进泥土\", \"startMs\": 0, \"endMs\": 3840, \"words\": [{\"text\": \"把\", \"startMs\": 0, \"endMs\": 540, \"probability\": 0.9783722758293152}, {\"text\": \"种\", \"startMs\": 540, \"endMs\": 740, \"probability\": 0.6283511519432068}, {\"text\": \"子\", \"startMs\": 740, \"endMs\": 1020, \"probability\": 0.9985713958740234}, {\"text\": \"轻\", \"startMs\": 1020, \"endMs\": 1360, \"probability\": 0.9772279560565948}, {\"text\": \"轻\", \"startMs\": 1360, \"endMs\": 1560, \"probability\": 0.9994441866874695}, {\"text\": \"埋\", \"startMs\": 1560, \"endMs\": 1800, \"probability\": 0.9981840252876282}, {\"text\": \"进\", \"startMs\": 1800, \"endMs\": 1980, \"probability\": 0.9899023771286011}, {\"text\": \"泥\", \"startMs\": 1980, \"endMs\": 2260, \"probability\": 0.9871088862419128}, {\"text\": \"土\", \"startMs\": 2260, \"endMs\": 3840, \"probability\": 0.9995336532592773}]}, {\"text\": \"适量浇水润湿大地\", \"startMs\": 4900, \"endMs\": 9780, \"words\": [{\"text\": \"适\", \"startMs\": 4900, \"endMs\": 5500, \"probability\": 0.701494887471199}, {\"text\": \"量\", \"startMs\": 5500, \"endMs\": 5740, \"probability\": 0.9998594522476196}, {\"text\": \"浇\", \"startMs\": 5740, \"endMs\": 5980, \"probability\": 0.9791646003723145}, {\"text\": \"水\", \"startMs\": 5980, \"endMs\": 6320, \"probability\": 0.9997569918632507}, {\"text\": \"润\", \"startMs\": 6320, \"endMs\": 6640, \"probability\": 0.8741547167301178}, {\"text\": \"湿\", \"startMs\": 6640, \"endMs\": 6800, \"probability\": 0.9119789302349091}, {\"text\": \"大\", \"startMs\": 6800, \"endMs\": 7140, \"probability\": 0.9977558255195618}, {\"text\": \"地\", \"startMs\": 7140, \"endMs\": 9780, \"probability\": 0.9984509944915771}]}, {\"text\": \"种子醒来了 探出绿芽\", \"startMs\": 9780, \"endMs\": 14840, \"words\": [{\"text\": \"种\", \"startMs\": 9780, \"endMs\": 10600, \"probability\": 0.944532036781311}, {\"text\": \"子\", \"startMs\": 10600, \"endMs\": 10780, \"probability\": 0.9999538660049438}, {\"text\": \"醒\", \"startMs\": 10780, \"endMs\": 11060, \"probability\": 0.997603714466095}, {\"text\": \"来了\", \"startMs\": 11060, \"endMs\": 11580, \"probability\": 0.9869228005409241}, {\"text\": \" 探\", \"startMs\": 11860, \"endMs\": 11980, \"probability\": 0.9920029044151306}, {\"text\": \"出\", \"startMs\": 11980, \"endMs\": 12180, \"probability\": 0.9987382292747498}, {\"text\": \"绿\", \"startMs\": 12180, \"endMs\": 14840, \"probability\": 0.9953614771366119}, {\"text\": \"芽\", \"startMs\": 14840, \"endMs\": 14840, \"probability\": 0.9423683285713196}]}, {\"text\": \"一起观察成长 耐心照料\", \"startMs\": 14840, \"endMs\": 18260, \"words\": [{\"text\": \"一起\", \"startMs\": 14840, \"endMs\": 15700, \"probability\": 0.8638614416122437}, {\"text\": \"观\", \"startMs\": 15700, \"endMs\": 16120, \"probability\": 0.9981536269187927}, {\"text\": \"察\", \"startMs\": 16120, \"endMs\": 16260, \"probability\": 0.9997815489768982}, {\"text\": \"成\", \"startMs\": 16260, \"endMs\": 16580, \"probability\": 0.9949910044670105}, {\"text\": \"长\", \"startMs\": 16580, \"endMs\": 16880, \"probability\": 0.9994164705276489}, {\"text\": \" 耐\", \"startMs\": 17240, \"endMs\": 17320, \"probability\": 0.9994361698627472}, {\"text\": \"心\", \"startMs\": 17320, \"endMs\": 17520, \"probability\": 0.9998008608818054}, {\"text\": \"照\", \"startMs\": 17520, \"endMs\": 17820, \"probability\": 0.9878353476524353}, {\"text\": \"料\", \"startMs\": 17820, \"endMs\": 18260, \"probability\": 0.9954351782798767}]}]}"
+    }
+  ]
+}
