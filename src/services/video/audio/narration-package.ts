@@ -10,14 +10,14 @@ import type {AtomicStore} from '@/services/video/storage/atomic-store';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {assertAsrExpected} from '@/services/video/timeline/compile';
 import type {TimingDraft} from '@/services/video/preview/timing-draft';
-import type {VerifiedNarrationManifest} from './asr';
+import {AsrModelSchema,type VerifiedNarrationManifest} from './asr';
 import {probeVoiceWav,type VoiceWavProbe} from './wav';
 
 const digest=z.string().regex(/^[a-f0-9]{64}$/),lineId=z.string().regex(/^[-a-zA-Z0-9_]{1,80}$/),sample=z.number().int().nonnegative();
 const voiceConfig=z.strictObject({language:z.enum(['zh-CN','en']),voice:z.enum(['zf_001','af_maple']),provider:z.literal('kokoro-js'),model:z.string().min(1).max(500),modelLicense:z.literal('Apache-2.0'),runtimeDigest:digest});
 export const NarrationSourceSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('generated_narration'),lineId,displayText:z.string().min(1).max(500),spokenText:z.string().min(1).max(250),expectedAsrText:z.string().min(1).max(500),voiceConfig,voiceConfigHash:digest,audioRef:ObjectRefSchema,wordTimingsRef:ObjectRefSchema,startSample:sample,endSample:sample,
  wav:z.strictObject({codec:z.literal('pcm_f32le'),sampleRate:z.literal(24000),channels:z.literal(1),samples:z.number().int().positive(),durationMs:z.number().positive(),bytes:z.number().int().positive(),sha256:digest,peakDbfs:z.number().finite(),rmsDbfs:z.number().finite()})});
-export const WordTimingManifestSchema=z.strictObject({schemaVersion:z.literal(1),lineId,voiceSha256:digest,asrModel:z.literal('Systran/faster-whisper-small'),asrRuntimeDigest:digest,recognizedText:z.string().min(1).max(2000),words:z.array(z.strictObject({text:z.string().min(1).max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)})).min(1).max(1000)});
+export const WordTimingManifestSchema=z.strictObject({schemaVersion:z.literal(1),lineId,voiceSha256:digest,asrModel:AsrModelSchema,asrRuntimeDigest:digest,recognizedText:z.string().min(1).max(2000),words:z.array(z.strictObject({text:z.string().min(1).max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)})).min(1).max(1000)});
 type NarrationSource=z.infer<typeof NarrationSourceSchema>;
 type WordTimingManifest=z.infer<typeof WordTimingManifestSchema>;
 type AudioSource={id:string;kind:'generated';sourceRef:ObjectRef;rightsRef:ObjectRef};

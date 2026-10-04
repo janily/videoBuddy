@@ -1,5 +1,11 @@
 # 开发任务与证据
 
+2026-10-04 升级语音新主题终态：独立seed-oD7Sxk / project4a5c6131…，真实Director stream与Treatment两调用settled（4993/2509、4346/3350），四原TTS完成。第1句ASR通过，第2句洒下→撒下保留ASR_MISMATCH，后两句未核；operation failed/attention/no preview。旧项目与unknown未改，不覆盖旧new-theme报告。AT079试听复核的实际原音频已准备，等待负责人判断；费用授权不代替豁免。继续独立功能，见 [新主题结果](evidence/new-theme-upgraded-validation.md)。
+
+
+2026-10-04 medium生产ASR已接通并真实六句通过：原四中文/日期/英文WAV SHA不变，六completed固定stdout+冷mustExist重读一致，0network，原control/预算未改。默认small/旧cachekey保留，medium明确选型并核实际model，词时间guard不变。首镜像权限unknown保留；文件0444/目录0555非root构建RED→GREEN，最终镜像caa3fca…；102文件541单元+lint/build/构建后types、Python2测试通过，两轴clean。见 [运行时验证](evidence/asr-medium-runtime-validation.md)。正在独立root执行升级语音的新主题真实preview，尚未验收影片，C0/C1/C2未达到。
+
+
 2026-10-04 medium 真实诊断：原第三句綠芽及词时间通过；原20秒完整上下文文本正确，但芽14840–14840零长度，保留 ASR_TIMINGS_UNAVAILABLE。两个持久回执completed、0network、原WAV/control/预算未改；固定模型四SHA已核，最初下载截断/官方206补齐证据保留。未提升生产ASR/发布预览，C0/C1/C2未达到；下一步固定medium运行时逐句核全部原音频。见 [medium验证](evidence/asr-medium-validation.md)。
 
 

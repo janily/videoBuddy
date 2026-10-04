@@ -1,0 +1,62 @@
+{
+  "executedAt": "2026-10-04T08:51:56.556Z",
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-Re0C3E",
+  "runtime": {
+    "image": "sha256:a31c834c17855e2ef53ddce979cacdde2b3824bef594319a7748367a25ae5c6a",
+    "runtimeDigest": "a31c834c17855e2ef53ddce979cacdde2b3824bef594319a7748367a25ae5c6a",
+    "model": "Systran/faster-whisper-medium",
+    "timeoutMs": 300000,
+    "user": "501:20"
+  },
+  "journalPrefix": "projects/292c32d3-77a9-4cd0-9611-265f5cb1fad1/operations/91d4a70e-e9e6-493a-a555-24de61c59f07/media-effects",
+  "sourcePlanHash": "7b19fc8406ff2affb6d8c37f9252e95f8d94d7e1512b36258a35a2961a6e0ead",
+  "lines": [],
+  "networkCalls": 0,
+  "limits": "Six original SHA-verified WAV copies through actual production transcribeAudio and verifySpokenText with the explicitly pinned medium image, one owned completed producer per line and mustExist cold replay. No synthesis, expected rewrite, source project mutation or remote model call. Whole-context zero-length timing failure remains archived. This is not AAC/postmix, listening, full preview or 43-style QA.",
+  "errorCode": "MEDIA_STOP_UNKNOWN",
+  "sourceUnchanged": true,
+  "receipts": [
+    {
+      "schemaVersion": 1,
+      "invocation": "4c0a8640-43ff-4485-8d7a-7cf0d1b2cd02",
+      "image": "sha256:a31c834c17855e2ef53ddce979cacdde2b3824bef594319a7748367a25ae5c6a",
+      "argsSha256": "c093fc955d25b027c406440e3d47184fd13acd2dd297261600840d0a9d0a2bb1",
+      "state": "unknown"
+    }
+  ],
+  "independentInspection": {
+    "runtimeImage": "sha256:a31c834c17855e2ef53ddce979cacdde2b3824bef594319a7748367a25ae5c6a",
+    "executionUser": "501:20",
+    "files": [
+      {
+        "name": "config.json",
+        "uid": 0,
+        "mode": "0600",
+        "readable": false
+      },
+      {
+        "name": "model.bin",
+        "uid": 0,
+        "mode": "0600",
+        "readable": false
+      },
+      {
+        "name": "vocabulary.txt",
+        "uid": 0,
+        "mode": "0600",
+        "readable": false
+      },
+      {
+        "name": "tokenizer.json",
+        "uid": 0,
+        "mode": "0600",
+        "readable": false
+      }
+    ],
+    "inspectionExitCode": 0,
+    "daemonReachable": true,
+    "ownedNameQuery": "no current match",
+    "limits": "This inspection proves unreadable weights, not the original primary process error or a verified stop. Original unknown receipt is retained and never retried."
+  }
+}

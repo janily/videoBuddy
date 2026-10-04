@@ -18,12 +18,20 @@ import {preparePreview,type PreviewOperation} from '../../src/services/video/pre
 import {buildPreviewPipeline} from '../../src/services/video/preview/pipeline';
 import {probeEnvironment,recordModelRequests} from './helpers/real-probe';
 import type {Environment} from '../../src/services/video/config/environment';
+import {asrConfiguration} from '../../src/services/video/audio/asr';
+import {voiceConfiguration} from '../../src/services/video/audio/voice';
 
 // New acceptance scenario, not a reset/retry of the historical unknown film.
 async function main(){
  if(!process.argv.includes('--new-theme'))throw Error('NEW_THEME_OPT_IN_REQUIRED');
+ const upgradedSpeech=process.argv.includes('--upgraded-speech');
  const parent=resolve('.video-local/new-theme');await mkdir(parent,{recursive:true,mode:0o700});const root=await mkdtemp(join(parent,'seed-'));
  const env:Environment={...probeEnvironment(root),VIDEO_MODEL_BUDGET_MODE:'unlimited_validation',VIDEO_MEDIA_TIMEOUT_SECONDS:'600'};
+ if(upgradedSpeech){
+  Object.assign(env,{VIDEO_VOICE_IMAGE_REF:process.env.VIDEO_VOICE_IMAGE_REF,VIDEO_VOICE_RUNTIME_DIGEST:process.env.VIDEO_VOICE_RUNTIME_DIGEST,VIDEO_ASR_IMAGE_REF:process.env.VIDEO_ASR_IMAGE_REF,VIDEO_ASR_RUNTIME_DIGEST:process.env.VIDEO_ASR_RUNTIME_DIGEST,VIDEO_ASR_MODEL:process.env.VIDEO_ASR_MODEL});
+  const voice=voiceConfiguration(env),asr=asrConfiguration(env);
+  if(voice.runtimeDigest==='831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64'||asr.model!=='Systran/faster-whisper-medium')throw Error('UPGRADED_SPEECH_REQUIRED');
+ }
  const store=new FileStore(root),projects=new ProjectStore(store),owner='new-theme-validation',authorization=JSON.parse(await readFile('docs/engineering/evidence/model-validation-authorization.json','utf8'));
  await authorizeUnlimitedValidation(store,authorization);
  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),messageId=randomUUID();
@@ -32,8 +40,10 @@ async function main(){
  const recorder=recordModelRequests(env,root,64,{timeoutMs:600000});
  const evidence:{executedAt:string;root:string;projectId:string;model:string|undefined;requests:typeof recorder.requests;stages:Record<string,unknown>;status:string;errorCode?:string;limits:string}={executedAt:new Date().toISOString(),root,projectId,model:env.VIDEO_DIRECTOR_MODEL,requests:recorder.requests,stages:{},status:'running',limits:'Independent new-theme acceptance scenario with actual provider and durable production preview pipeline. Unlimited validation authorization persisted; this individual diagnostic allows at most 64 requests, no automatic retries. All unknown effects remain blocked. No formal approval, delivery or 43-style acceptance claim; historical original name/readability/unknown-call failures are unchanged.'};
  const reportPath=join(root,'new-theme-evidence.json');
- async function record(){await recorder.flush();if(recorder.requests.length)evidence.stages.modelBudget=(await store.readFresh(`projects/${projectId}/budget`)).value;const body=JSON.stringify(evidence,null,2)+'\n';await writeFile(reportPath,body,{mode:0o600});await writeFile('docs/engineering/evidence/new-theme-probe.json',body)}
+ const evidencePath=upgradedSpeech?'docs/engineering/evidence/new-theme-upgraded-probe.json':'docs/engineering/evidence/new-theme-probe.json';
+ async function record(){await recorder.flush();if(recorder.requests.length)evidence.stages.modelBudget=(await store.readFresh(`projects/${projectId}/budget`)).value;const body=JSON.stringify(evidence,null,2)+'\n';await writeFile(reportPath,body,{mode:0o600});await writeFile(evidencePath,body)}
  try{
+  evidence.stages.speechRuntime={voice:voiceConfiguration(env),asr:asrConfiguration(env)};
   await record();const r=(await reserveModelBudget(store,projectId,'new-theme-director',{inputTokens:60000,outputTokens:8000},modelLimits(env))).reservation;
   const decision=await runEffect(store,`projects/${projectId}/diagnostics/director`,()=>withAccountedModel(store,r,()=>runDirectorStream(initialUnderstanding(),[{id:messageId,role:'user',text}],8000,async()=>{},env)));
   evidence.stages.director=decision;await record();

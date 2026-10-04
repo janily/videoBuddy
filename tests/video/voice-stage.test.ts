@@ -44,7 +44,7 @@ function wav(){
  return result;
 }
 
-it('T10/T11 persists frozen voice through a private excerpt and detects tampering',async()=>{
+it.each(['Systran/faster-whisper-small','Systran/faster-whisper-medium'] as const)('T10/T11 persists frozen voice with %s through a private excerpt and detects tampering',async model=>{
  const root=await mkdtemp(join(tmpdir(),'vb-voice-stage-'));
  try{
   const projects=new ProjectStore(new FileStore(root)),created=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
@@ -64,7 +64,7 @@ it('T10/T11 persists frozen voice through a private excerpt and detects tamperin
    generated++;await mkdir(join(root,'voice','fixture'),{recursive:true});const bytes=wav();await writeFile(voicePath,bytes);
    return{lineId:job.lineId,language:job.language,voice:'zf_001' as const,provider:'kokoro-js' as const,model:'test-runtime',modelLicense:'Apache-2.0' as const,runtimeDigest:'a'.repeat(64),outputPath:voicePath,wav:probeVoiceWav(bytes)};
   },recognize:async(_root:string,voice:{wav:{sha256:string}})=>{
-   recognized++;return{language:'zh-CN' as const,model:'Systran/faster-whisper-small' as const,segments:[{text:'欢迎参加。',startMs:0,endMs:700,words:[{text:'欢迎参加',startMs:0,endMs:700,probability:0.9}]}],voiceSha256:voice.wav.sha256,runtimeDigest:'b'.repeat(64),recognizedText:'欢迎参加。'};
+   recognized++;return{language:'zh-CN' as const,model,segments:[{text:'欢迎参加。',startMs:0,endMs:700,words:[{text:'欢迎参加',startMs:0,endMs:700,probability:0.9}]}],voiceSha256:voice.wav.sha256,runtimeDigest:'b'.repeat(64),recognizedText:'欢迎参加。'};
   }};
   const first=await prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options);
   expect(first.verifiedRef.sha256).toMatch(/^[a-f0-9]{64}$/);

@@ -3,7 +3,7 @@ import {z} from 'zod';
 import type {ObjectRef,Understanding} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
 import {type NarrationPlan,prepareNarration} from '@/services/video/audio/narration';
-import {asrConfiguration,transcribeVoice,verifyNarration,type AsrTranscript,type VerifiedNarrationManifest} from '@/services/video/audio/asr';
+import {AsrModelSchema,asrConfiguration,transcribeVoice,verifyNarration,type AsrTranscript,type VerifiedNarrationManifest} from '@/services/video/audio/asr';
 import {synthesizeVoice,voiceConfiguration,type VoiceJob,type VoiceResult} from '@/services/video/audio/voice';
 import {inspectVoiceWav} from '@/services/video/audio/wav';
 import type {Environment} from '@/services/video/config/environment';
@@ -36,7 +36,7 @@ function assertManifest(plan:NarrationPlan,verified:VerifiedNarrationManifest){
  if(verified.durationMs!==plan.durationMs||verified.lines.length!==plan.lines.length)throw Error('VOICE_STAGE_REF_CHANGED');
  for(const [index,line] of verified.lines.entries()){
   const expected=plan.lines[index];
-  if(line.lineId!==expected.lineId||line.language!==expected.language||line.spokenText!==expected.spokenText||line.displayText!==expected.displayText||line.expectedAsrText!==expected.expectedAsrText||line.startMs!==expected.startMs||line.reservedMs!==expected.reservedMs||line.durationMs<=0||line.durationMs>line.reservedMs||line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||line.wordTimings.length===0||line.asr?.voiceSha256!==line.voice.wav.sha256||line.asr.model!=='Systran/faster-whisper-small'||!/^([a-f0-9]{64})$/.test(line.asr.runtimeDigest))throw Error('VOICE_STAGE_REF_CHANGED');
+  if(line.lineId!==expected.lineId||line.language!==expected.language||line.spokenText!==expected.spokenText||line.displayText!==expected.displayText||line.expectedAsrText!==expected.expectedAsrText||line.startMs!==expected.startMs||line.reservedMs!==expected.reservedMs||line.durationMs<=0||line.durationMs>line.reservedMs||line.asrStatus!=='pass'||line.wordTimingsStatus!=='available'||line.wordTimings.length===0||line.asr?.voiceSha256!==line.voice.wav.sha256||!AsrModelSchema.safeParse(line.asr.model).success||!/^([a-f0-9]{64})$/.test(line.asr.runtimeDigest))throw Error('VOICE_STAGE_REF_CHANGED');
  }
 }
 

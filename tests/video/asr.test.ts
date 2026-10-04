@@ -30,3 +30,12 @@ it('checks the immutable narration plan before recognizing any audio',async()=>{
  await expect(verifyNarration(plan,manifest,'/tmp',async()=>({...await recognize(),voiceSha256:'f'.repeat(64)}))).rejects.toThrow('ASR_SOURCE_CHANGED');
  await expect(verifyNarration(plan,manifest,'/tmp',async()=>({...await recognize(),language:'zh-CN'}))).rejects.toThrow('ASR_OUTPUT_INVALID');
 });
+
+it('selects a pinned medium runtime with sufficient limits and rejects unknown models',()=>{
+ const digest='a'.repeat(64),env={VIDEO_ASR_IMAGE_REF:'sha256:'+digest,VIDEO_ASR_RUNTIME_DIGEST:digest};
+ const config=asrConfiguration({...env,VIDEO_ASR_MODEL:'Systran/faster-whisper-medium'});
+ expect(config).toMatchObject({model:'Systran/faster-whisper-medium',timeoutMs:300000});
+ const args=asrDockerArguments(config,'/tmp/job.json','/tmp/voice.wav');
+ expect(args[args.indexOf('--memory')+1]).toBe('6g');
+ expect(()=>asrConfiguration({...env,VIDEO_ASR_MODEL:'unknown'})).toThrow('ASR_MODEL_UNAVAILABLE');
+});

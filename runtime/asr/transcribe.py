@@ -1,12 +1,21 @@
 """Offline, input-blind ASR for independently checking synthesized narration."""
 import json
+import os
 import sys
 from pathlib import Path
 
 from faster_whisper import WhisperModel
 
 
+def model_identity():
+    name = os.environ.get('VIDEO_ASR_MODEL', 'Systran/faster-whisper-small')
+    if name not in ('Systran/faster-whisper-small', 'Systran/faster-whisper-medium'):
+        raise ValueError('ASR_MODEL_UNAVAILABLE')
+    return name
+
+
 def main():
+    identity = model_identity()
     if sys.argv[1:] != ['/work/job.json']:
         raise ValueError('ASR_JOB_INVALID')
     job = json.loads(Path('/work/job.json').read_text())
@@ -34,7 +43,7 @@ def main():
     detected = job['language'] if language else {'zh': 'zh-CN', 'en': 'en'}.get(info.language)
     if detected is None or not result:
         raise ValueError('ASR_OUTPUT_INVALID')
-    print(json.dumps({'language': detected, 'model': 'Systran/faster-whisper-small',
+    print(json.dumps({'language': detected, 'model': identity,
                       'segments': result}, ensure_ascii=False))
 
 

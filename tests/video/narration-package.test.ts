@@ -14,21 +14,21 @@ import {loadVerifiedFilmPackage} from '@/contracts/video/film-package';
 import type {FilmSpec,FilmTimeline} from '@/contracts/video/film';
 import {seedPreviewBundle} from './fixtures/preview-package';
 
-async function fixture(root:string){
+async function fixture(root:string,model:'Systran/faster-whisper-small'|'Systran/faster-whisper-medium'='Systran/faster-whisper-small'){
  const bytes=Buffer.alloc(44+24000*4);
  bytes.write('RIFF',0);bytes.writeUInt32LE(bytes.length-8,4);bytes.write('WAVEfmt ',8);bytes.writeUInt32LE(16,16);bytes.writeUInt16LE(3,20);bytes.writeUInt16LE(1,22);bytes.writeUInt32LE(24000,24);bytes.writeUInt32LE(96000,28);bytes.writeUInt16LE(4,32);bytes.writeUInt16LE(32,34);bytes.write('data',36);bytes.writeUInt32LE(24000*4,40);
  for(let i=0;i<24000;i++)bytes.writeFloatLE(Math.sin(i/10)*0.1,44+i*4);
  const outputPath=join(root,'voice','fixture','narration.wav');await mkdir(join(root,'voice','fixture'),{recursive:true});await writeFile(outputPath,bytes);
  const wav=probeVoiceWav(bytes);
- const verified:VerifiedNarrationManifest={durationMs:20000,lines:[{lineId:'line_1',language:'zh-CN',spokenText:'活动十月八日开始。',displayText:'活动十月八日开始。',expectedAsrText:'活动十月八日开始。',startMs:1000,reservedMs:19000,durationMs:1000,voice:{lineId:'line_1',language:'zh-CN',voice:'zf_001',provider:'kokoro-js',model:'test-only',modelLicense:'Apache-2.0',runtimeDigest:'a'.repeat(64),outputPath,wav},asrStatus:'pass',wordTimingsStatus:'available',asr:{model:'Systran/faster-whisper-small',runtimeDigest:'b'.repeat(64),voiceSha256:wav.sha256},recognizedText:'活动十月八日开始。',wordTimings:[{text:'活动十月八日开始',startMs:0,endMs:950,probability:0.9}]}]};
+ const verified:VerifiedNarrationManifest={durationMs:20000,lines:[{lineId:'line_1',language:'zh-CN',spokenText:'活动十月八日开始。',displayText:'活动十月八日开始。',expectedAsrText:'活动十月八日开始。',startMs:1000,reservedMs:19000,durationMs:1000,voice:{lineId:'line_1',language:'zh-CN',voice:'zf_001',provider:'kokoro-js',model:'test-only',modelLicense:'Apache-2.0',runtimeDigest:'a'.repeat(64),outputPath,wav},asrStatus:'pass',wordTimingsStatus:'available',asr:{model,runtimeDigest:'b'.repeat(64),voiceSha256:wav.sha256},recognizedText:'活动十月八日开始。',wordTimings:[{text:'活动十月八日开始',startMs:0,endMs:950,probability:0.9}]}]};
  const narration:TimingDraft['narration']=[{lineId:'line_1',spokenText:verified.lines[0].spokenText,displayText:verified.lines[0].displayText,expectedAsrText:verified.lines[0].expectedAsrText,startSample:48000,endSample:96000,voiceSha256:wav.sha256,voiceRuntimeDigest:'a'.repeat(64),asrRuntimeDigest:'b'.repeat(64)}];
  return{bytes,verified,narration};
 }
 
-it('T10 archives actual narration bytes and timing provenance; reads independently of disposable voice directories',async()=>{
+it.each(['Systran/faster-whisper-small','Systran/faster-whisper-medium'] as const)('T10 archives actual narration bytes and %s timing provenance; reads independently of disposable voice directories',async model=>{
  const root=await mkdtemp(join(tmpdir(),'vb-narration-package-'));
  try{
-  const projects=new ProjectStore(new FileStore(root)),projectId=randomUUID(),revisionId=randomUUID(),input=await fixture(root);
+  const projects=new ProjectStore(new FileStore(root)),projectId=randomUUID(),revisionId=randomUUID(),input=await fixture(root,model);
   const [first,replay]=await Promise.all([archiveVerifiedNarration(projects,root,projectId,revisionId,input.verified,input.narration),archiveVerifiedNarration(projects,root,projectId,revisionId,input.verified,input.narration)]);
   expect(replay).toEqual(first);expect(first.lines).toHaveLength(1);
   const packaged=await loadPackagedNarration(projects.store,root,projectId,revisionId,first.sources[0].sourceRef);

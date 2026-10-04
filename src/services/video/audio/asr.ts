@@ -12,17 +12,22 @@ import {assertAsrExpected} from '@/services/video/timeline/compile';
 
 const wordSchema=z.strictObject({text:z.string().max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)});
 const segmentSchema=z.strictObject({text:z.string().max(1000),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),words:z.array(wordSchema).max(200)});
-const transcriptSchema=z.strictObject({language:z.enum(['zh-CN','en']),model:z.literal('Systran/faster-whisper-small'),segments:z.array(segmentSchema).max(100)});
+export const AsrModelSchema=z.enum(['Systran/faster-whisper-small','Systran/faster-whisper-medium']);
+const transcriptSchema=z.strictObject({language:z.enum(['zh-CN','en']),model:AsrModelSchema,segments:z.array(segmentSchema).max(100)});
 export type AsrTranscript=z.infer<typeof transcriptSchema> & {voiceSha256:string;runtimeDigest:string;recognizedText:string};
 
 export function asrConfiguration(env:Environment){
  const image=env.VIDEO_ASR_IMAGE_REF,digest=env.VIDEO_ASR_RUNTIME_DIGEST;
  if(!image||!digest||!/^sha256:[a-f0-9]{64}$/.test(image)||image!==`sha256:${digest}`)throw Error('ASR_RUNTIME_UNAVAILABLE');
- return{image,runtimeDigest:digest,user:`${process.getuid?.()??10001}:${process.getgid?.()??10001}`};
+ const parsed=AsrModelSchema.safeParse(env.VIDEO_ASR_MODEL??'Systran/faster-whisper-small');
+ if(!parsed.success)throw Error('ASR_MODEL_UNAVAILABLE');
+ const model=parsed.data;
+ return{image,runtimeDigest:digest,model,timeoutMs:model==='Systran/faster-whisper-medium'?300000:120000,user:`${process.getuid?.()??10001}:${process.getgid?.()??10001}`};
 }
 export function asrDockerArguments(config:ReturnType<typeof asrConfiguration>,jobPath:string,voicePath:string){
  for(const path of [jobPath,voicePath])if(!isAbsolute(path)||!/^\/[A-Za-z0-9_./-]+$/.test(path))throw Error('ASR_JOB_INVALID');
- return['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','2g','--memory-swap','2g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=128m','--mount',`type=bind,src=${jobPath},dst=/work/job.json,readonly`,'--mount',`type=bind,src=${voicePath},dst=/input/voice.wav,readonly`,config.image,'python3','/opt/videobuddy/asr/transcribe.py','/work/job.json'];
+ const memory=config.model==='Systran/faster-whisper-medium'?'6g':'2g';
+ return['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory',memory,'--memory-swap',memory,'--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=128m','--mount',`type=bind,src=${jobPath},dst=/work/job.json,readonly`,'--mount',`type=bind,src=${voicePath},dst=/input/voice.wav,readonly`,config.image,'python3','/opt/videobuddy/asr/transcribe.py','/work/job.json'];
 }
 async function writeOnce(path:string,value:string,mustExist=false){
  if(mustExist){const info=await lstat(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||await readFile(path,'utf8')!==value)throw Error('ASR_STAGE_UNKNOWN');return}
@@ -32,7 +37,7 @@ async function writeOnce(path:string,value:string,mustExist=false){
 export interface AsrAudioInput{language:'zh-CN'|'en'|'auto';outputPath:string;wav:VoiceWavProbe}
 function validateTranscript(raw:string,voice:AsrAudioInput,config:ReturnType<typeof asrConfiguration>):AsrTranscript{
  const parsed=transcriptSchema.parse(JSON.parse(raw));
- if(voice.language!=='auto'&&parsed.language!==voice.language||parsed.segments.length===0)throw Error('ASR_OUTPUT_INVALID');
+ if(parsed.model!==config.model||voice.language!=='auto'&&parsed.language!==voice.language||parsed.segments.length===0)throw Error('ASR_OUTPUT_INVALID');
  let last=0;
  for(const segment of parsed.segments){
   if(segment.startMs<last||segment.endMs<segment.startMs||segment.endMs>voice.wav.durationMs+1000)throw Error('ASR_OUTPUT_INVALID');
@@ -50,7 +55,7 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
  if(!isAbsolute(voice.outputPath)||rel.startsWith('..')||isAbsolute(rel))throw Error('ASR_JOB_INVALID');
  const inspected=await inspectVoiceWav(voice.outputPath);
  if(inspected.sha256!==voice.wav.sha256)throw Error('ASR_SOURCE_CHANGED');
- const config=asrConfiguration(env),key=createHash('sha256').update(JSON.stringify([voice.language,inspected.sha256,config.runtimeDigest,'faster-whisper-small'])).digest('hex');
+ const config=asrConfiguration(env),key=createHash('sha256').update(JSON.stringify([voice.language,inspected.sha256,config.runtimeDigest,config.model.split('/')[1]])).digest('hex');
  const stageDir=join(root,'asr',key),jobPath=join(stageDir,'job.json'),resultPath=join(stageDir,'transcript.json');
  if(!options.mustExist)await mkdir(stageDir,{recursive:true,mode:0o700});
  await writeOnce(jobPath,JSON.stringify({language:voice.language}),options.mustExist);
@@ -58,7 +63,7 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
  try{raw=await readFile(resultPath,'utf8')}catch(error){
   if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
   if(options.mustExist)throw Error('ASR_EVIDENCE_MISSING');
-  raw=await runOwnedDocker(asrDockerArguments(config,jobPath,voice.outputPath),120000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
+  raw=await runOwnedDocker(asrDockerArguments(config,jobPath,voice.outputPath),config.timeoutMs,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
   validateTranscript(raw,voice,config);
   await options.assertActive?.();
   await writeOnce(resultPath,raw);

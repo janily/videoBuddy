@@ -1,0 +1,232 @@
+{
+  "executedAt": "2026-10-04T08:55:45.993Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "model": "gemini-3.8-flash",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000,
+      "startedAt": "2026-10-04T08:55:46.298Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T08:56:00.133Z",
+      "responseSha256": "0185cae032c6051a4a642d0573b8338e3c54f889be95652a745022e050a0c240",
+      "responseFile": "model-diagnostics/0185cae032c6051a4a642d0573b8338e3c54f889be95652a745022e050a0c240.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 5000,
+      "startedAt": "2026-10-04T08:56:00.801Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T08:56:18.010Z",
+      "responseSha256": "72fce550cb7f0d2679fffc9a1f56774ca2bff33c23f59b1cf2767c47438bd4a1",
+      "responseFile": "model-diagnostics/72fce550cb7f0d2679fffc9a1f56774ca2bff33c23f59b1cf2767c47438bd4a1.json",
+      "usage": {
+        "prompt_tokens": 4346,
+        "completion_tokens": 3350,
+        "total_tokens": 7696,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "stages": {
+    "speechRuntime": {
+      "voice": {
+        "image": "sha256:b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+        "runtimeDigest": "b145374e774d91aa729569a65e06fe0038009398a55ae8d31e025b227642c8d6",
+        "user": "501:20"
+      },
+      "asr": {
+        "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "model": "Systran/faster-whisper-medium",
+        "timeoutMs": 300000,
+        "user": "501:20"
+      }
+    },
+    "director": {
+      "action": "suggest_preview",
+      "reply": "已为您设定好20秒蜡笔儿童绘本风格的科普视频：面向小学生，展现播种、适量浇水到发芽的过程，并以“观察成长，耐心照料”收尾，不涉及具体天数或虚构数据。您可以点击下方按钮生成效果预览。",
+      "effect": "update_brief",
+      "understandingPatch": {
+        "baseBriefVersion": 0,
+        "operations": [
+          {
+            "op": "replace_summary",
+            "summary": [
+              "呈现从播种、适量浇水到种子发芽的完整生长过程",
+              "以“观察成长，耐心照料”作为结尾结语",
+              "不承诺具体生长天数，不出现虚构名称、日期或数字"
+            ],
+            "subject": "一粒种子长成绿芽",
+            "audience": "小学生",
+            "objective": "科普播种、浇水至发芽的过程，传达观察成长、耐心照料的理念",
+            "sourceMessageIds": [
+              "0a73948e-9bf8-40b3-a382-af974d992d5a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "durationSec",
+            "value": 20,
+            "sourceMessageIds": [
+              "0a73948e-9bf8-40b3-a382-af974d992d5a"
+            ]
+          },
+          {
+            "op": "set_preference",
+            "field": "styleSlug",
+            "value": "crayon-book",
+            "sourceMessageIds": [
+              "0a73948e-9bf8-40b3-a382-af974d992d5a"
+            ]
+          },
+          {
+            "op": "add_fact",
+            "fact": {
+              "id": "fact-seed-sprout-flow",
+              "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。",
+              "sourceRefs": [
+                {
+                  "type": "user_message",
+                  "id": "0a73948e-9bf8-40b3-a382-af974d992d5a",
+                  "excerpt": "表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不要承诺具体生长天数，不要虚构名称、活动日期或数字。"
+                }
+              ],
+              "status": "provided",
+              "mustInclude": true,
+              "critical": true
+            },
+            "sourceMessageIds": [
+              "0a73948e-9bf8-40b3-a382-af974d992d5a"
+            ]
+          }
+        ]
+      },
+      "recommendedStyleId": "crayon-book",
+      "executionIntent": "none",
+      "evidenceMessageIds": [
+        "0a73948e-9bf8-40b3-a382-af974d992d5a"
+      ]
+    },
+    "modelBudget": {
+      "calls": 2,
+      "inputTokens": 76858,
+      "outputTokens": 13000,
+      "reservations": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:55:46.195Z",
+          "inputTokens": 4993,
+          "outputTokens": 2509
+        },
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:56:00.722Z",
+          "inputTokens": 4346,
+          "outputTokens": 3350
+        }
+      }
+    },
+    "previewReceipt": {
+      "schemaVersion": 5,
+      "commandId": "e78aada9-177c-409d-b287-b35a51c930b5",
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "operationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+      "controlVersion": 3,
+      "status": "accepted"
+    },
+    "currentStage": "voice",
+    "operation": {
+      "id": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "commandId": "e78aada9-177c-409d-b287-b35a51c930b5",
+      "kind": "preview",
+      "status": "failed",
+      "canonicalRunId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+      "streamEpoch": 0,
+      "fence": 0,
+      "revisionId": "6c44bcea-b727-4aee-9368-cac9299e7e45",
+      "previewId": "bfe2a698-f0ea-470e-8c47-fd301063ebc2",
+      "briefVersion": 1,
+      "consentEpoch": 0,
+      "understandingRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "bytes": 1272,
+        "mime": "application/json"
+      },
+      "mediaAttemptStarted": true,
+      "stage": "voice",
+      "errorCode": "ASR_MISMATCH"
+    },
+    "control": {
+      "schemaVersion": 5,
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "ownerKeyHash": "new-theme-validation",
+      "controlVersion": 5,
+      "briefVersion": 1,
+      "createdAt": "2026-10-04T08:55:45.728Z",
+      "lastUserActivityAt": "2026-10-04T08:56:00.379Z",
+      "expiresAt": "2026-11-03T08:56:00.379Z",
+      "reviewPolicy": "preview_first",
+      "phase": "attention",
+      "understandingRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "bytes": 1272,
+        "mime": "application/json"
+      },
+      "messagesIndexRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/messages/855773eb0179175c6e3a8dd02c9617622ed772d6f2ec0043ff981287891df08d",
+        "sha256": "855773eb0179175c6e3a8dd02c9617622ed772d6f2ec0043ff981287891df08d",
+        "bytes": 281,
+        "mime": "application/json"
+      },
+      "revisionIndexRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/revisions/29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "sha256": "29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "bytes": 23,
+        "mime": "application/json"
+      },
+      "assets": [],
+      "inputPending": false,
+      "previewState": "none",
+      "receipts": [
+        {
+          "schemaVersion": 5,
+          "commandId": "e78aada9-177c-409d-b287-b35a51c930b5",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+          "controlVersion": 3,
+          "status": "accepted"
+        }
+      ],
+      "consentEpoch": 0,
+      "nextOrdinal": 1,
+      "ordinalReservations": {},
+      "activeProduction": null,
+      "previewOutcomes": {},
+      "latestPreviewOutcome": {
+        "operationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+        "briefVersion": 1,
+        "consentEpoch": 0,
+        "controlVersion": 4
+      }
+    }
+  },
+  "status": "blocked",
+  "limits": "Independent new-theme acceptance scenario with actual provider and durable production preview pipeline. Unlimited validation authorization persisted; this individual diagnostic allows at most 64 requests, no automatic retries. All unknown effects remain blocked. No formal approval, delivery or 43-style acceptance claim; historical original name/readability/unknown-call failures are unchanged.",
+  "errorCode": "ASR_MISMATCH"
+}

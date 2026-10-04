@@ -1,0 +1,603 @@
+{
+  "executedAt": "2026-10-04T08:54:29.080Z",
+  "status": "pass",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D",
+  "runtime": {
+    "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+    "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+    "model": "Systran/faster-whisper-medium",
+    "timeoutMs": 300000,
+    "user": "501:20"
+  },
+  "journalPrefix": "projects/0423cbfd-9cfa-4dd9-a953-bcac63b2fb19/operations/f82f3266-015c-41eb-86d2-0d92ffb1f46c/media-effects",
+  "sourcePlanHash": "7b19fc8406ff2affb6d8c37f9252e95f8d94d7e1512b36258a35a2961a6e0ead",
+  "lines": [
+    {
+      "lineId": "line_1",
+      "expectedAsrText": "把种子轻轻埋进泥土。",
+      "originalPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/99640af9dfd1d911966263de32a447bda2c71fe51efd483760b97ea337446ba0/output/narration.wav",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D/voice/line_1/narration.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 75000,
+        "durationMs": 3125,
+        "bytes": 300044,
+        "sha256": "24598eed5d50b1d4d2ebc7a441fcddcf91ceb01c3cf88db6f4e643972531276e",
+        "peakDbfs": -6.971483292186934,
+        "rmsDbfs": -23.971200863290335
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "把种子轻轻埋进泥土。",
+            "startMs": 0,
+            "endMs": 2420,
+            "words": [
+              {
+                "text": "把",
+                "startMs": 0,
+                "endMs": 540,
+                "probability": 0.9498290419578552
+              },
+              {
+                "text": "种",
+                "startMs": 540,
+                "endMs": 740,
+                "probability": 0.5771088004112244
+              },
+              {
+                "text": "子",
+                "startMs": 740,
+                "endMs": 1020,
+                "probability": 0.9565786123275757
+              },
+              {
+                "text": "轻",
+                "startMs": 1020,
+                "endMs": 1320,
+                "probability": 0.9819009602069855
+              },
+              {
+                "text": "轻",
+                "startMs": 1320,
+                "endMs": 1580,
+                "probability": 0.9996883273124695
+              },
+              {
+                "text": "埋",
+                "startMs": 1580,
+                "endMs": 1820,
+                "probability": 0.9981510937213898
+              },
+              {
+                "text": "进",
+                "startMs": 1820,
+                "endMs": 2000,
+                "probability": 0.9916702508926392
+              },
+              {
+                "text": "泥",
+                "startMs": 2000,
+                "endMs": 2180,
+                "probability": 0.9774619936943054
+              },
+              {
+                "text": "土。",
+                "startMs": 2180,
+                "endMs": 2420,
+                "probability": 0.9996366500854492
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "24598eed5d50b1d4d2ebc7a441fcddcf91ceb01c3cf88db6f4e643972531276e",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "把种子轻轻埋进泥土。"
+      },
+      "coldReplayIdentical": true,
+      "status": "pass"
+    },
+    {
+      "lineId": "line_2",
+      "expectedAsrText": "适量浇水，润湿大地。",
+      "originalPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/7e01c064ed616de646d99a43e58948f01335c41a2cc209cb8b042d068ed8502f/output/narration.wav",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D/voice/line_2/narration.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 70800,
+        "durationMs": 2950,
+        "bytes": 283244,
+        "sha256": "f1c4fc819de1883db63d12613b98aef4589f141a81c39c811f9cd7225993630d",
+        "peakDbfs": -9.08545995157071,
+        "rmsDbfs": -24.038043263489723
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "適量澆水,潤湿大地。",
+            "startMs": 0,
+            "endMs": 2280,
+            "words": [
+              {
+                "text": "適",
+                "startMs": 0,
+                "endMs": 520,
+                "probability": 0.8390358090400696
+              },
+              {
+                "text": "量",
+                "startMs": 520,
+                "endMs": 760,
+                "probability": 0.9996577501296997
+              },
+              {
+                "text": "澆",
+                "startMs": 760,
+                "endMs": 1000,
+                "probability": 0.8935000896453857
+              },
+              {
+                "text": "水,",
+                "startMs": 1000,
+                "endMs": 1280,
+                "probability": 0.9997408986091614
+              },
+              {
+                "text": "潤",
+                "startMs": 1480,
+                "endMs": 1620,
+                "probability": 0.9220796525478363
+              },
+              {
+                "text": "湿",
+                "startMs": 1620,
+                "endMs": 1820,
+                "probability": 0.7232472598552704
+              },
+              {
+                "text": "大",
+                "startMs": 1820,
+                "endMs": 2120,
+                "probability": 0.9975796341896057
+              },
+              {
+                "text": "地。",
+                "startMs": 2120,
+                "endMs": 2280,
+                "probability": 0.9973434805870056
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "f1c4fc819de1883db63d12613b98aef4589f141a81c39c811f9cd7225993630d",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "適量澆水,潤湿大地。"
+      },
+      "coldReplayIdentical": true,
+      "status": "pass"
+    },
+    {
+      "lineId": "line_3",
+      "expectedAsrText": "种子醒来了，探出绿芽。",
+      "originalPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/8b88cf3c597508e54c87a6d1445fb1d70ecb3de05616f8f6f7704e8cba6aa223/output/narration.wav",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D/voice/line_3/narration.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 79800,
+        "durationMs": 3325,
+        "bytes": 319244,
+        "sha256": "fc0ffd605a9034915c9f133eeb4971b513d8fcc89e7be4f105059d2524649e4c",
+        "peakDbfs": -5.517251851628617,
+        "rmsDbfs": -24.391039827950266
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "種子醒來了 探出綠芽",
+            "startMs": 0,
+            "endMs": 2640,
+            "words": [
+              {
+                "text": "種",
+                "startMs": 0,
+                "endMs": 580,
+                "probability": 0.5996307134628296
+              },
+              {
+                "text": "子",
+                "startMs": 580,
+                "endMs": 780,
+                "probability": 0.9994682669639587
+              },
+              {
+                "text": "醒",
+                "startMs": 780,
+                "endMs": 1060,
+                "probability": 0.9970734119415283
+              },
+              {
+                "text": "來了",
+                "startMs": 1060,
+                "endMs": 1560,
+                "probability": 0.9306649565696716
+              },
+              {
+                "text": " 探",
+                "startMs": 1820,
+                "endMs": 1980,
+                "probability": 0.9599997401237488
+              },
+              {
+                "text": "出",
+                "startMs": 1980,
+                "endMs": 2180,
+                "probability": 0.9990559220314026
+              },
+              {
+                "text": "綠",
+                "startMs": 2180,
+                "endMs": 2420,
+                "probability": 0.9953173696994781
+              },
+              {
+                "text": "芽",
+                "startMs": 2420,
+                "endMs": 2640,
+                "probability": 0.9788020551204681
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "fc0ffd605a9034915c9f133eeb4971b513d8fcc89e7be4f105059d2524649e4c",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "種子醒來了 探出綠芽"
+      },
+      "coldReplayIdentical": true,
+      "status": "pass"
+    },
+    {
+      "lineId": "line_4",
+      "expectedAsrText": "一起观察成长，耐心照料。",
+      "originalPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/f65d496f190c29ffbd5b9fd8285e54413ad122d7c2033d0600bbc54eace6c197/output/narration.wav",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D/voice/line_4/narration.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 88200,
+        "durationMs": 3675,
+        "bytes": 352844,
+        "sha256": "13ee3d7c08032d28d857f48af4f5e8d621797a4218546a404b2424dec436f9e9",
+        "peakDbfs": -7.758583288436707,
+        "rmsDbfs": -24.189978662174187
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "一起觀察成長 耐心照料",
+            "startMs": 0,
+            "endMs": 2980,
+            "words": [
+              {
+                "text": "一起",
+                "startMs": 0,
+                "endMs": 720,
+                "probability": 0.9690853357315063
+              },
+              {
+                "text": "觀",
+                "startMs": 720,
+                "endMs": 1100,
+                "probability": 0.5904179811477661
+              },
+              {
+                "text": "察",
+                "startMs": 1100,
+                "endMs": 1260,
+                "probability": 0.9997429251670837
+              },
+              {
+                "text": "成",
+                "startMs": 1260,
+                "endMs": 1560,
+                "probability": 0.996864378452301
+              },
+              {
+                "text": "長",
+                "startMs": 1560,
+                "endMs": 1880,
+                "probability": 0.9981731176376343
+              },
+              {
+                "text": " 耐",
+                "startMs": 2180,
+                "endMs": 2280,
+                "probability": 0.9991303384304047
+              },
+              {
+                "text": "心",
+                "startMs": 2280,
+                "endMs": 2520,
+                "probability": 0.9995304346084595
+              },
+              {
+                "text": "照",
+                "startMs": 2520,
+                "endMs": 2780,
+                "probability": 0.993707001209259
+              },
+              {
+                "text": "料",
+                "startMs": 2780,
+                "endMs": 2980,
+                "probability": 0.9973908066749573
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "13ee3d7c08032d28d857f48af4f5e8d621797a4218546a404b2424dec436f9e9",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "一起觀察成長 耐心照料"
+      },
+      "coldReplayIdentical": true,
+      "status": "pass"
+    },
+    {
+      "lineId": "frontend_date",
+      "expectedAsrText": "上海的活动将在十月八日开始",
+      "originalPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/6e7d6de4ee2af3b0b6a2f8f1724f2f164c00c0d7527ad1d23fcd360c1899bb98/output/narration.wav",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D/voice/frontend_date/narration.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 98400,
+        "durationMs": 4100,
+        "bytes": 393644,
+        "sha256": "6676380a72030f3bf2fee6d99e1e0ea87fa32ce3a4998a762dbaf8384e4f46a0",
+        "peakDbfs": -9.090582077651492,
+        "rmsDbfs": -24.38110566042747
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "上海的活動將在10月8日開始",
+            "startMs": 0,
+            "endMs": 3320,
+            "words": [
+              {
+                "text": "上",
+                "startMs": 0,
+                "endMs": 620,
+                "probability": 0.9442181587219238
+              },
+              {
+                "text": "海",
+                "startMs": 620,
+                "endMs": 780,
+                "probability": 0.9995692372322083
+              },
+              {
+                "text": "的",
+                "startMs": 780,
+                "endMs": 980,
+                "probability": 0.9776181578636169
+              },
+              {
+                "text": "活",
+                "startMs": 980,
+                "endMs": 1100,
+                "probability": 0.9984802603721619
+              },
+              {
+                "text": "動",
+                "startMs": 1100,
+                "endMs": 1500,
+                "probability": 0.919478178024292
+              },
+              {
+                "text": "將",
+                "startMs": 1500,
+                "endMs": 1760,
+                "probability": 0.9643893837928772
+              },
+              {
+                "text": "在",
+                "startMs": 1760,
+                "endMs": 2020,
+                "probability": 0.983095109462738
+              },
+              {
+                "text": "10",
+                "startMs": 2020,
+                "endMs": 2280,
+                "probability": 0.9220738410949707
+              },
+              {
+                "text": "月",
+                "startMs": 2280,
+                "endMs": 2460,
+                "probability": 0.9980146884918213
+              },
+              {
+                "text": "8",
+                "startMs": 2460,
+                "endMs": 2700,
+                "probability": 0.997478187084198
+              },
+              {
+                "text": "日",
+                "startMs": 2700,
+                "endMs": 2900,
+                "probability": 0.9967831373214722
+              },
+              {
+                "text": "開始",
+                "startMs": 2900,
+                "endMs": 3320,
+                "probability": 0.9918889403343201
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "6676380a72030f3bf2fee6d99e1e0ea87fa32ce3a4998a762dbaf8384e4f46a0",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "上海的活動將在10月8日開始"
+      },
+      "coldReplayIdentical": true,
+      "status": "pass"
+    },
+    {
+      "lineId": "frontend_english",
+      "expectedAsrText": "The event in Shanghai begins on October eighth",
+      "originalPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/voice-front-end/probe-pQIHKQ/voice/fd5719e448e3fa43e68eeffb97ffbd5998aed43a1bb84a4b7598281512b6d7a3/output/narration.wav",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/asr-medium-runtime/probe-ywuj8D/voice/frontend_english/narration.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 88800,
+        "durationMs": 3700,
+        "bytes": 355244,
+        "sha256": "4a6da566b07a5d13c8824e539c6b2b762e94677a2f3f35804559010fee4795e3",
+        "peakDbfs": -12.01715091576602,
+        "rmsDbfs": -28.433735768520595
+      },
+      "transcript": {
+        "language": "en",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": " The event in Shanghai begins on October 8th.",
+            "startMs": 0,
+            "endMs": 3200,
+            "words": [
+              {
+                "text": " The",
+                "startMs": 0,
+                "endMs": 440,
+                "probability": 0.9610738158226013
+              },
+              {
+                "text": " event",
+                "startMs": 440,
+                "endMs": 700,
+                "probability": 0.9971363544464111
+              },
+              {
+                "text": " in",
+                "startMs": 700,
+                "endMs": 920,
+                "probability": 0.9938096404075623
+              },
+              {
+                "text": " Shanghai",
+                "startMs": 920,
+                "endMs": 1360,
+                "probability": 0.9903531670570374
+              },
+              {
+                "text": " begins",
+                "startMs": 1360,
+                "endMs": 1920,
+                "probability": 0.9688591361045837
+              },
+              {
+                "text": " on",
+                "startMs": 1920,
+                "endMs": 2160,
+                "probability": 0.9939111471176147
+              },
+              {
+                "text": " October",
+                "startMs": 2160,
+                "endMs": 2540,
+                "probability": 0.7342590093612671
+              },
+              {
+                "text": " 8th.",
+                "startMs": 2540,
+                "endMs": 3200,
+                "probability": 0.874119758605957
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "4a6da566b07a5d13c8824e539c6b2b762e94677a2f3f35804559010fee4795e3",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "The event in Shanghai begins on October 8th."
+      },
+      "coldReplayIdentical": true,
+      "status": "pass"
+    }
+  ],
+  "networkCalls": 0,
+  "limits": "Six original SHA-verified WAV copies through actual production transcribeAudio and verifySpokenText with the explicitly pinned medium image, one owned completed producer per line and mustExist cold replay. No synthesis, expected rewrite, source project mutation or remote model call. Whole-context zero-length timing failure remains archived. This is not AAC/postmix, listening, full preview or 43-style QA.",
+  "sourceUnchanged": true,
+  "receipts": [
+    {
+      "schemaVersion": 1,
+      "invocation": "71cedbef-b616-423b-b7d9-1d09f3e71270",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "1347f6c7e05430f2fcc99970ed8e0f1a1ef814f8a6c0cc8bbaf0e70055caded9",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"適量澆水,潤湿大地。\", \"startMs\": 0, \"endMs\": 2280, \"words\": [{\"text\": \"適\", \"startMs\": 0, \"endMs\": 520, \"probability\": 0.8390358090400696}, {\"text\": \"量\", \"startMs\": 520, \"endMs\": 760, \"probability\": 0.9996577501296997}, {\"text\": \"澆\", \"startMs\": 760, \"endMs\": 1000, \"probability\": 0.8935000896453857}, {\"text\": \"水,\", \"startMs\": 1000, \"endMs\": 1280, \"probability\": 0.9997408986091614}, {\"text\": \"潤\", \"startMs\": 1480, \"endMs\": 1620, \"probability\": 0.9220796525478363}, {\"text\": \"湿\", \"startMs\": 1620, \"endMs\": 1820, \"probability\": 0.7232472598552704}, {\"text\": \"大\", \"startMs\": 1820, \"endMs\": 2120, \"probability\": 0.9975796341896057}, {\"text\": \"地。\", \"startMs\": 2120, \"endMs\": 2280, \"probability\": 0.9973434805870056}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "39ba5388-ee74-4404-a989-1109f6dba6c6",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "2146ad07480304687b449848f7c7aa69a3a9807f75ef91527ac4ca576942fec9",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"一起觀察成長 耐心照料\", \"startMs\": 0, \"endMs\": 2980, \"words\": [{\"text\": \"一起\", \"startMs\": 0, \"endMs\": 720, \"probability\": 0.9690853357315063}, {\"text\": \"觀\", \"startMs\": 720, \"endMs\": 1100, \"probability\": 0.5904179811477661}, {\"text\": \"察\", \"startMs\": 1100, \"endMs\": 1260, \"probability\": 0.9997429251670837}, {\"text\": \"成\", \"startMs\": 1260, \"endMs\": 1560, \"probability\": 0.996864378452301}, {\"text\": \"長\", \"startMs\": 1560, \"endMs\": 1880, \"probability\": 0.9981731176376343}, {\"text\": \" 耐\", \"startMs\": 2180, \"endMs\": 2280, \"probability\": 0.9991303384304047}, {\"text\": \"心\", \"startMs\": 2280, \"endMs\": 2520, \"probability\": 0.9995304346084595}, {\"text\": \"照\", \"startMs\": 2520, \"endMs\": 2780, \"probability\": 0.993707001209259}, {\"text\": \"料\", \"startMs\": 2780, \"endMs\": 2980, \"probability\": 0.9973908066749573}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "34465aee-c52e-4e1f-897c-aeddf3ce5996",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "3046990763a355fc6763c1f99edeaa3758ff8502ad60bf81a626824d22772943",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"種子醒來了 探出綠芽\", \"startMs\": 0, \"endMs\": 2640, \"words\": [{\"text\": \"種\", \"startMs\": 0, \"endMs\": 580, \"probability\": 0.5996307134628296}, {\"text\": \"子\", \"startMs\": 580, \"endMs\": 780, \"probability\": 0.9994682669639587}, {\"text\": \"醒\", \"startMs\": 780, \"endMs\": 1060, \"probability\": 0.9970734119415283}, {\"text\": \"來了\", \"startMs\": 1060, \"endMs\": 1560, \"probability\": 0.9306649565696716}, {\"text\": \" 探\", \"startMs\": 1820, \"endMs\": 1980, \"probability\": 0.9599997401237488}, {\"text\": \"出\", \"startMs\": 1980, \"endMs\": 2180, \"probability\": 0.9990559220314026}, {\"text\": \"綠\", \"startMs\": 2180, \"endMs\": 2420, \"probability\": 0.9953173696994781}, {\"text\": \"芽\", \"startMs\": 2420, \"endMs\": 2640, \"probability\": 0.9788020551204681}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "ccd78d35-a1ca-4079-b2e9-a931c57ae82f",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "63e03f6b7a29161934f70e8a33fa1bf79b1426c5871db7ccc6eae547c0d47efa",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"把种子轻轻埋进泥土。\", \"startMs\": 0, \"endMs\": 2420, \"words\": [{\"text\": \"把\", \"startMs\": 0, \"endMs\": 540, \"probability\": 0.9498290419578552}, {\"text\": \"种\", \"startMs\": 540, \"endMs\": 740, \"probability\": 0.5771088004112244}, {\"text\": \"子\", \"startMs\": 740, \"endMs\": 1020, \"probability\": 0.9565786123275757}, {\"text\": \"轻\", \"startMs\": 1020, \"endMs\": 1320, \"probability\": 0.9819009602069855}, {\"text\": \"轻\", \"startMs\": 1320, \"endMs\": 1580, \"probability\": 0.9996883273124695}, {\"text\": \"埋\", \"startMs\": 1580, \"endMs\": 1820, \"probability\": 0.9981510937213898}, {\"text\": \"进\", \"startMs\": 1820, \"endMs\": 2000, \"probability\": 0.9916702508926392}, {\"text\": \"泥\", \"startMs\": 2000, \"endMs\": 2180, \"probability\": 0.9774619936943054}, {\"text\": \"土。\", \"startMs\": 2180, \"endMs\": 2420, \"probability\": 0.9996366500854492}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "6bb10b38-738f-4eb8-b94a-905f012cb236",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "c523936aed2f1274c5130de3d23bbec78bad92fe84d506f9065fff1a65984f94",
+      "state": "completed",
+      "output": "{\"language\": \"en\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \" The event in Shanghai begins on October 8th.\", \"startMs\": 0, \"endMs\": 3200, \"words\": [{\"text\": \" The\", \"startMs\": 0, \"endMs\": 440, \"probability\": 0.9610738158226013}, {\"text\": \" event\", \"startMs\": 440, \"endMs\": 700, \"probability\": 0.9971363544464111}, {\"text\": \" in\", \"startMs\": 700, \"endMs\": 920, \"probability\": 0.9938096404075623}, {\"text\": \" Shanghai\", \"startMs\": 920, \"endMs\": 1360, \"probability\": 0.9903531670570374}, {\"text\": \" begins\", \"startMs\": 1360, \"endMs\": 1920, \"probability\": 0.9688591361045837}, {\"text\": \" on\", \"startMs\": 1920, \"endMs\": 2160, \"probability\": 0.9939111471176147}, {\"text\": \" October\", \"startMs\": 2160, \"endMs\": 2540, \"probability\": 0.7342590093612671}, {\"text\": \" 8th.\", \"startMs\": 2540, \"endMs\": 3200, \"probability\": 0.874119758605957}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "ce206781-8bf7-4fb0-9eda-fb4aa0e17191",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "e4e12cb4d205582da8bdc00a18dff2290ba3cb1f813d86e16e04d516d0c0ace0",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"上海的活動將在10月8日開始\", \"startMs\": 0, \"endMs\": 3320, \"words\": [{\"text\": \"上\", \"startMs\": 0, \"endMs\": 620, \"probability\": 0.9442181587219238}, {\"text\": \"海\", \"startMs\": 620, \"endMs\": 780, \"probability\": 0.9995692372322083}, {\"text\": \"的\", \"startMs\": 780, \"endMs\": 980, \"probability\": 0.9776181578636169}, {\"text\": \"活\", \"startMs\": 980, \"endMs\": 1100, \"probability\": 0.9984802603721619}, {\"text\": \"動\", \"startMs\": 1100, \"endMs\": 1500, \"probability\": 0.919478178024292}, {\"text\": \"將\", \"startMs\": 1500, \"endMs\": 1760, \"probability\": 0.9643893837928772}, {\"text\": \"在\", \"startMs\": 1760, \"endMs\": 2020, \"probability\": 0.983095109462738}, {\"text\": \"10\", \"startMs\": 2020, \"endMs\": 2280, \"probability\": 0.9220738410949707}, {\"text\": \"月\", \"startMs\": 2280, \"endMs\": 2460, \"probability\": 0.9980146884918213}, {\"text\": \"8\", \"startMs\": 2460, \"endMs\": 2700, \"probability\": 0.997478187084198}, {\"text\": \"日\", \"startMs\": 2700, \"endMs\": 2900, \"probability\": 0.9967831373214722}, {\"text\": \"開始\", \"startMs\": 2900, \"endMs\": 3320, \"probability\": 0.9918889403343201}]}]}"
+    }
+  ]
+}

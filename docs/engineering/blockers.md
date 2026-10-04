@@ -1,5 +1,11 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 升级语音新主题终态：独立seed-oD7Sxk / project4a5c6131…，真实Director stream与Treatment两调用settled（4993/2509、4346/3350），四原TTS完成。第1句ASR通过，第2句洒下→撒下保留ASR_MISMATCH，后两句未核；operation failed/attention/no preview。旧项目与unknown未改，不覆盖旧new-theme报告。AT079试听复核的实际原音频已准备，等待负责人判断；费用授权不代替豁免。继续独立功能，见 [新主题结果](evidence/new-theme-upgraded-validation.md)。
+
+
+2026-10-04 medium生产ASR已接通并真实六句通过：原四中文/日期/英文WAV SHA不变，六completed固定stdout+冷mustExist重读一致，0network，原control/预算未改。默认small/旧cachekey保留，medium明确选型并核实际model，词时间guard不变。首镜像权限unknown保留；文件0444/目录0555非root构建RED→GREEN，最终镜像caa3fca…；102文件541单元+lint/build/构建后types、Python2测试通过，两轴clean。见 [运行时验证](evidence/asr-medium-runtime-validation.md)。正在独立root执行升级语音的新主题真实preview，尚未验收影片，C0/C1/C2未达到。
+
+
 2026-10-04 最新完整上下文诊断：原四句PCM按冻结时窗进入20秒24k轨，480000samples、四窗逐字节相同；固定盲ASR仍綠牙，保留ASR_MISMATCH。两owned持久回执completed、无遗留容器、0network、原plan/control/预算不变。归档depth10错误与恢复丢SHA的P2都已修复，实际隔离失败→只读恢复保留同SHA与原失败，两轴clean；见 [上下文验证](evidence/asr-context-validation.md)。英文日期已过、原中文四句仍3/4；下一步按04§5.2升级独立ASR模型核同一音频，不能改预期或豁免同音差异。C0/C1/C2继续未达到。
 
 2026-10-04 最新英文日期表示修正：只对英文月名+1–31日合法序数规范化比较，原expected与音频不改；错误日期/月份/suffix及青禾清和、绿芽绿牙继续拒绝。3新增RED→GREEN、102文件536单元与lint/build/构建后types通过，双轴clean。原六WAV/原blind transcript只读mustExist复核5通过1失败，0producer/provider/network，原source control/预算不变；旧4/2报告原样保留。原四句仍3/4，绿芽→綠牙仍blocked，未发布预览。见 [英文日期验证](evidence/asr-date-normalization-validation.md)。下一步诊断原音频上下文，不自动降低门槛。
