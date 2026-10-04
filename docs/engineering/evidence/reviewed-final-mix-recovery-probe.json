@@ -1,0 +1,99 @@
+{
+  "executedAt": "2026-10-04T11:04:57.108Z",
+  "status": "full_postmix_verified",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+  "sourceRevisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "diagnosticOperationId": "1f9557e2-8a3b-4f2f-9ca1-7e458f2b67cd",
+  "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "voiceManifestSha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+  "coldOnly": true,
+  "deliveryEligible": false,
+  "formalProductionApproval": false,
+  "fullFilmListeningApproval": false,
+  "result": {
+    "status": "pass",
+    "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+    "lines": [
+      {
+        "lineId": "line_1",
+        "recognizedText": "把小种子轻轻放进泥土里",
+        "sourceSha256": "8d54eb6e52f5ec44cc1157062c09d30e00c91b2702486f58ccef388597a221b8",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_2",
+        "recognizedText": "撒下适量的水 润湿土壤",
+        "sourceSha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 10,
+        "status": "trusted_review",
+        "speechReviewRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-reviews/c37eeebd5457cde46d86dda7249c96eb6888cc8a5bd007150683a6de16ab68a4",
+          "sha256": "c37eeebd5457cde46d86dda7249c96eb6888cc8a5bd007150683a6de16ab68a4",
+          "bytes": 814,
+          "mime": "application/json"
+        }
+      },
+      {
+        "lineId": "line_3",
+        "recognizedText": "泥土里探出了嫩绿的小芽",
+        "sourceSha256": "1a4b940fbdf2751e09b2ed070016a1c1a165fdb55b1f978bd10115b93c5c3025",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_4",
+        "recognizedText": "观察成长 耐心照料",
+        "sourceSha256": "9d652d7cb8f87da3a8abcba03671a7b0bb617d73df8a7e4e4e075914ded26c25",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 8,
+        "status": "pass"
+      }
+    ]
+  },
+  "coldRecoveryIdentical": true,
+  "nativeInvocationCount": 4,
+  "nativeReceipts": [
+    {
+      "schemaVersion": 1,
+      "invocation": "6d1fb000-c7f4-471f-97d5-31ec5b91725a",
+      "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+      "argsSha256": "02698840faae174e50f401cd300f1d3cbf08a563546afdd7f554b5e78e43e436",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "9f730f07-c439-4437-8f63-c1a18462f6ee",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "33024f8762fd8a7d0cce72a5d9fdf4be9baf71c7853dd31dc119c7de80b82a91",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"观察成长 耐心照料\", \"startMs\": 0, \"endMs\": 2320, \"words\": [{\"text\": \"观\", \"startMs\": 0, \"endMs\": 580, \"probability\": 0.5846517086029053}, {\"text\": \"察\", \"startMs\": 580, \"endMs\": 800, \"probability\": 0.9992815852165222}, {\"text\": \"成\", \"startMs\": 800, \"endMs\": 1080, \"probability\": 0.9935830235481262}, {\"text\": \"长\", \"startMs\": 1080, \"endMs\": 1340, \"probability\": 0.9996455907821655}, {\"text\": \" 耐\", \"startMs\": 1580, \"endMs\": 1660, \"probability\": 0.9675006866455078}, {\"text\": \"心\", \"startMs\": 1660, \"endMs\": 1840, \"probability\": 0.9989311099052429}, {\"text\": \"照\", \"startMs\": 1840, \"endMs\": 2100, \"probability\": 0.9831632971763611}, {\"text\": \"料\", \"startMs\": 2100, \"endMs\": 2320, \"probability\": 0.9960678815841675}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "984750b8-7db5-43a3-972a-230463e7d655",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "5d1d26889e0834f56fd7cbad79ec08a7568caaff069a131d6ecd3df19893b79f",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"泥土里探出了嫩绿的小芽\", \"startMs\": 0, \"endMs\": 2720, \"words\": [{\"text\": \"泥\", \"startMs\": 0, \"endMs\": 500, \"probability\": 0.9861980676651001}, {\"text\": \"土\", \"startMs\": 500, \"endMs\": 700, \"probability\": 0.9944762587547302}, {\"text\": \"里\", \"startMs\": 700, \"endMs\": 960, \"probability\": 0.8054194450378418}, {\"text\": \"探\", \"startMs\": 960, \"endMs\": 1280, \"probability\": 0.932609498500824}, {\"text\": \"出\", \"startMs\": 1280, \"endMs\": 1500, \"probability\": 0.9918255805969238}, {\"text\": \"了\", \"startMs\": 1500, \"endMs\": 1720, \"probability\": 0.9902575016021729}, {\"text\": \"嫩\", \"startMs\": 1720, \"endMs\": 1840, \"probability\": 0.9970797896385193}, {\"text\": \"绿\", \"startMs\": 1840, \"endMs\": 2000, \"probability\": 0.9196927547454834}, {\"text\": \"的\", \"startMs\": 2000, \"endMs\": 2220, \"probability\": 0.9892372488975525}, {\"text\": \"小\", \"startMs\": 2220, \"endMs\": 2440, \"probability\": 0.9815400242805481}, {\"text\": \"芽\", \"startMs\": 2440, \"endMs\": 2720, \"probability\": 0.9421117901802063}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "23cecff5-2efc-4dbc-8a20-840906bba3c8",
+      "image": "sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+      "argsSha256": "b950ed011e2d4069f399e94c98bf79a7ae63c8d41bb324bf4d363e5b0bd07982",
+      "state": "completed",
+      "output": ""
+    }
+  ],
+  "networkCalls": 0,
+  "sourceStateUnchanged": true,
+  "limits": "Actual frozen 20-second final AAC. Reads existing line 1/2 WAV and ASR; never-reached original-root line 3/4 extracted and recognized through four bounded owned native invocations. New diagnostic operation only; old failed production operation remains failed. Original source-only confirmation not accepted here. Cold full verification produces no new native/model work. This is speech technical verification, not listening, Critic, preview publication or formal delivery approval."
+}

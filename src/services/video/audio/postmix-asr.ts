@@ -1,3 +1,4 @@
+import {verifyReviewedPostMixText,type ConfirmedPostMixReview,type PostMixReviewContext} from './postmix-review';
 import {hasVerifiedNarrationStatus} from './asr';
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
 import {assertDockerCacheReusable,type DockerJournal} from '@/services/video/media/docker-journal';
@@ -42,7 +43,7 @@ export async function verifyPostMixNoNarration(store:AtomicStore,root:string,fil
  await verifiedFilmHash(root,film);
  return{status:'not_applicable' as const,reason:'no_narration' as const,filmSha256:film.sha256,executionSha256:executionRef.sha256,voiceTrackSha256:voice.sha256,lines:[]};
 }
-export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal}={}){
+export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal;resolveReview?:(context:PostMixReviewContext)=>Promise<ConfirmedPostMixReview|undefined>}={}){
  await options.assertActive?.();
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
  await verifiedFilmHash(root,film);
@@ -85,8 +86,14 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   await options.assertActive?.();
   let checked:ReturnType<typeof verifySpokenText>;
   try{checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript)}
-  catch(error){if((error as Error).message!=='ASR_MISMATCH')throw error;onMismatch?.(line.lineId,transcript.recognizedText);throw Error(`POSTMIX_ASR_MISMATCH: ${line.lineId}`)}
-  results.push({lineId:line.lineId,recognizedText:checked.recognizedText,sourceSha256:wav.sha256,asrRuntimeDigest:transcript.runtimeDigest,wordCount:checked.words.length,status:checked.status});
+  catch(error){
+   if((error as Error).message!=='ASR_MISMATCH')throw error;
+   const context:PostMixReviewContext={film,plan:originalPlan,lineId:line.lineId,window:{startMs:line.startMs,lengthMs,mediaRuntimeDigest:config.runtimeDigest},transcript},proof=await options.resolveReview?.(context);
+   await options.assertActive?.();
+   if(!proof){onMismatch?.(line.lineId,transcript.recognizedText);throw Error(`POSTMIX_ASR_MISMATCH: ${line.lineId}`)}
+   checked=verifyReviewedPostMixText(context,proof);
+  }
+  results.push({lineId:line.lineId,recognizedText:checked.recognizedText,sourceSha256:wav.sha256,asrRuntimeDigest:transcript.runtimeDigest,wordCount:checked.words.length,status:checked.status,...(checked.status==='trusted_review'?{speechReviewRef:checked.speechReviewRef}:{})});
  }
  return{status:'pass' as const,filmSha256:film.sha256,lines:results};
 }

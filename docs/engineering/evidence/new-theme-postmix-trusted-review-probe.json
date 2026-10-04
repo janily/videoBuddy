@@ -1,0 +1,180 @@
+{
+  "executedAt": "2026-10-04T11:03:12.288Z",
+  "status": "trusted_review",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+  "sourceRevisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "formalProductionApproval": false,
+  "fullFilmListeningApproval": false,
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "challengeRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-review-challenges/dd4ca220722553b3f54e4a79808d8d615a65053f851c9ad0394f96ebfaa18291",
+    "sha256": "dd4ca220722553b3f54e4a79808d8d615a65053f851c9ad0394f96ebfaa18291",
+    "bytes": 1129,
+    "mime": "application/json"
+  },
+  "reviewRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-reviews/c37eeebd5457cde46d86dda7249c96eb6888cc8a5bd007150683a6de16ab68a4",
+    "sha256": "c37eeebd5457cde46d86dda7249c96eb6888cc8a5bd007150683a6de16ab68a4",
+    "bytes": 814,
+    "mime": "application/json"
+  },
+  "confirmationMessageId": "2652b00d-980e-47a5-9ecf-a633a925183e",
+  "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "mixedWavSha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+  "transcript": {
+    "language": "zh-CN",
+    "model": "Systran/faster-whisper-medium",
+    "segments": [
+      {
+        "text": "撒下适量的水 润湿土壤",
+        "startMs": 0,
+        "endMs": 2820,
+        "words": [
+          {
+            "text": "撒",
+            "startMs": 0,
+            "endMs": 600,
+            "probability": 0.8676214218139648
+          },
+          {
+            "text": "下",
+            "startMs": 600,
+            "endMs": 840,
+            "probability": 0.9803907871246338
+          },
+          {
+            "text": "适",
+            "startMs": 840,
+            "endMs": 1000,
+            "probability": 0.7724399864673615
+          },
+          {
+            "text": "量",
+            "startMs": 1000,
+            "endMs": 1180,
+            "probability": 0.9996609687805176
+          },
+          {
+            "text": "的",
+            "startMs": 1180,
+            "endMs": 1360,
+            "probability": 0.9893787503242493
+          },
+          {
+            "text": "水",
+            "startMs": 1360,
+            "endMs": 1640,
+            "probability": 0.9995753169059753
+          },
+          {
+            "text": " 润",
+            "startMs": 1780,
+            "endMs": 1960,
+            "probability": 0.9969022870063782
+          },
+          {
+            "text": "湿",
+            "startMs": 1960,
+            "endMs": 2160,
+            "probability": 0.869838297367096
+          },
+          {
+            "text": "土",
+            "startMs": 2160,
+            "endMs": 2480,
+            "probability": 0.9154500961303711
+          },
+          {
+            "text": "壤",
+            "startMs": 2480,
+            "endMs": 2820,
+            "probability": 0.996200442314148
+          }
+        ]
+      }
+    ],
+    "voiceSha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+    "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+    "recognizedText": "撒下适量的水 润湿土壤"
+  },
+  "checked": {
+    "status": "trusted_review",
+    "model": "Systran/faster-whisper-medium",
+    "voiceSha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+    "recognizedText": "撒下适量的水 润湿土壤",
+    "words": [
+      {
+        "text": "撒",
+        "startMs": 0,
+        "endMs": 600,
+        "probability": 0.8676214218139648
+      },
+      {
+        "text": "下",
+        "startMs": 600,
+        "endMs": 840,
+        "probability": 0.9803907871246338
+      },
+      {
+        "text": "适",
+        "startMs": 840,
+        "endMs": 1000,
+        "probability": 0.7724399864673615
+      },
+      {
+        "text": "量",
+        "startMs": 1000,
+        "endMs": 1180,
+        "probability": 0.9996609687805176
+      },
+      {
+        "text": "的",
+        "startMs": 1180,
+        "endMs": 1360,
+        "probability": 0.9893787503242493
+      },
+      {
+        "text": "水",
+        "startMs": 1360,
+        "endMs": 1640,
+        "probability": 0.9995753169059753
+      },
+      {
+        "text": " 润",
+        "startMs": 1780,
+        "endMs": 1960,
+        "probability": 0.9969022870063782
+      },
+      {
+        "text": "湿",
+        "startMs": 1960,
+        "endMs": 2160,
+        "probability": 0.869838297367096
+      },
+      {
+        "text": "土",
+        "startMs": 2160,
+        "endMs": 2480,
+        "probability": 0.9154500961303711
+      },
+      {
+        "text": "壤",
+        "startMs": 2480,
+        "endMs": 2820,
+        "probability": 0.996200442314148
+      }
+    ],
+    "speechReviewRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-reviews/c37eeebd5457cde46d86dda7249c96eb6888cc8a5bd007150683a6de16ab68a4",
+      "sha256": "c37eeebd5457cde46d86dda7249c96eb6888cc8a5bd007150683a6de16ab68a4",
+      "bytes": 814,
+      "mime": "application/json"
+    }
+  },
+  "networkCalls": 0,
+  "operationAndBudgetUnchanged": true,
+  "literalAsrMatch": false,
+  "limits": "Only the actual confirmed final AAC-extracted single sentence. Existing film/WAV/ASR read and hashes checked; no media/model producers, expectation rewrite, operation reset, formal authorization or full-film quality approval. Public review UI and technical continuation remain outstanding."
+}

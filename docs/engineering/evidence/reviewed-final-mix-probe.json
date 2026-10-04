@@ -1,0 +1,17 @@
+{
+  "executedAt": "2026-10-04T11:04:07.142Z",
+  "status": "blocked",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+  "sourceRevisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "diagnosticOperationId": "1f9557e2-8a3b-4f2f-9ca1-7e458f2b67cd",
+  "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+  "planSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "voiceManifestSha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+  "deliveryEligible": false,
+  "formalProductionApproval": false,
+  "fullFilmListeningApproval": false,
+  "errorCode": "INVALID_KEY",
+  "networkCalls": 0
+}
