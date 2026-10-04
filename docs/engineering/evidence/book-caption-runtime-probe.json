@@ -1,0 +1,13 @@
+{
+  "executedAt": "2026-10-04T12:12:44.589Z",
+  "status": "failed",
+  "image": "sha256:46a3a937735e1f0472fecc8e32b78da99c7da187aa1faac7017c523b92911dfb",
+  "newModelCalls": 0,
+  "defaultRuntimeChanged": false,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/book-caption/probe-PBpLTI",
+  "journalPrefix": "projects/ab4001c4-37b6-4834-acca-623539b1cb32/operations/a22aca94-469c-4280-99d2-357ba366f071/media-effects",
+  "errorCode": "CAPABILITY_UNAVAILABLE: pinned Docker runtime required",
+  "invocations": []
+}

@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 T10/T11 绘本字幕绘制器：52px真实测量中英手写、墨棕/撕边浅纸/固定纸纹、350ms逐字/12fps字形抖动，显式safeBox严格溢出拒绝。纸纹相关线视觉修复，独立Spec纸边±2.5越界加6px余量修复；实际advance52.000045的诊断盒修正不放宽布局。v6三completed/16PNG哈希及正反序/12fps/alpha区域/紧界实际通过；首次配置失败、v2纹理问题、v4unknown、v5诊断OVERFLOW均保留，0model。111文件579项53.88s及最终4项、lint/build/构建后types通过，代码4dba5ed与审查快照6f8f7ec同树，双轴clean。尚未生产接线/全片QA；下一步新冻结字幕policy/字体与源码身份/安全区及新影片，项目范围不变，C0/C1/C2未达到，无push/部署。见 [绘本字幕验证](evidence/book-caption-validation.md)。
+
 2026-10-04 T10/T11 手写字体资源基础：固定官方 Google Fonts commit406197b9 的 Ma Shan Zheng/Patrick Hand、许可及元数据六文件 SHA/bytes；新离线镜像46a3a937…构建通过，实际两条 completed 字体回执核验7015/513 glyph，原四句中文及英文样本 missing=[]。首次 BuildKit 将原始 image ID 解释为远端仓库导致失败，记录保留；改为全ID命名本地引用并核构建前后基镜像及层继承通过。4新增测试、110文件575项50.20s、lint/build/构建后types通过，固定差异 b5987de…379c4a5 双轴clean，0模型调用。当前只完成资源基础，默认字幕及旧影片不改；接入版本化绘本字幕/纸底/安全区/完整新影片QA仍待完成，C0/C1/C2未达到，无push/部署。见 [字体验证](evidence/style-font-validation.md)。
 
 2026-10-04 T10/T11 字幕坐标修正：新policy2/CaptionPackage2固定横1920×1080/竖1080×1920逻辑画布，full/preview/probe同样式等比缩放，PlayRes进入合成hash；旧policy1完整graph冷读不改/跨schema错配拒绝，Composite先核mustExist冻结包。3新测试及FilmPackage/Composite接线实际RED→GREEN，108文件571项53.35s、lint/build/types通过，双轴clean。原生六profile及原画面frame51尺寸诊断通过：首unknown保留，v2 completed后宿主depth错误保留，严格同args冷回执恢复0producer/0model、七PNG hash核证、原project状态/SRT/picture不改。仅单位修正，白字黑边仍不符crayon-book；下一步真实手写字体/许可/纸底/安全区/事实及新完整影片QA，公共UI与43风格等范围仍缺，C0/C1/C2未达到，无push/部署。见 [坐标验证](evidence/caption-coordinate-validation.md)。
