@@ -1,0 +1,466 @@
+{
+  "executedAt": "2026-10-04T10:37:14.718Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+  "status": "blocked",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "startedAt": "2026-10-04T10:37:16.469Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T10:37:39.619Z",
+      "responseSha256": "5564c4b8c8c961f7826d57f0d457b0ee73827a42847d65251ef05253e6e8423f",
+      "responseFile": "model-diagnostics/5564c4b8c8c961f7826d57f0d457b0ee73827a42847d65251ef05253e6e8423f.json",
+      "usage": {
+        "prompt_tokens": 9063,
+        "completion_tokens": 6625,
+        "total_tokens": 15688,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "startedAt": "2026-10-04T10:37:41.737Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T10:38:15.644Z",
+      "responseSha256": "97ab8155bf0e60a294a5f08d69db18ddd1b9325b1ef966f4813adcf469a88b25",
+      "responseFile": "model-diagnostics/97ab8155bf0e60a294a5f08d69db18ddd1b9325b1ef966f4813adcf469a88b25.json",
+      "usage": {
+        "prompt_tokens": 7342,
+        "completion_tokens": 8437,
+        "total_tokens": 15779,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "startedAt": "2026-10-04T10:39:00.056Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T10:39:33.348Z",
+      "responseSha256": "ef4d74bf2be0baf0d3ea9fb66865325ad7d5eff3c1911bb6661d1195aa32fd23",
+      "responseFile": "model-diagnostics/ef4d74bf2be0baf0d3ea9fb66865325ad7d5eff3c1911bb6661d1195aa32fd23.json",
+      "usage": {
+        "prompt_tokens": 7330,
+        "completion_tokens": 9171,
+        "total_tokens": 16501,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "startedAt": "2026-10-04T10:40:05.514Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T10:40:52.107Z",
+      "responseSha256": "2d1e6aa3341a8d74fdc97caf01e5195029689950e3278e0fcf3066325bf5ada4",
+      "responseFile": "model-diagnostics/2d1e6aa3341a8d74fdc97caf01e5195029689950e3278e0fcf3066325bf5ada4.json",
+      "usage": {
+        "prompt_tokens": 7327,
+        "completion_tokens": 9692,
+        "total_tokens": 17019,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "startedAt": "2026-10-04T10:41:33.818Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T10:42:10.093Z",
+      "responseSha256": "f6133c0d090547931d54253cc15210405678fec6407a30924fb0c7bfd757bd44",
+      "responseFile": "model-diagnostics/f6133c0d090547931d54253cc15210405678fec6407a30924fb0c7bfd757bd44.json",
+      "usage": {
+        "prompt_tokens": 7319,
+        "completion_tokens": 9371,
+        "total_tokens": 16690,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "stages": {
+    "sourceTreatmentRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/6c44bcea-b727-4aee-9368-cac9299e7e45/treatment-plan/baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+      "sha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+      "bytes": 4115,
+      "mime": "application/json"
+    },
+    "sourceBudget": {
+      "calls": 6,
+      "inputTokens": 177865,
+      "outputTokens": 61000,
+      "reservations": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+        "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:55:46.195Z",
+          "inputTokens": 4993,
+          "outputTokens": 2509
+        },
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:56:00.722Z",
+          "inputTokens": 4346,
+          "outputTokens": 3350
+        },
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:00.666Z",
+          "inputTokens": 9042,
+          "outputTokens": 7048
+        },
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:30.346Z",
+          "inputTokens": 7216,
+          "outputTokens": 5707
+        },
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:18:19.782Z",
+          "inputTokens": 7209,
+          "outputTokens": 10458
+        },
+        "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:32:42.453Z",
+          "inputTokens": 9048,
+          "outputTokens": 4233
+        }
+      }
+    },
+    "budget": {
+      "calls": 11,
+      "inputTokens": 304151,
+      "outputTokens": 121000,
+      "reservations": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+        "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+        "f95b7a9de25fa8ea7ab4e53a6012ad8dab55f0ddf08b9ea56fea582183c90589": "a91e5ffc13a8ff6c0094f514c491a05d8712b3475daef5cd4154d3524ca6ac3e",
+        "d40c1ee002b909c8601d3f9f8b9a84e1aa6aa5db4b07c3ba0447f5b62e1fe8d1": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+        "8866cfcab10821fb875a27eab7cd0af4c09d831a63107982b462dea9ebe63bd2": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+        "e40e1f3ca49e3ebfde743e433c333c956e31f47afed0b6f60ba007e4259002cb": "896d3460e288afaa584cf0a9516b50dc5be6cf4bcdad766272399650556c2ce7",
+        "66a6fdd1ced8786c8dfa3db2ade8e986c89a1c13d1cc7fa60cbd5aeefffe0959": "7e78cdb0ac4126f66630687c9824667b9106db94b157a3f721052bf3b20d5d2e"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:55:46.195Z",
+          "inputTokens": 4993,
+          "outputTokens": 2509
+        },
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:56:00.722Z",
+          "inputTokens": 4346,
+          "outputTokens": 3350
+        },
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:00.666Z",
+          "inputTokens": 9042,
+          "outputTokens": 7048
+        },
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:30.346Z",
+          "inputTokens": 7216,
+          "outputTokens": 5707
+        },
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:18:19.782Z",
+          "inputTokens": 7209,
+          "outputTokens": 10458
+        },
+        "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:32:42.453Z",
+          "inputTokens": 9048,
+          "outputTokens": 4233
+        },
+        "f95b7a9de25fa8ea7ab4e53a6012ad8dab55f0ddf08b9ea56fea582183c90589": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:37:16.380Z",
+          "inputTokens": 9063,
+          "outputTokens": 6625
+        },
+        "d40c1ee002b909c8601d3f9f8b9a84e1aa6aa5db4b07c3ba0447f5b62e1fe8d1": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:37:41.658Z",
+          "inputTokens": 7342,
+          "outputTokens": 8437
+        },
+        "8866cfcab10821fb875a27eab7cd0af4c09d831a63107982b462dea9ebe63bd2": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:38:59.981Z",
+          "inputTokens": 7330,
+          "outputTokens": 9171
+        },
+        "e40e1f3ca49e3ebfde743e433c333c956e31f47afed0b6f60ba007e4259002cb": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:40:05.439Z",
+          "inputTokens": 7327,
+          "outputTokens": 9692
+        },
+        "66a6fdd1ced8786c8dfa3db2ade8e986c89a1c13d1cc7fa60cbd5aeefffe0959": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:41:33.745Z",
+          "inputTokens": 7319,
+          "outputTokens": 9371
+        }
+      }
+    },
+    "receipt": {
+      "schemaVersion": 5,
+      "commandId": "fdb62617-3f02-46d7-92a0-e608695493c0",
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "operationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+      "controlVersion": 15,
+      "status": "accepted"
+    },
+    "currentStage": "composition",
+    "operation": {
+      "id": "5b25cce7-3723-4128-8fa8-b252053386e9",
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "commandId": "fdb62617-3f02-46d7-92a0-e608695493c0",
+      "kind": "preview",
+      "status": "failed",
+      "canonicalRunId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+      "streamEpoch": 0,
+      "fence": 0,
+      "revisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+      "previewId": "896ce493-8ae0-41d7-b32a-f03c26d25b2e",
+      "briefVersion": 1,
+      "consentEpoch": 0,
+      "understandingRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "bytes": 1272,
+        "mime": "application/json"
+      },
+      "reviewedTreatmentSha256": "b17ce40862bcb625dcb613f6a71d3850f5e6933cb370ed3503cbcc4dd964b17b",
+      "mediaAttemptStarted": true,
+      "stage": "composition",
+      "errorCode": "PROVIDER_UNAVAILABLE"
+    },
+    "control": {
+      "schemaVersion": 5,
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "ownerKeyHash": "new-theme-validation",
+      "controlVersion": 17,
+      "briefVersion": 1,
+      "createdAt": "2026-10-04T08:55:45.728Z",
+      "lastUserActivityAt": "2026-10-04T10:37:14.789Z",
+      "expiresAt": "2026-11-03T10:37:14.789Z",
+      "reviewPolicy": "preview_first",
+      "phase": "attention",
+      "understandingRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "bytes": 1272,
+        "mime": "application/json"
+      },
+      "messagesIndexRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/messages/80a832b79824e67c9963160acd15d0f2a1a72381f5c27b1b156c9363cdd8d7e9",
+        "sha256": "80a832b79824e67c9963160acd15d0f2a1a72381f5c27b1b156c9363cdd8d7e9",
+        "bytes": 281,
+        "mime": "application/json"
+      },
+      "revisionIndexRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/revisions/29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "sha256": "29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "bytes": 23,
+        "mime": "application/json"
+      },
+      "assets": [],
+      "inputPending": false,
+      "previewState": "none",
+      "receipts": [
+        {
+          "schemaVersion": 5,
+          "commandId": "e78aada9-177c-409d-b287-b35a51c930b5",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+          "controlVersion": 3,
+          "status": "accepted"
+        },
+        {
+          "schemaVersion": 5,
+          "commandId": "7683c638-26c4-49b6-9e87-15c3dab3dd8d",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "df5b5a6e-173d-4e69-aaa3-15ce765cfb0b",
+          "controlVersion": 9,
+          "status": "accepted"
+        },
+        {
+          "schemaVersion": 5,
+          "commandId": "2849be3f-39ce-43c4-b352-bfac3d2fd434",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "dafc18d9-5419-4367-ad29-db65e0361604",
+          "controlVersion": 12,
+          "status": "accepted"
+        },
+        {
+          "schemaVersion": 5,
+          "commandId": "fdb62617-3f02-46d7-92a0-e608695493c0",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+          "controlVersion": 15,
+          "status": "accepted"
+        }
+      ],
+      "consentEpoch": 0,
+      "nextOrdinal": 3,
+      "ordinalReservations": {},
+      "activeProduction": null,
+      "previewOutcomes": {},
+      "latestPreviewOutcome": {
+        "operationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+        "briefVersion": 1,
+        "consentEpoch": 0,
+        "controlVersion": 16
+      }
+    },
+    "stageRecords": {
+      "audio-execution-v2-stage": {
+        "schemaVersion": 2,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "timingDraftSha256": "1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+        "audioPlanSha256": "7a7aa25e9154e2f3eb3addbad42ab4d6d28843353835501e725e5718b4477542",
+        "runtimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+        "qualityStatus": "listening_not_checked",
+        "packageRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/audio-execution/22453e034205fa17cf36138e65f03555aa9d0c7816b5fe7a37de5ef172aa9530",
+          "sha256": "22453e034205fa17cf36138e65f03555aa9d0c7816b5fe7a37de5ef172aa9530",
+          "bytes": 4311,
+          "mime": "application/json"
+        }
+      },
+      "audio-plan-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "timingDraftSha256": "1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+        "seed": 68162429,
+        "executionStatus": "not_started",
+        "planRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/audio-plan/7a7aa25e9154e2f3eb3addbad42ab4d6d28843353835501e725e5718b4477542",
+          "sha256": "7a7aa25e9154e2f3eb3addbad42ab4d6d28843353835501e725e5718b4477542",
+          "bytes": 5607,
+          "mime": "application/json"
+        }
+      },
+      "film-package-v2-stage": {
+        "schemaVersion": 2,
+        "briefVersion": 1,
+        "filmSpecRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/film/291f036efb6746a86eeaf1217838273bee201a5a5bab8aeb6532e7dce99ff1d4",
+          "sha256": "291f036efb6746a86eeaf1217838273bee201a5a5bab8aeb6532e7dce99ff1d4",
+          "bytes": 2610,
+          "mime": "application/json"
+        },
+        "qualityPolicyRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/quality-policy/9ae29a7379521b0b909f109b362d04d1833e5e9065873116026d8afd952410a7",
+          "sha256": "9ae29a7379521b0b909f109b362d04d1833e5e9065873116026d8afd952410a7",
+          "bytes": 278,
+          "mime": "application/json"
+        },
+        "qualityStatus": "semantic_not_checked"
+      },
+      "narration-package-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "timingDraftSha256": "1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+        "voiceVerifiedSha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+        "packageRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/narration-package/2543d15d22639bb56151be56105778242a1a8e3440647235bde85e1100c63ecb",
+          "sha256": "2543d15d22639bb56151be56105778242a1a8e3440647235bde85e1100c63ecb",
+          "bytes": 6702,
+          "mime": "application/json"
+        }
+      },
+      "timing-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "voiceStageHash": "beb26bb209bc8fd326cf89260465c4695fa363e5fc923b933525a4d00533361e",
+        "draftRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/timing-draft/1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+          "sha256": "1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+          "bytes": 4614,
+          "mime": "application/json"
+        }
+      },
+      "voice-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "planRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/voice-plan/24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+          "sha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+          "bytes": 947,
+          "mime": "application/json"
+        },
+        "verifiedRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/35f71e39-809d-479d-b23e-3aca60ab6e41/voice-verified/c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+          "sha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+          "bytes": 9709,
+          "mime": "application/json"
+        }
+      }
+    },
+    "sourceOperationUnchanged": true,
+    "sourceTreatmentUnchanged": true
+  },
+  "limits": "New authorized preview operation and revision (current Visual instructions require full Canvas state reset and leave narration captions to the compositor) after explicit single-WAV listening confirmation. Reuses only the original completed frozen Treatment effect. Existing failed operation and unknown histories remain unchanged. Actual downstream Audio/Visual/Critic calls and media are allowed; no formal production approval or final quality claim.",
+  "errorCode": "PROVIDER_UNAVAILABLE"
+}

@@ -9,7 +9,7 @@ import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
 import {getStyle} from '@/services/video/styles/registry';
 import {createVideoAgent} from './model-adapter';
 
-const instructions=`你是 VideoBuddy Visual Agent，只创作当前镜头的原生画面源码，不修改事实、时长、镜头表、声音或用户批准状态。严格遵守当前已选风格的材料、构图、运动与字体规则；不要套用其他风格或复制示例主题。输出完整自包含 HTML，用逻辑画幅布局，设 window.READY=true 与 window.render(t)；t 是全片绝对秒，任意顺序调用都必须产生同一帧。动画只依赖 t、给定种子和固定资源，不使用计时器、requestAnimationFrame、当前时间或未种子的随机数。不得访问网络、浏览器存储、密钥或外部脚本。只能声明已授权 assetId 和当前镜头 factId；不得把模型代码当成质量检查结果。只输出严格 VisualShotSource 对象。`;
+const instructions=`你是 VideoBuddy Visual Agent，只创作当前镜头的原生画面源码，不修改事实、时长、镜头表、声音或用户批准状态。严格遵守当前已选风格的材料、构图、运动与字体规则；不要套用其他风格或复制示例主题。输出完整自包含 HTML，用逻辑画幅布局，设 window.READY=true 与 window.render(t)；t 是全片绝对秒，任意顺序调用都必须产生同一帧。Canvas2D的动态主画布每次render开始先ctx.reset()重置完整绘制状态，再从固定资源重画完整当前帧；clearRect不能代替reset，不得沿用上一帧的像素、路径、变换、剪裁或绘制状态。离屏静态纹理可预生成，随机序列必须在每次render中按相同种子与时间重新初始化。旁白字幕由合成器按冻结逐词时序统一绘制，源码不得重复绘制旁白字幕、字幕底板或打字机字幕；画面内必要的事实标签仍须严格绑定factId。动画只依赖 t、给定种子和固定资源，不使用计时器、requestAnimationFrame、当前时间或未种子的随机数。不得访问网络、浏览器存储、密钥或外部脚本。只能声明已授权 assetId 和当前镜头 factId；不得把模型代码当成质量检查结果。只输出严格 VisualShotSource 对象。`;
 
 export async function runVisualShot(understanding:Understanding,rawTreatment:unknown,rawTiming:TimingDraft,expectedTimingHash:string,shotId:string,maxOutputTokens=12000,env:Environment=process.env,seed=0):Promise<VisualShotSource>{
  if(!Number.isSafeInteger(maxOutputTokens)||maxOutputTokens<2000||maxOutputTokens>24000||!understanding.preferences.styleSlug)throw Error('VISUAL_INPUT_INVALID');

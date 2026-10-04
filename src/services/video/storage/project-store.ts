@@ -51,7 +51,7 @@ export class ProjectStore{
    if(!outcome)try{outcome=(await this.store.readFresh<NonNullable<ProjectControl['previewOutcomes']>[string]>(`projects/${id}/operations/${last.operationId}/${isRender?'render':'preview'}-outcome`)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
    if(outcome?.status==='failed'||outcome?.status==='interrupted'){
     const code=outcome.errorCode||'PROVIDER_UNAVAILABLE';
-    const message=code==='QUALITY_BLOCKED'?'完整视频的视听质量或许可证据尚未通过，效果片段和已有结果已保留。':code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':['ASR_MISMATCH','POSTMIX_ASR_MISMATCH'].includes(code)?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':isRender?'本次完整视频制作未完成，效果片段和已有结果已保留。':'本次效果制作未完成，资料和已有内容已保留。';
+    const message=code==='MODEL_OUTPUT_INVALID'?'创作结果格式未通过核验，资料和已有内容已保留。':code==='PICTURE_RENDER_FAILED'?'画面渲染未通过，资料和已有内容已保留。':code==='ASR_TIMINGS_UNAVAILABLE'?'声音时序核验未通过，资料和已有片段已保留。':code==='QUALITY_BLOCKED'?'完整视频的视听质量或许可证据尚未通过，效果片段和已有结果已保留。':code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':['ASR_MISMATCH','POSTMIX_ASR_MISMATCH'].includes(code)?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':isRender?'本次完整视频制作未完成，效果片段和已有结果已保留。':'本次效果制作未完成，资料和已有内容已保留。';
     productionFailure={operationId:last.operationId,errorCode:code,message};
    }
   }

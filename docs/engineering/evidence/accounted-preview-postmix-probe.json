@@ -1,0 +1,217 @@
+{
+  "executedAt": "2026-10-04T10:46:34.472Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "operationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+  "revisionId": "35f71e39-809d-479d-b23e-3aca60ab6e41",
+  "filmPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/429a90ff9afeef2ee7a92eb76bef4b1c2006eb1b53e0adcb1cd0c8e43f5d27f2/output/final.mp4",
+  "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+  "status": "existing_evidence_read",
+  "technicalProbeOnly": true,
+  "deliveryEligible": false,
+  "lines": [
+    {
+      "lineId": "line_1",
+      "expectedText": "把小种子轻轻放进泥土里。",
+      "status": "pass",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/postmix/61f7f561bf7ddc6043322b8609682ce4a43111909af2b71baf399fdc2ea467c5/output/line.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 93600,
+        "durationMs": 3900,
+        "bytes": 374514,
+        "sha256": "8d54eb6e52f5ec44cc1157062c09d30e00c91b2702486f58ccef388597a221b8",
+        "peakDbfs": -1.0439044133460642,
+        "rmsDbfs": -13.797372368257232
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "把小种子轻轻放进泥土里",
+            "startMs": 0,
+            "endMs": 2980,
+            "words": [
+              {
+                "text": "把",
+                "startMs": 0,
+                "endMs": 540,
+                "probability": 0.7818937301635742
+              },
+              {
+                "text": "小",
+                "startMs": 540,
+                "endMs": 800,
+                "probability": 0.9950509667396545
+              },
+              {
+                "text": "种",
+                "startMs": 800,
+                "endMs": 980,
+                "probability": 0.27235764265060425
+              },
+              {
+                "text": "子",
+                "startMs": 980,
+                "endMs": 1300,
+                "probability": 0.9995988011360168
+              },
+              {
+                "text": "轻",
+                "startMs": 1300,
+                "endMs": 1600,
+                "probability": 0.9747575521469116
+              },
+              {
+                "text": "轻",
+                "startMs": 1600,
+                "endMs": 1820,
+                "probability": 0.9991850852966309
+              },
+              {
+                "text": "放",
+                "startMs": 1820,
+                "endMs": 2080,
+                "probability": 0.9854363799095154
+              },
+              {
+                "text": "进",
+                "startMs": 2080,
+                "endMs": 2280,
+                "probability": 0.9911444783210754
+              },
+              {
+                "text": "泥",
+                "startMs": 2280,
+                "endMs": 2480,
+                "probability": 0.9947576522827148
+              },
+              {
+                "text": "土",
+                "startMs": 2480,
+                "endMs": 2680,
+                "probability": 0.994843602180481
+              },
+              {
+                "text": "里",
+                "startMs": 2680,
+                "endMs": 2980,
+                "probability": 0.9926615953445435
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "8d54eb6e52f5ec44cc1157062c09d30e00c91b2702486f58ccef388597a221b8",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "把小种子轻轻放进泥土里"
+      }
+    },
+    {
+      "lineId": "line_2",
+      "expectedText": "洒下适量的水，润湿土壤。",
+      "status": "ASR_MISMATCH",
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/postmix/b9f5f086a16fc5aa9899a611a5b7571e49b86b9d0a6b90211393e49b2984dc06/output/line.wav",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 88200,
+        "durationMs": 3675,
+        "bytes": 352914,
+        "sha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+        "peakDbfs": -1.9498922754227477,
+        "rmsDbfs": -13.383324269316685
+      },
+      "transcript": {
+        "language": "zh-CN",
+        "model": "Systran/faster-whisper-medium",
+        "segments": [
+          {
+            "text": "撒下适量的水 润湿土壤",
+            "startMs": 0,
+            "endMs": 2820,
+            "words": [
+              {
+                "text": "撒",
+                "startMs": 0,
+                "endMs": 600,
+                "probability": 0.8676214218139648
+              },
+              {
+                "text": "下",
+                "startMs": 600,
+                "endMs": 840,
+                "probability": 0.9803907871246338
+              },
+              {
+                "text": "适",
+                "startMs": 840,
+                "endMs": 1000,
+                "probability": 0.7724399864673615
+              },
+              {
+                "text": "量",
+                "startMs": 1000,
+                "endMs": 1180,
+                "probability": 0.9996609687805176
+              },
+              {
+                "text": "的",
+                "startMs": 1180,
+                "endMs": 1360,
+                "probability": 0.9893787503242493
+              },
+              {
+                "text": "水",
+                "startMs": 1360,
+                "endMs": 1640,
+                "probability": 0.9995753169059753
+              },
+              {
+                "text": " 润",
+                "startMs": 1780,
+                "endMs": 1960,
+                "probability": 0.9969022870063782
+              },
+              {
+                "text": "湿",
+                "startMs": 1960,
+                "endMs": 2160,
+                "probability": 0.869838297367096
+              },
+              {
+                "text": "土",
+                "startMs": 2160,
+                "endMs": 2480,
+                "probability": 0.9154500961303711
+              },
+              {
+                "text": "壤",
+                "startMs": 2480,
+                "endMs": 2820,
+                "probability": 0.996200442314148
+              }
+            ]
+          }
+        ],
+        "voiceSha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+        "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "recognizedText": "撒下适量的水 润湿土壤"
+      }
+    },
+    {
+      "lineId": "line_3",
+      "status": "not_reached"
+    },
+    {
+      "lineId": "line_4",
+      "status": "not_reached"
+    }
+  ],
+  "listeningAudioPath": "docs/engineering/evidence/new-theme-postmix-spoken-review.wav",
+  "listeningFileSha256": "e7683805520462ea967123d8082cc306fb9b18cd8360aae9d920530526a42967",
+  "sourceStateUnchanged": true
+}

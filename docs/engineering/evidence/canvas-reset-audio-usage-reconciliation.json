@@ -1,0 +1,78 @@
+{
+  "executedAt": "2026-10-04T10:36:57.154Z",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "operationId": "dafc18d9-5419-4367-ad29-db65e0361604",
+  "reservationId": "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51",
+  "responseSha256": "18e54df0ea89983c3a395633ddc3c0d62f556c0cf93e4d2bb12930139fe6c231",
+  "sourceReport": "new-theme-canvas-reset-preview-probe.json",
+  "status": "usage_settled",
+  "usage": {
+    "inputTokens": 9048,
+    "outputTokens": 4233
+  },
+  "policy": "Settle only the captured HTTP200 usage after strict output rejection. No effect result repair, retries, refunds or operation/control mutation.",
+  "settlement": {
+    "state": "settled",
+    "usage": {
+      "inputTokens": 9048,
+      "outputTokens": 4233
+    }
+  },
+  "budget": {
+    "calls": 6,
+    "inputTokens": 177865,
+    "outputTokens": 61000,
+    "reservations": {
+      "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+      "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+      "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+      "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+      "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+      "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb"
+    },
+    "accountingVersion": 2,
+    "accounting": {
+      "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+        "state": "settled",
+        "startedAt": "2026-10-04T08:55:46.195Z",
+        "inputTokens": 4993,
+        "outputTokens": 2509
+      },
+      "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+        "state": "settled",
+        "startedAt": "2026-10-04T08:56:00.722Z",
+        "inputTokens": 4346,
+        "outputTokens": 3350
+      },
+      "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:17:00.666Z",
+        "inputTokens": 9042,
+        "outputTokens": 7048
+      },
+      "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:17:30.346Z",
+        "inputTokens": 7216,
+        "outputTokens": 5707
+      },
+      "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:18:19.782Z",
+        "inputTokens": 7209,
+        "outputTokens": 10458
+      },
+      "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": {
+        "state": "settled",
+        "startedAt": "2026-10-04T10:32:42.453Z",
+        "inputTokens": 9048,
+        "outputTokens": 4233
+      }
+    }
+  },
+  "gate": {
+    "schemaVersion": 1,
+    "active": null
+  },
+  "sourceStateUnchanged": true
+}

@@ -1,0 +1,286 @@
+{
+  "executedAt": "2026-10-04T10:32:40.803Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+  "status": "blocked",
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 12000,
+      "startedAt": "2026-10-04T10:32:42.542Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-04T10:33:05.026Z",
+      "responseSha256": "18e54df0ea89983c3a395633ddc3c0d62f556c0cf93e4d2bb12930139fe6c231",
+      "responseFile": "model-diagnostics/18e54df0ea89983c3a395633ddc3c0d62f556c0cf93e4d2bb12930139fe6c231.json",
+      "usage": {
+        "prompt_tokens": 9048,
+        "completion_tokens": 4233,
+        "total_tokens": 13281,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "stages": {
+    "sourceTreatmentRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/6c44bcea-b727-4aee-9368-cac9299e7e45/treatment-plan/baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+      "sha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+      "bytes": 4115,
+      "mime": "application/json"
+    },
+    "sourceBudget": {
+      "calls": 5,
+      "inputTokens": 152621,
+      "outputTokens": 49000,
+      "reservations": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:55:46.195Z",
+          "inputTokens": 4993,
+          "outputTokens": 2509
+        },
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:56:00.722Z",
+          "inputTokens": 4346,
+          "outputTokens": 3350
+        },
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:00.666Z",
+          "inputTokens": 9042,
+          "outputTokens": 7048
+        },
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:30.346Z",
+          "inputTokens": 7216,
+          "outputTokens": 5707
+        },
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:18:19.782Z",
+          "inputTokens": 7209,
+          "outputTokens": 10458
+        }
+      }
+    },
+    "budget": {
+      "calls": 6,
+      "inputTokens": 177865,
+      "outputTokens": 61000,
+      "reservations": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": "2f79f701a3cf076c4c20e80f571783b0b868753e4bd2ed1bdf3da2c98eacba97",
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": "679964cf73fb8dc89eb10490c34a2a1a3818517ba70eb5e7e5ef1c59a20beff9",
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb",
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": "049c83336bea1f6b27c20dc6cef2f37d4c1f7008803b49773daece575cebd75e",
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": "46559fc4a0629236a5a95d302aaccd84a8a5a16e7cadc3c3c4dc27fb9f7e65dd",
+        "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": "b815328e3ebcb05e96d7d4c1a0366551c35218faee288b65c89e04d6b16ea7cb"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5f1680ca2fe6acd70bd306778aada702d4d01afccf6667cd6317ab8484f89805": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:55:46.195Z",
+          "inputTokens": 4993,
+          "outputTokens": 2509
+        },
+        "7a2e3e611ef5a2ad8f7ead9848e64d8cbd3260e6b578f8edb5a217f7746fea04": {
+          "state": "settled",
+          "startedAt": "2026-10-04T08:56:00.722Z",
+          "inputTokens": 4346,
+          "outputTokens": 3350
+        },
+        "ac2d36c48bae3c3472cadce6f24f2e06ce34ca123a07ed09dd86edd5c22a30d1": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:00.666Z",
+          "inputTokens": 9042,
+          "outputTokens": 7048
+        },
+        "2d6bc90edfd75c37c446a898dc5bef6ac1933c78910938552fabe68ae96720a0": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:17:30.346Z",
+          "inputTokens": 7216,
+          "outputTokens": 5707
+        },
+        "6f3c2dd4abfb63085ea354c8cb7a0c8363dff7ba5cdd7fb41418265a70ae6454": {
+          "state": "settled",
+          "startedAt": "2026-10-04T10:18:19.782Z",
+          "inputTokens": 7209,
+          "outputTokens": 10458
+        },
+        "61e7cbbb6bb51d0dd6aec1439f46abe9bf2c9aa475d13ec39e37b6a16858cd51": {
+          "state": "unknown",
+          "startedAt": "2026-10-04T10:32:42.453Z"
+        }
+      }
+    },
+    "receipt": {
+      "schemaVersion": 5,
+      "commandId": "2849be3f-39ce-43c4-b352-bfac3d2fd434",
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "operationId": "dafc18d9-5419-4367-ad29-db65e0361604",
+      "controlVersion": 12,
+      "status": "accepted"
+    },
+    "currentStage": "audio",
+    "operation": {
+      "id": "dafc18d9-5419-4367-ad29-db65e0361604",
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "commandId": "2849be3f-39ce-43c4-b352-bfac3d2fd434",
+      "kind": "preview",
+      "status": "failed",
+      "canonicalRunId": "dafc18d9-5419-4367-ad29-db65e0361604",
+      "streamEpoch": 0,
+      "fence": 0,
+      "revisionId": "0a457df3-201a-420e-8b1c-f081372d2395",
+      "previewId": "7ce4ac8d-e196-4b82-afa2-4636a7ede310",
+      "briefVersion": 1,
+      "consentEpoch": 0,
+      "understandingRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "bytes": 1272,
+        "mime": "application/json"
+      },
+      "reviewedTreatmentSha256": "b17ce40862bcb625dcb613f6a71d3850f5e6933cb370ed3503cbcc4dd964b17b",
+      "mediaAttemptStarted": true,
+      "stage": "audio",
+      "errorCode": "PROVIDER_UNAVAILABLE"
+    },
+    "control": {
+      "schemaVersion": 5,
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "ownerKeyHash": "new-theme-validation",
+      "controlVersion": 14,
+      "briefVersion": 1,
+      "createdAt": "2026-10-04T08:55:45.728Z",
+      "lastUserActivityAt": "2026-10-04T10:32:40.877Z",
+      "expiresAt": "2026-11-03T10:32:40.877Z",
+      "reviewPolicy": "preview_first",
+      "phase": "attention",
+      "understandingRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "bytes": 1272,
+        "mime": "application/json"
+      },
+      "messagesIndexRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/messages/80a832b79824e67c9963160acd15d0f2a1a72381f5c27b1b156c9363cdd8d7e9",
+        "sha256": "80a832b79824e67c9963160acd15d0f2a1a72381f5c27b1b156c9363cdd8d7e9",
+        "bytes": 281,
+        "mime": "application/json"
+      },
+      "revisionIndexRef": {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/indexes/revisions/29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "sha256": "29868c3d236e002ef8b1373f5f1e231ab88c401fe1f6fcc1b5de55a234ee6b3a",
+        "bytes": 23,
+        "mime": "application/json"
+      },
+      "assets": [],
+      "inputPending": false,
+      "previewState": "none",
+      "receipts": [
+        {
+          "schemaVersion": 5,
+          "commandId": "e78aada9-177c-409d-b287-b35a51c930b5",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "46cc7a4f-4d53-439f-b681-f818df76f7b9",
+          "controlVersion": 3,
+          "status": "accepted"
+        },
+        {
+          "schemaVersion": 5,
+          "commandId": "7683c638-26c4-49b6-9e87-15c3dab3dd8d",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "df5b5a6e-173d-4e69-aaa3-15ce765cfb0b",
+          "controlVersion": 9,
+          "status": "accepted"
+        },
+        {
+          "schemaVersion": 5,
+          "commandId": "2849be3f-39ce-43c4-b352-bfac3d2fd434",
+          "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+          "operationId": "dafc18d9-5419-4367-ad29-db65e0361604",
+          "controlVersion": 12,
+          "status": "accepted"
+        }
+      ],
+      "consentEpoch": 0,
+      "nextOrdinal": 3,
+      "ordinalReservations": {},
+      "activeProduction": null,
+      "previewOutcomes": {},
+      "latestPreviewOutcome": {
+        "operationId": "dafc18d9-5419-4367-ad29-db65e0361604",
+        "briefVersion": 1,
+        "consentEpoch": 0,
+        "controlVersion": 13
+      }
+    },
+    "stageRecords": {
+      "narration-package-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "timingDraftSha256": "1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+        "voiceVerifiedSha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+        "packageRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/0a457df3-201a-420e-8b1c-f081372d2395/narration-package/1d1a04eceae380fab5d92da4599ec19ab122f5342af9b3af9131e6dcbd26c48d",
+          "sha256": "1d1a04eceae380fab5d92da4599ec19ab122f5342af9b3af9131e6dcbd26c48d",
+          "bytes": 6702,
+          "mime": "application/json"
+        }
+      },
+      "timing-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "voiceStageHash": "23534708463e5fe90aea39abfcbbbb5f787ce2aeba05b536661f2dc2e2849d01",
+        "draftRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/0a457df3-201a-420e-8b1c-f081372d2395/timing-draft/1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+          "sha256": "1b050bc21f181cbccb29a35643ce7fe415c32fe63b89bba35b388f1945a948a8",
+          "bytes": 4614,
+          "mime": "application/json"
+        }
+      },
+      "voice-stage": {
+        "schemaVersion": 1,
+        "briefVersion": 1,
+        "understandingSha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+        "treatmentSha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+        "planRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/0a457df3-201a-420e-8b1c-f081372d2395/voice-plan/24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+          "sha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+          "bytes": 947,
+          "mime": "application/json"
+        },
+        "verifiedRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/0a457df3-201a-420e-8b1c-f081372d2395/voice-verified/c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+          "sha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+          "bytes": 9709,
+          "mime": "application/json"
+        }
+      }
+    },
+    "sourceOperationUnchanged": true,
+    "sourceTreatmentUnchanged": true
+  },
+  "limits": "New authorized preview operation and revision (current Visual instructions require full Canvas state reset and leave narration captions to the compositor) after explicit single-WAV listening confirmation. Reuses only the original completed frozen Treatment effect. Existing failed operation and unknown histories remain unchanged. Actual downstream Audio/Visual/Critic calls and media are allowed; no formal production approval or final quality claim.",
+  "errorCode": "PROVIDER_UNAVAILABLE"
+}

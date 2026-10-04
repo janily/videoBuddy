@@ -1,3 +1,9 @@
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {FileStore} from '@/services/video/storage/file-store';
+import {reserveModelBudget} from '@/services/video/budget/model-budget';
+import {withAccountedModel} from '@/services/video/budget/model-call';
 import {expect,it} from 'vitest';
 import {createServer} from 'node:http';
 import {initialUnderstanding} from '@/contracts/video/domain';
@@ -42,4 +48,15 @@ it('T06 sends frozen clock, seed, selected STYLE and audio intent through the ac
   const output=await runAudioPlan(understanding,treatment,timing,timingHash,3,12000,{MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:`http://127.0.0.1:${address.port}/v1`,MODEL_API_KEY:'local-test-only',VIDEO_AUDIO_MODEL:'test-model'});
   expect(output.music).toHaveLength(1);expect(JSON.stringify(requests[0])).toContain(style.rulesHash);expect(JSON.stringify(requests[0])).toContain(timingHash);expect(JSON.stringify(requests[0])).toContain('composed');
  }finally{await new Promise<void>(resolve=>server.close(()=>resolve()))}
+});
+
+it('rejects extra model schema metadata while preserving actual provider usage without a second request',async()=>{
+ let calls=0;const server=createServer(async(req,res)=>{calls++;for await(const part of req)void part;res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({id:'schema-failed',object:'chat.completion',created:1,model:'test-model',choices:[{index:0,message:{role:'assistant',content:JSON.stringify({...plan,$schema:'http://json-schema.org/draft-07/schema#'})},finish_reason:'stop'}],usage:{prompt_tokens:100,completion_tokens:200,total_tokens:300}}))});
+ await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));const address=server.address();if(!address||typeof address==='string')throw Error('TEST_SERVER_FAILED');
+ const root=await mkdtemp(join(tmpdir(),'vb-audio-invalid-schema-'));
+ try{
+ const store=new FileStore(root),reservation=(await reserveModelBudget(store,'project','audio-invalid',{inputTokens:1000,outputTokens:12000},{projectCalls:1,projectInputTokens:10000,projectOutputTokens:20000,dailyCalls:1})).reservation;
+ await expect(withAccountedModel(store,reservation,()=>runAudioPlan(understanding,treatment,timing,timingHash,3,12000,{MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:`http://127.0.0.1:${address.port}/v1`,MODEL_API_KEY:'local-test-only',VIDEO_AUDIO_MODEL:'test-model'}))).rejects.toThrow('MODEL_OUTPUT_INVALID');
+ expect(calls).toBe(1);expect((await store.readFresh<{accounting:Record<string,unknown>}>('projects/project/budget')).value.accounting[reservation.id]).toMatchObject({state:'settled',inputTokens:100,outputTokens:200});
+ }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
 });

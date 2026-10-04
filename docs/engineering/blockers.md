@@ -1,5 +1,8 @@
 # 当前阻断（更新至2026-10-04，自托管架构）
 
+2026-10-04 T06/T10/T11 最终混音增量：Visual ctx.reset/合成器字幕规则后四实际镜头480帧通过；Audio SDK格式拒绝前usage结算修复，真实HTTP协议RED→GREEN，safe错误分类4例持久SSE/冷读通过。首次$schema失败9048/4233原响应严格对账settled，failed/started不改。新preview五200请求38381/43296全部settled，20秒720p双声道实片SHA7c381b…10492984字节，独立全解码/−14.29LUFS/−4.05dBTP通过，最终ASR第1/3/4句pass，第2洒→撒仍阻断；未Excerpt/Critic/发布。负责人已明确确认最终AAC提取的单句WAV e768…，事实JSON绑定精确question/fullPlan/film/transcript，非正式批准，运行时final proof及同冻结影片的新operation技术继续仍待实现。105文件560测试，lint/build/types通过，两轴clean，完整引用guard已补；见 [验证](evidence/accounted-preview-validation.md)。C0/C1/C2未达到，旧failed/unknown不重置，无push/部署。
+
+
 2026-10-04 T10/T11/T14 新预览与Canvas确定性诊断：单句可信复核后受限复用原已完成Treatment，新operation/revision实际通过四原WAV、字幕时序、Audio与首镜头。3新增模型请求均200/原响应归档/settled，实际23467 input+23213 output；第二镜头原可信renderer报NONDETERMINISTIC_SCENE，预览未发布。默认/software/readback复现，ctx.reset九采样SHA一致；唯一替换clearRect的派生源码另存完整5秒120帧720p真实render+全解码通过，technical_only/deliveryEligible=false，原source/失败op/control/预算在诊断不变。复用来源丢命令禁止回退，诊断原子准入/fsync/固定脚本副本及并发冷拒绝修复，两轴clean。后续接受限技术修复流程、完整预览Critic及43风格等仍待完成，C0/C1/C2未达到，无push/部署。见 [验证](evidence/reviewed-preview-validation.md)。
 
 

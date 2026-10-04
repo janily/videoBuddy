@@ -1,0 +1,58 @@
+{
+  "executedAt": "2026-10-04T10:48:25.652Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/existing-preview-film/probe-u3a6QG",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "5b25cce7-3723-4128-8fa8-b252053386e9",
+  "diagnosticOperationId": "b42a9c6f-300d-486e-a9db-202155c35c6f",
+  "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+  "filmBytes": 10492984,
+  "fullPlanSha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+  "voiceManifestSha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+  "mediaRuntimeDigest": "75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919",
+  "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+  "decoderSourceSha256": "af899c84a09f83c8433be20cb63a001f7fa09425fd2fe0285285b33b8cd9a0c1",
+  "status": "remainder_verified",
+  "technicalProbeOnly": true,
+  "deliveryEligible": false,
+  "scope": "Read-only technical QA and independently extract/recognize only never-reached mixed lines 3 and 4. Original line 2 remains ASR_MISMATCH awaiting its own listening fact. No publication, source overwrite or model request.",
+  "technicalQa": {
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2,
+    "decoded": true,
+    "sha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3"
+  },
+  "loudness": {
+    "integratedLufs": -14.29,
+    "truePeakDbtp": -4.05,
+    "status": "pass"
+  },
+  "remainder": {
+    "status": "pass",
+    "filmSha256": "7c381b9b2f75e9a05ccaa7e542686268df18a23c02fff7dd487cabcf00312ce3",
+    "lines": [
+      {
+        "lineId": "line_3",
+        "recognizedText": "泥土里探出了嫩绿的小芽",
+        "sourceSha256": "1a4b940fbdf2751e09b2ed070016a1c1a165fdb55b1f978bd10115b93c5c3025",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_4",
+        "recognizedText": "观察成长 耐心照料",
+        "sourceSha256": "9d652d7cb8f87da3a8abcba03671a7b0bb617d73df8a7e4e4e075914ded26c25",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 8,
+        "status": "pass"
+      }
+    ]
+  },
+  "sourceStateUnchanged": true
+}

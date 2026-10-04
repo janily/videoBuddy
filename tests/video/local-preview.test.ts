@@ -165,3 +165,19 @@ it('a damaged queue record is reported while other queued operations continue',a
   expect(healthy).toBe(1);expect((await queue.pendingWithFailures()).failure?.message).toBe('QUEUE_RECORD_INVALID');
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
+it.each([
+ ['PICTURE_RENDER_FAILED','画面渲染未通过，资料和已有内容已保留。'],
+ ['ASR_TIMINGS_UNAVAILABLE','声音时序核验未通过，资料和已有片段已保留。'],
+ ['MODEL_OUTPUT_INVALID','创作结果格式未通过核验，资料和已有内容已保留。'],
+ ['POSTMIX_ASR_MISMATCH','声音核验未通过，资料和已有片段已保留。'],
+])('persists %s as the real failure category without leaking native diagnostic details',async(code,message)=>{
+ const f=await setup();try{
+  let calls=0;const options={root:f.root,build:async()=>{calls++;throw Error(code+': /private/provider-secret diagnostics')}};
+  await runPreviewOperation(f.store,f.events,f.projectId,f.operationId,options);
+  const cold=new ProjectStore(new FileStore(f.root));
+  expect((await cold.view('owner',f.projectId)).productionFailure).toMatchObject({errorCode:code,message});
+  const events=(await f.events.readFrom(f.projectId,f.operationId,0)).map(({event})=>event);
+  expect(events.at(-1)?.payload).toMatchObject({status:'failed',errorCode:code,retryable:false});expect(JSON.stringify(events)).not.toContain('provider-secret');
+  await runPreviewOperation(cold.store,f.events,f.projectId,f.operationId,options);expect(calls).toBe(1);
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
