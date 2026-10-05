@@ -24,3 +24,10 @@ it('rejects unreadable post-reveal holds before native work',async()=>{
  const style=bookCaptionStyle({width:1920,height:1080},{x:100,y:800,width:1720,height:200}),spec={width:1280,height:720,durationSec:20,fps:24 as const,bundleHash:'a'.repeat(64),fence:0};
  await expect(prepareBookCaptionLayer('/tmp/book-reading',[{lineId:'line_1',text:'观察成长，耐心照料。',startMs:0,endMs:2000,startFrame:0,endFrame:48,voiceSha256:'b'.repeat(64)}],style,spec,{})).rejects.toThrow('BOOK_CAPTION_READING_CONFLICT');
 });
+it('binds clear handwriting to a distinct renderer version and rejects mixing its fonts with legacy style',()=>{
+ const output={width:1920,height:1080},box={x:100,y:800,width:1720,height:200},old=bookCaptionStyle(output,box),clear=bookCaptionStyle(output,box,2);
+ expect(clear.book?.schemaVersion).toBe(2);expect(clear.book?.fonts.map(f=>f.id)).toEqual(['longcang','patrickhand']);expect(clear.book?.rendererSha256).not.toBe(old.book?.rendererSha256);
+ expect(()=>validateCaptionStyle(clear)).not.toThrow();
+ for(const book of [{...clear.book!,schemaVersion:1 as const},{...clear.book!,fonts:old.book!.fonts},{...clear.book!,rendererSha256:old.book!.rendererSha256}])expect(()=>validateCaptionStyle({...clear,book})).toThrow('CAPTION_STYLE_INVALID');
+ expect(bookCaptionStyle(output,box)).toEqual(old);
+});
