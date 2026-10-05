@@ -12,20 +12,21 @@ const server=createRuntimeAssetServer(root,job.assets||[]);
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;
 let browser;
 try{
- browser=await chromium.launch({headless:true,executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});const context=await browser.newContext({viewport:{width:job.logicalWidth,height:job.logicalHeight},deviceScaleFactor:1,serviceWorkers:'block'});
+ const launch=()=>chromium.launch({headless:true,executablePath:'/usr/bin/chromium',args:['--no-sandbox','--disable-dev-shm-usage']});
+ // Decode in a separate browser before generated scene code executes. Closing
+ // that browser avoids cross-context protocol events during scene rendering.
+ if(job.assets?.length){
+  browser=await launch();
+  const decoder=await browser.newContext({serviceWorkers:'block'});
+  await decoder.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
+  const decoderPage=await decoder.newPage();
+  const decoded=await decoderPage.evaluate(async({origin,assets})=>{try{for(const asset of assets){const image=new Image();image.src=origin+'/assets/'+asset.id+'.bin';await image.decode();if(!image.naturalWidth||!image.naturalHeight)return false}return true}catch{return false}},{origin,assets:job.assets});
+  if(decoded!==true)throw Error('IMAGE_DECODE_FAILED');
+  await browser.close();browser=null;
+ }
+ browser=await launch();const context=await browser.newContext({viewport:{width:job.logicalWidth,height:job.logicalHeight},deviceScaleFactor:1,serviceWorkers:'block'});
  await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
  const page=await context.newPage();let runtimeError;page.on('pageerror',e=>runtimeError=e);page.on('response',r=>{if(r.status()>=400)runtimeError=Error('RESOURCE_MISSING')});
- // Decode in a separate trusted context before generated scene code executes.
- // Its Image constructor/prototype and globals cannot be patched by the scene.
- if(job.assets?.length){
-  const decoder=await browser.newContext({serviceWorkers:'block'});
-  try{
-   await decoder.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
-   const decoderPage=await decoder.newPage();
-   const decoded=await decoderPage.evaluate(async({origin,assets})=>{try{for(const asset of assets){const image=new Image();image.src=origin+'/assets/'+asset.id+'.bin';await image.decode();if(!image.naturalWidth||!image.naturalHeight)return false}return true}catch{return false}},{origin,assets:job.assets});
-   if(decoded!==true)throw Error('IMAGE_DECODE_FAILED');
-  }finally{await decoder.close()}
- }
  await page.goto(origin+'/scene.html',{waitUntil:'load'});await page.waitForFunction(()=>window.READY===true,{},{timeout:30000});await page.evaluate(()=>document.fonts.ready);
  const output=join(root,'output'),frames=join(root,'frames');await mkdir(output,{recursive:true});await mkdir(frames,{recursive:true});
  const samples=[...new Set([job.startFrame,Math.floor((job.startFrame+job.endFrame)/2),job.endFrame-1])],baseline=new Map();
