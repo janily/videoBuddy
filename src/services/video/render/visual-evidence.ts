@@ -8,6 +8,7 @@ import {wholeFilmVisualPlan} from '@/services/video/quality/whole-visual-plan';
 import {extractVisualFrames,readVisualEvidence} from '@/services/video/quality/visual-evidence';
 import {assertApprovedRenderFence,loadApprovedRenderInputs} from './approved-inputs';
 import {composeApprovedFilm} from './composition';
+import {frozenVisualCriteria} from '@/services/video/quality/source-visual-criteria';
 
 interface Options{root:string;env?:Environment;mustExist?:boolean;compose?:typeof composeApprovedFilm;extract?:typeof extractVisualFrames;readImages?:typeof readVisualEvidence}
 // Evidence collection is model-free. It does not turn image extraction into a
@@ -21,7 +22,7 @@ export async function prepareApprovedVisualEvidence(projects:ProjectStore,owner:
  const composition=await (options.compose||composeApprovedFilm)(projects,owner,projectId,operationId,expectedFence,{root,env,mustExist:readOnly});
  if(composition.inputHash!==inputs.inputHash||composition.deliveryEligible!==false||composition.movie.qaStatus!=='semantic_not_checked')throw Error('CRITIC_BASELINE_CHANGED');
  const {movie}=composition,{width,height,totalFrames}=inputs.frozen.filmSpec.output;
- const baseline={filmSha256:movie.technicalQa.sha256,filmSpecSha256:inputs.bundle.filmSpecRef.sha256,styleSlug:inputs.frozen.filmSpec.style.slug,styleRulesHash:getStyle(inputs.frozen.filmSpec.style.slug).rulesHash,facts:inputs.frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(({id,text})=>({id,text}))};
+ const sourceCriteria=frozenVisualCriteria(inputs.frozen),baseline={filmSha256:movie.technicalQa.sha256,filmSpecSha256:inputs.bundle.filmSpecRef.sha256,styleSlug:inputs.frozen.filmSpec.style.slug,styleRulesHash:getStyle(inputs.frozen.filmSpec.style.slug).rulesHash,facts:inputs.frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(({id,text})=>({id,text})),...(sourceCriteria?{sourceCriteria}:{})};
  const batches=[];
  for(const round of plan.rounds)for(const batch of round.batches){
   const assertActive=()=>assertApprovedRenderFence(projects,inputs);await assertActive();

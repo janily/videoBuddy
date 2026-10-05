@@ -32,6 +32,7 @@ export function aggregateWholeVisualReviews(plan:WholeFilmVisualPlan,baseline:Vi
   const {context}=entry;
   for(const field of ['filmSha256','filmSpecSha256','styleSlug','styleRulesHash'] as const)if(context[field]!==baseline[field])throw Error('CRITIC_BASELINE_CHANGED');
   if(canonicalHash(context.facts)!==canonicalHash(baseline.facts))throw Error('CRITIC_BASELINE_CHANGED');
+  if(canonicalHash(context.sourceCriteria||null)!==canonicalHash(baseline.sourceCriteria||null))throw Error('CRITIC_BASELINE_CHANGED');
   const key=canonicalHash({round:context.round,frames:context.frames.map(f=>f.frame)});
   if(byBatch.has(key)||!batches.some(batch=>canonicalHash(batch)===key))throw Error('WHOLE_VISUAL_COVERAGE_MISSING');
   byBatch.set(key,guardVisualReview(entry.review,context));
@@ -46,6 +47,12 @@ export function aggregateWholeVisualReviews(plan:WholeFilmVisualPlan,baseline:Vi
   });return{factId:fact.id,result:combined(rounds.map(check=>check.result)),rounds};
  });
  const style=combined(reviews.map(review=>review.style.result)),readability=combined(reviews.map(review=>review.readability.result)),blockingIssues=reviews.flatMap(review=>review.observations.flatMap(observation=>observation.issues.filter(issue=>issue.severity==='blocking').map(issue=>({round:review.round,frameId:observation.frameId,...issue}))));
- const factConflicts=reviews.flatMap(review=>review.observations.flatMap(observation=>observation.issues.filter(issue=>issue.kind==='fact_conflict').map(issue=>({round:review.round,frameId:observation.frameId,...issue})))),criticalFactsResult:Result=factConflicts.length?'fail':combined(facts.map(f=>f.result));
- return{schemaVersion:1 as const,filmSha256:baseline.filmSha256,filmSpecSha256:baseline.filmSpecSha256,planSha256:canonicalHash(plan),scope:'two_round_sampled_frames' as const,result:blockingIssues.length?'fail' as const:combined([style,readability,criticalFactsResult]),style,readability,criticalFactsResult,facts,factConflicts,blockingIssues,batchCount:reviews.length,continuousMotion:'not_supplied' as const,audio:'not_supplied' as const,deliveryEligible:false as const};
+ const factConflicts=reviews.flatMap(review=>review.observations.flatMap(observation=>observation.issues.filter(issue=>issue.kind==='fact_conflict').map(issue=>({round:review.round,frameId:observation.frameId,...issue}))));
+ const literalFacts=baseline.sourceCriteria?baseline.facts.flatMap(f=>baseline.sourceCriteria!.requirements.find(r=>r.factId===f.id)!.exactText.map(sourceExcerpt=>{
+  const rounds=([1,2] as const).map(round=>{const checks=reviews.filter(r=>r.round===round).map(r=>{if(r.schemaVersion!==2)throw Error('CRITIC_BASELINE_CHANGED');return r.facts.find(c=>c.factId===f.id)!.literalChecks.find(c=>c.sourceExcerpt===sourceExcerpt)!});return{round,result:checks.some(c=>c.result==='fail')?'fail' as const:checks.some(c=>c.result==='pass')?'pass' as const:'not_checked' as const}});
+  return{factId:f.id,sourceExcerpt,result:combined(rounds.map(r=>r.result)),rounds};
+ })):undefined;
+ const literalFactsResult:Result=factConflicts.length||reviews.some(r=>r.facts.some(f=>f.result==='fail'))?'fail':combined(literalFacts?.map(c=>c.result)||[]);
+ const criticalFactsResult:Result=baseline.sourceCriteria?literalFactsResult==='fail'?'fail':'not_checked':factConflicts.length?'fail':combined(facts.map(f=>f.result));
+ return{schemaVersion:1 as const,filmSha256:baseline.filmSha256,filmSpecSha256:baseline.filmSpecSha256,planSha256:canonicalHash(plan),scope:'two_round_sampled_frames' as const,result:blockingIssues.length?'fail' as const:combined([style,readability,baseline.sourceCriteria?literalFactsResult:criticalFactsResult]),style,readability,criticalFactsResult,facts,...(literalFacts?{sourceCriteriaSha256:canonicalHash(baseline.sourceCriteria),sourceFactsManifestSha256:baseline.sourceCriteria!.factsRef.sha256,literalFactsResult,literalFacts}:{}),factConflicts,blockingIssues,batchCount:reviews.length,continuousMotion:'not_supplied' as const,audio:'not_supplied' as const,deliveryEligible:false as const};
 }

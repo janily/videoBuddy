@@ -1,8 +1,8 @@
 import type {QualityCheck} from './publish-gate';
 import {mandatoryDeliveryRules,type DeliveryPolicy} from './delivery';
 interface CompositionEvidence{movie:{technicalQa:{sha256:string};loudness:{status:string;filmSha256:string}};postMix:{status:string;filmSha256:string;reason?:string}}
-interface ContentEvidence{report:{filmSha256:string;result:'pass'|'fail'|'not_checked';scope:'two_round_provided_frames_and_verified_transcripts';deliveryEligible:false};ref:string}
-interface VisualEvidence{filmSha256:string;result:'pass'|'fail'|'not_checked';criticalFactsResult:'pass'|'fail'|'not_checked'}
+interface ContentEvidence{report:{filmSha256:string;filmSpecSha256?:string;factsManifestSha256?:string;result:'pass'|'fail'|'not_checked';scope:'two_round_provided_frames_and_verified_transcripts';deliveryEligible:false};ref:string}
+interface VisualEvidence{filmSha256:string;filmSpecSha256?:string;result:'pass'|'fail'|'not_checked';criticalFactsResult:'pass'|'fail'|'not_checked';sourceCriteriaSha256?:string;sourceFactsManifestSha256?:string;literalFactsResult?:'pass'|'fail'|'not_checked'}
 /** Consumes verified producer evidence. Does not replace independent semantic,
  * listening, font and license checks with technical decode or sampled-frame pass. */
 export function compileApprovedDeliveryChecks(policy:DeliveryPolicy,composition:CompositionEvidence,visual:VisualEvidence,technicalRef:string,visualRef:string,content?:ContentEvidence):QualityCheck[]{
@@ -14,6 +14,11 @@ export function compileApprovedDeliveryChecks(policy:DeliveryPolicy,composition:
  function set(ruleId:string,result:QualityCheck['result'],ref:string,reason?:string){const check=checks.find(c=>c.ruleId===ruleId)!;Object.assign(check,{result,evidenceRefs:[ref],...(reason?{reason}:{})});if(!reason)delete check.reason}
  for(const rule of ['decode','media_metadata','duration','file_hash','source_integrity','resource_ready'])set(rule,'pass',technicalRef);
  set('critical_facts',visual.criticalFactsResult,visualRef);
+ if(visual.sourceCriteriaSha256!==undefined||visual.literalFactsResult!==undefined||visual.sourceFactsManifestSha256!==undefined){
+  if(!/^[a-f0-9]{64}$/.test(visual.sourceCriteriaSha256||'')||!/^[a-f0-9]{64}$/.test(visual.filmSpecSha256||'')||!/^[a-f0-9]{64}$/.test(visual.sourceFactsManifestSha256||'')||!visual.literalFactsResult||content&&(content.report.filmSpecSha256!==visual.filmSpecSha256||content.report.factsManifestSha256!==visual.sourceFactsManifestSha256))throw Error('RENDER_OUTPUT_CHANGED');
+  const result=visual.literalFactsResult==='fail'||content?.report.result==='fail'?'fail':visual.literalFactsResult==='pass'&&content?.report.result==='pass'?'pass':'not_checked';
+  set('critical_facts',result,visualRef);if(content)checks.find(c=>c.ruleId==='critical_facts')!.evidenceRefs.push(content.ref);
+ }
  set('visual_review',visual.result==='fail'?'fail':'not_checked',visualRef,'Two-round sampled frames do not establish continuous-motion quality.');
  if(!policy.captions)set('subtitle_sync','not_applicable',technicalRef,'No captions in the frozen film.');
  if(policy.audioIntent==='silent'&&composition.postMix.status==='not_applicable'&&composition.postMix.reason==='intentional_silence'&&composition.movie.loudness.status==='not_applicable'){

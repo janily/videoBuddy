@@ -6,17 +6,20 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {runVisualCritic} from '@/mastra/video/critic';
 import {getStyle} from '@/services/video/styles/registry';
+import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {visualReviewContext} from '@/contracts/video/visual-review';
 import {FileStore} from '@/services/video/storage/file-store';
 import {reserveModelBudget} from '@/services/video/budget/model-budget';
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import {recordModelRequests} from '../../scripts/video/helpers/real-probe';
 
-it('sends exact decoded PNG bytes through native Mastra multimodal transport and accounts read-only review once',async()=>{
+it.each([false,true])('sends exact decoded PNG bytes and audited=$audited criteria through native Mastra transport with exact usage',async audited=>{
  const image=await readFile('docs/engineering/evidence/native-frame-3.png'),sha256=createHash('sha256').update(image).digest('hex'),style=getStyle('crayon-book');
- const context=visualReviewContext({filmSha256:'b'.repeat(64),filmSpecSha256:'a'.repeat(64),styleSlug:style.slug,styleRulesHash:style.rulesHash,round:1,frames:[{id:'frame-324',frame:324,sha256,bytes:image.length}],facts:[]});
- const response={schemaVersion:1,...context,scope:'sampled_frames',observations:[{frameId:'frame-324',visibleText:['上海青禾社'],issues:[{kind:'clipped_text',severity:'blocking',description:'所示地点尚未完整显示'}]}],facts:[],style:{result:'not_checked',frameIds:['frame-324'],reason:'单帧不足判断全片风格'},readability:{result:'fail',frameIds:['frame-324'],reason:'地点未完整显示'}};
- const {frames:unused,...result}=response;void unused;
+ const sourceFacts=[{id:'place',text:'上海青禾社区举办活动。',sourceRefs:[{type:'user_message' as const,id:'message'}],status:'confirmed' as const,mustInclude:true,critical:true}],contentRequirementsRef={key:'owned/content-proof',sha256:'c'.repeat(64),bytes:100,mime:'application/json'},manifest={schemaVersion:2,facts:sourceFacts,contentRequirementsRef};
+ const sourceCriteria={factsRef:{key:'owned/facts',sha256:canonicalHash(manifest),bytes:Buffer.byteLength(canonicalJson(manifest)),mime:'application/json'},contentRequirementsRef,facts:sourceFacts,requirements:[{factId:'place',representation:'semantic' as const,exactText:['上海青禾社区']}]};
+ const context=visualReviewContext({filmSha256:'b'.repeat(64),filmSpecSha256:'a'.repeat(64),styleSlug:style.slug,styleRulesHash:style.rulesHash,round:1,frames:[{id:'frame-324',frame:324,sha256,bytes:image.length}],facts:audited?sourceFacts.map(({id,text})=>({id,text})):[],...(audited?{sourceCriteria}:{})});
+ const response={schemaVersion:audited?2:1,...(audited?{sourceCriteriaSha256:canonicalHash(sourceCriteria)}:{}),...context,scope:'sampled_frames',observations:[{frameId:'frame-324',visibleText:['上海青禾社'],issues:[{kind:'clipped_text',severity:'blocking',description:'所示地点尚未完整显示'}]}],facts:audited?[{factId:'place',result:'fail',frameIds:['frame-324'],reason:'名称裁切。',literalChecks:[{sourceExcerpt:'上海青禾社区',result:'fail',frameIds:['frame-324'],reason:'名称裁切。'}]}]:[],style:{result:'not_checked',frameIds:['frame-324'],reason:'单帧不足判断全片风格'},readability:{result:'fail',frameIds:['frame-324'],reason:'地点未完整显示'}};
+ const {frames:unused,sourceCriteria:unusedCriteria,...result}=response;void unused;void unusedCriteria;
  let calls=0;const received:unknown[]=[];
  const server=createServer(async(req,res)=>{
   calls++;const parts:Buffer[]=[];for await(const part of req)parts.push(part);received.push(JSON.parse(Buffer.concat(parts).toString()));
@@ -32,7 +35,7 @@ it('sends exact decoded PNG bytes through native Mastra multimodal transport and
   try{review=await withAccountedModel(store,r,()=>runVisualCritic(context,images,1000,env))}finally{await transport.flush();transport.restore()}
   expect(transport.requests).toHaveLength(1);
   expect(review.readability.result).toBe('fail');expect(calls).toBe(1);
-  const body=JSON.stringify(received[0]);expect(body).toContain('data:image/png;base64,'+image.toString('base64'));expect(body).not.toContain('local-unit-only');
+  const body=JSON.stringify(received[0]);expect(body.includes('data:image/png;base64,'+image.toString('base64'))).toBe(true);expect(body).not.toContain('local-unit-only');if(audited){expect(body.includes('上海青禾社区举办活动。')).toBe(true);expect(body.includes(canonicalHash(sourceCriteria))).toBe(true);expect(body.includes('普通语义 fact 必须 not_checked')).toBe(true)}
   expect((await store.readFresh<{accounting:Record<string,{state:string;inputTokens:number;outputTokens:number}>}>('projects/project/budget')).value.accounting[r.id]).toMatchObject({state:'settled',inputTokens:120,outputTokens:60});
  }finally{await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
 });

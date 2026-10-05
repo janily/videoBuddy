@@ -16,6 +16,7 @@ import type {VisualReview} from '@/contracts/video/visual-review';
 import type {VisualReviewContext} from '@/contracts/video/visual-review';
 import {loadVerifiedFilmPackage} from '@/contracts/video/film-package';
 import {assertCompositePackageFields} from '@/services/video/quality/composite-binding';
+import {budgetKeys} from '@/services/video/config/environment';
 
 it('archives a film-bound sampled review once, revalidates byte evidence on replay and fences cancellation before commit',async()=>{
  const root=await mkdtemp(join(tmpdir(),'vb-critic-stage-'));
@@ -40,6 +41,23 @@ it('archives a film-bound sampled review once, revalidates byte evidence on repl
   const invoke=(round:1|2=1)=>prepareVisualReviewBatch(projects,projectId,revisionId,operationId,0,bundle.filmSpecRef,'preview',[324],round,{...options,decide});
   const first=await invoke();expect(first.qualityStatus).toBe('sampled_visuals_only');expect(calls).toBe(1);expect(await invoke()).toEqual(first);expect(calls).toBe(1);
   changed=true;await expect(invoke()).rejects.toThrow('VISUAL_EVIDENCE_CHANGED');changed=false;
-  cancel=true;await expect(invoke(2)).rejects.toThrow('PREVIEW_STALE');expect(calls).toBe(2);
+  const nativeEnv={...options.env,VIDEO_ENVIRONMENT:'local',VIDEO_DATA_DIR:root,VIDEO_APP_ORIGIN:'https://video.test',VIDEO_SESSION_SIGNING_KEY:'s'.repeat(64),VIDEO_GENERATION_ENABLED:'true',MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:'http://127.0.0.1:1/v1',MODEL_API_KEY:'unit-only',VIDEO_DIRECTOR_MODEL:'unit-model',VIDEO_CRITIC_MODEL:'unit-model',...Object.fromEntries(budgetKeys.map(key=>[key,'1000000']))};
+  await expect(prepareVisualReviewBatch(projects,projectId,revisionId,operationId,0,bundle.filmSpecRef,'preview',[324],2,{...options,env:nativeEnv,readImages:async()=>new Map([['frame-324',Buffer.from('wrong')]])})).rejects.toThrow('CRITIC_IMAGE_CHANGED');
+  await expect(projects.store.readFresh(`projects/${projectId}/budget`)).rejects.toThrow('STORE_NOT_FOUND');
+  expect(await projects.store.listKeys!(`projects/${projectId}/operations/${operationId}/effects/visual-critic`,1)).toHaveLength(1);
+  // A completed decision can outlive a failed archival write. It must be
+  // guarded before any immutable evidence or durable batch is accepted.
+  let archiveFailed=true;const create=projects.store.create.bind(projects.store);
+  projects.store.create=async(key,value)=>{if(archiveFailed&&key.includes('/visual-review/'))throw Error('ARCHIVE_FAILED');return create(key,value)};
+  await expect(invoke(2)).rejects.toThrow('ARCHIVE_FAILED');expect(calls).toBe(2);archiveFailed=false;
+  archiveFailed=true;await expect(prepareVisualReviewBatch(projects,projectId,revisionId,operationId,0,bundle.filmSpecRef,'preview',[324],2,{...options,env:{...options.env,VIDEO_GENERATION_ENABLED:'false'}})).rejects.toThrow('ARCHIVE_FAILED');expect(calls).toBe(2);archiveFailed=false;
+  const effects=await projects.store.listKeys!(`projects/${projectId}/operations/${operationId}/effects/visual-critic`,1);
+  const selected=await Promise.all(effects.map(async key=>({key,value:(await projects.store.readFresh<{output:VisualReview}>(key)).value})));
+  const second=selected.find(e=>e.value.output.round===2)!;
+  await updateJson(projects.store,second.key,(effect:{output:VisualReview})=>({...effect,output:{...effect.output,filmSpecSha256:'0'.repeat(64)}}));
+  let archives=0;projects.store.create=async(key,value)=>{if(key.includes('/visual-review/'))archives++;return create(key,value)};
+  await expect(invoke(2)).rejects.toThrow('CRITIC_BASELINE_CHANGED');expect(calls).toBe(2);expect(archives).toBe(0);projects.store.create=create;
+  const cancelledOperation=randomUUID();await updateJson(projects.store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,activeProduction:cancelledOperation}));
+  cancel=true;await expect(prepareVisualReviewBatch(projects,projectId,revisionId,cancelledOperation,0,bundle.filmSpecRef,'preview',[324],2,{...options,decide})).rejects.toThrow('PREVIEW_STALE');expect(calls).toBe(3);
  }finally{await rm(root,{recursive:true,force:true})}
 });

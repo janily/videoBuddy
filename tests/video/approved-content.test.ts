@@ -38,7 +38,7 @@ it('consumes only audited frozen source requirements and cold-rejects a changed 
  await updateJson(f.projects.store,`projects/${f.projectId}/previews/${bundle.previewId}/manifest`,()=>bundle);
  await updateJson(f.projects.store,`projects/${f.projectId}/approvals/${f.approval.approvalId}`,(a:typeof f.approval)=>({...a,bundleHash:bundle.bundleHash}));
  await updateJson(f.projects.store,`projects/${f.projectId}/operations/${f.operationId}`,(op:object)=>({...op,bundleHash:bundle.bundleHash}));
- const options=await producers(f);await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);let calls=0;
+ const options=await producers(f),evidence=await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);expect(evidence.baseline).toMatchObject({sourceCriteria:{facts:c.facts,requirements:[{factId:'fact-0',representation:'semantic',exactText:['十月八日']}]}});let calls=0;
  const stage=await reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,decide:async context=>{
   calls++;expect(context.requirements).toEqual([{factId:'fact-0',representation:'semantic',exactText:['十月八日']}]);
   const r=response(context);return{...r,observations:r.observations.map(o=>({...o,visibleText:[...o.visibleText,'活动在十月八日开始']}))};

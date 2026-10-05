@@ -9,7 +9,7 @@ import {withAccountedModel} from '@/services/video/budget/model-call';
 import {runEffect} from '@/services/video/commands/effect-ledger';
 import {guardVisualReview,type VisualReviewContext,type VisualReview} from '@/contracts/video/visual-review';
 import type {ObjectRef} from '@/contracts/video/domain';
-import {runVisualCritic} from '@/mastra/video/critic';
+import {runVisualCritic,prepareVisualCriticInput} from '@/mastra/video/critic';
 import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
 import {aggregateWholeVisualReviews} from '@/services/video/quality/whole-visual-plan';
 import {VisualEvidenceSchema,readVisualEvidence} from '@/services/video/quality/visual-evidence';
@@ -34,14 +34,18 @@ export async function reviewApprovedWholeFilm(projects:ProjectStore,owner:string
    review=guardVisualReview(await readNarrationJson(projects.store,saved.reviewRef,prefix+'visual-review/'),context);
   }else{
    if(options.mustExist)throw Error('CRITIC_REVIEW_MISSING');
+   const effectKey=`projects/${projectId}/operations/${operationId}/effects/formal-visual-critic/${stageKey}`;
+   let prior:unknown;try{prior=(await projects.store.readFresh(effectKey)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
    let execute:()=>Promise<VisualReview>;
    if(options.decide){const decide=options.decide;execute=()=>decide(context,images)}else{
-    requireGeneration(readConfiguration(env));const knowledge=await loadStageKnowledge(context.styleSlug,'style');
-    const reservation=await reserveModelBudget(projects.store,projectId,operationId+'-formal-critic-'+stageKey,{inputTokens:Buffer.byteLength(canonicalJson({context,styleRules:knowledge.rules}))+4096+context.frames.length*8192,outputTokens:8000},options.limits||modelLimits(env));
-    execute=()=>withAccountedModel(projects.store,reservation.reservation,()=>runVisualCritic(context,images,reservation.maxOutputTokens,env,{assertActive:()=>assertApprovedRenderFence(projects,inputs)}));
+    if(prior===undefined){
+     requireGeneration(readConfiguration(env));await prepareVisualCriticInput(context,images,8000);await assertApprovedRenderFence(projects,inputs);const knowledge=await loadStageKnowledge(context.styleSlug,'style');
+     const reservation=await reserveModelBudget(projects.store,projectId,operationId+'-formal-critic-'+stageKey,{inputTokens:Buffer.byteLength(canonicalJson({context,styleRules:knowledge.rules}))+4096+context.frames.length*8192,outputTokens:8000},options.limits||modelLimits(env));
+     execute=()=>withAccountedModel(projects.store,reservation.reservation,()=>runVisualCritic(context,images,reservation.maxOutputTokens,env,{assertActive:()=>assertApprovedRenderFence(projects,inputs)}));
+    }else execute=async()=>{throw Error('CRITIC_EFFECT_CHANGED')};
    }
    await assertApprovedRenderFence(projects,inputs);
-   review=guardVisualReview(await runEffect(projects.store,`projects/${projectId}/operations/${operationId}/effects/formal-visual-critic/${stageKey}`,async()=>{await assertApprovedRenderFence(projects,inputs);return guardVisualReview(await execute(),context)}),context);
+   review=guardVisualReview(await runEffect(projects.store,effectKey,async()=>{await assertApprovedRenderFence(projects,inputs);return guardVisualReview(await execute(),context)}),context);
    await assertApprovedRenderFence(projects,inputs);await (options.readImages||readVisualEvidence)(root,evidence);
    const reviewRef=await projects.index.immutable(prefix+'visual-review',review),candidate:BatchReviewRecord={schemaVersion:1,inputHash:inputs.inputHash,compositionHash:record.compositionHash,contextRef:batch.contextRef,evidenceRef:batch.evidenceRef,reviewRef};
    saved=await createOrRead(projects.store,key,candidate);if(canonicalHash(saved)!==canonicalHash(candidate))throw Error('CRITIC_BASELINE_CHANGED');
