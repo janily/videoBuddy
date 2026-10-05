@@ -6,7 +6,7 @@ import type {Understanding} from '@/contracts/video/domain';
 import {imageUnderstandingInput,guardImageUnderstanding,ImageAnalysisRecordSchema,imageAnalysisText,type ImageUnderstandingInput} from '@/contracts/video/image-understanding';
 import {runImageUnderstanding} from '@/mastra/video/image-understanding';
 import {configuredModel} from '@/mastra/video/model-adapter';
-import type {Environment} from '@/services/video/config/environment';
+import {requireGeneration,readConfiguration,type Environment} from '@/services/video/config/environment';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {StoreMissing,updateJson} from '@/services/video/storage/atomic-store';
 import {runEffect} from '@/services/video/commands/effect-ledger';
@@ -30,8 +30,8 @@ export async function prepareImageAnalysis(projects:ProjectStore,root:string,pro
  const identity=canonicalHash(input),effectKey=p+'/assets/'+assetId+'/effects/image-understanding/'+identity;let prior:unknown;
  try{prior=(await projects.store.readFresh(effectKey)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  const env=options.env||process.env;let reservation:Awaited<ReturnType<typeof reserveModelBudget>>|undefined;
- if(prior===undefined&&!options.analyze){configuredModel('visual',env);reservation=await reserveModelBudget(projects.store,projectId,'image-'+assetId+'-'+identity,{inputTokens:Math.ceil(original.length*4/3)+Buffer.byteLength(JSON.stringify(input))+8192,outputTokens:4000},options.limits||modelLimits(env));await fence()}
- const raw=await runEffect(projects.store,effectKey,async()=>{await fence();if(options.analyze)return options.analyze(input,original,fence);if(!reservation)throw Error('IMAGE_EFFECT_CHANGED');return withAccountedModel(projects.store,reservation.reservation,()=>runImageUnderstanding(input,original,reservation.maxOutputTokens,env,{assertActive:fence}))});
+ if(prior===undefined&&!options.analyze){requireGeneration(readConfiguration(env));configuredModel('visual',env);reservation=await reserveModelBudget(projects.store,projectId,'image-'+assetId+'-'+identity,{inputTokens:Math.ceil(original.length*4/3)+Buffer.byteLength(JSON.stringify(input))+8192,outputTokens:4000},options.limits||modelLimits(env));await fence()}
+ const raw=await runEffect(projects.store,effectKey,async()=>{await fence();if(options.analyze)return options.analyze(input,original,fence);if(!reservation)throw Error('IMAGE_EFFECT_CHANGED');requireGeneration(readConfiguration(env));return withAccountedModel(projects.store,reservation.reservation,()=>runImageUnderstanding(input,original,reservation.maxOutputTokens,env,{assertActive:fence}))});
  await fence();const imageAnalysis=guardImageUnderstanding(raw,input),text=imageAnalysisText(imageAnalysis);
  if(Buffer.byteLength(text)>40000)throw Error('IMAGE_ANALYSIS_INVALID');
  const record={schemaVersion:5,assetId,mime:input.mime,sha256:input.sha256,text,imageAnalysis,trust:'untrusted_material'},ref=await projects.index.immutable(p+'/assets/'+assetId+'/analysis/'+identity,record);await fence();

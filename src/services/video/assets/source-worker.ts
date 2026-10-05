@@ -47,12 +47,14 @@ export async function runSourceAnalysisOnce(store:AtomicStore,root:string,extrac
   for(const candidate of control.assets.filter(asset=>['image/png','image/jpeg','image/webp'].includes(asset.declaredMime)&&['uploaded','analyzing'].includes(asset.status))){
    try{await prepareImageAnalysis(projects,root,projectId,candidate.id,imageOptions)}catch(error){
     const message=error instanceof Error?error.message:'';
-    if(message.startsWith('CONFIGURATION_REQUIRED:')){
-     await updateJson(store,key,(c:ProjectControl)=>{if(c.deletedAt||!Number.isFinite(Date.parse(c.expiresAt))||Date.parse(c.expiresAt)<=Date.now())return c;const a=c.assets.find(a=>a.id===candidate.id);if(!a||!['uploaded','analyzing'].includes(a.status)||a.errorCode==='IMAGE_CONFIGURATION_REQUIRED')return c;return{...c,controlVersion:c.controlVersion+1,assets:c.assets.map(a=>a.id===candidate.id?{...a,errorCode:'IMAGE_CONFIGURATION_REQUIRED'}:a)}});
+    if(message.startsWith('CONFIGURATION_REQUIRED:')||message==='GENERATION_DISABLED'){
+     await updateJson(store,key,(c:ProjectControl)=>{if(c.deletedAt||!Number.isFinite(Date.parse(c.expiresAt))||Date.parse(c.expiresAt)<=Date.now())return c;const a=c.assets.find(a=>a.id===candidate.id);if(!a||!['uploaded','analyzing'].includes(a.status)||a.errorCode===(message==='GENERATION_DISABLED'?'IMAGE_GENERATION_PAUSED':'IMAGE_CONFIGURATION_REQUIRED'))return c;return{...c,controlVersion:c.controlVersion+1,assets:c.assets.map(a=>a.id===candidate.id?{...a,errorCode:message==='GENERATION_DISABLED'?'IMAGE_GENERATION_PAUSED':'IMAGE_CONFIGURATION_REQUIRED'}:a)}});
      continue;
     }
     if(['ACCESS_NOT_FOUND','IMAGE_ASSET_CHANGED'].includes(message))continue;
-    await failAsset(store,key,candidate.id,['MODEL_USAGE_UNCERTAIN','EFFECT_UNKNOWN','MODEL_BUDGET_OVERRUN'].includes(message)?'IMAGE_MODEL_USAGE_UNCERTAIN':message==='IMAGE_INPUT_CHANGED'?'ASSET_HASH_CONFLICT':'IMAGE_ANALYSIS_FAILED');
+    if(['IMAGE_INPUT_INVALID','IMAGE_INPUT_CHANGED','IMAGE_ANALYSIS_INVALID','IMAGE_ANALYSIS_CHANGED','ASSET_HASH_CONFLICT','ASSET_INVALID'].includes(message)||message.startsWith('ASSET_INVALID:')){await failAsset(store,key,candidate.id,message==='IMAGE_INPUT_CHANGED'?'ASSET_HASH_CONFLICT':'IMAGE_ANALYSIS_FAILED');continue}
+    const code=['MODEL_USAGE_UNCERTAIN','EFFECT_UNKNOWN','MODEL_BUDGET_OVERRUN'].includes(message)?'IMAGE_MODEL_USAGE_UNCERTAIN':'IMAGE_ANALYSIS_RECONCILIATION_REQUIRED';
+    await updateJson(store,key,(c:ProjectControl)=>{if(c.deletedAt||!Number.isFinite(Date.parse(c.expiresAt))||Date.parse(c.expiresAt)<=Date.now())return c;const a=c.assets.find(a=>a.id===candidate.id);if(!a||!['uploaded','analyzing'].includes(a.status)||a.errorCode===code)return c;return{...c,controlVersion:c.controlVersion+1,assets:c.assets.map(a=>a.id===candidate.id?{...a,errorCode:code}:a)}});
    }
   }
   for(const candidate of control.assets.filter(asset=>['audio/wav','audio/mpeg','audio/mp4'].includes(asset.declaredMime)&&['uploaded','analyzing'].includes(asset.status))){
