@@ -1,0 +1,34 @@
+{
+  "observedAt": "2026-10-05T14:14:11.414330+00:00",
+  "implementationCommit": "27e79f98c403631fc935f8bd84a2e4e849ec3285",
+  "unitAndIntegration": {
+    "files": 156,
+    "passed": 763,
+    "failed": 0,
+    "durationSec": 72.38
+  },
+  "typecheck": "pass",
+  "lint": "pass",
+  "productionBuild": {
+    "result": "pass",
+    "nextVersion": "16.3.8"
+  },
+  "browserE2E": {
+    "passed": 50,
+    "failed": 0,
+    "durationSec": 11.1,
+    "scope": "Interface fixtures; does not prove actual paid generation or real browser MP4 download."
+  },
+  "realFormalPublished": {
+    "resultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "mandatoryQualityChecksPassed": 15
+  },
+  "remaining": [
+    "Browser native ended state",
+    "Actual browser download verification",
+    "Chat edit -> new preview approval -> new formal, with previous formal still downloadable"
+  ],
+  "cloudCredentialsRequired": false,
+  "push": false,
+  "productionDeployment": false
+}

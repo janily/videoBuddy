@@ -1,0 +1,60 @@
+{
+  "observedAt": "2026-10-05T12:04:13.522Z",
+  "scope": "Read-only diagnostic of four existing final-mix transcripts against immutable narration source; not a new review or publication.",
+  "filmSha256": "74a070f29ad9c0d33a717719ff8b25171cf14b3c1ba65aa2c864b6a939fff65d",
+  "newModelCalls": 0,
+  "newNativeCalls": 0,
+  "originalRawTextsPreserved": true,
+  "contextSha256": "5a19306a1f12341c8d060bd0211cb9213adbfd06eb32e7330cf1e5b9bdd4f982",
+  "lines": [
+    {
+      "id": "line_1",
+      "rawAsr": "睡前,小猫把小枕头摆好",
+      "expectedText": "睡前，小猫把小枕头摆好。",
+      "sourceRef": {
+        "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/e7e06787-42ab-411c-99dd-ca80d19032d6/narration-source/88363c5245ab8665235253ef17a6a03b4c40251010e53cd989f23148201da79f",
+        "sha256": "88363c5245ab8665235253ef17a6a03b4c40251010e53cd989f23148201da79f",
+        "bytes": 1490,
+        "mime": "application/json"
+      },
+      "wholePronunciationVerification": "pass"
+    },
+    {
+      "id": "line_2",
+      "rawAsr": "闭上眼睛 他轻轻入睡",
+      "expectedText": "闭上眼睛，它轻轻入睡。",
+      "sourceRef": {
+        "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/e7e06787-42ab-411c-99dd-ca80d19032d6/narration-source/1eaf4c8c46cbd04adb7567fbf4beea2f0fb45fe70a01e8bcf7daf09440900530",
+        "sha256": "1eaf4c8c46cbd04adb7567fbf4beea2f0fb45fe70a01e8bcf7daf09440900530",
+        "bytes": 1486,
+        "mime": "application/json"
+      },
+      "wholePronunciationVerification": "pass"
+    },
+    {
+      "id": "line_3",
+      "rawAsr": "屋裡靜悄悄的 夜色好溫柔",
+      "expectedText": "屋里静悄悄的，夜色好温柔。",
+      "sourceRef": {
+        "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/e7e06787-42ab-411c-99dd-ca80d19032d6/narration-source/b15fe658908c6d8f9f05a275135494190bf03d6d76905c34a6cbdce88d41e57e",
+        "sha256": "b15fe658908c6d8f9f05a275135494190bf03d6d76905c34a6cbdce88d41e57e",
+        "bytes": 1504,
+        "mime": "application/json"
+      },
+      "wholePronunciationVerification": "pass"
+    },
+    {
+      "id": "line_4",
+      "rawAsr": "晚安,小貓",
+      "expectedText": "晚安，小猫。",
+      "sourceRef": {
+        "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/e7e06787-42ab-411c-99dd-ca80d19032d6/narration-source/36c47d3c3279e91328a6b31213b59a33b70423c5350b08518342418e7a3dd61f",
+        "sha256": "36c47d3c3279e91328a6b31213b59a33b70423c5350b08518342418e7a3dd61f",
+        "bytes": 1439,
+        "mime": "application/json"
+      },
+      "wholePronunciationVerification": "pass"
+    }
+  ],
+  "originalContextUnchanged": true
+}

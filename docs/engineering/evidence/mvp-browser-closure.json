@@ -1,0 +1,789 @@
+{
+  "observedAt": "2026-10-05T14:08:57.220877+00:00",
+  "status": "first_formal_published_browser_connection_interrupted",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "url": "http://localhost:3000/video/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "profile": {
+    "style": "crayon-book",
+    "durationSec": 20,
+    "aspect": "16:9",
+    "language": "zh-CN",
+    "narration": true,
+    "captions": true
+  },
+  "firstPreview": {
+    "operationId": "b714e3d5-dd62-4878-aea4-06478bc4e9ab",
+    "revisionId": "027ea8c6-2ef6-469a-8df7-67936434cf04",
+    "publishedThroughNormalPipeline": true,
+    "browserNativePlayback": {
+      "durationSec": 9,
+      "width": 1280,
+      "height": 720,
+      "readyState": 4,
+      "observedPlayingTimeSec": 0.156567,
+      "observedEndedTimeSec": 9,
+      "error": null
+    },
+    "screenshot": "mvp-preview-ready.png"
+  },
+  "firstFormal": {
+    "operationId": "bcce55a1-c900-4412-af04-a9ad551554b9",
+    "approvalId": "9af1485a-bc99-4bdf-84f2-b3437f795a97",
+    "approvalThroughNormalPageButton": true,
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "60767a9e9655d369793dd5c65be64786d64214292460d9ef5c8d4d866ffd404c",
+      "bytes": 12850920,
+      "width": 1920,
+      "height": 1080,
+      "durationSec": 20,
+      "fps": 24,
+      "frames": 480,
+      "audio": true,
+      "audioChannels": 2
+    },
+    "postMix": {
+      "status": "pass",
+      "filmSha256": "60767a9e9655d369793dd5c65be64786d64214292460d9ef5c8d4d866ffd404c",
+      "lines": [
+        {
+          "lineId": "line_1",
+          "recognizedText": "睡前小猫把小枕头摆好",
+          "sourceSha256": "56f13ba002d59ec1fb305f2080de163b5158f8a546b4d904b438467f18271f8c",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 10,
+          "status": "pass"
+        },
+        {
+          "lineId": "line_2",
+          "recognizedText": "閉上眼睛 他輕輕入睡",
+          "sourceSha256": "d9de4fd259e9fedd919ca9f081a39332b99243d9e738d9002e18f6624a6697c6",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 9,
+          "status": "pass"
+        },
+        {
+          "lineId": "line_3",
+          "recognizedText": "屋裡靜悄悄的夜色好溫柔",
+          "sourceSha256": "385077d5db733c5675f670da2aae82c30dc62e60c1322dbabfad6fcf17c6c4b6",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 11,
+          "status": "pass"
+        },
+        {
+          "lineId": "line_4",
+          "recognizedText": "晚安,小貓",
+          "sourceSha256": "dda5486d9cb4eb5a0534aa882a98a1f6836e153167e56085197cbdbfc6aaab02",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 4,
+          "status": "pass"
+        }
+      ]
+    },
+    "published": false,
+    "browserDownloadVerified": false,
+    "status": "failed",
+    "errorCode": "RENDER_FAILED",
+    "modelBlocker": {
+      "stage": "critic",
+      "startedAt": "2026-10-05T10:44:12.505Z",
+      "finishedAt": "2026-10-05T10:49:17.480Z",
+      "errorName": "TypeError",
+      "httpStatus": null,
+      "usage": null,
+      "budgetStatus": "unknown_preserved",
+      "replayed": false
+    }
+  },
+  "limits": [
+    "MVP closure requires published playback/download plus one revised video and old-result recovery.",
+    "43 styles and C1/C2 are not certified by this evidence."
+  ],
+  "smallBatchPreview": {
+    "operationId": "8d2aa38c-18ab-433e-9455-5f2c4e2e12e9",
+    "revisionId": "02253d68-2d44-4cbe-9b4b-ea308e6e5637",
+    "startedThroughNormalPageButton": true,
+    "published": true,
+    "browserMetadata": {
+      "durationSec": 9,
+      "width": 1280,
+      "height": 720,
+      "readyState": 4,
+      "error": null
+    }
+  },
+  "smallBatchFormal": {
+    "operationId": "e67adc58-0836-4bb3-b328-4d7cc4b32727",
+    "approvalId": "d11e0ac4-ecf4-4848-b589-ececd5fce1f4",
+    "approvalThroughNormalPageButton": true,
+    "published": false,
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "ef2ec05cd0c07107a44d9e4e92014c6f4f05425a7b6dcfef72b22020d62084e8",
+      "bytes": 8740758,
+      "width": 1920,
+      "height": 1080,
+      "durationSec": 20,
+      "fps": 24,
+      "frames": 480,
+      "audio": true,
+      "audioChannels": 2
+    },
+    "postMix": {
+      "status": "pass",
+      "filmSha256": "ef2ec05cd0c07107a44d9e4e92014c6f4f05425a7b6dcfef72b22020d62084e8",
+      "lines": [
+        {
+          "lineId": "line_1",
+          "recognizedText": "睡前小猫把小枕头摆好",
+          "sourceSha256": "01ea558acd9bc41f4cd75e58d900bb54a6a46ef84d1ceec01db3b3618a63b74e",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 10,
+          "status": "pass"
+        },
+        {
+          "lineId": "line_2",
+          "recognizedText": "閉上眼睛 她輕輕入睡",
+          "sourceSha256": "bd81222b05a647d70cf3d1aef239be0f76a7910f5c9b27de483c387e7321a038",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 9,
+          "status": "pass"
+        },
+        {
+          "lineId": "line_3",
+          "recognizedText": "屋裡靜悄悄的 夜色好溫柔",
+          "sourceSha256": "ffd20f0c31912fb29e2d764e818ecdf502ad347e424714566a4f787cbf90039f",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 11,
+          "status": "pass"
+        },
+        {
+          "lineId": "line_4",
+          "recognizedText": "晚安,小貓",
+          "sourceSha256": "72bcd0748e8c25e5c268b0820685b10e8d77df19f1543bdda0aee1027f9883ed",
+          "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+          "wordCount": 4,
+          "status": "pass"
+        }
+      ]
+    },
+    "visualPlan": {
+      "schemaVersion": 3,
+      "profile": "mvp",
+      "sampling": "caption_shot_v2",
+      "clock": {
+        "fps": 24,
+        "totalFrames": 480,
+        "shots": [
+          {
+            "id": "shot-1",
+            "startFrame": 0,
+            "endFrame": 120
+          },
+          {
+            "id": "shot-2",
+            "startFrame": 120,
+            "endFrame": 240
+          },
+          {
+            "id": "shot-3",
+            "startFrame": 240,
+            "endFrame": 360
+          },
+          {
+            "id": "shot-4",
+            "startFrame": 360,
+            "endFrame": 480
+          }
+        ],
+        "captions": [
+          {
+            "startFrame": 0,
+            "endFrame": 110,
+            "stableReadableStartFrame": 9
+          },
+          {
+            "startFrame": 120,
+            "endFrame": 224,
+            "stableReadableStartFrame": 129
+          },
+          {
+            "startFrame": 240,
+            "endFrame": 355,
+            "stableReadableStartFrame": 249
+          },
+          {
+            "startFrame": 360,
+            "endFrame": 438,
+            "stableReadableStartFrame": 369
+          }
+        ]
+      },
+      "actionCoverage": "sampled_shots",
+      "batchSize": 4,
+      "rounds": [
+        {
+          "round": 1,
+          "frames": [
+            59,
+            176,
+            302,
+            403
+          ],
+          "batches": [
+            {
+              "index": 0,
+              "frames": [
+                59,
+                176,
+                302,
+                403
+              ]
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "frames": [
+            34,
+            152,
+            275,
+            386
+          ],
+          "batches": [
+            {
+              "index": 0,
+              "frames": [
+                34,
+                152,
+                275,
+                386
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "status": "failed",
+    "errorCode": "RENDER_FAILED",
+    "modelBlocker": {
+      "startedAt": "2026-10-05T11:10:21.721Z",
+      "finishedAt": "2026-10-05T11:15:26.197Z",
+      "errorName": "TypeError",
+      "usage": null,
+      "budgetStatus": "unknown_preserved",
+      "replayed": false
+    }
+  },
+  "twoFrameDiagnostic": "mvp-two-frame-critic-diagnostic.json",
+  "twoFramePreview": {
+    "operationId": "b01e8063-0bd5-4819-aa66-19526cf19ca8",
+    "revisionId": "e7e06787-42ab-411c-99dd-ca80d19032d6",
+    "previewId": "e4a73447-e7f9-4903-bc92-9d0d5ce3b307",
+    "previewArtifactId": "02b50b8d-dc0b-42c7-851a-e79df1581fbe",
+    "published": true,
+    "frozenPolicy": {
+      "schemaVersion": 2,
+      "profile": "mvp",
+      "visualSampling": "caption_shot_v3",
+      "audioIntent": "voiced",
+      "captions": true,
+      "requiredRules": [
+        "decode",
+        "media_metadata",
+        "duration",
+        "file_hash",
+        "source_integrity",
+        "resource_ready",
+        "license",
+        "critical_facts",
+        "sampled_visual_review",
+        "loudness",
+        "true_peak",
+        "subtitle_sync",
+        "font_coverage",
+        "postmix_narration",
+        "content_coverage"
+      ]
+    }
+  },
+  "twoFrameFormal": {
+    "approvalId": "4033bf01-ef52-4896-a4c8-53d620ac6850",
+    "operationId": "193d952d-a5e0-4ba3-a079-f0e83a8b4bc3",
+    "approvedThroughBrowserButton": true,
+    "published": false,
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "74a070f29ad9c0d33a717719ff8b25171cf14b3c1ba65aa2c864b6a939fff65d",
+      "bytes": 9147570,
+      "width": 1920,
+      "height": 1080,
+      "durationSec": 20,
+      "fps": 24,
+      "frames": 480,
+      "audio": true,
+      "audioChannels": 2
+    },
+    "loudness": {
+      "status": "pass",
+      "filmSha256": "74a070f29ad9c0d33a717719ff8b25171cf14b3c1ba65aa2c864b6a939fff65d",
+      "runtimeDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "integratedLufs": -14.96,
+      "truePeakDbtp": -3.03,
+      "targetLufs": -14,
+      "toleranceLu": 1,
+      "maxTruePeakDbtp": -1.2
+    },
+    "postMixStatus": "pass",
+    "status": "failed",
+    "errorCode": "QUALITY_BLOCKED",
+    "contentReport": {
+      "schemaVersion": 1,
+      "filmSha256": "74a070f29ad9c0d33a717719ff8b25171cf14b3c1ba65aa2c864b6a939fff65d",
+      "filmSpecSha256": "8ca803b9aecb276db352dea5c86c30a0b2c7646c071a807326a7adc0d4b68c0e",
+      "factsManifestSha256": "9ab0f4d082add8ac7eb9185c68ab80a9e6b72af810827e6c76f0302482acab5d",
+      "scope": "two_round_provided_frames_and_verified_transcripts",
+      "result": "fail",
+      "facts": [
+        {
+          "factId": "fact-bedtime-cat-sleep",
+          "result": "pass",
+          "rounds": [
+            {
+              "round": 1,
+              "result": "pass"
+            },
+            {
+              "round": 2,
+              "result": "pass"
+            }
+          ]
+        },
+        {
+          "factId": "fact-ending-goodnight-cat",
+          "result": "pass",
+          "rounds": [
+            {
+              "round": 1,
+              "result": "pass"
+            },
+            {
+              "round": 2,
+              "result": "pass"
+            }
+          ]
+        },
+        {
+          "factId": "fact-voiceover-and-captions",
+          "result": "fail",
+          "rounds": [
+            {
+              "round": 1,
+              "result": "fail"
+            },
+            {
+              "round": 2,
+              "result": "fail"
+            }
+          ]
+        }
+      ],
+      "conflicts": [
+        {
+          "round": 1,
+          "factId": "fact-voiceover-and-captions",
+          "description": "旁白转写未严格按原文使用：line_2中“它”被改为“他”（闭上眼睛 他轻轻入睡）；line_3与line_4中文字被改写为繁体字（屋裡靜悄悄的 夜色好溫柔、晚安,小貓）。",
+          "frameIds": [],
+          "transcriptIds": [
+            "line_2",
+            "line_3",
+            "line_4"
+          ]
+        },
+        {
+          "round": 1,
+          "factId": "fact-voiceover-and-captions",
+          "description": "旁白转写未严格按指定原文使用且存在改写错字：line_2 将“它”改写为“他”（“闭上眼睛 他轻轻入睡”）；line_3 和 line_4 转写为繁体字（“屋裡靜悄悄的 夜色好溫柔”、“晚安,小貓”）；此外，提供画面仅涵盖后两句字幕，前两句字幕在当前抽帧中缺失。",
+          "frameIds": [
+            "frame-302",
+            "frame-403"
+          ],
+          "transcriptIds": [
+            "line_1",
+            "line_2",
+            "line_3",
+            "line_4"
+          ]
+        },
+        {
+          "round": 2,
+          "factId": "fact-voiceover-and-captions",
+          "description": "旁白转写未严格按原文使用且存在同音字及繁体字改写：line_2 转写为“闭上眼睛 他轻轻入睡”（原文为“闭上眼睛，它轻轻入睡。”，使用同音字“他”替代“它”）；line_3 转写为繁体字“屋裡靜悄悄的 夜色好溫柔”；line_4 转写为繁体字“晚安,小貓”。此外，后两句字幕所在画面帧未提供。",
+          "frameIds": [],
+          "transcriptIds": [
+            "line_2",
+            "line_3",
+            "line_4"
+          ]
+        },
+        {
+          "round": 2,
+          "factId": "fact-voiceover-and-captions",
+          "description": "旁白转写与指定原文及画面字幕存在错字改写与繁简不一致：line_2中“它”被错误转写为“他”（“闭上眼睛 他轻轻入睡”）；line_3与line_4转写为繁体字“屋裡靜悄悄的 夜色好溫柔”及“晚安,小貓”，而画面字幕使用规范简体中文“屋里静悄悄的，夜色好温柔。”与“晚安，小猫。”，导致旁白与字幕不一致，且旁白未能严格按指定原文使用。",
+          "frameIds": [
+            "frame-275",
+            "frame-386"
+          ],
+          "transcriptIds": [
+            "line_2",
+            "line_3",
+            "line_4"
+          ]
+        }
+      ],
+      "batchCount": 4,
+      "audio": "transcripts_only",
+      "continuousMotion": "not_supplied",
+      "deliveryEligible": false
+    }
+  },
+  "verifiedNarrationPreview": {
+    "operationId": "1f652a47-0ee6-4c40-ba2a-77b7f2ef7b51",
+    "revisionId": "4f938148-818b-4bf7-8682-446b92be3ef0",
+    "previewId": "7d7ebb08-601d-41ea-b449-dd2543014540",
+    "previewArtifactId": "3138225f-4b5f-4833-b6b9-65cb36522ae7",
+    "published": true,
+    "frozenPolicy": {
+      "schemaVersion": 2,
+      "profile": "mvp",
+      "contentNarration": "mandarin_pronunciation_v1",
+      "visualSampling": "caption_shot_v3",
+      "audioIntent": "voiced",
+      "captions": true,
+      "requiredRules": [
+        "decode",
+        "media_metadata",
+        "duration",
+        "file_hash",
+        "source_integrity",
+        "resource_ready",
+        "license",
+        "critical_facts",
+        "sampled_visual_review",
+        "loudness",
+        "true_peak",
+        "subtitle_sync",
+        "font_coverage",
+        "postmix_narration",
+        "content_coverage"
+      ]
+    },
+    "browserPlayback": {
+      "duration": 9,
+      "width": 1280,
+      "height": 720,
+      "nativePlayButtonUsed": true,
+      "ended": true,
+      "currentTime": 9,
+      "error": null
+    }
+  },
+  "verifiedNarrationFormal": {
+    "operationId": "e89eeef4-e5e8-4402-983b-76f514798a4a",
+    "approvalId": "d32a32ac-714e-4129-a248-ca758e633b88",
+    "approvedThroughBrowserButton": true,
+    "published": false,
+    "technicalQa": {
+      "result": "pass",
+      "sha256": "9d6676583f8778799b409abeb65b0d577b9ef347ca79d6ff86721dc277a7535a",
+      "bytes": 15173238,
+      "width": 1920,
+      "height": 1080,
+      "durationSec": 20,
+      "fps": 24,
+      "frames": 480,
+      "audio": true,
+      "audioChannels": 2
+    },
+    "loudness": {
+      "status": "pass",
+      "filmSha256": "9d6676583f8778799b409abeb65b0d577b9ef347ca79d6ff86721dc277a7535a",
+      "runtimeDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "integratedLufs": -14.33,
+      "truePeakDbtp": -2.6,
+      "targetLufs": -14,
+      "toleranceLu": 1,
+      "maxTruePeakDbtp": -1.2
+    },
+    "postMixStatus": "pass",
+    "status": "failed",
+    "errorCode": "QUALITY_BLOCKED",
+    "contentReport": {
+      "schemaVersion": 1,
+      "filmSha256": "9d6676583f8778799b409abeb65b0d577b9ef347ca79d6ff86721dc277a7535a",
+      "filmSpecSha256": "f1d2ccc777dddd56bb5736e46a3cda5825b044d30ee3d5b8926e146573755efb",
+      "factsManifestSha256": "fc788a8baae56a9b8edbcdfb09eca7f2c06f1ac1bfdb3f1bf31780e4f53710be",
+      "scope": "two_round_provided_frames_and_verified_transcripts",
+      "result": "not_checked",
+      "facts": [
+        {
+          "factId": "fact-bedtime-cat-sleep",
+          "result": "pass",
+          "rounds": [
+            {
+              "round": 1,
+              "result": "pass"
+            },
+            {
+              "round": 2,
+              "result": "pass"
+            }
+          ]
+        },
+        {
+          "factId": "fact-ending-goodnight-cat",
+          "result": "pass",
+          "rounds": [
+            {
+              "round": 1,
+              "result": "pass"
+            },
+            {
+              "round": 2,
+              "result": "pass"
+            }
+          ]
+        },
+        {
+          "factId": "fact-voiceover-and-captions",
+          "result": "not_checked",
+          "rounds": [
+            {
+              "round": 1,
+              "result": "not_checked"
+            },
+            {
+              "round": 2,
+              "result": "not_checked"
+            }
+          ]
+        }
+      ],
+      "conflicts": [],
+      "batchCount": 4,
+      "audio": "transcripts_only",
+      "continuousMotion": "not_supplied",
+      "deliveryEligible": false
+    }
+  },
+  "completeRoundDiagnostic": {
+    "report": "mvp-complete-round-content-verified-transport.json",
+    "actualFrames": 4,
+    "allFactsCompletePass": true,
+    "httpStatus": 200,
+    "requestBytes": 7866389,
+    "newMediaProducerCalls": 0,
+    "resultPublished": false
+  },
+  "completeRoundPreview": {
+    "operationId": "3f371b8d-0fb2-468e-af56-c1a1034dc515",
+    "revisionId": "259741f0-8cc1-457b-84cb-3b7b30629973",
+    "status": "failed",
+    "startedThroughBrowserButton": true,
+    "errorCode": "PREVIEW_QUALITY_BLOCKED",
+    "reason": "Actual preview Critic found blocking style drift in night shot frame-358; original report and sources retained."
+  },
+  "styleCorrectionPreview": {
+    "operationId": "21281c85-8182-4c21-8d9e-1bdd3d4a739d",
+    "revisionId": "781b962b-51d1-439a-a69d-aa4d84aa4483",
+    "status": "failed",
+    "startedThroughBrowserButton": true,
+    "storyFactsUnchanged": true,
+    "objectiveUpdatedThroughNormalChat": true,
+    "errorCode": "PREVIEW_QUALITY_BLOCKED",
+    "reason": "Actual generated actors/materials drifted across shots; block retained."
+  },
+  "continuityPreview": {
+    "operationId": "fd3a53ef-5e9a-43d8-8052-bd0742d30a63",
+    "revisionId": "1f3e7abc-820d-4858-8e36-af4d4edaccc6",
+    "status": "succeeded",
+    "startedThroughBrowserButton": true,
+    "previewId": "a72c29ca-e5fe-45e7-b9cb-487e1e0ba8fc",
+    "publishedThroughNormalPipeline": true,
+    "browserNativePlayback": {
+      "durationSec": 9,
+      "width": 1280,
+      "height": 720,
+      "ended": true,
+      "error": null
+    },
+    "screenshot": "mvp-continuity-preview-ready.png"
+  },
+  "continuityFormal": {
+    "operationId": "2e9f597e-c1a5-4779-a47d-a3b68b86f3ec",
+    "approvalId": "9f283ae9-0648-43b2-a3f6-cb28ec5e28bd",
+    "approvedThroughBrowserButton": true,
+    "status": "succeeded",
+    "published": true,
+    "resultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "artifactId": "7cd2294a-0954-4306-8007-ddb101c25a20",
+    "mp4Sha256": "5b4b28a785604913d79964c4e177241c5d35017a0d887f581dd7393fe794df6a",
+    "mp4Bytes": 17551276,
+    "qualityChecks": [
+      {
+        "ruleId": "decode",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "media_metadata",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "duration",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "file_hash",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "source_integrity",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "resource_ready",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "license",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/mvp-core-v1-stage"
+        ]
+      },
+      {
+        "ruleId": "critical_facts",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/whole-visual-review-v1-stage",
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/content-review-v1-stage"
+        ]
+      },
+      {
+        "ruleId": "sampled_visual_review",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/whole-visual-review-v1-stage"
+        ]
+      },
+      {
+        "ruleId": "loudness",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "true_peak",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "subtitle_sync",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/mvp-core-v1-stage"
+        ]
+      },
+      {
+        "ruleId": "font_coverage",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/mvp-core-v1-stage"
+        ]
+      },
+      {
+        "ruleId": "postmix_narration",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ]
+      },
+      {
+        "ruleId": "content_coverage",
+        "result": "pass",
+        "severity": "blocking",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/content-review-v1-stage"
+        ]
+      },
+      {
+        "ruleId": "visual_review",
+        "result": "not_checked",
+        "severity": "warning",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/whole-visual-review-v1-stage"
+        ],
+        "reason": "Continuous motion is not certified in MVP."
+      },
+      {
+        "ruleId": "listening_review",
+        "result": "not_checked",
+        "severity": "warning",
+        "evidenceRefs": [
+          "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+        ],
+        "reason": "Full aesthetic listening is not certified in MVP."
+      }
+    ],
+    "browserPlayerLoaded": {
+      "durationSec": 20,
+      "width": 1920,
+      "height": 1080,
+      "error": null
+    },
+    "browserPlaybackObserved": {
+      "currentTimeSec": 9.932882,
+      "paused": false,
+      "error": null
+    },
+    "browserPlaybackEndedVerified": false,
+    "browserDownloadVerified": false,
+    "screenshot": "mvp-first-final-ready.png",
+    "pending": "Chrome connection failed during download verification; actual browser download not yet recorded."
+  }
+}

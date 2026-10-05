@@ -1,0 +1,90 @@
+{
+  "observations": [
+    {
+      "observedAt": "2026-10-05T09:17:27.594494+00:00",
+      "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+      "phase": "preparing_preview",
+      "briefVersion": 1,
+      "activeProduction": "b3f64960-2d28-48c9-a514-749e5bfe0017",
+      "controlVersion": 6
+    },
+    {
+      "observedAt": "2026-10-05T09:17:58.063874+00:00",
+      "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+      "phase": "preparing_preview",
+      "briefVersion": 1,
+      "activeProduction": "b3f64960-2d28-48c9-a514-749e5bfe0017",
+      "controlVersion": 6
+    },
+    {
+      "observedAt": "2026-10-05T10:41:04.711047+00:00",
+      "scenario": "formal render before browser reload",
+      "phase": "rendering",
+      "briefVersion": 2,
+      "activeProduction": "bcce55a1-c900-4412-af04-a9ad551554b9",
+      "currentApprovalId": "9af1485a-bc99-4bdf-84f2-b3437f795a97",
+      "controlVersion": 30,
+      "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8"
+    },
+    {
+      "observedAt": "2026-10-05T10:41:21.019618+00:00",
+      "scenario": "formal render after browser reload",
+      "phase": "rendering",
+      "briefVersion": 2,
+      "activeProduction": "bcce55a1-c900-4412-af04-a9ad551554b9",
+      "currentApprovalId": "9af1485a-bc99-4bdf-84f2-b3437f795a97",
+      "controlVersion": 30,
+      "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8"
+    }
+  ],
+  "twoFrameFormalRefresh": {
+    "observedAt": "2026-10-05T11:49:36.567457+00:00",
+    "before": {
+      "phase": "rendering",
+      "controlVersion": 44,
+      "briefVersion": 2,
+      "activeProduction": "193d952d-a5e0-4ba3-a079-f0e83a8b4bc3",
+      "currentApprovalId": "4033bf01-ef52-4896-a4c8-53d620ac6850",
+      "currentPreviewId": "e4a73447-e7f9-4903-bc92-9d0d5ce3b307"
+    },
+    "after": {
+      "phase": "rendering",
+      "controlVersion": 44,
+      "briefVersion": 2,
+      "activeProduction": "193d952d-a5e0-4ba3-a079-f0e83a8b4bc3",
+      "currentApprovalId": "4033bf01-ef52-4896-a4c8-53d620ac6850",
+      "currentPreviewId": "e4a73447-e7f9-4903-bc92-9d0d5ce3b307"
+    },
+    "samePersistedState": true
+  },
+  "continuityFormalRefresh": {
+    "observedAt": "2026-10-05T13:50:32.103432+00:00",
+    "before": {
+      "briefVersion": 2,
+      "phase": "rendering",
+      "currentApprovalId": "9f283ae9-0648-43b2-a3f6-cb28ec5e28bd",
+      "activeProduction": "2e9f597e-c1a5-4779-a47d-a3b68b86f3ec",
+      "currentPreviewId": "a72c29ca-e5fe-45e7-b9cb-487e1e0ba8fc",
+      "controlVersion": 75
+    },
+    "after": {
+      "briefVersion": 2,
+      "phase": "rendering",
+      "currentApprovalId": "9f283ae9-0648-43b2-a3f6-cb28ec5e28bd",
+      "activeProduction": "2e9f597e-c1a5-4779-a47d-a3b68b86f3ec",
+      "currentPreviewId": "a72c29ca-e5fe-45e7-b9cb-487e1e0ba8fc",
+      "controlVersion": 75
+    },
+    "sameApprovalAndOperationAndBrief": true
+  },
+  "firstPublishedServerRestart": {
+    "observedAt": "2026-10-05T14:15:25.322325+00:00",
+    "webRestarted": true,
+    "workerGracefullyStoppedAndRestarted": true,
+    "phase": "ready",
+    "resultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "samePublishedResult": true,
+    "activeOperationId": null,
+    "scope": "Read-only persisted-state verification after restart; browser reconnect remains pending."
+  }
+}
