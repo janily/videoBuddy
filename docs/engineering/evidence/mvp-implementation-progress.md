@@ -136,3 +136,5 @@ Spec复核指出只匹配引导语开头还会误认“旁白原文出自‘你�
 完整轮次实际模型诊断通过：4张原1080p帧无损WebP，7,866,389请求bytes，gemini-3.8-flash实际HTTP200，28.08秒，usage9311/4139；三项facts均complete/pass、无conflicts，旧失败源完全不变，0新媒体、未发布。两轴复核关闭诊断完整覆盖P2，真实4帧source-only复核0模型/native。
 
 浏览器新预览3f371b8d-0fb2-468e-af56-c1a1034dc515实际完成生成，但其夜色镜头frame358被独立Critic判定blocking style_drift，因此PREVIEW_QUALITY_BLOCKED，真实失败保留。正常聊天随后尝试改画风，Director虽返回合法来源patch却错误选择prepare_preview，guard按规则拒绝AUTHORIZATION_REQUIRED，消息中断且brief仍为2。本轮补模型专用DirectorResponseSchema，只允许none/classify_change，保留历史Guidance合同与服务端授权guard；明确画风偏好归创意摘要而非必须展示的新事实。新政策反例RED→GREEN，5文件28项相关测试、types/lint通过。完整回归在该最后prompt修复之前为155文件757项69.78秒，Next构建通过；最后变更需要最终回归。
+
+新的正常聊天已成功保存画风到objective，未增故事facts，随后页面启动新预览21281c85-8182-4c21-8d9e-1bdd3d4a739d。核对发现历史replace_summary仅比较summary，objective/subject/audience独立修改会漏增briefVersion；三项实际反例RED确认后修复，重复相同值仍不增版本。相关3文件24项11.35秒、types/lint通过。50项浏览器回归10.4秒通过（HTTP/API协议fixture，不代替真实媒体闭环）。当前新预览仍在创作，不宣称正式发布或下载完成。

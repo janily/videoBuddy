@@ -6,3 +6,9 @@ it('excludes executing previews from native model output while retaining the his
  expect(DirectorResponseSchema.safeParse({...d,executionIntent:'none'}).success).toBe(true);
  expect(DirectorResponseSchema.safeParse({...d,executionIntent:'classify_change'}).success).toBe(true);
 });
+it.each(['objective','subject','audience'] as const)('invalidates the preview brief when only %s changes',async field=>{
+ const {initialUnderstanding}=await import('@/contracts/video/domain'),{applyUnderstandingPatch}=await import('@/mastra/video/director'),{randomUUID}=await import('node:crypto');
+ const base=initialUnderstanding(),id=randomUUID(),next=applyUnderstandingPatch(base,{baseBriefVersion:base.briefVersion,operations:[{op:'replace_summary',summary:base.summary,[field]:'新的创意方向',sourceMessageIds:[id]}]},[{id,role:'user',text:'新的创意方向'}]);
+ expect(next.briefVersion).toBe(base.briefVersion+1);expect(next[field]).toBe('新的创意方向');
+ expect(applyUnderstandingPatch(next,{baseBriefVersion:next.briefVersion,operations:[{op:'replace_summary',summary:next.summary,[field]:next[field],sourceMessageIds:[id]}]},[{id,role:'user',text:'新的创意方向'}]).briefVersion).toBe(next.briefVersion);
+});

@@ -84,7 +84,7 @@ export function applyUnderstandingPatch(base:Understanding,raw:unknown,messages:
     for(const fact of next.facts)if(op.factIds.includes(fact.id))fact.status=fact.id===op.selectedFactId?'confirmed':'excluded';
     next.unresolvedConflictIds=next.unresolvedConflictIds.filter(id=>!op.factIds.includes(id));semantic=true;break;
    }
-   case 'replace_summary':semantic ||= JSON.stringify(next.summary)!==JSON.stringify(op.summary);next.summary=op.summary;if(op.subject!==undefined)next.subject=op.subject;if(op.audience!==undefined)next.audience=op.audience;if(op.objective!==undefined)next.objective=op.objective;break;
+   case 'replace_summary':semantic ||= JSON.stringify(next.summary)!==JSON.stringify(op.summary)||op.subject!==undefined&&op.subject!==next.subject||op.audience!==undefined&&op.audience!==next.audience||op.objective!==undefined&&op.objective!==next.objective;next.summary=op.summary;if(op.subject!==undefined)next.subject=op.subject;if(op.audience!==undefined)next.audience=op.audience;if(op.objective!==undefined)next.objective=op.objective;break;
   }
  }
  if(semantic)next.briefVersion++;return UnderstandingSchema.parse(next);
