@@ -19,7 +19,20 @@ export const ContentReviewSchema=z.strictObject({schemaVersion:z.literal(1),cont
  conflicts:z.array(z.strictObject({factId:id,description:text,frameIds:z.array(id).max(24),transcriptIds:z.array(id).max(200)})).max(100),
 });
 export type ContentReview=z.infer<typeof ContentReviewSchema>;
-export function supportsContentPronunciationEvidence(expected:string,raw:string){return !/[\p{N}A-Za-z零〇一二三四五六七八九十百千万亿两壹贰叁肆伍陆柒捌玖拾佰仟]/u.test(expected+raw)}
+// Unicode 13.0.0 Numeric_Value characters outside general category Number,
+// including traditional/financial Han numerals and compatibility ideographs.
+const numericIdeographs=new Set([
+ 0x3405,0x3483,0x382a,0x3b4d,0x4e00,0x4e03,0x4e07,0x4e09,0x4e5d,0x4e8c,0x4e94,0x4e96,
+ 0x4ebf,0x4ec0,0x4edf,0x4ee8,0x4f0d,0x4f70,0x5104,0x5146,0x5169,0x516b,0x516d,0x5341,
+ 0x5343,0x5344,0x5345,0x534c,0x53c1,0x53c2,0x53c3,0x53c4,0x56db,0x58f1,0x58f9,0x5e7a,
+ 0x5efe,0x5eff,0x5f0c,0x5f0d,0x5f0e,0x5f10,0x62fe,0x634c,0x67d2,0x6f06,0x7396,0x767e,
+ 0x8086,0x842c,0x8cae,0x8cb3,0x8d30,0x9621,0x9646,0x964c,0x9678,0x96f6,0xf96b,0xf973,
+ 0xf978,0xf9b2,0xf9d1,0xf9d3,0xf9fd,0x20001,0x20064,0x200e2,0x20121,0x2092a,0x20983,0x2098c,
+ 0x2099c,0x20aea,0x20afd,0x20b19,0x22390,0x22998,0x23b1b,0x2626d,0x2f890
+].map(value=>String.fromCodePoint(value)));
+export function supportsContentPronunciationEvidence(expected:string,raw:string){
+ const text=(expected+raw).normalize('NFKC');return !/[\p{N}A-Za-z]/u.test(text)&&!Array.from(text).some(char=>numericIdeographs.has(char));
+}
 function unique(ids:string[]){return new Set(ids).size===ids.length}
 function normalized(value:string){return value.normalize('NFC').replace(/[\s，。！？、：；,.!?:;]/g,'')}
 /** Shared source-freezing and review boundary: reject unusable literal anchors
