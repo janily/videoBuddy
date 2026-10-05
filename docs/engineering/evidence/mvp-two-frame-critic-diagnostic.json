@@ -1,0 +1,261 @@
+{
+  "observedAt": "2026-10-05T11:18:23.720Z",
+  "status": "actual_two_frame_review_returned",
+  "sourceOperationId": "e67adc58-0836-4bb3-b328-4d7cc4b32727",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "diagnosticId": "7027c3fb-cfc9-4277-9402-d1ab37393bd3",
+  "context": {
+    "filmSha256": "ef2ec05cd0c07107a44d9e4e92014c6f4f05425a7b6dcfef72b22020d62084e8",
+    "filmSpecSha256": "d5edb2cedfdb4302da2ec3a63b7d90d14fd7892b3ac8de442cc1e25b14f44591",
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "round": 1,
+    "frames": [
+      {
+        "id": "frame-59",
+        "frame": 59,
+        "sha256": "79dfb778c9dd6b64915328a49ab2a054b3374c3f0daa4c7520552251bdb3fab0",
+        "bytes": 1871931
+      },
+      {
+        "id": "frame-176",
+        "frame": 176,
+        "sha256": "cf8f7cc4b6ae84cee47dbfa6ad6768b97225e299d8523aef073c43befae3f1cb",
+        "bytes": 2491948
+      }
+    ],
+    "facts": [
+      {
+        "id": "fact-bedtime-cat-sleep",
+        "text": "睡前小猫把枕头摆好，闭上眼睛，轻轻入睡。"
+      },
+      {
+        "id": "fact-ending-goodnight-cat",
+        "text": "结尾画面显示“晚安，小猫”。"
+      },
+      {
+        "id": "fact-voiceover-and-captions",
+        "text": "旁白与字幕均严格按指定原文使用且不改写：“睡前，小猫把小枕头摆好。闭上眼睛，它轻轻入睡。屋里静悄悄的，夜色好温柔。晚安，小猫。”"
+      }
+    ],
+    "sourceCriteria": {
+      "factsRef": {
+        "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/02253d68-2d44-4cbe-9b4b-ea308e6e5637/facts/90dc0923ae09ad04829b9bb0dda6e0c58a57f0d64c4b51764b37a756175b47e0",
+        "sha256": "90dc0923ae09ad04829b9bb0dda6e0c58a57f0d64c4b51764b37a756175b47e0",
+        "bytes": 1426,
+        "mime": "application/json"
+      },
+      "contentRequirementsRef": {
+        "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/02253d68-2d44-4cbe-9b4b-ea308e6e5637/content-requirements-proof/f76008792d31b9d0211d7a449ff2897573d7da302b0866cab86315308803f787",
+        "sha256": "f76008792d31b9d0211d7a449ff2897573d7da302b0866cab86315308803f787",
+        "bytes": 1811,
+        "mime": "application/json"
+      },
+      "facts": [
+        {
+          "id": "fact-bedtime-cat-sleep",
+          "text": "睡前小猫把枕头摆好，闭上眼睛，轻轻入睡。",
+          "sourceRefs": [
+            {
+              "type": "user_message",
+              "id": "42ad4b86-48a4-4e73-97d2-cecdaefdda30"
+            }
+          ],
+          "status": "provided",
+          "mustInclude": true,
+          "critical": false
+        },
+        {
+          "id": "fact-ending-goodnight-cat",
+          "text": "结尾画面显示“晚安，小猫”。",
+          "sourceRefs": [
+            {
+              "type": "user_message",
+              "id": "42ad4b86-48a4-4e73-97d2-cecdaefdda30"
+            }
+          ],
+          "status": "provided",
+          "mustInclude": true,
+          "critical": false
+        },
+        {
+          "id": "fact-voiceover-and-captions",
+          "text": "旁白与字幕均严格按指定原文使用且不改写：“睡前，小猫把小枕头摆好。闭上眼睛，它轻轻入睡。屋里静悄悄的，夜色好温柔。晚安，小猫。”",
+          "sourceRefs": [
+            {
+              "type": "user_message",
+              "id": "2f3210b3-10db-40af-84af-848aa8c3c9ef",
+              "excerpt": "旁白请按原文使用：睡前，小猫把小枕头摆好。闭上眼睛，它轻轻入睡。屋里静悄悄的，夜色好温柔。晚安，小猫。不要改写这段旁白，字幕与旁白一致。"
+            }
+          ],
+          "status": "provided",
+          "mustInclude": true,
+          "critical": false
+        }
+      ],
+      "requirements": [
+        {
+          "factId": "fact-bedtime-cat-sleep",
+          "representation": "semantic",
+          "exactText": []
+        },
+        {
+          "factId": "fact-ending-goodnight-cat",
+          "representation": "semantic",
+          "exactText": [
+            "晚安，小猫"
+          ]
+        },
+        {
+          "factId": "fact-voiceover-and-captions",
+          "representation": "semantic",
+          "exactText": [
+            "睡前，小猫把小枕头摆好。",
+            "闭上眼睛，它轻轻入睡。",
+            "屋里静悄悄的，夜色好温柔。",
+            "晚安，小猫。"
+          ]
+        }
+      ]
+    },
+    "frameSetSha256": "50c522c7b46db54d6292c50b9dda44794bf141d7b4fe9c0afce412c981e7d1aa"
+  },
+  "frameBytes": 4363879,
+  "newNativeCalls": 0,
+  "productionApproval": false,
+  "resultPublished": false,
+  "review": {
+    "schemaVersion": 2,
+    "filmSha256": "ef2ec05cd0c07107a44d9e4e92014c6f4f05425a7b6dcfef72b22020d62084e8",
+    "filmSpecSha256": "d5edb2cedfdb4302da2ec3a63b7d90d14fd7892b3ac8de442cc1e25b14f44591",
+    "frameSetSha256": "50c522c7b46db54d6292c50b9dda44794bf141d7b4fe9c0afce412c981e7d1aa",
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "round": 1,
+    "scope": "sampled_frames",
+    "observations": [
+      {
+        "frameId": "frame-59",
+        "visibleText": [
+          "睡前，小猫把小枕头摆好。"
+        ],
+        "issues": []
+      },
+      {
+        "frameId": "frame-176",
+        "visibleText": [
+          "闭上眼睛，它轻轻入睡。",
+          "Z",
+          "z",
+          "Z"
+        ],
+        "issues": []
+      }
+    ],
+    "facts": [
+      {
+        "result": "not_checked",
+        "frameIds": [],
+        "reason": "该事实无字面条件（exactText为空），属于普通语义事实，按规则设为 not_checked，由独立内容QA验证。",
+        "factId": "fact-bedtime-cat-sleep",
+        "literalChecks": []
+      },
+      {
+        "result": "not_checked",
+        "frameIds": [],
+        "reason": "字面条件“晚安，小猫”未在当前抽帧中出现，由于 scope=sampled_frames，在抽帧范围内设为 not_checked。",
+        "factId": "fact-ending-goodnight-cat",
+        "literalChecks": [
+          {
+            "result": "not_checked",
+            "frameIds": [],
+            "reason": "当前抽帧（frame-59、frame-176）未包含结尾画面或该字面原文，无法直接核验。",
+            "sourceExcerpt": "晚安，小猫"
+          }
+        ]
+      },
+      {
+        "result": "not_checked",
+        "frameIds": [
+          "frame-59",
+          "frame-176"
+        ],
+        "reason": "部分字面条件在抽帧中完整匹配（frame-59、frame-176），其余未覆盖字面项未见于抽帧，按抽帧范围整体设为 not_checked。",
+        "factId": "fact-voiceover-and-captions",
+        "literalChecks": [
+          {
+            "result": "pass",
+            "frameIds": [
+              "frame-59"
+            ],
+            "reason": "frame-59 底部字幕完整清晰显示“睡前，小猫把小枕头摆好。”",
+            "sourceExcerpt": "睡前，小猫把小枕头摆好。"
+          },
+          {
+            "result": "pass",
+            "frameIds": [
+              "frame-176"
+            ],
+            "reason": "frame-176 底部字幕完整清晰显示“闭上眼睛，它轻轻入睡。”",
+            "sourceExcerpt": "闭上眼睛，它轻轻入睡。"
+          },
+          {
+            "result": "not_checked",
+            "frameIds": [],
+            "reason": "当前抽帧中未出现此句字幕，抽帧范围内无法核验。",
+            "sourceExcerpt": "屋里静悄悄的，夜色好温柔。"
+          },
+          {
+            "result": "not_checked",
+            "frameIds": [],
+            "reason": "当前抽帧中未出现此句字幕，抽帧范围内无法核验。",
+            "sourceExcerpt": "晚安，小猫。"
+          }
+        ]
+      }
+    ],
+    "style": {
+      "result": "pass",
+      "frameIds": [
+        "frame-59",
+        "frame-176"
+      ],
+      "reason": "两帧均呈现温暖米白粗糙纸张底色与可见颗粒咬合，角色与物件使用有限蜡笔色盘和手绘抖动线条排线着色，字幕置于底部浅色底衬，符合 crayon-book 风格设定。"
+    },
+    "readability": {
+      "result": "pass",
+      "frameIds": [
+        "frame-59",
+        "frame-176"
+      ],
+      "reason": "frame-59 与 frame-176 底部字幕完整居中，字迹工整清晰，对比度充足，无裁切、遮挡或难读问题。"
+    },
+    "sourceCriteriaSha256": "7816c1b559b526aca23d59778fc7f9a2994ab5006e0c82ca707c41d0eb1ed226"
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000,
+      "requestBytes": 5839856,
+      "stream": false,
+      "imageCount": 2,
+      "startedAt": "2026-10-05T11:18:24.239Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-05T11:19:06.072Z",
+      "responseSha256": "6ca7ad8ed2543a4aba4e635a1077848676e054d01955d9e921f174a1b5167623",
+      "responseFile": "model-diagnostics/6ca7ad8ed2543a4aba4e635a1077848676e054d01955d9e921f174a1b5167623.json",
+      "usage": {
+        "prompt_tokens": 8211,
+        "completion_tokens": 8046,
+        "total_tokens": 16257,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "originalControlAndFailedOperationUnchanged": true
+}

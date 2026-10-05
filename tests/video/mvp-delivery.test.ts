@@ -13,8 +13,9 @@ it('allows explicitly unreviewed continuous aesthetics only in MVP, never known 
 });
 it('freezes small-batch sampling in new policies while preserving old frozen MVP policies',()=>{
  const u=initialUnderstanding();u.preferences={...u.preferences,styleSlug:'crayon-book',durationSec:20};
- const policy=filmDeliveryPolicy(timeline,'mvp');expect(policy).toHaveProperty('visualSampling','caption_shot_v2');
+ const policy=filmDeliveryPolicy(timeline,'mvp');expect(policy).toHaveProperty('visualSampling','caption_shot_v3');
  expect(verifyFrozenDeliveryPolicy(timeline,policy,u)).toEqual(policy);
  const old=filmDeliveryPolicy(timeline,'mvp','legacy');expect(old).not.toHaveProperty('visualSampling');expect(verifyFrozenDeliveryPolicy(timeline,old,u)).toEqual(old);expect(canonicalHash(old)).not.toBe(canonicalHash(policy));
  expect(()=>verifyFrozenDeliveryPolicy(timeline,{...policy,visualSampling:'unsupported'},u)).toThrow();
+ const four=filmDeliveryPolicy(timeline,'mvp','caption_shot_v2');expect(verifyFrozenDeliveryPolicy(timeline,four,u)).toEqual(four);expect(canonicalHash(four)).not.toBe(canonicalHash(policy));
 });

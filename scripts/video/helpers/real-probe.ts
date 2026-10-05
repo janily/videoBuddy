@@ -8,7 +8,7 @@ export function probeEnvironment(root:string):Environment{
  VIDEO_ASR_IMAGE_REF:'sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c',VIDEO_ASR_RUNTIME_DIGEST:'67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c',VIDEO_ASR_MODEL:'Systran/faster-whisper-small',
  VIDEO_MEDIA_IMAGE_REF:'sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919',VIDEO_MEDIA_RUNTIME_DIGEST:'75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919',VIDEO_MEDIA_TIMEOUT_SECONDS:'300'};
 }
-export interface ProbeRequest{model:string;maxTokens?:number;status?:number;usage?:unknown;responseSha256?:string;responseFile?:string;startedAt:string;finishedAt?:string;timeoutMs:number;errorName?:string;evidenceErrorName?:string}
+export interface ProbeRequest{model:string;maxTokens?:number;requestBytes?:number;stream?:boolean;imageCount?:number;transportCode?:string;status?:number;usage?:unknown;responseSha256?:string;responseFile?:string;startedAt:string;finishedAt?:string;timeoutMs:number;errorName?:string;evidenceErrorName?:string}
 function transportErrorName(error:unknown){return error instanceof Error&&['AbortError','TimeoutError','TypeError'].includes(error.name)?error.name:'TransportError'}
 export function recordModelRequests(env:Environment,root:string,maxCalls:number,options:{timeoutMs?:number}={}){
  const timeoutMs=options.timeoutMs??120000;
@@ -21,11 +21,11 @@ export function recordModelRequests(env:Environment,root:string,maxCalls:number,
   if(url.protocol==='data:'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(url.href)&&url.href.length<=12*1024*1024)return original(input,init);
   if(url.origin!==provider.origin||url.pathname!==provider.pathname.replace(/\/$/,'')+'/chat/completions')throw Error('MODEL_PROBE_UNEXPECTED_DESTINATION');
   if(requests.length>=maxCalls)throw Error('MODEL_PROBE_CALL_LIMIT');
-  const body=JSON.parse(String(init?.body||'{}')),entry:ProbeRequest={model:String(body.model),maxTokens:body.max_tokens??body.max_completion_tokens,startedAt:new Date().toISOString(),timeoutMs};requests.push(entry);
+  const requestBody=String(init?.body||'{}'),body=JSON.parse(requestBody),entry:ProbeRequest={model:String(body.model),maxTokens:body.max_tokens??body.max_completion_tokens,requestBytes:Buffer.byteLength(requestBody),stream:body.stream===true,imageCount:Array.isArray(body.messages)?body.messages.reduce((n:number,m:{content?:unknown})=>n+(Array.isArray(m.content)?m.content.filter((p:{type?:string})=>p?.type==='image_url').length:0),0):0,startedAt:new Date().toISOString(),timeoutMs};requests.push(entry);
   const callerSignal=init?.signal??(input instanceof Request?input.signal:undefined);
   let response:Response;
   try{response=await original(input,{...init,signal:AbortSignal.any([AbortSignal.timeout(timeoutMs),...(callerSignal?[callerSignal]:[])])});entry.status=response.status}
-  catch(error){entry.errorName=transportErrorName(error);entry.finishedAt=new Date().toISOString();throw error}
+  catch(error){entry.errorName=transportErrorName(error);const cause=error instanceof Error?error.cause:undefined,code=cause&&typeof cause==='object'&&'code' in cause?cause.code:undefined;if(typeof code==='string'&&/^UND_ERR_[A-Z_]+$/.test(code))entry.transportCode=code;entry.finishedAt=new Date().toISOString();throw error}
   reads.push((async()=>{
    let text:string;
    try{text=await response.clone().text()}catch(error){entry.errorName=transportErrorName(error);return}finally{entry.finishedAt=new Date().toISOString()}

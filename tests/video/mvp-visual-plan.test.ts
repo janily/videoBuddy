@@ -22,3 +22,10 @@ it('includes uncaptained shots and shards many captions instead of dropping evid
  const plan=mvpFilmVisualPlan(many,'caption_shot_v2');
  for(const round of plan.rounds){expect(round.frames).toHaveLength(9);expect(round.batches.every(b=>b.frames.length<=4)).toBe(true);expect(round.frames.some(f=>f<40)).toBe(true);for(const c of many.captions)expect(round.frames.some(f=>f>=c.stableReadableStartFrame&&f<c.endFrame)).toBe(true)}
 });
+it('freezes two-image transport batches without changing either round or historical four-image plans',()=>{
+ const previous=mvpFilmVisualPlan(clock,'caption_shot_v2'),current=mvpFilmVisualPlan(clock,'caption_shot_v3');
+ expect(current).toMatchObject({schemaVersion:4,batchSize:2,sampling:'caption_shot_v3'});
+ expect(current.rounds.map(r=>r.frames)).toEqual(previous.rounds.map(r=>r.frames));
+ for(const round of current.rounds)expect(round.batches.every(b=>b.frames.length<=2)).toBe(true);
+ expect(mvpFilmVisualPlan(clock,'caption_shot_v2')).toEqual(previous);
+});

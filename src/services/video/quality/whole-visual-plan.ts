@@ -22,10 +22,10 @@ export function wholeFilmVisualPlan(raw:Clock){
  return{schemaVersion:1 as const,clock,actionCoverage:'entire_shots' as const,batchSize:8 as const,rounds};
 }
 /** MVP samples every shot and caption; no continuous action certification. */
-export function mvpFilmVisualPlan(raw:Clock,sampling:'legacy'|'caption_shot_v2'='legacy'){
+export function mvpFilmVisualPlan(raw:Clock,sampling:'legacy'|'caption_shot_v2'|'caption_shot_v3'='legacy'){
  const full=wholeFilmVisualPlan(raw),clock=full.clock;
  if(clock.totalFrames>30*clock.fps)throw Error('MVP_PROFILE_UNSUPPORTED');
- const batchSize=sampling==='legacy'?8:4;
+ const batchSize=sampling==='legacy'?8:sampling==='caption_shot_v2'?4:2;
  const rounds=([1,2] as const).map(round=>{
   const set=new Set<number>();
   if(sampling==='legacy'){
@@ -40,6 +40,7 @@ export function mvpFilmVisualPlan(raw:Clock,sampling:'legacy'|'caption_shot_v2'=
   const frames=[...set].sort((a,b)=>a-b),batches=[];for(let offset=0;offset<frames.length;offset+=batchSize)batches.push({index:batches.length,frames:frames.slice(offset,offset+batchSize)});
   return{round,frames,batches};
  });
+ if(sampling==='caption_shot_v3')return{schemaVersion:4 as const,profile:'mvp' as const,sampling,clock,actionCoverage:'sampled_shots' as const,batchSize:2 as const,rounds};
  if(sampling==='caption_shot_v2')return{schemaVersion:3 as const,profile:'mvp' as const,sampling,clock,actionCoverage:'sampled_shots' as const,batchSize:4 as const,rounds};
  return{schemaVersion:2 as const,profile:'mvp' as const,clock,actionCoverage:'sampled_shots' as const,batchSize:8 as const,rounds};
 }
@@ -48,7 +49,7 @@ export type VisualReviewBaseline=Omit<VisualReviewContext,'round'|'frames'|'fram
 type Result='pass'|'fail'|'not_checked';
 function combined(results:Result[]):Result{return results.includes('fail')?'fail':results.every(result=>result==='pass')?'pass':'not_checked'}
 export function aggregateWholeVisualReviews(plan:WholeFilmVisualPlan,baseline:VisualReviewBaseline,entries:Array<{context:VisualReviewContext;review:VisualReview}>){
- if(canonicalHash(plan.schemaVersion===1?wholeFilmVisualPlan(plan.clock):mvpFilmVisualPlan(plan.clock,plan.schemaVersion===3?'caption_shot_v2':'legacy'))!==canonicalHash(plan))throw Error('WHOLE_VISUAL_PLAN_CHANGED');
+ if(canonicalHash(plan.schemaVersion===1?wholeFilmVisualPlan(plan.clock):mvpFilmVisualPlan(plan.clock,plan.schemaVersion===4?'caption_shot_v3':plan.schemaVersion===3?'caption_shot_v2':'legacy'))!==canonicalHash(plan))throw Error('WHOLE_VISUAL_PLAN_CHANGED');
  const batches=plan.rounds.flatMap(round=>round.batches.map(batch=>({round:round.round,frames:batch.frames}))),byBatch=new Map<string,VisualReview>();
  for(const entry of entries){
   const {context}=entry;

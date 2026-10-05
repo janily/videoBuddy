@@ -11,11 +11,11 @@ export const mandatoryDeliveryRules=[
 const Digest=z.string().regex(/^[a-f0-9]{64}$/);
 export const mvpDeliveryRules=['decode','media_metadata','duration','file_hash','source_integrity','resource_ready','license','critical_facts','sampled_visual_review','loudness','true_peak','subtitle_sync','font_coverage','postmix_narration','content_coverage'] as const;
 const common={audioIntent:z.enum(['voiced','music','silent']),captions:z.boolean()};
-export const DeliveryPolicySchema=z.discriminatedUnion('schemaVersion',[z.strictObject({schemaVersion:z.literal(1),...common,requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)}),z.strictObject({schemaVersion:z.literal(2),profile:z.literal('mvp'),visualSampling:z.literal('caption_shot_v2').optional(),...common,requiredRules:z.array(z.string().min(1)).min(mvpDeliveryRules.length)})]);
+export const DeliveryPolicySchema=z.discriminatedUnion('schemaVersion',[z.strictObject({schemaVersion:z.literal(1),...common,requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)}),z.strictObject({schemaVersion:z.literal(2),profile:z.literal('mvp'),visualSampling:z.enum(['caption_shot_v2','caption_shot_v3']).optional(),...common,requiredRules:z.array(z.string().min(1)).min(mvpDeliveryRules.length)})]);
 const Check=z.strictObject({ruleId:z.string().min(1),result:z.enum(['pass','fail','not_checked','not_applicable','waived']),severity:z.enum(['blocking','warning']),evidenceRefs:z.array(z.string().min(1)),reason:z.string().optional(),waiverActor:z.string().optional()});
 export type DeliveryPolicy=z.input<typeof DeliveryPolicySchema>;
-export function filmDeliveryPolicy(timeline:FilmTimeline,profile:'full'|'mvp'='full',sampling:'legacy'|'caption_shot_v2'='caption_shot_v2'):DeliveryPolicy{
- return{...(profile==='mvp'?{schemaVersion:2 as const,profile:'mvp' as const,...(sampling==='caption_shot_v2'?{visualSampling:'caption_shot_v2' as const}:{})}:{schemaVersion:1 as const}),audioIntent:timeline.narration.length?'voiced':timeline.music.length||timeline.foley.length?'music':'silent',captions:Boolean(timeline.captions.length),requiredRules:[...(profile==='mvp'?mvpDeliveryRules:mandatoryDeliveryRules)]};
+export function filmDeliveryPolicy(timeline:FilmTimeline,profile:'full'|'mvp'='full',sampling:'legacy'|'caption_shot_v2'|'caption_shot_v3'='caption_shot_v3'):DeliveryPolicy{
+ return{...(profile==='mvp'?{schemaVersion:2 as const,profile:'mvp' as const,...(sampling!=='legacy'?{visualSampling:sampling}:{})}:{schemaVersion:1 as const}),audioIntent:timeline.narration.length?'voiced':timeline.music.length||timeline.foley.length?'music':'silent',captions:Boolean(timeline.captions.length),requiredRules:[...(profile==='mvp'?mvpDeliveryRules:mandatoryDeliveryRules)]};
 }
 export interface DeliveryInput{policy:DeliveryPolicy;expectedPolicySha256:string;expectedFileSha256:string;actualFileSha256:string;checks:QualityCheck[]}
 
@@ -49,5 +49,5 @@ export function assertMvpProfile(understanding:Understanding){
 }
 export function verifyFrozenDeliveryPolicy(timeline:FilmTimeline,raw:unknown,understanding:Understanding){
  const policy=DeliveryPolicySchema.parse(raw);if(policy.schemaVersion===2)assertMvpProfile(understanding);
- const expected=filmDeliveryPolicy(timeline,policy.schemaVersion===2?'mvp':'full',policy.schemaVersion===2&&policy.visualSampling?'caption_shot_v2':'legacy');if(canonicalHash(policy)!==canonicalHash(expected))throw Error('QUALITY_POLICY_CHANGED');return policy;
+ const expected=filmDeliveryPolicy(timeline,policy.schemaVersion===2?'mvp':'full',policy.schemaVersion===2?policy.visualSampling||'legacy':'legacy');if(canonicalHash(policy)!==canonicalHash(expected))throw Error('QUALITY_POLICY_CHANGED');return policy;
 }
