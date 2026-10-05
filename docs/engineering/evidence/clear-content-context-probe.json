@@ -1,0 +1,127 @@
+{
+  "executedAt": "2026-10-05T02:36:24.758Z",
+  "status": "actual_frozen_content_context_verified_no_judgment",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "technicalRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/clear-full-TMnPO7",
+  "sourceProjectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "newModelCalls": 0,
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "deliveryEligible": false,
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/clear-content-context-xTeNLW",
+  "filmSpecRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "bytes": 2631,
+    "mime": "application/json"
+  },
+  "factsRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/facts/60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "sha256": "60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "bytes": 569,
+    "mime": "application/json"
+  },
+  "contextRef": {
+    "key": "content-review/context/4ea6c8576300f09966975f846ffe3ed15ae5219e0a45537ed9ba565945140738",
+    "sha256": "4ea6c8576300f09966975f846ffe3ed15ae5219e0a45537ed9ba565945140738",
+    "bytes": 2230,
+    "mime": "application/json"
+  },
+  "context": {
+    "filmSha256": "cb5ac8454a867abb361fbe13fafd9fd07e09335c76685a672e94cc931bc6d0fd",
+    "filmSpecSha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "factsManifestSha256": "60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "fps": 24,
+    "totalFrames": 480,
+    "facts": [
+      {
+        "id": "fact-seed-sprout-flow",
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。",
+        "sourceRefs": [
+          {
+            "type": "user_message",
+            "id": "0a73948e-9bf8-40b3-a382-af974d992d5a",
+            "excerpt": "表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不要承诺具体生长天数，不要虚构名称、活动日期或数字。"
+          }
+        ],
+        "status": "provided",
+        "mustInclude": true,
+        "critical": true
+      }
+    ],
+    "frames": [
+      {
+        "id": "frame-9",
+        "frame": 9,
+        "sha256": "041cd65107740b01451e19e5531ece8658d9d6ca3145a909594b7e301479abde",
+        "bytes": 1818798
+      },
+      {
+        "id": "frame-129",
+        "frame": 129,
+        "sha256": "94b5d3c11c3eecc4d4fc068fa82fe6459112a5b16042cf8ccd300e36728bec26",
+        "bytes": 2232628
+      },
+      {
+        "id": "frame-249",
+        "frame": 249,
+        "sha256": "1742c5c915b5419d50385ae3b67d81e1a7cd6ae8dd39e1456d59ae903a57e7b2",
+        "bytes": 1628939
+      },
+      {
+        "id": "frame-369",
+        "frame": 369,
+        "sha256": "9adea888c6421b3ce48846227f3af5bfec7a36ae0bddd06c910aa01658d508d0",
+        "bytes": 690046
+      }
+    ],
+    "transcripts": [
+      {
+        "id": "line_1",
+        "startSample": 0,
+        "endSample": 172800,
+        "audioSha256": "e68471ec08ee22e2e1f15971b1e734940be1cb378ead5b8107fecf23b67fd4f1",
+        "text": "把小种子轻轻放进泥土里",
+        "verification": "pass"
+      },
+      {
+        "id": "line_2",
+        "startSample": 240000,
+        "endSample": 402000,
+        "audioSha256": "a7b30c09022cb0d6926aebfbdb22845d8bd813985243bfc0105e76fa9f1d25ba",
+        "text": "撒下适量的水润湿土壤",
+        "verification": "trusted_policy"
+      },
+      {
+        "id": "line_3",
+        "startSample": 480000,
+        "endSample": 639600,
+        "audioSha256": "31aa94bae8ca7cc8f8d91b47f36e1ce4cee1801de54f9f00c312a90d66e9d079",
+        "text": "泥土里探出了嫩绿的小芽",
+        "verification": "pass"
+      },
+      {
+        "id": "line_4",
+        "startSample": 720000,
+        "endSample": 864000,
+        "audioSha256": "97bc67fafadb49c00984c1b294b033e7b0e6b099d86b4e7b83c41eb6b592eb43",
+        "text": "觀察成長 耐心照料",
+        "verification": "pass"
+      }
+    ],
+    "contextSha256": "39b1cffea4e9304e6db0a7595dd8408498cc435c6ca922c22619ceb69e3cc627"
+  },
+  "coldIdentical": true,
+  "rawTranscriptsPreserved": true,
+  "selectedFrames": 4,
+  "completeFrozenFacts": 1,
+  "asrVerificationStatuses": [
+    "pass",
+    "trusted_policy",
+    "pass",
+    "pass"
+  ],
+  "networkCalls": 0,
+  "nativeInvocationsUnchanged": true,
+  "originalControlBudgetOperationsUnchanged": true
+}
