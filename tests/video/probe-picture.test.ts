@@ -20,3 +20,18 @@ it('checks the source fence after completion and stops its own handle if that fe
  await expect(observeProbePicture(executor,job,async()=>{},guard,1000)).rejects.toThrow('SOURCE_CHANGED');
  expect(executor.cancel).toHaveBeenCalledExactlyOnceWith(handle);
 });
+it('accepts only a terminal failed negative probe and stops on its report failure',async()=>{
+ const executor:MediaExecutor={...fixture(),inspect:vi.fn(async()=>({status:'failed',outputs:[]}))};
+ const result=await observeProbePicture(executor,job,async()=>{},async()=>{},1000,'failed');
+ expect(result).toEqual(handle);
+ const failure=Error('NEGATIVE_REPORT_IO_FAILED');
+ await expect(observeProbePicture(executor,job,async()=>{throw failure},async()=>{},1000,'failed')).rejects.toBe(failure);
+ expect(executor.cancel).toHaveBeenCalledExactlyOnceWith(handle);
+});
+it('preserves unknown cleanup on negative probes and rejects output-bearing failures',async()=>{
+ const executor:MediaExecutor={...fixture(),cancel:async()=>({status:'cancelling'})};
+ await expect(observeProbePicture(executor,job,async()=>{throw Error('REPORT_IO')},async()=>{},1000,'failed')).rejects.toThrow('MEDIA_STOP_UNKNOWN');
+ const invalid:MediaExecutor={...fixture(),inspect:async()=>({status:'failed',outputs:['output/picture.mp4']})};
+ await expect(observeProbePicture(invalid,job,async()=>{},async()=>{},1000,'failed')).rejects.toThrow('CLEAR_FULL_FILM_PICTURE_FAILED');
+ expect(invalid.cancel).toHaveBeenCalledExactlyOnceWith(handle);
+});
