@@ -49,5 +49,6 @@ it('keeps raw ASR quotations while accepting a frozen whole-line Mandarin pronun
  const {spokenTextEvidence,...legacy}=raw.transcripts[0];void spokenTextEvidence;const old=contentReviewContext({...raw,transcripts:[legacy]});expect(()=>guardContentReview({...v,contextSha256:old.contextSha256},old)).toThrow('CONTENT_LITERAL_EVIDENCE_INVALID');
  expect(()=>contentReviewContext({...raw,transcripts:[{...raw.transcripts[0],text:'闭上眼睛 他轻轻离开'}]})).toThrow();
  expect(()=>contentReviewContext({...raw,transcripts:[{...raw.transcripts[0],text:'1.8',spokenTextEvidence:{...raw.transcripts[0].spokenTextEvidence,expectedText:'18'}}]})).toThrow('CONTENT_INPUT_INVALID');
+ expect(()=>contentReviewContext({...raw,transcripts:[{...raw.transcripts[0],text:'\u77f3\u53ea\u5c0f\u732b',spokenTextEvidence:{...raw.transcripts[0].spokenTextEvidence,expectedText:'\u5341\u53ea\u5c0f\u732b'}}]})).toThrow('CONTENT_INPUT_INVALID');
  const fragment=structuredClone(v);fragment.facts[0].literalChecks[0].evidence[0]={...quote,quote:'他轻轻入睡'};expect(()=>guardContentReview(fragment,c)).toThrow('CONTENT_LITERAL_EVIDENCE_INVALID');
 });

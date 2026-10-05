@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import {ObjectRefSchema,type ObjectRef} from '@/contracts/video/domain';
-import {contentReviewContext,guardContentReview,type ContentReview,type ContentReviewContext} from '@/contracts/video/content-review';
+import {contentReviewContext,guardContentReview,supportsContentPronunciationEvidence,type ContentReview,type ContentReviewContext} from '@/contracts/video/content-review';
 import {runContentCritic} from '@/mastra/video/content-critic';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {StoreMissing,createOrRead,type AtomicStore} from '@/services/video/storage/atomic-store';
@@ -58,7 +58,7 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
     const entry=frozen.audioManifest.sources.find(s=>s.id==='voice-'+line.lineId);if(!entry)throw Error('CONTENT_BASELINE_CHANGED');
     const packaged=await loadPackagedNarration(projects.store,root,projectId,inputs.bundle.revisionId,entry.sourceRef);
     if(packaged.source.lineId!==line.lineId)throw Error('CONTENT_BASELINE_CHANGED');
-    if(packaged.words.recognitionPolicy==='mandarin_pronunciation_v1'&&!/[\p{N}A-Za-z]/u.test(packaged.source.expectedAsrText+line.recognizedText))spokenTextEvidence={policy:packaged.words.recognitionPolicy,expectedText:packaged.source.expectedAsrText,sourceRef:entry.sourceRef};
+    if(packaged.words.recognitionPolicy==='mandarin_pronunciation_v1'&&supportsContentPronunciationEvidence(packaged.source.expectedAsrText,line.recognizedText))spokenTextEvidence={policy:packaged.words.recognitionPolicy,expectedText:packaged.source.expectedAsrText,sourceRef:entry.sourceRef};
    }
    transcripts.push({id:line.lineId,startSample:clock.startSample,endSample:clock.endSample,audioSha256:line.sourceSha256,text:line.recognizedText,verification:line.status,...(spokenTextEvidence?{spokenTextEvidence}:{})});
   }
