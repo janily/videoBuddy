@@ -38,3 +38,18 @@ it.each(['活动日期是10月8日。','价格是￥39.90。','标题必须为�
  const checked=guardRequirementsProposal({...p,facts:[{factId:'flow',segments:[{sourceText:text,kind:'literal' as const,reason:'完整字面来源。'}]}]},c),a={schemaVersion:1 as const,contextSha256:c.contextSha256,proposalSha256:canonicalHash(checked),facts:[{factId:'flow',segments:[{sourceText:text,kind:'literal' as const,result:'accept' as const,reason:'完整字面来源。'}]}]};
  expect(approvedRequirements(c,checked,a)[0].exactText).toEqual([text]);
 });
+it('preserves every quoted narration sentence as a separately verifiable literal condition',()=>{
+ const lines=['睡前，小猫把小枕头摆好。','闭上眼睛，它轻轻入睡。','屋里静悄悄的，夜色好温柔。','晚安，小猫。'];
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text:'旁白与字幕原文：“'+lines.join('')+'”'}]});
+ const segments=[{sourceText:'旁白与字幕原文：“',kind:'semantic' as const,reason:'引文前缀与定界符。'},...lines.map(sourceText=>({sourceText,kind:'literal' as const,reason:'完整原文句子。'})),{sourceText:'”',kind:'semantic' as const,reason:'引文定界符。'}];
+ const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments}]};
+ const a={schemaVersion:1 as const,contextSha256:c.contextSha256,proposalSha256:canonicalHash(p),facts:p.facts.map(f=>({...f,segments:f.segments.map(s=>({...s,result:'accept' as const}))}))};
+ expect(approvedRequirements(c,p,a)[0].exactText).toEqual(lines);
+ const gap={...p,facts:[{factId:'flow',segments:segments.map((s,i)=>i===2?{...s,kind:'semantic' as const}:s)}]};
+ expect(()=>guardRequirementsProposal(gap,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
+});
+it.each(['“青禾学校”','“10月8日”','“￥39.90”'])('does not split a quoted name, date or number into separately satisfiable fragments: %s',text=>{
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text}]}),body=text.slice(1,-1);
+ const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:[{sourceText:'“',kind:'semantic' as const,reason:'定界符。'},{sourceText:body.slice(0,1),kind:'literal' as const,reason:'错误拆分。'},{sourceText:body.slice(1),kind:'literal' as const,reason:'错误拆分。'},{sourceText:'”',kind:'semantic' as const,reason:'定界符。'}]}]};
+ expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
+});

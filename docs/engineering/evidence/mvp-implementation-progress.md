@@ -82,3 +82,9 @@ MVP新有旁白的执行增加冻结 `voice-first-v1`：音乐和拟音各减12d
 新增MVP每shot仅一次已完成响应修正：SDK warn只让实际usage先结算；显式Complete schema与完整静态guard继续严格拒绝坏方案。原方案/文本不可变归档、新预约/usage独立记录。模型重新生成完整紧凑源码，不续写残片，不补造固定画面；未知计费/transport/native不自动重试。mark前后均核持久fence，冷effect重放不发新HTTP。新增VISUAL_SOURCE_INVALID具体页面提示。
 
 实际RED：旧adapter严格schema在截断响应后抛异常，另两场景没有修正/取消fence。修复后3文件35项通过（12.50秒），包含真实loopback adapter/accounting/FileStore的五场景、旧Visual契约与错误提示。types、定向lint通过。最后完整153文件732项回归（70.80秒）及build在本次增量之前通过；本次后最终验证待集成里程碑。新页面attempt进行中，MVP仍未交付。
+
+## 来源引文的逐句核验修复
+
+真实操作 `f7aac9fe-a423-4dd4-b1c6-a43ea4d7c3aa` 已生成四段画面、20秒720p合成、四句最终AAC旁白核验及效果片段。首次Visual Critic响应200，原始SHA `b040928f39a5e85c474e4da6b5392fc904bcf8a4e8b61f97237988893c81036b`；报告将来源字面项 `“晚安，小猫”。` 标pass，而观察只有 `晚安，小猫。`，严格guard拒绝。旧来源proof还将四句旁白一起冻结为一个literal，无法在任何单帧或单句transcript中完整核验。没有发布、改写旧proof或伪造审核。
+
+只修复新来源候选的切分：引号保留在完整原文的semantic定界段，不成为画面正文；中文多句引文允许在完整句末连续切成literal，每个正文字符仍必须被literal覆盖，不能跳过任何句子。数字/日期仍由原不可拆分floor守护，名称、短标题、未完句不得按字拆开。独立审核仍逐段核验，全部原文/sourceRefs保留；冷读旧proof仍按自己的原段重算。没有把not_checked改成pass。实际RED复现CONTENT_REQUIREMENTS_LITERAL_MISSING；最初相关3文件27项通过（4.80秒），更广相关回归继续运行。
