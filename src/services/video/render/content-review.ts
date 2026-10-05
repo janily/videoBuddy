@@ -29,9 +29,9 @@ function verifierStore(store:AtomicStore):AtomicStore{return{
  async cas(){throw Error('CONTENT_COLD_WRITE_FORBIDDEN')},
  ...(store.listKeys?{listKeys:store.listKeys.bind(store)}:{}),
 }}
-/** Complete two-round content evidence. Conservative literal requirements are
- * derived from the actual approved manifest, never chosen by the Critic. A
- * future trusted semantic-requirement producer needs its own frozen policy.
+/** Complete two-round content evidence. Requirements come from the independently
+ * audited immutable source proof, with conservative whole-text literals for
+ * historical packages. They are never chosen by the film Critic.
  * This stage does not replace the old literal visual or listening gates. */
 export async function reviewApprovedContent(projects:ProjectStore,owner:string,projectId:string,operationId:string,fence:number,options:Options){
  const env=options.env||process.env,{root}=options,inputs=await loadApprovedRenderInputs(projects,owner,projectId,operationId,fence,{root,env}),prefix=`projects/${projectId}/approvals/${inputs.approval.approvalId}/`,key=prefix+'content-review-v1-stage';
@@ -55,14 +55,14 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
    transcripts.push({id:line.lineId,startSample:clock.startSample,endSample:clock.endSample,audioSha256:line.sourceSha256,text:line.recognizedText,verification:line.status});
   }
  }else if(composition.postMix.lines.length)throw Error('CONTENT_BASELINE_CHANGED');
- const requirementsRecord={schemaVersion:1,inputHash:inputs.inputHash,factsRef:frozen.filmSpec.factsRef,policy:'unclassified_facts_literal' as const,requirements:frozen.facts.facts.map(f=>({factId:f.id,representation:'literal' as const,exactText:[f.text]}))},requirementsRef=immutableRef(prefix+'content-requirements',requirementsRecord);
+ const requirementsRecord=frozen.facts.schemaVersion===2&&frozen.contentRequirements?{schemaVersion:2,inputHash:inputs.inputHash,factsRef:frozen.filmSpec.factsRef,policy:'independently_audited_source' as const,sourceProofRef:frozen.facts.contentRequirementsRef,requirements:frozen.contentRequirements.requirements}:{schemaVersion:1,inputHash:inputs.inputHash,factsRef:frozen.filmSpec.factsRef,policy:'unclassified_facts_literal' as const,requirements:frozen.facts.facts.map(f=>({factId:f.id,representation:'literal' as const,exactText:[f.text]}))},requirementsRef=immutableRef(prefix+'content-requirements',requirementsRecord);
  const prepared=[];
  // Verify complete coverage and all physical PNGs before the first paid call.
  for(const [index,expectedBatch] of expected.entries()){
   const batch=rawEvidence.batches[index],evidence=VisualEvidenceSchema.parse(await readNarrationJson(projects.store,batch.evidenceRef,prefix+'visual-frame-evidence/'));
   if(batch.round!==expectedBatch.round||batch.index!==expectedBatch.index||evidence.filmSha256!==filmSha256||evidence.runtimeDigest!==frozen.filmSpec.runtimeDigest||evidence.width!==frozen.filmSpec.output.width||evidence.height!==frozen.filmSpec.output.height||canonicalHash(evidence.frames.map(f=>f.frame))!==canonicalHash(expectedBatch.frames))throw Error('CONTENT_COVERAGE_MISSING');
   await (options.readImages||readVisualEvidence)(root,evidence);await assertApprovedRenderFence(projects,inputs);
-  const context=contentReviewContext({filmSha256,filmSpecSha256:inputs.bundle.filmSpecRef.sha256,factsManifestSha256:frozen.filmSpec.factsRef.sha256,fps:frozen.timeline.fps,totalFrames:frozen.timeline.totalFrames,facts:frozen.facts.facts,requirements:requirementsRecord.requirements,frames:evidence.frames.map(({id,frame,sha256,bytes})=>({id,frame,sha256,bytes})),transcripts,reviewBatch:{round:batch.round,index:batch.index}}),contextRef=immutableRef(prefix+'content-context',context);
+  const context=contentReviewContext({filmSha256,filmSpecSha256:inputs.bundle.filmSpecRef.sha256,factsManifestSha256:frozen.filmSpec.factsRef.sha256,...(frozen.facts.schemaVersion===2?{contentRequirementsRef:frozen.facts.contentRequirementsRef}:{}),fps:frozen.timeline.fps,totalFrames:frozen.timeline.totalFrames,facts:frozen.facts.facts,requirements:requirementsRecord.requirements,frames:evidence.frames.map(({id,frame,sha256,bytes})=>({id,frame,sha256,bytes})),transcripts,reviewBatch:{round:batch.round,index:batch.index}}),contextRef=immutableRef(prefix+'content-context',context);
   prepared.push({round:batch.round,index:batch.index,evidence,evidenceRef:batch.evidenceRef,context,contextRef});
  }
  await assertApprovedRenderFence(projects,inputs);

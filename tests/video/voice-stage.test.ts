@@ -20,6 +20,7 @@ import {prepareAudioPlanStage} from '@/services/video/preview/audio-plan-stage';
 import {confirmSpeechReview} from '@/services/video/audio/spoken-review';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {revisionSeed} from '@/services/video/timeline/seed';
+import {prepareContentRequirementsStage} from '@/services/video/preview/content-requirements-stage';
 import {prepareFilmPackageStage} from '@/services/video/preview/film-package-stage';
 import {prepareAudioExecutionStage} from '@/services/video/preview/audio-execution-stage';
 import {loadVerifiedFilmPackage,CaptionPackageSchema,expectedCaptionPackage} from '@/contracts/video/film-package';
@@ -135,11 +136,18 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   await updateJson(projects.store,visualKey,()=>visual);
   await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:{...packageEnv,VIDEO_MEDIA_IMAGE_REF:`sha256:${'b'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'b'.repeat(64)}})).rejects.toThrow('FILM_RUNTIME_CHANGED');
   if(!book) await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:async()=>({...await timingOptions.readFont(),glyphs:new Set()})})).rejects.toThrow('FILM_FONT_CHANGED');
+  await expect(prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:timingOptions.readFont})).rejects.toThrow('CONTENT_REQUIREMENTS_MISSING');
+  await projects.store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,commandId:randomUUID(),kind:'preview',revisionId,previewId:randomUUID(),briefVersion:1,consentEpoch:0,understandingRef,status:'running'});
+  await prepareContentRequirementsStage(projects,projectId,revisionId,operationId,0,{
+   propose:async context=>({schemaVersion:1,contextSha256:context.contextSha256,facts:context.facts.map(f=>({factId:f.id,segments:[{sourceText:f.text,kind:'literal',reason:'本地完整来源协议样本。'}]}))}),
+   audit:async(context,proposal)=>({schemaVersion:1,contextSha256:context.contextSha256,proposalSha256:canonicalHash(proposal),facts:proposal.facts.map(f=>({factId:f.factId,segments:f.segments.map(s=>({...s,result:'accept'}))}))}),
+  });
   const filmPackage=await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,readFont:timingOptions.readFont});
   expect(filmPackage.qualityStatus).toBe('semantic_not_checked');
   expect(await prepareFilmPackageStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,env:packageEnv,mustExist:true,readFont:timingOptions.readFont})).toEqual(filmPackage);
   const spec=(await projects.store.readFresh<FilmSpec>(filmPackage.filmSpecRef.key)).value;
   const frozen=await loadVerifiedFilmPackage(projects.store,spec,root);
+  expect(frozen.facts.schemaVersion).toBe(2);expect(frozen.contentRequirements?.productionApproval).toBe(false);
   const captionRef=frozen.sourceManifest.captionStyles[0].styleRef;
   const captionPackage=CaptionPackageSchema.parse((await projects.store.readFresh(captionRef.key)).value);
   expect(captionPackage.schemaVersion).toBe(book?4:2);
@@ -256,6 +264,7 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   await writeFile(voicePath,Buffer.from('tampered'));
   await expect(prepareVoiceStage(projects,projectId,revisionId,operationId,0,treatmentRef,options)).rejects.toThrow('VOICE_SOURCE_CHANGED');
   const changedRevision=randomUUID();
+  await updateJson(projects.store,`projects/${projectId}/operations/${operationId}`,(op:object)=>({...op,revisionId:changedRevision}));
   const changedTreatment=await prepareTreatmentStage(projects,projectId,changedRevision,operationId,0,{decide:async()=>plan,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:40000,dailyCalls:10}});
   await expect(prepareVoiceStage(projects,projectId,changedRevision,operationId,0,changedTreatment,{...options,generate:async(dir,job)=>{
    const voice=await options.generate(dir,job);

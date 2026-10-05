@@ -12,6 +12,11 @@ import {canonicalHash} from '@/services/video/domain/hash';
 import type {ContentReviewContext,ContentReview} from '@/contracts/video/content-review';
 import type {ProjectControl} from '@/contracts/video/project';
 import {updateJson} from '@/services/video/storage/atomic-store';
+import {randomUUID} from 'node:crypto';
+import {requirementsContext} from '@/contracts/video/content-requirements';
+import {createPreviewBundle} from '@/services/video/preview/bundle';
+import type {FilmSpec} from '@/contracts/video/film';
+import type {Understanding} from '@/contracts/video/domain';
 async function producers(f:Awaited<ReturnType<typeof seedApprovedProject>>){
  const inputs=await loadApprovedRenderInputs(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env}),sha256='a'.repeat(64);
  const compose:typeof composeApprovedFilm=async()=>({schemaVersion:2,inputHash:inputs.inputHash,pictureStageHash:'b'.repeat(64),audioExecutionSha256:'c'.repeat(64),movie:{stageKey:'d'.repeat(64),outputPath:join(f.root,'composition','d'.repeat(64),'output/final.mp4'),subtitlesPath:null,technicalQa:{result:'pass',sha256,bytes:2000,width:1920,height:1080,durationSec:20,fps:24,frames:480,audio:true,audioChannels:2},loudness:{status:'not_applicable',filmSha256:sha256,runtimeDigest:'1'.repeat(64),integratedLufs:null,truePeakDbtp:null,targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2},qaStatus:'semantic_not_checked'},postMix:{status:'not_applicable',reason:'no_narration',filmSha256:sha256,executionSha256:'c'.repeat(64),voiceTrackSha256:'e'.repeat(64),lines:[]},qualityStatus:'semantic_not_checked',deliveryEligible:false});
@@ -21,6 +26,28 @@ async function producers(f:Awaited<ReturnType<typeof seedApprovedProject>>){
  return{root:f.root,env:f.env,compose,extract,readImages:async()=>new Map<string,Uint8Array>()};
 }
 function response(c:ContentReviewContext):ContentReview{return{schemaVersion:1,contextSha256:c.contextSha256,scope:'provided_frames_and_verified_transcripts',observations:c.frames.map(f=>({frameId:f.id,description:'本地归档协议样本。',visibleText:c.requirements.flatMap(r=>r.exactText)})),facts:c.facts.map(f=>({factId:f.id,result:'pass',coverage:'complete',reason:'单元测试给定完整字面观察。',evidence:[{kind:'frame_text',frameId:c.frames[0].id,quote:f.text}],literalChecks:c.requirements.find(r=>r.factId===f.id)!.exactText.map(sourceExcerpt=>({sourceExcerpt,result:'pass',evidence:[{kind:'frame_text',frameId:c.frames[0].id,quote:sourceExcerpt}],reason:'单元测试字面匹配。'}))})),conflicts:[]}}
+it('consumes only audited frozen source requirements and cold-rejects a changed source audit',async()=>{
+ const f=await seedApprovedProject();try{
+ const p=`projects/${f.projectId}/revisions/${f.bundle.revisionId}/`,spec=(await f.projects.store.readFresh<FilmSpec>(f.bundle.filmSpecRef.key)).value,u=(await f.projects.store.readFresh<Understanding>(spec.understandingRef.key)).value,c=requirementsContext({understandingSha256:spec.understandingRef.sha256,facts:u.facts});
+ const proposal={schemaVersion:1,contextSha256:c.contextSha256,facts:[{factId:'fact-0',segments:[{sourceText:'活动在',kind:'semantic',reason:'本地协议样本，普通关系。'},{sourceText:'十月八日',kind:'literal',reason:'日期必须逐字。'},{sourceText:'开始',kind:'semantic',reason:'本地协议样本，普通动作。'}]}]};
+ const audit={schemaVersion:1,contextSha256:c.contextSha256,proposalSha256:canonicalHash(proposal),facts:proposal.facts.map(f=>({...f,segments:f.segments.map(s=>({...s,result:'accept'}))}))};
+ const auditRef=await f.projects.index.immutable(p+'content-requirements-audit',audit),proofRef=await f.projects.index.immutable(p+'content-requirements-proof',{schemaVersion:1,operationId:randomUUID(),consentEpoch:0,understandingRef:spec.understandingRef,contextRef:await f.projects.index.immutable(p+'content-requirements-context',c),proposalRef:await f.projects.index.immutable(p+'content-requirements-proposal',proposal),auditRef,requirements:[{factId:'fact-0',representation:'semantic',exactText:['十月八日']}],scope:'source_requirements_only',productionApproval:false});
+ const factsRef=await f.projects.index.immutable(p+'facts',{schemaVersion:2,facts:c.facts,contentRequirementsRef:proofRef}),filmSpecRef=await f.projects.index.immutable(p+'film',{...spec,factsRef});
+ const {scriptHash:_,factsHash:__,bundleHash:___,expiresAt:____,...bundleInput}=f.bundle;void _;void __;void ___;void ____;
+ const bundle=createPreviewBundle({...bundleInput,filmSpecRef:{...filmSpecRef,mime:'application/json'}});
+ await updateJson(f.projects.store,`projects/${f.projectId}/previews/${bundle.previewId}/manifest`,()=>bundle);
+ await updateJson(f.projects.store,`projects/${f.projectId}/approvals/${f.approval.approvalId}`,(a:typeof f.approval)=>({...a,bundleHash:bundle.bundleHash}));
+ await updateJson(f.projects.store,`projects/${f.projectId}/operations/${f.operationId}`,(op:object)=>({...op,bundleHash:bundle.bundleHash}));
+ const options=await producers(f);await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);let calls=0;
+ const stage=await reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,decide:async context=>{
+  calls++;expect(context.requirements).toEqual([{factId:'fact-0',representation:'semantic',exactText:['十月八日']}]);
+  const r=response(context);return{...r,observations:r.observations.map(o=>({...o,visibleText:[...o.visibleText,'活动在十月八日开始']}))};
+ }});expect(stage.report.result).toBe('pass');
+ await expect(reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,mustExist:true})).resolves.toEqual(stage);
+ const before=calls,old=await f.projects.store.readFresh(auditRef.key);await f.projects.store.cas(auditRef.key,old.etag,{...audit,proposalSha256:'0'.repeat(64)});
+ await expect(reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,mustExist:true,decide:async context=>{calls++;return response(context)}})).rejects.toThrow();expect(calls).toBe(before);
+ }finally{await rm(f.root,{recursive:true,force:true})}
+},30000);
 it('archives complete approved content batches once and cold-verifies them without new decisions',async()=>{
  const f=await seedApprovedProject();try{const options=await producers(f);await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);let calls=0;
  const first=await reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,decide:async c=>{calls++;return response(c)}});expect(calls).toBe(first.batches.length);expect(first.report).toMatchObject({result:'pass',deliveryEligible:false,audio:'transcripts_only',continuousMotion:'not_supplied'});

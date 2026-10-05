@@ -28,6 +28,7 @@ import {NarrationPackageDataSchema,prepareNarrationPackageStage} from './narrati
 import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVisualShotStage} from './visual-stage';
+import {loadContentRequirements} from './content-requirements-stage';
 
 const RecordSchema=z.strictObject({schemaVersion:z.literal(2),briefVersion:z.number().int().nonnegative(),filmSpecRef:ObjectRefSchema,qualityPolicyRef:ObjectRefSchema,qualityStatus:z.literal('semantic_not_checked')});
 export type FilmPackageStageRecord=z.infer<typeof RecordSchema>;
@@ -44,7 +45,8 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  let existing:unknown;
  try{existing=(await projects.store.readFresh<unknown>(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(existing===undefined&&options.mustExist)throw Error('FILM_PACKAGE_MISSING');
- let policyVersion=existing===undefined?filmPackagePolicyVersion:FilmSpecSchema.parse(await readNarrationJson(projects.store,RecordSchema.parse(existing).filmSpecRef,`${revisionPrefix}film/`)).qualityPolicyVersion;
+ const existingSpec=existing===undefined?undefined:FilmSpecSchema.parse(await readNarrationJson(projects.store,RecordSchema.parse(existing).filmSpecRef,`${revisionPrefix}film/`));
+ let policyVersion=existingSpec?.qualityPolicyVersion||filmPackagePolicyVersion;
  const understanding=UnderstandingSchema.parse(await readNarrationJson(projects.store,control.understandingRef,`${prefix}/understanding/`));
  if(understanding.briefVersion!==control.briefVersion||!understanding.preferences.styleSlug)throw Error('FILM_BRIEF_CHANGED');
  const style=getStyle(understanding.preferences.styleSlug),treatment=guardTreatment(await readNarrationJson(projects.store,treatmentRef,`${revisionPrefix}treatment-plan/`),understanding,style.rulesHash);
@@ -93,7 +95,18 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  }
  const landscape=understanding.preferences.aspect==='16:9',logicalOutput={width:landscape?1920:1080,height:landscape?1080:1920};
  const captions=frozenCaptions(timing,treatment),captionStyles=captions.length?[{id:captionStyleId,styleRef:document('caption-styles',expectedCaptionPackage(timing.font,logicalOutput,policyVersion))}]:[];
- const facts=FactsManifestSchema.parse({schemaVersion:1,facts:understanding.facts.filter(fact=>['provided','confirmed'].includes(fact.status))});
+ const activeFacts=understanding.facts.filter(fact=>['provided','confirmed'].includes(fact.status));
+ let facts:z.infer<typeof FactsManifestSchema>;
+ if(existingSpec){
+  facts=FactsManifestSchema.parse(await readNarrationJson(projects.store,existingSpec.factsRef,`${revisionPrefix}facts/`));
+  if(canonicalHash(facts.facts)!==canonicalHash(activeFacts))throw Error('FILM_FACT_INVALID');
+ }else{
+  let proof:Awaited<ReturnType<typeof loadContentRequirements>>;
+  try{proof=await loadContentRequirements(projects.store,projectId,revisionId,{understandingSha256:control.understandingRef.sha256,facts:activeFacts})}
+  catch(error){if(error instanceof StoreMissing)throw Error('CONTENT_REQUIREMENTS_MISSING');throw error}
+  if(proof.operationId!==operationId||proof.consentEpoch!==expectedConsentEpoch||canonicalHash(proof.understandingRef)!==canonicalHash(control.understandingRef))throw Error('CONTENT_REQUIREMENTS_BASELINE_CHANGED');
+  facts=FactsManifestSchema.parse({schemaVersion:2,facts:activeFacts,contentRequirementsRef:document('content-requirements-proof',proof)});
+ }
  const soundSources=executed?await archiveSynthSources(projects,projectId,revisionId,audioRecord.planRef,audio,runtime.runtimeDigest):[];
  const manifests={
   treatment:TreatmentSchema.parse({schemaVersion:1,summary:treatment.summary,script:treatment.script,factIds:[...new Set(treatment.shots.flatMap(shot=>shot.factIds))],planRef:treatmentRef}),facts,

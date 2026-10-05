@@ -1,5 +1,6 @@
 import {z} from 'zod';
-import {UnderstandingSchema,ObjectRefSchema} from '@/contracts/video/domain';
+import {UnderstandingSchema} from '@/contracts/video/domain';
+import {ContentRequirementsProofSchema as RecordSchema,verifyContentRequirementsProof} from '@/contracts/video/content-requirements-proof';
 import type {ProjectControl} from '@/contracts/video/project';
 import {requirementsContext,guardRequirementsProposal,guardRequirementsAudit,approvedRequirements,type RequirementsContext,type RequirementsProposal} from '@/contracts/video/content-requirements';
 import {runRequirementsProposal,runRequirementsAudit,requirementsPayload} from '@/mastra/video/content-requirements';
@@ -14,19 +15,12 @@ import {runEffect} from '@/services/video/commands/effect-ledger';
 import {readConfiguration,requireGeneration,type Environment} from '@/services/video/config/environment';
 import {assertPreviewProductionFence} from './fence';
 import {assertPreviewOperation} from './operation';
-const RecordSchema=z.strictObject({schemaVersion:z.literal(1),operationId:z.uuid(),consentEpoch:z.number().int().nonnegative(),understandingRef:ObjectRefSchema,contextRef:ObjectRefSchema,proposalRef:ObjectRefSchema,auditRef:ObjectRefSchema,requirements:z.array(z.strictObject({factId:z.string().min(1),representation:z.enum(['literal','semantic']),exactText:z.array(z.string().min(1))})).max(100),scope:z.literal('source_requirements_only'),productionApproval:z.literal(false)});
 type Options={env?:Environment;limits?:ModelLimits;mustExist?:boolean;propose?:(context:RequirementsContext)=>Promise<unknown>;audit?:(context:RequirementsContext,proposal:RequirementsProposal)=>Promise<unknown>};
 function prefix(projectId:string,revisionId:string){if(![projectId,revisionId].every(id=>z.uuid().safeParse(id).success))throw Error('VALIDATION_FAILED');return`projects/${projectId}/revisions/${revisionId}/`}
 /** Read-only source proof; current creation/publication fences remain mandatory
  * at the consuming stage. Reading historical proof never grants fresh consent. */
 export async function loadContentRequirements(store:AtomicStore,projectId:string,revisionId:string,expected:Omit<RequirementsContext,'contextSha256'>){
- const p=prefix(projectId,revisionId),record=RecordSchema.parse((await store.readFresh(p+'content-requirements-v1-stage')).value),context=requirementsContext(expected);
- if(record.understandingRef.sha256!==context.understandingSha256)throw Error('CONTENT_REQUIREMENTS_BASELINE_CHANGED');
- const understanding=UnderstandingSchema.parse(await readNarrationJson(store,record.understandingRef,`projects/${projectId}/understanding/`));
- if(canonicalHash(understanding.facts.filter(f=>['provided','confirmed'].includes(f.status)))!==canonicalHash(context.facts))throw Error('CONTENT_REQUIREMENTS_BASELINE_CHANGED');
- const cold=await readNarrationJson(store,record.contextRef,p+'content-requirements-context/');if(canonicalHash(cold)!==canonicalHash(context))throw Error('CONTENT_REQUIREMENTS_BASELINE_CHANGED');
- const proposal=guardRequirementsProposal(await readNarrationJson(store,record.proposalRef,p+'content-requirements-proposal/'),context),audit=guardRequirementsAudit(await readNarrationJson(store,record.auditRef,p+'content-requirements-audit/'),context,proposal);
- if(canonicalHash(record.requirements)!==canonicalHash(approvedRequirements(context,proposal,audit)))throw Error('CONTENT_REQUIREMENTS_BASELINE_CHANGED');return record;
+ const p=prefix(projectId,revisionId);return verifyContentRequirementsProof(store,projectId,revisionId,(await store.readFresh(p+'content-requirements-v1-stage')).value,expected);
 }
 export async function prepareContentRequirementsStage(projects:ProjectStore,projectId:string,revisionId:string,operationId:string,epoch:number,options:Options={}){
  const p=prefix(projectId,revisionId);if(!z.uuid().safeParse(operationId).success||!Number.isSafeInteger(epoch)||epoch<0)throw Error('VALIDATION_FAILED');

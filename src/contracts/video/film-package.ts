@@ -17,10 +17,14 @@ import{TimingDraftSchema}from'@/services/video/preview/timing-draft';
 import{revisionSeed}from'@/services/video/timeline/seed';
 import{filmPackagePolicyVersion,legacyFilmPackagePolicyVersion,bookFilmPackagePolicyVersion,clearBookFilmPackagePolicyVersion,captionStyleId,captionStyleForProfile,frozenCaptions,narrationSilence}from'@/services/video/timeline/package';
 import{LocalAssetBytes}from'@/services/video/assets/local-bytes';
+import{readContentRequirementsProof}from'./content-requirements-proof';
 
 const id=z.string().min(1).max(120);
 export const TreatmentSchema=z.strictObject({schemaVersion:z.literal(1),summary:z.string().min(1),script:z.array(z.string().min(1)).min(1),factIds:z.array(id),planRef:ObjectRefSchema});
-export const FactsManifestSchema=z.strictObject({schemaVersion:z.literal(1),facts:z.array(FactSchema)});
+export const FactsManifestSchema=z.discriminatedUnion('schemaVersion',[
+ z.strictObject({schemaVersion:z.literal(1),facts:z.array(FactSchema)}),
+ z.strictObject({schemaVersion:z.literal(2),facts:z.array(FactSchema),contentRequirementsRef:ObjectRefSchema}),
+]);
 export const AssetManifestSchema=z.strictObject({schemaVersion:z.literal(1),assets:z.array(z.strictObject({id:z.string().uuid(),analysisRef:ObjectRefSchema,rightsRef:ObjectRefSchema,originalRef:ObjectRefSchema,usage:z.string().min(1)}))});
 export const SourceManifestSchema=z.strictObject({schemaVersion:z.literal(1),modules:z.array(z.strictObject({id,sourceRef:ObjectRefSchema})).min(1),actors:z.array(z.strictObject({id,sourceModuleId:id})),captionStyles:z.array(z.strictObject({id,styleRef:ObjectRefSchema}))});
 export const AudioManifestSchema=z.strictObject({schemaVersion:z.literal(1),sources:z.array(z.strictObject({id,kind:z.enum(['generated','licensed','user_supplied']),sourceRef:ObjectRefSchema,rightsRef:ObjectRefSchema})),buses:z.array(z.strictObject({id})).min(1),planRef:ObjectRefSchema,timingDraftRef:ObjectRefSchema,executionRef:ObjectRefSchema.optional()});
@@ -63,6 +67,7 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  const understanding=parse(UnderstandingSchema,rawUnderstanding),treatment=parse(TreatmentSchema,rawTreatment),facts=parse(FactsManifestSchema,rawFacts),timeline=parse(FilmTimelineSchema,rawTimeline),assets=parse(AssetManifestSchema,rawAssets,'FILM_ASSET_INVALID'),sources=parse(SourceManifestSchema,rawSources),audio=parse(AudioManifestSchema,rawAudio,'FILM_AUDIO_PLAN_CHANGED');
  if(understanding.briefVersion!==spec.briefVersion||understanding.preferences.durationSec!==spec.output.totalFrames/spec.output.fps||understanding.preferences.aspect!==(spec.output.width>spec.output.height?'16:9':'9:16')||understanding.preferences.styleSlug!==spec.style.slug)throw Error('FILM_BRIEF_CHANGED');
  const understoodFacts=new Map(understanding.facts.map(fact=>[fact.id,fact]));
+ const contentRequirements=facts.schemaVersion===2?await readContentRequirementsProof(store,spec.projectId,spec.revisionId,facts.contentRequirementsRef,spec.understandingRef,facts.facts):undefined;
  if(!unique(understanding.facts.map(f=>f.id))||!unique(facts.facts.map(f=>f.id))||!unique(treatment.factIds)||!unique(sources.modules.map(x=>x.id))||!unique(sources.actors.map(x=>x.id))||!unique(sources.captionStyles.map(x=>x.id))||!unique(assets.assets.map(x=>x.id))||!unique(audio.sources.map(x=>x.id))||!unique(audio.buses.map(x=>x.id)))throw Error('FILM_MANIFEST_INVALID');
  const assetIds=new Set(assets.assets.map(asset=>asset.id)),messages=new Set(understanding.sourceMessageIds),factIds=new Set(facts.facts.map(fact=>fact.id));
  for(const fact of facts.facts){
@@ -154,5 +159,5 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  if(canonicalHash(timeline.intentionalSilenceRanges)!==canonicalHash([...plan.intentionalSilenceRanges,...narrationSilence(timeline.narration,timing.durationMs*48)]))throw Error('FILM_AUDIO_PLAN_CHANGED');
  const refs:TimelineReferences={sourceModules:sourceIds,actorIds:new Set(sources.actors.map(actor=>actor.id)),factIds,captionStyles:new Set(sources.captionStyles.map(style=>style.id)),audioSources:new Set(audio.sources.map(source=>source.id)),audioBuses:new Set(audio.buses.map(bus=>bus.id))};
  validateFilmTimeline(timeline,refs);validateFilmSpec(spec,timeline);
- return{filmSpec:spec,timing,understanding,treatment,treatmentPlan,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio,...(executed?{audioExecution:executed.package,filmAudioTrack:executed.track}:{})};
+ return{filmSpec:spec,timing,understanding,treatment,treatmentPlan,facts,timeline,assetManifest:assets,sourceManifest:sources,audioManifest:audio,...(contentRequirements?{contentRequirements}:{}),...(executed?{audioExecution:executed.package,filmAudioTrack:executed.track}:{})};
 }

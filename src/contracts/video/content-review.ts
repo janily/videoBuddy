@@ -1,11 +1,11 @@
 import {z} from 'zod';
-import {FactSchema} from './domain';
+import {FactSchema,ObjectRefSchema} from './domain';
 import {canonicalHash} from '@/services/video/domain/hash';
 const digest=z.string().regex(/^[a-f0-9]{64}$/),id=z.string().min(1).max(120).refine(value=>value===value.trim()),text=z.string().min(1).max(3000).refine(value=>value.trim().length>0),result=z.enum(['pass','fail','not_checked']);
 const frame=z.strictObject({id,frame:z.number().int().nonnegative(),sha256:digest,bytes:z.number().int().positive().max(8*1024*1024)});
 const transcript=z.strictObject({id,startSample:z.number().int().nonnegative(),endSample:z.number().int().positive(),audioSha256:digest,text,verification:z.enum(['pass','trusted_review','trusted_policy'])});
 const requirement=z.strictObject({factId:id,representation:z.enum(['literal','semantic']),exactText:z.array(text).max(100)});
-const Input=z.strictObject({filmSha256:digest,filmSpecSha256:digest,factsManifestSha256:digest,fps:z.union([z.literal(24),z.literal(30),z.literal(60)]),totalFrames:z.number().int().positive(),facts:z.array(FactSchema).max(100),frames:z.array(frame).min(1).max(24),transcripts:z.array(transcript).max(200),requirements:z.array(requirement).max(100).optional(),reviewBatch:z.strictObject({round:z.union([z.literal(1),z.literal(2)]),index:z.number().int().nonnegative()}).optional()});
+const Input=z.strictObject({filmSha256:digest,filmSpecSha256:digest,factsManifestSha256:digest,contentRequirementsRef:ObjectRefSchema.optional(),fps:z.union([z.literal(24),z.literal(30),z.literal(60)]),totalFrames:z.number().int().positive(),facts:z.array(FactSchema).max(100),frames:z.array(frame).min(1).max(24),transcripts:z.array(transcript).max(200),requirements:z.array(requirement).max(100).optional(),reviewBatch:z.strictObject({round:z.union([z.literal(1),z.literal(2)]),index:z.number().int().nonnegative()}).optional()});
 export type ContentReviewContext=Omit<z.infer<typeof Input>,'requirements'>&{requirements:z.infer<typeof requirement>[];contextSha256:string};
 const evidence=z.discriminatedUnion('kind',[
  z.strictObject({kind:z.literal('frame_scene'),frameId:id,quote:text}),
@@ -25,7 +25,8 @@ function normalized(value:string){return value.normalize('NFC').replace(/[\sï¼Œã
 export function contentReviewContext(raw:unknown):ContentReviewContext{
  const parsed=Input.safeParse(raw);if(!parsed.success)throw Error('CONTENT_INPUT_INVALID');const value={...parsed.data,requirements:parsed.data.requirements??parsed.data.facts.map(f=>({factId:f.id,representation:'literal' as const,exactText:[f.text]}))},totalSamples=value.totalFrames*48000/value.fps;
  if(value.totalFrames<20*value.fps||value.totalFrames>120*value.fps||value.totalFrames%value.fps||!Number.isSafeInteger(totalSamples)||!unique(value.facts.map(f=>f.id))||value.facts.some(f=>f.id.length>120||f.id!==f.id.trim()||!f.text.trim())||!unique(value.frames.map(f=>f.id))||!unique(value.transcripts.map(t=>t.id))||value.frames.some((f,i)=>f.frame>=value.totalFrames||i>0&&f.frame<=value.frames[i-1].frame)||value.transcripts.some(t=>t.startSample>=t.endSample||t.endSample>totalSamples))throw Error('CONTENT_INPUT_INVALID');
- if(canonicalHash({schemaVersion:1,facts:value.facts})!==value.factsManifestSha256)throw Error('CONTENT_INPUT_CHANGED');
+ const manifest=value.contentRequirementsRef?{schemaVersion:2,facts:value.facts,contentRequirementsRef:value.contentRequirementsRef}:{schemaVersion:1,facts:value.facts};
+ if(canonicalHash(manifest)!==value.factsManifestSha256)throw Error('CONTENT_INPUT_CHANGED');
  if(value.requirements.length!==value.facts.length||!unique(value.requirements.map(r=>r.factId))||value.requirements.some(r=>{const fact=value.facts.find(f=>f.id===r.factId);return!fact||r.representation==='literal'&&!r.exactText.length||!unique(r.exactText.map(s=>s.normalize('NFC')))||r.exactText.some(t=>!normalized(t)||!fact.text.normalize('NFC').includes(t.normalize('NFC')))}))throw Error('CONTENT_INPUT_INVALID');
  return{...value,contextSha256:canonicalHash(value)};
 }

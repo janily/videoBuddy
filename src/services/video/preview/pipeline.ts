@@ -8,6 +8,7 @@ import {getStyle} from '@/services/video/styles/registry';
 import {readNarrationJson} from '@/services/video/audio/narration-package';
 import {prepareVisualReviewBatch} from '@/services/video/quality/visual-review-stage';
 import {prepareTreatmentStage} from './treatment-stage';
+import {prepareContentRequirementsStage} from './content-requirements-stage';
 import {prepareVoiceStage} from './voice-stage';
 import {prepareTimingStage} from './timing-stage';
 import {prepareNarrationPackageStage} from './narration-package-stage';
@@ -44,6 +45,7 @@ export async function buildPreviewPipeline(projects:ProjectStore,input:Parameter
   await assertPreviewOperation(projects,c,operationId,revisionId,input.previewId,expectedConsentEpoch);await activity(name,label);
  }
  const retry=await readFrozenPreview(projects,root,projectId,operationId,revisionId,expectedConsentEpoch),mustExist=Boolean(retry);
+ if(!retry){await stage('source','正在核对资料的表达要求');await prepareContentRequirementsStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env})}
  await stage('treatment','正在构思故事');
  const treatmentRef=retry?.treatmentRef||await prepareTreatmentStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env});
  const treatment=guardTreatment(await readNarrationJson(projects.store,treatmentRef,revisionPrefix+'treatment-plan/'),understanding,getStyle(understanding.preferences.styleSlug!).rulesHash);
