@@ -132,3 +132,7 @@ Spec复核指出只匹配引导语开头还会误认“旁白原文出自‘你�
 最新正式任务 e89eeef4-e5e8-4402-983b-76f514798a4a 已完成真实20秒1080p渲染，最终混音4句核验通过，两轮Visual通过；Content不再误报ASR同音选字冲突，但每批仅两帧导致跨4句字幕事实仍为partial/not_checked，因此真实失败QUALITY_BLOCKED，未发布。当前修复让新版MVP的Content每轮读取全部已验PNG帧，Visual仍保持两帧批次；传输使用逐像素RGBA比对后的无损WebP。旧stage v1报告、抽帧计划、失败记录和原始ASR不改写。相关5文件23项测试通过（40.17秒）；新增加的重图像编解码测试使用15秒明确上限，既有测试阈值不变。
 
 诊断器原本只允许本地PNG data URI，第一次WebP诊断在到达模型HTTP之前被本地拦截，requests=0；保守started记账仍保留unknown，未伪造usage或退款。第二次诊断在预约前被原3槽上限拦截，requests=0。依据既有“不限次数和费用上限”及MVP实施授权，显式本机操作将未知恢复上限扩展为8，原授权不可变归档、gate及账目原样保留，不允许重放任何未知effect。两份失败报告保留，第三次新诊断正在验证实际完整轮次输入；均不发布影片或伪造产品批准。
+
+完整轮次实际模型诊断通过：4张原1080p帧无损WebP，7,866,389请求bytes，gemini-3.8-flash实际HTTP200，28.08秒，usage9311/4139；三项facts均complete/pass、无conflicts，旧失败源完全不变，0新媒体、未发布。两轴复核关闭诊断完整覆盖P2，真实4帧source-only复核0模型/native。
+
+浏览器新预览3f371b8d-0fb2-468e-af56-c1a1034dc515实际完成生成，但其夜色镜头frame358被独立Critic判定blocking style_drift，因此PREVIEW_QUALITY_BLOCKED，真实失败保留。正常聊天随后尝试改画风，Director虽返回合法来源patch却错误选择prepare_preview，guard按规则拒绝AUTHORIZATION_REQUIRED，消息中断且brief仍为2。本轮补模型专用DirectorResponseSchema，只允许none/classify_change，保留历史Guidance合同与服务端授权guard；明确画风偏好归创意摘要而非必须展示的新事实。新政策反例RED→GREEN，5文件28项相关测试、types/lint通过。完整回归在该最后prompt修复之前为155文件757项69.78秒，Next构建通过；最后变更需要最终回归。
