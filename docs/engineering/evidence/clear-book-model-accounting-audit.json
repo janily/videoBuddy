@@ -1,0 +1,61 @@
+{
+  "status": "five_actual_model_responses_and_exact_usage_settled",
+  "sourceOperationId": "7abd57da-019e-4c7b-8a37-5921a6c3b3c5",
+  "calls": [
+    {
+      "responseSha256": "c6edc62374b94df85ec1a87fff881f2db3219acb5a5e334005c5fadbfdcb31f5",
+      "responseBytes": 8199,
+      "status": 200,
+      "model": "gemini-3.8-flash",
+      "inputTokens": 9836,
+      "outputTokens": 8112,
+      "accountingKey": "a7332b204e59a7d658eee321505ed5321d49f5d22fc02c13295b8557d7ea5aec",
+      "accountingState": "settled"
+    },
+    {
+      "responseSha256": "950e76b034acb972ffd4867c1f1d6f493154a0075096f6e4488e2f120a0c8bb5",
+      "responseBytes": 16650,
+      "status": 200,
+      "model": "gemini-3.8-flash",
+      "inputTokens": 8109,
+      "outputTokens": 7094,
+      "accountingKey": "08c0985e9c665f563607e83c20968bdf23b358f56ae56d4a5ff6c6cac96a5885",
+      "accountingState": "settled"
+    },
+    {
+      "responseSha256": "ce6693013151c48f1b4ebf3fe8f4ad65df905da63ac3aa55d959f663aac7a4b6",
+      "responseBytes": 18859,
+      "status": 200,
+      "model": "gemini-3.8-flash",
+      "inputTokens": 8105,
+      "outputTokens": 8375,
+      "accountingKey": "02cdf8354753d7e08c755f5aa03f3adec4231444e61d1043336592eaa5ecbc96",
+      "accountingState": "settled"
+    },
+    {
+      "responseSha256": "5f7b46fa4a02e2bd4d1f1bac8fb8e3b5bb1e2e700378e6bc10200ab3738e8136",
+      "responseBytes": 17656,
+      "status": 200,
+      "model": "gemini-3.8-flash",
+      "inputTokens": 8098,
+      "outputTokens": 8674,
+      "accountingKey": "14afa6056ee316eaf333b41c2bd9d4b81a604850e0e3122c5a90862b47a868e4",
+      "accountingState": "settled"
+    },
+    {
+      "responseSha256": "764daf769794945bc219d20914067d6e3351723b0201b83a895bd2a85106a1c8",
+      "responseBytes": 19606,
+      "status": 200,
+      "model": "gemini-3.8-flash",
+      "inputTokens": 8090,
+      "outputTokens": 8313,
+      "accountingKey": "908a1f1a22fc86671caed9d12ec82834a2d47881753cae254d65c7921c775afe",
+      "accountingState": "settled"
+    }
+  ],
+  "totalInputTokens": 42238,
+  "totalOutputTokens": 40568,
+  "requestsWithoutRawResponse": 0,
+  "unsettledNewCalls": 0,
+  "newModelCalls": 0
+}

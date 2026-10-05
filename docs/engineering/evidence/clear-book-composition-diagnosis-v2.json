@@ -1,0 +1,10 @@
+{
+  "executedAt": "2026-10-05T01:04:53.249Z",
+  "mode": "readonly_control_overlay_all_writes_forbidden",
+  "newModelCalls": 0,
+  "status": "readonly_composite_failure_observed",
+  "errorCode": "VOICE_OUTPUT_INVALID",
+  "stack": "Error: VOICE_OUTPUT_INVALID\n    at probeVoiceWav (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/wav.ts:35:65)\n    at inspectVoiceWav (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/wav.ts:62:9)\n    at async verifyPostMixNarration (/Users/janily/Desktop/dev/videoBuddy/src/services/video/audio/postmix-asr.ts:78:19)\n    at async prepareCompositeStage (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-stage.ts:130:203)\n    at async main (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-clear-book-composition.ts:21:6)",
+  "originalControlUnchanged": true,
+  "originalNativeJournalUnchanged": true
+}

@@ -1,3 +1,4 @@
+import {selectPostMixDownmix,type PostMixDownmix} from '../audio/postmix-extraction';
 import {resolvePreviewPostMixReview} from '../preview/postmix-review';
 import {join} from 'node:path';
 import type {ProjectStore} from '@/services/video/storage/project-store';
@@ -48,8 +49,10 @@ export async function composeApprovedFilm(projects:ProjectStore,owner:string,pro
  if(canonicalHash(actual)!==canonicalHash(movie.technicalQa)||movie.loudness.filmSha256!==actual.sha256)throw Error('RENDER_OUTPUT_CHANGED');
  const film={outputPath:movie.outputPath,sha256:actual.sha256,durationMs:durationSec*1000,technicalQa:'pass' as const};
  await assertApprovedRenderFence(projects,inputs);
- const postMix=!verified.lines.length&&!track.wav.silence?await verifyPostMixNoNarration(projects.store,root,film,projectId,inputs.bundle.revisionId,executionRef,frozen.audioManifest.planRef,frozen.audioManifest.timingDraftRef):await verifyPostMixNarration(root,film,plan,verified,env,undefined,{mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs),journal,resolveReview:context=>resolvePreviewPostMixReview(projects,root,projectId,inputs.bundle.revisionId,context,{mustExist:options.mustExist,verified})});
- const record={schemaVersion:2 as const,inputHash:inputs.inputHash,pictureStageHash:canonicalHash(picture),audioExecutionSha256:executionRef.sha256,movie,postMix,qualityStatus:'semantic_not_checked' as const,deliveryEligible:false as const};
+ let existingProtocol:{postMixDownmix?:PostMixDownmix}|undefined;try{existingProtocol=(await projects.store.readFresh<{postMixDownmix?:PostMixDownmix}>(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
+ const downmix=selectPostMixDownmix(frozen.filmSpec.qualityPolicyVersion,track.wav.channels,existingProtocol);
+ const postMix=!verified.lines.length&&!track.wav.silence?await verifyPostMixNoNarration(projects.store,root,film,projectId,inputs.bundle.revisionId,executionRef,frozen.audioManifest.planRef,frozen.audioManifest.timingDraftRef):await verifyPostMixNarration(root,film,plan,verified,env,undefined,{...(downmix?{downmix}:{}),mustExist:options.mustExist,assertActive:()=>assertApprovedRenderFence(projects,inputs),journal,resolveReview:context=>resolvePreviewPostMixReview(projects,root,projectId,inputs.bundle.revisionId,context,{mustExist:options.mustExist,verified})});
+ const record={schemaVersion:2 as const,inputHash:inputs.inputHash,pictureStageHash:canonicalHash(picture),audioExecutionSha256:executionRef.sha256,movie,postMix,...(downmix?{postMixDownmix:downmix}:{}),qualityStatus:'semantic_not_checked' as const,deliveryEligible:false as const};
  let previous:typeof record|undefined;try{previous=(await projects.store.readFresh<typeof record>(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(previous&&canonicalHash(previous)!==canonicalHash(record))throw Error('RENDER_OUTPUT_CHANGED');
  const latest=await loadApprovedRenderInputs(projects,owner,projectId,operationId,expectedFence,{root,env});

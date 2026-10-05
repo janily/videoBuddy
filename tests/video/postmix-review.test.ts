@@ -1,3 +1,4 @@
+import {postMixExtractionKey,type PostMixDownmix} from '@/services/video/audio/postmix-extraction';
 import {expect,it} from 'vitest';
 import {confirmNarrationReusePolicy,findNarrationPolicyReview,verifyPolicyPostMixText} from '@/services/video/audio/narration-policy';
 import {createHash,randomUUID} from 'node:crypto';
@@ -18,15 +19,15 @@ import {verifySpokenText,type VerifiedNarrationManifest} from '@/services/video/
 import {inspectVoiceWav} from '@/services/video/audio/wav';
 import {assertPostMixReviewChallenge,createPostMixReviewChallenge,confirmPostMixReview,loadConfirmedPostMixReview,verifyReviewedPostMixText} from '@/services/video/audio/postmix-review';
 
-async function fixture(root:string){
+async function fixture(root:string,downmix?:PostMixDownmix){
  const projects=new ProjectStore(new FileStore(root)),owner='mixed-review-owner';
  const {projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),revisionId=randomUUID();
  const plan:NarrationPlan={durationMs:20000,lines:[{lineId:'line_2',language:'zh-CN',spokenText:'洒下适量的水，润湿土壤。',displayText:'洒下适量的水，润湿土壤。',expectedAsrText:'洒下适量的水，润湿土壤。',startMs:5000,reservedMs:800}]};
  // Synthetic container and PCM test ownership/hash boundaries, not real speech QA.
  const filmDir=join(root,'composition','fixture');await mkdir(filmDir,{recursive:true});const bytes=Buffer.alloc(2048,1),outputPath=join(filmDir,'final.mp4');await writeFile(outputPath,bytes);
  const film={outputPath,sha256:createHash('sha256').update(bytes).digest('hex'),durationMs:20000,technicalQa:'pass' as const};
- const window={startMs:5000,lengthMs:1000,mediaRuntimeDigest:'a'.repeat(64)};
- const key=createHash('sha256').update(JSON.stringify([film.sha256,'line_2','zh-CN',window.startMs,window.lengthMs,window.mediaRuntimeDigest,'postmix-v1'])).digest('hex'),dir=join(root,'postmix',key,'output');await mkdir(dir,{recursive:true});
+ const window={startMs:5000,lengthMs:1000,mediaRuntimeDigest:'a'.repeat(64),...(downmix?{downmix}:{})};
+ const key=postMixExtractionKey(film.sha256,'line_2','zh-CN',window),dir=join(root,'postmix',key,'output');await mkdir(dir,{recursive:true});
  const pcm=Buffer.alloc(44+96000);pcm.write('RIFF');pcm.writeUInt32LE(pcm.length-8,4);pcm.write('WAVEfmt ',8);pcm.writeUInt32LE(16,16);pcm.writeUInt16LE(3,20);pcm.writeUInt16LE(1,22);pcm.writeUInt32LE(24000,24);pcm.writeUInt32LE(96000,28);pcm.writeUInt16LE(4,32);pcm.writeUInt16LE(32,34);pcm.write('data',36);pcm.writeUInt32LE(96000,40);for(let n=0;n<24000;n++)pcm.writeFloatLE(Math.sin(n/20)*0.1,44+n*4);
  const mixedPath=join(dir,'line.wav');await writeFile(mixedPath,pcm);const wav=await inspectVoiceWav(mixedPath);
  const transcript:AsrTranscript={language:'zh-CN',model:'Systran/faster-whisper-medium',runtimeDigest:'b'.repeat(64),voiceSha256:wav.sha256,recognizedText:'撒下适量的水 润湿土壤',segments:[{text:'撒下适量的水 润湿土壤',startMs:0,endMs:700,words:[{text:'撒下适量的水 润湿土壤',startMs:0,endMs:700,probability:0.95}]}]};
@@ -160,5 +161,17 @@ it('cold reuses only an explicit owner policy for exact verified source and pres
   await writeFile(voicePath,Buffer.alloc(pcm.length));await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,verified,f.context)).rejects.toThrow();await writeFile(voicePath,pcm);
   await updateJson(f.projects.store,`projects/${f.projectId}/control`,(control:ProjectControl)=>({...control,consentEpoch:control.consentEpoch+1}));
   await expect(findNarrationPolicyReview(cold,root,f.projectId,f.context.plan,verified,f.context)).resolves.toBeUndefined();
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('binds a stereo-average listening proof to the versioned extracted WAV and rejects legacy substitution',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-average-review-'));
+ try{
+  const f=await fixture(root,'stereo_average'),ref=await confirmPostMixReview(f.projects,f.owner,f.projectId,f.challenge,f.messageId),proof=await loadConfirmedPostMixReview(new FileStore(root),f.projectId,ref);
+  expect(proof.challenge.downmix).toBe('stereo_average');
+  expect(verifyReviewedPostMixText(f.context,proof).status).toBe('trusted_review');
+  const {downmix,...oldWindow}=f.context.window;void downmix;
+  expect(()=>verifyReviewedPostMixText({...f.context,window:oldWindow},proof)).toThrow('POSTMIX_REVIEW_CHANGED');
+  expect(postMixExtractionKey(f.context.film.sha256,f.context.lineId,'zh-CN',oldWindow)).not.toBe(postMixExtractionKey(f.context.film.sha256,f.context.lineId,'zh-CN',f.context.window));
  }finally{await rm(root,{recursive:true,force:true})}
 });

@@ -1,3 +1,4 @@
+import {postMixExtractionKey,postMixExtractionVersion,type PostMixDownmix} from './postmix-extraction';
 import {verifyPolicyPostMixText,type NarrationPolicyProof} from './narration-policy';
 import {verifyReviewedPostMixText,type ConfirmedPostMixReview,type PostMixReviewContext} from './postmix-review';
 import {hasVerifiedNarrationStatus} from './asr';
@@ -21,10 +22,11 @@ function postMixDockerBase(image:string,user:string,filmPath:string,outputDir:st
  if(!/^sha256:[a-f0-9]{64}$/.test(image)||!/^\d+:\d+$/.test(user)||[filmPath,outputDir].some(path=>!isAbsolute(path)||!/^\/[A-Za-z0-9_./-]+$/.test(path)))throw Error('POSTMIX_JOB_INVALID');
  return['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','2','--memory','1g','--memory-swap','1g','--user',user,'--tmpfs','/tmp:rw,nosuid,size=64m','--mount',`type=bind,src=${filmPath},dst=/input/final.mp4,readonly`,'--mount',`type=bind,src=${outputDir},dst=/output`,image,'ffmpeg','-hide_banner','-loglevel','error','-xerror','-nostdin','-y','-i','/input/final.mp4'];
 }
-export function postMixDockerArguments(image:string,user:string,filmPath:string,outputDir:string,startMs:number,lengthMs:number){
+export function postMixDockerArguments(image:string,user:string,filmPath:string,outputDir:string,startMs:number,lengthMs:number,downmix?:PostMixDownmix){
  if(!Number.isFinite(startMs)||startMs<0||!Number.isFinite(lengthMs)||lengthMs<200||lengthMs>30000)throw Error('POSTMIX_JOB_INVALID');
+ postMixExtractionVersion(downmix);
  const start=Math.floor(startMs),end=Math.ceil(startMs+lengthMs);
- return[...postMixDockerBase(image,user,filmPath,outputDir),'-ss',String(start/1000),'-t',String((end-start)/1000),'-map','0:a:0','-vn','-ar','24000','-ac','1','-c:a','pcm_f32le','/output/line.wav'];
+ return[...postMixDockerBase(image,user,filmPath,outputDir),'-ss',String(start/1000),'-t',String((end-start)/1000),'-map','0:a:0','-vn',...(downmix==='stereo_average'?['-af','pan=mono|c0=0.5*c0+0.5*c1']:[]),'-ar','24000','-ac','1','-c:a','pcm_f32le','/output/line.wav'];
 }
 export function postMixSilenceDockerArguments(image:string,user:string,filmPath:string,outputDir:string){
  return[...postMixDockerBase(image,user,filmPath,outputDir),'-map','0:a:0','-vn','-ar','48000','-ac','1','-c:a','pcm_f32le','/output/track.wav'];
@@ -44,7 +46,8 @@ export async function verifyPostMixNoNarration(store:AtomicStore,root:string,fil
  await verifiedFilmHash(root,film);
  return{status:'not_applicable' as const,reason:'no_narration' as const,filmSha256:film.sha256,executionSha256:executionRef.sha256,voiceTrackSha256:voice.sha256,lines:[]};
 }
-export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal;resolveReview?:(context:PostMixReviewContext)=>Promise<ConfirmedPostMixReview|NarrationPolicyProof|undefined>}={}){
+export async function verifyPostMixNarration(root:string,film:PostMixFilm,originalPlan:NarrationPlan,verified:VerifiedNarrationManifest,env:Environment=process.env,onMismatch?:(lineId:string,recognizedText:string)=>void,options:{downmix?:PostMixDownmix;assertActive?:()=>Promise<void>;mustExist?:boolean;journal?:DockerJournal;resolveReview?:(context:PostMixReviewContext)=>Promise<ConfirmedPostMixReview|NarrationPolicyProof|undefined>}={}){
+ postMixExtractionVersion(options.downmix);
  await options.assertActive?.();
  if(originalPlan.durationMs!==film.durationMs||verified.durationMs!==film.durationMs||originalPlan.lines.length!==verified.lines.length)throw Error('POSTMIX_PLAN_CHANGED');
  await verifiedFilmHash(root,film);
@@ -73,15 +76,15 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   if(!original||original.language!==line.language||original.spokenText!==line.spokenText||original.displayText!==line.displayText||original.expectedAsrText!==line.expectedAsrText||original.startMs!==line.startMs||original.reservedMs!==line.reservedMs||!hasVerifiedNarrationStatus(line)||line.wordTimingsStatus!=='available'||line.durationMs<=0)throw Error('POSTMIX_PLAN_CHANGED');
   const nextStart=ordered[index+1]?.startMs??film.durationMs,lengthMs=Math.min(line.durationMs+300,nextStart-line.startMs,film.durationMs-line.startMs);
   if(lengthMs<line.durationMs||lengthMs>30000)throw Error('POSTMIX_PLAN_CHANGED');
-  const key=createHash('sha256').update(JSON.stringify([film.sha256,line.lineId,line.language,line.startMs,lengthMs,config.runtimeDigest,'postmix-v1'])).digest('hex');
+  const window={startMs:line.startMs,lengthMs,mediaRuntimeDigest:config.runtimeDigest,...(options.downmix?{downmix:options.downmix}:{})},key=postMixExtractionKey(film.sha256,line.lineId,line.language,window);
   const stageDir=join(root,'postmix',key),outputDir=join(stageDir,'output'),outputPath=join(outputDir,'line.wav');if(!options.mustExist)await mkdir(outputDir,{recursive:true,mode:0o700});
   let wav;try{wav=await inspectVoiceWav(outputPath)}catch(error){
    if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;
    if(options.mustExist)throw Error('POSTMIX_EVIDENCE_MISSING');
-   await runOwnedDocker(postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs),60000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
+   await runOwnedDocker(postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs,options.downmix),60000,config.image,options.assertActive,...(options.journal?[options.journal]:[]));
    wav=await inspectVoiceWav(outputPath);
   }
-  if(options.journal)await assertDockerCacheReusable(options.journal,postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs),config.image);
+  if(options.journal)await assertDockerCacheReusable(options.journal,postMixDockerArguments(config.image,config.user,film.outputPath,outputDir,line.startMs,lengthMs,options.downmix),config.image);
   await options.assertActive?.();
   const transcript=await transcribeAudio(root,{language:line.language,outputPath,wav},'postmix',env,options);
   await options.assertActive?.();
@@ -89,7 +92,7 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   try{checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript)}
   catch(error){
    if((error as Error).message!=='ASR_MISMATCH')throw error;
-   const context:PostMixReviewContext={film,plan:originalPlan,lineId:line.lineId,window:{startMs:line.startMs,lengthMs,mediaRuntimeDigest:config.runtimeDigest},transcript},proof=await options.resolveReview?.(context);
+   const context:PostMixReviewContext={film,plan:originalPlan,lineId:line.lineId,window,transcript},proof=await options.resolveReview?.(context);
    await options.assertActive?.();
    if(!proof){onMismatch?.(line.lineId,transcript.recognizedText);throw Error(`POSTMIX_ASR_MISMATCH: ${line.lineId}`)}
    checked='kind' in proof&&proof.kind==='owner_narration_reuse_policy'?verifyPolicyPostMixText(context,proof):verifyReviewedPostMixText(context,proof as ConfirmedPostMixReview);

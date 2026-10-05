@@ -1,0 +1,217 @@
+{
+  "executedAt": "2026-10-05T01:09:17.129Z",
+  "status": "actual_stereo_average_postmix_and_cold_verified",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "7abd57da-019e-4c7b-8a37-5921a6c3b3c5",
+  "sourceRevisionId": "4838f74b-4b34-4156-9511-0629ec18cb78",
+  "journalPrefix": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects",
+  "newModelCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "result": {
+    "status": "pass",
+    "filmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+    "lines": [
+      {
+        "lineId": "line_1",
+        "recognizedText": "把小种子轻轻放进泥土里",
+        "sourceSha256": "e68471ec08ee22e2e1f15971b1e734940be1cb378ead5b8107fecf23b67fd4f1",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_2",
+        "recognizedText": "撒下适量的水润湿土壤",
+        "sourceSha256": "a7b30c09022cb0d6926aebfbdb22845d8bd813985243bfc0105e76fa9f1d25ba",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 10,
+        "status": "trusted_policy",
+        "narrationPolicyRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/narration-policies/398b55a00d7323cbf13c33ebffb7164edd39a01459d4764d89aeb7c49b1ad5b8",
+          "sha256": "398b55a00d7323cbf13c33ebffb7164edd39a01459d4764d89aeb7c49b1ad5b8",
+          "bytes": 1179,
+          "mime": "application/json"
+        }
+      },
+      {
+        "lineId": "line_3",
+        "recognizedText": "泥土里探出了嫩绿的小芽",
+        "sourceSha256": "31aa94bae8ca7cc8f8d91b47f36e1ce4cee1801de54f9f00c312a90d66e9d079",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_4",
+        "recognizedText": "觀察成長 耐心照料",
+        "sourceSha256": "97bc67fafadb49c00984c1b294b033e7b0e6b099d86b4e7b83c41eb6b592eb43",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 8,
+        "status": "pass"
+      }
+    ]
+  },
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+    "bytes": 5339754,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2
+  },
+  "loudness": {
+    "status": "pass",
+    "filmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+    "runtimeDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "integratedLufs": -13.49,
+    "truePeakDbtp": -2.23,
+    "targetLufs": -14,
+    "toleranceLu": 1,
+    "maxTruePeakDbtp": -1.2
+  },
+  "filmSpecRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "bytes": 2631,
+    "mime": "application/json"
+  },
+  "outputs": [
+    {
+      "lineId": "line_1",
+      "key": "a176cdfc7ff3c5705631065423b3090a11dfd3066dc1a57fe249107902023454",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 93600,
+        "durationMs": 3900,
+        "bytes": 374514,
+        "sha256": "e68471ec08ee22e2e1f15971b1e734940be1cb378ead5b8107fecf23b67fd4f1",
+        "peakDbfs": -2.7941101091664553,
+        "rmsDbfs": -15.833356952951355
+      }
+    },
+    {
+      "lineId": "line_2",
+      "key": "90e9e47b69b3e1f088a46a05a4122ef4c6eccc20a6c179e7caca1c2c3a77f5ab",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 88200,
+        "durationMs": 3675,
+        "bytes": 352914,
+        "sha256": "a7b30c09022cb0d6926aebfbdb22845d8bd813985243bfc0105e76fa9f1d25ba",
+        "peakDbfs": -4.1988493719942905,
+        "rmsDbfs": -16.555926214610025
+      }
+    },
+    {
+      "lineId": "line_3",
+      "key": "174157bb63f25c28b08b44f653c09a59db726c0841fd16695397dee16303d844",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 87000,
+        "durationMs": 3625,
+        "bytes": 348114,
+        "sha256": "31aa94bae8ca7cc8f8d91b47f36e1ce4cee1801de54f9f00c312a90d66e9d079",
+        "peakDbfs": -3.834119560311092,
+        "rmsDbfs": -17.12120511021706
+      }
+    },
+    {
+      "lineId": "line_4",
+      "key": "f8ffc151c82ea204d20d6678bc533f390f7027d3df87768623b43ce09fb7667f",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 24000,
+        "channels": 1,
+        "samples": 79200,
+        "durationMs": 3300,
+        "bytes": 316914,
+        "sha256": "97bc67fafadb49c00984c1b294b033e7b0e6b099d86b4e7b83c41eb6b592eb43",
+        "peakDbfs": -3.71540289871266,
+        "rmsDbfs": -15.769204367568658
+      }
+    }
+  ],
+  "coldMatches": true,
+  "newColdNativeCalls": 0,
+  "oldInvalidWavPreserved": true,
+  "sourceControlBudgetOperationUnchanged": true,
+  "originalNativeJournalUnchanged": true,
+  "invocations": [
+    {
+      "schemaVersion": 1,
+      "invocation": "69b10e0f-38af-4995-a7ca-b97431c159fc",
+      "image": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "argsSha256": "2b33c620481e9d7d575ba859a13594a3319c51a52ac1dfa6f5f20f9756cb4565",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "10c47c1b-634e-4cef-a73a-f2b226cfd69a",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "3bed80fac520c12432e8608ce1ed093a5119ef465bad861ddfafc0abd0034b1a",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"觀察成長 耐心照料\", \"startMs\": 0, \"endMs\": 2320, \"words\": [{\"text\": \"觀\", \"startMs\": 0, \"endMs\": 580, \"probability\": 0.5404747128486633}, {\"text\": \"察\", \"startMs\": 580, \"endMs\": 800, \"probability\": 0.9995669722557068}, {\"text\": \"成\", \"startMs\": 800, \"endMs\": 1060, \"probability\": 0.9901543259620667}, {\"text\": \"長\", \"startMs\": 1060, \"endMs\": 1340, \"probability\": 0.9953722357749939}, {\"text\": \" 耐\", \"startMs\": 1580, \"endMs\": 1640, \"probability\": 0.9924434721469879}, {\"text\": \"心\", \"startMs\": 1640, \"endMs\": 1840, \"probability\": 0.9984595775604248}, {\"text\": \"照\", \"startMs\": 1840, \"endMs\": 2080, \"probability\": 0.9917253255844116}, {\"text\": \"料\", \"startMs\": 2080, \"endMs\": 2320, \"probability\": 0.9925948977470398}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "e2cb029f-263b-46d2-90f5-be6e4df0f0ec",
+      "image": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "argsSha256": "63f3ae85e5528eef3363132e0f215e6962334322e9abcfe1780ed8dfde326f3b",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "bb1ae94e-271e-4bb7-80fa-cdce2e4c1ba9",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "70a0c2144becb6fe4f34b01e5ea419cb1f649d6d4b71c601cbef98892d6c748b",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"泥土里探出了嫩绿的小芽\", \"startMs\": 0, \"endMs\": 2780, \"words\": [{\"text\": \"泥\", \"startMs\": 0, \"endMs\": 500, \"probability\": 0.9886489808559418}, {\"text\": \"土\", \"startMs\": 500, \"endMs\": 720, \"probability\": 0.995083212852478}, {\"text\": \"里\", \"startMs\": 720, \"endMs\": 960, \"probability\": 0.8063124418258667}, {\"text\": \"探\", \"startMs\": 960, \"endMs\": 1260, \"probability\": 0.9632198214530945}, {\"text\": \"出\", \"startMs\": 1260, \"endMs\": 1500, \"probability\": 0.9886562824249268}, {\"text\": \"了\", \"startMs\": 1500, \"endMs\": 1720, \"probability\": 0.9870391488075256}, {\"text\": \"嫩\", \"startMs\": 1720, \"endMs\": 1840, \"probability\": 0.9965127110481262}, {\"text\": \"绿\", \"startMs\": 1840, \"endMs\": 2020, \"probability\": 0.90388622879982}, {\"text\": \"的\", \"startMs\": 2020, \"endMs\": 2220, \"probability\": 0.9858945608139038}, {\"text\": \"小\", \"startMs\": 2220, \"endMs\": 2420, \"probability\": 0.986407995223999}, {\"text\": \"芽\", \"startMs\": 2420, \"endMs\": 2780, \"probability\": 0.9633964598178864}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "df2b2788-63d3-440e-a0e6-1d732be1d265",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "7ba5ccee1b703d8de845264fb2511431abe06b49b7542ecdedab911c9cc36620",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"撒下适量的水润湿土壤\", \"startMs\": 0, \"endMs\": 2800, \"words\": [{\"text\": \"撒\", \"startMs\": 0, \"endMs\": 600, \"probability\": 0.8769825100898743}, {\"text\": \"下\", \"startMs\": 600, \"endMs\": 840, \"probability\": 0.978725016117096}, {\"text\": \"适\", \"startMs\": 840, \"endMs\": 1000, \"probability\": 0.8880641460418701}, {\"text\": \"量\", \"startMs\": 1000, \"endMs\": 1180, \"probability\": 0.9995212554931641}, {\"text\": \"的\", \"startMs\": 1180, \"endMs\": 1360, \"probability\": 0.9902601838111877}, {\"text\": \"水\", \"startMs\": 1360, \"endMs\": 1640, \"probability\": 0.9996558427810669}, {\"text\": \"润\", \"startMs\": 1640, \"endMs\": 1940, \"probability\": 0.7336957454681396}, {\"text\": \"湿\", \"startMs\": 1940, \"endMs\": 2160, \"probability\": 0.8389740288257599}, {\"text\": \"土\", \"startMs\": 2160, \"endMs\": 2480, \"probability\": 0.9193271398544312}, {\"text\": \"壤\", \"startMs\": 2480, \"endMs\": 2800, \"probability\": 0.9933176636695862}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "854aac6a-0c43-456e-97f6-1f61f78e7e51",
+      "image": "sha256:caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "argsSha256": "9009697b345d224ab34390e6fd138af08ce9b80930bb3b0149f951fb6fc06960",
+      "state": "completed",
+      "output": "{\"language\": \"zh-CN\", \"model\": \"Systran/faster-whisper-medium\", \"segments\": [{\"text\": \"把小种子轻轻放进泥土里\", \"startMs\": 0, \"endMs\": 2920, \"words\": [{\"text\": \"把\", \"startMs\": 0, \"endMs\": 540, \"probability\": 0.8715646266937256}, {\"text\": \"小\", \"startMs\": 540, \"endMs\": 780, \"probability\": 0.9947007894515991}, {\"text\": \"种\", \"startMs\": 780, \"endMs\": 1020, \"probability\": 0.6685228943824768}, {\"text\": \"子\", \"startMs\": 1020, \"endMs\": 1300, \"probability\": 0.9993472695350647}, {\"text\": \"轻\", \"startMs\": 1300, \"endMs\": 1600, \"probability\": 0.9650058746337891}, {\"text\": \"轻\", \"startMs\": 1600, \"endMs\": 1820, \"probability\": 0.9993857741355896}, {\"text\": \"放\", \"startMs\": 1820, \"endMs\": 2080, \"probability\": 0.974219799041748}, {\"text\": \"进\", \"startMs\": 2080, \"endMs\": 2280, \"probability\": 0.9930608868598938}, {\"text\": \"泥\", \"startMs\": 2280, \"endMs\": 2480, \"probability\": 0.9923781156539917}, {\"text\": \"土\", \"startMs\": 2480, \"endMs\": 2680, \"probability\": 0.9970813393592834}, {\"text\": \"里\", \"startMs\": 2680, \"endMs\": 2920, \"probability\": 0.9910755157470703}]}]}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "049fb9b9-f7a9-4286-878a-68103e07c7f7",
+      "image": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "argsSha256": "9588ba5f84f46e7661c698af86cbc72d473df6d1ea7e2e75ab5bb4702b17ac31",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "8f02c13b-9f33-44c3-bb5e-97071ea65128",
+      "image": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "argsSha256": "d16fdc3de5ceb7408beb791c341eb3e635ece5ea9863e9ae07e0befb5db5cf6b",
+      "state": "completed",
+      "output": ""
+    }
+  ]
+}

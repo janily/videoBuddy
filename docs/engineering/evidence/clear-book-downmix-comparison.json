@@ -1,0 +1,14 @@
+{
+  "status": "real_same_window_downmix_gain_comparison_verified",
+  "samples": 93600,
+  "oldSha256": "5234f3fde2fd485f8f65ba52c3dfbc5a00e1879c09568ebf74ab54465686a13f",
+  "newSha256": "e68471ec08ee22e2e1f15971b1e734940be1cb378ead5b8107fecf23b67fd4f1",
+  "oldPeak": 1.0252019166946411,
+  "newPeak": 0.7249273657798767,
+  "oldOverUnitySamples": 2,
+  "newOverUnitySamples": 0,
+  "maxErrorAgainstOldDivSqrt2": 1.8751210273393326e-07,
+  "sourceFilmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+  "newModelCalls": 0,
+  "deliveryEligible": false
+}

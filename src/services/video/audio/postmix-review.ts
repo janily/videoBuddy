@@ -1,4 +1,4 @@
-import {createHash} from 'node:crypto';
+import {postMixExtractionKey,type PostMixDownmix} from './postmix-extraction';
 import {join} from 'node:path';
 import {z} from 'zod';
 import {ObjectRefSchema,type ObjectRef} from '@/contracts/video/domain';
@@ -15,7 +15,7 @@ import {inspectVoiceWav} from './wav';
 import {verifiedFilmHash,type PostMixFilm} from './postmix-asr';
 
 const digest=z.string().regex(/^[a-f0-9]{64}$/);
-const ChallengeSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('postmix_review_challenge'),projectId:z.uuid(),sourceRevisionId:z.uuid(),planSha256:digest,lineId:z.string().regex(/^[-a-zA-Z0-9_]{1,80}$/),language:z.enum(['zh-CN','en']),spokenText:z.string().min(1).max(250),displayText:z.string().min(1).max(500),expectedAsrText:z.string().min(1).max(500),filmSha256:digest,filmDurationMs:z.number().int().min(20000).max(120000),startMs:z.number().nonnegative(),lengthMs:z.number().min(200).max(30000),mediaRuntimeDigest:digest,mixedWavSha256:digest,transcriptSha256:digest,wordTimingsSha256:digest,recognizedText:z.string().min(1).max(2000),asrModel:z.string().regex(/^Systran\/faster-whisper-(?:small|medium)$/),asrRuntimeDigest:digest,scope:z.literal('single_postmix_wav')});
+const ChallengeSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('postmix_review_challenge'),projectId:z.uuid(),sourceRevisionId:z.uuid(),planSha256:digest,lineId:z.string().regex(/^[-a-zA-Z0-9_]{1,80}$/),language:z.enum(['zh-CN','en']),spokenText:z.string().min(1).max(250),displayText:z.string().min(1).max(500),expectedAsrText:z.string().min(1).max(500),filmSha256:digest,filmDurationMs:z.number().int().min(20000).max(120000),startMs:z.number().nonnegative(),lengthMs:z.number().min(200).max(30000),mediaRuntimeDigest:digest,downmix:z.literal('stereo_average').optional(),mixedWavSha256:digest,transcriptSha256:digest,wordTimingsSha256:digest,recognizedText:z.string().min(1).max(2000),asrModel:z.string().regex(/^Systran\/faster-whisper-(?:small|medium)$/),asrRuntimeDigest:digest,scope:z.literal('single_postmix_wav')});
 const ConfirmationSchema=z.strictObject({schemaVersion:z.literal(1),kind:z.literal('confirmed_postmix_review'),projectId:z.uuid(),challengeRef:ObjectRefSchema,sourceMessageRef:ObjectRefSchema,ownerKeyHash:z.string().min(1),consentEpoch:z.number().int().nonnegative(),decision:z.literal('pronunciation_correct'),confirmedAt:z.iso.datetime()});
 const ownerActionSchema=z.strictObject({scope:z.literal('single_postmix_wav'),challengeSha256:digest,decision:z.literal('pronunciation_correct')});
 function explicitMessage(message:ArchivedMessage,challengeRef:ObjectRef){
@@ -27,7 +27,7 @@ function explicitMessage(message:ArchivedMessage,challengeRef:ObjectRef){
 }
 const authority=Symbol('loaded-owned-postmix-confirmation');
 export type ConfirmedPostMixReview={readonly ref:ObjectRef;readonly challenge:z.infer<typeof ChallengeSchema>;readonly [authority]:true};
-export interface PostMixReviewContext{film:PostMixFilm;plan:NarrationPlan;lineId:string;window:{startMs:number;lengthMs:number;mediaRuntimeDigest:string};transcript:AsrTranscript}
+export interface PostMixReviewContext{film:PostMixFilm;plan:NarrationPlan;lineId:string;window:{startMs:number;lengthMs:number;mediaRuntimeDigest:string;downmix?:PostMixDownmix};transcript:AsrTranscript}
 async function readRef(store:AtomicStore,ref:ObjectRef,prefix:string){
  if(!ObjectRefSchema.safeParse(ref).success||ref.mime!=='application/json'||!ref.key.startsWith(prefix))throw Error('POSTMIX_REVIEW_CHANGED');
  const value=(await store.readFresh(ref.key)).value;
@@ -50,7 +50,7 @@ export async function createPostMixReviewChallenge(projects:ProjectStore,root:st
  if(![projectId,sourceRevisionId].every(id=>z.uuid().safeParse(id).success))throw Error('POSTMIX_REVIEW_CHANGED');
  assertLiveProject((await projects.store.readFresh<ProjectControl>(`projects/${projectId}/control`)).value);
  const binding=contextBinding(context);checkedWords(context);await verifiedFilmHash(root,context.film);
- const key=createHash('sha256').update(JSON.stringify([binding.filmSha256,binding.lineId,binding.language,binding.startMs,binding.lengthMs,binding.mediaRuntimeDigest,'postmix-v1'])).digest('hex');
+ const key=postMixExtractionKey(binding.filmSha256,binding.lineId,binding.language,binding);
  const wav=await inspectVoiceWav(join(root,'postmix',key,'output','line.wav'));
  if(wav.sha256!==binding.mixedWavSha256||Math.abs(wav.durationMs-binding.lengthMs)>2)throw Error('POSTMIX_REVIEW_CHANGED');
  let mismatch=false;try{assertAsrExpected(binding.expectedAsrText,binding.expectedAsrText,binding.recognizedText)}catch(error){if((error as Error).message!=='ASR_MISMATCH')throw error;mismatch=true}

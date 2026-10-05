@@ -1,0 +1,10 @@
+{
+  "executedAt": "2026-10-05T01:04:08.217Z",
+  "mode": "readonly_control_overlay_all_writes_forbidden",
+  "newModelCalls": 0,
+  "status": "exact_failure_reproduced",
+  "errorCode": "FROZEN_PREVIEW_CHANGED",
+  "stack": "Error: FROZEN_PREVIEW_CHANGED\n    at compositionMediaJournal (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-journal.ts:12:37)\n    at async prepareCompositeStage (/Users/janily/Desktop/dev/videoBuddy/src/services/video/preview/composite-stage.ts:62:21)\n    at async main (/Users/janily/Desktop/dev/videoBuddy/scripts/video/diagnose-clear-book-composition.ts:19:6)",
+  "originalControlUnchanged": true,
+  "originalNativeJournalUnchanged": true
+}

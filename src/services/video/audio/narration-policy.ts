@@ -1,4 +1,4 @@
-import {createHash} from 'node:crypto';
+import {postMixExtractionKey} from './postmix-extraction';
 import {verifiedFilmHash} from './postmix-asr';
 import {realpath} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -76,7 +76,7 @@ export async function findNarrationPolicyReview(projects:ProjectStore,root:strin
  if(narrationPolicyIdentity(original.verified)!==narrationPolicyIdentity(verified))throw Error('NARRATION_POLICY_CHANGED');
  verifyNarrationPolicyContext(context,verified);
  await verifiedFilmHash(root,context.film);
- const key=createHash('sha256').update(JSON.stringify([context.film.sha256,context.lineId,context.transcript.language,context.window.startMs,context.window.lengthMs,context.window.mediaRuntimeDigest,'postmix-v1'])).digest('hex');
+ const key=postMixExtractionKey(context.film.sha256,context.lineId,context.transcript.language,context.window);
  const mixed=await inspectVoiceWav(join(root,'postmix',key,'output','line.wav'));
  if(mixed.sha256!==context.transcript.voiceSha256||Math.abs(mixed.durationMs-context.window.lengthMs)>2)throw Error('NARRATION_POLICY_CHANGED');
  return Object.freeze({kind:'owner_narration_reuse_policy' as const,ref:Object.freeze({...ref}),contextSha256:canonicalHash(context),[authority]:true as const});
