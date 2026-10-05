@@ -20,6 +20,13 @@ export const ContentReviewSchema=z.strictObject({schemaVersion:z.literal(1),cont
 export type ContentReview=z.infer<typeof ContentReviewSchema>;
 function unique(ids:string[]){return new Set(ids).size===ids.length}
 function normalized(value:string){return value.normalize('NFC').replace(/[\s，。！？、：；,.!?:;]/g,'')}
+/** Shared source-freezing and review boundary: reject unusable literal anchors
+ * before a creative package can make them immutable. */
+export function guardContentRequirements(raw:unknown,facts:ReadonlyArray<{id:string;text:string}>){
+ const parsed=z.array(requirement).max(100).safeParse(raw);if(!parsed.success)throw Error('CONTENT_INPUT_INVALID');const requirements=parsed.data;
+ if(requirements.length!==facts.length||!unique(requirements.map(r=>r.factId))||requirements.some(r=>{const fact=facts.find(f=>f.id===r.factId);return!fact||r.representation==='literal'&&!r.exactText.length||!unique(r.exactText.map(s=>s.normalize('NFC')))||r.exactText.some(t=>!normalized(t)||!fact.text.normalize('NFC').includes(t.normalize('NFC')))}))throw Error('CONTENT_INPUT_INVALID');
+ return requirements;
+}
 /** Caller must load the complete immutable facts manifest and verified physical
  * evidence. The digest prevents silently dropping facts from that manifest. */
 export function contentReviewContext(raw:unknown):ContentReviewContext{
@@ -27,7 +34,7 @@ export function contentReviewContext(raw:unknown):ContentReviewContext{
  if(value.totalFrames<20*value.fps||value.totalFrames>120*value.fps||value.totalFrames%value.fps||!Number.isSafeInteger(totalSamples)||!unique(value.facts.map(f=>f.id))||value.facts.some(f=>f.id.length>120||f.id!==f.id.trim()||!f.text.trim())||!unique(value.frames.map(f=>f.id))||!unique(value.transcripts.map(t=>t.id))||value.frames.some((f,i)=>f.frame>=value.totalFrames||i>0&&f.frame<=value.frames[i-1].frame)||value.transcripts.some(t=>t.startSample>=t.endSample||t.endSample>totalSamples))throw Error('CONTENT_INPUT_INVALID');
  const manifest=value.contentRequirementsRef?{schemaVersion:2,facts:value.facts,contentRequirementsRef:value.contentRequirementsRef}:{schemaVersion:1,facts:value.facts};
  if(canonicalHash(manifest)!==value.factsManifestSha256)throw Error('CONTENT_INPUT_CHANGED');
- if(value.requirements.length!==value.facts.length||!unique(value.requirements.map(r=>r.factId))||value.requirements.some(r=>{const fact=value.facts.find(f=>f.id===r.factId);return!fact||r.representation==='literal'&&!r.exactText.length||!unique(r.exactText.map(s=>s.normalize('NFC')))||r.exactText.some(t=>!normalized(t)||!fact.text.normalize('NFC').includes(t.normalize('NFC')))}))throw Error('CONTENT_INPUT_INVALID');
+ guardContentRequirements(value.requirements,value.facts);
  return{...value,contextSha256:canonicalHash(value)};
 }
 /** Validates references and literal quotations, not the truth of an arbitrary

@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import {FactSchema} from './domain';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {guardContentRequirements} from './content-review';
 const digest=z.string().regex(/^[a-f0-9]{64}$/),id=z.string().min(1).max(120),text=z.string().min(1).max(3000).refine(s=>Boolean(s.trim())),kind=z.enum(['literal','semantic','restriction']);
 const input=z.strictObject({understandingSha256:digest,facts:z.array(FactSchema).max(100)});
 const segment=z.strictObject({sourceText:z.string().min(1).max(2000),kind,reason:text});
@@ -48,5 +49,6 @@ export function guardRequirementsAudit(raw:unknown,context:RequirementsContext,p
 export function approvedRequirements(context:RequirementsContext,proposal:RequirementsProposal,audit:RequirementsAudit){
  guardRequirementsProposal(proposal,context);guardRequirementsAudit(audit,context,proposal);
  if(audit.facts.some(f=>f.segments.some(s=>s.result!=='accept')))throw Error('CONTENT_REQUIREMENTS_UNAPPROVED');
- return context.facts.map(f=>{const segments=proposal.facts.find(p=>p.factId===f.id)!.segments,exactText=[...new Set(segments.filter(s=>s.kind==='literal').map(s=>s.sourceText))];return{factId:f.id,representation:segments.every(s=>s.kind==='literal')?'literal' as const:'semantic' as const,exactText}});
+ const requirements=context.facts.map(f=>{const segments=proposal.facts.find(p=>p.factId===f.id)!.segments,seen=new Set<string>(),exactText=segments.filter(s=>s.kind==='literal').map(s=>s.sourceText).filter(text=>{const key=text.normalize('NFC');if(seen.has(key))return false;seen.add(key);return true});return{factId:f.id,representation:segments.every(s=>s.kind==='literal')?'literal' as const:'semantic' as const,exactText}});
+ try{return guardContentRequirements(requirements,context.facts)}catch(error){if((error as Error).message==='CONTENT_INPUT_INVALID')throw Error('CONTENT_REQUIREMENTS_INVALID');throw error}
 }

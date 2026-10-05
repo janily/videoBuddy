@@ -1,10 +1,20 @@
 import {it,expect} from 'vitest';
 import {requirementsContext,guardRequirementsProposal,guardRequirementsAudit,approvedRequirements} from '@/contracts/video/content-requirements';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {contentReviewContext} from '@/contracts/video/content-review';
 const fact={id:'flow',text:'先播种，再浇水，最后发芽。',sourceRefs:[{type:'user_message' as const,id:'source'}],status:'confirmed' as const,mustInclude:true,critical:true};
 const context=()=>requirementsContext({understandingSha256:'a'.repeat(64),facts:[fact]});
 const proposal=()=>({schemaVersion:1 as const,contextSha256:context().contextSha256,facts:[{factId:fact.id,segments:[{sourceText:fact.text,kind:'semantic' as const,reason:'按顺序完整表达三个动作。'}]}]});
 const audit=()=>({schemaVersion:1 as const,contextSha256:context().contextSha256,proposalSha256:canonicalHash(proposal()),facts:[{factId:fact.id,segments:[{sourceText:fact.text,kind:'semantic' as const,result:'accept' as const,reason:'只有流程，没有专名或数字。'}]}]});
+it('freezes canonically unique literal names that the downstream content contract can consume',()=>{
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text:'Café 和 Cafe\u0301'}]}),p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:[{sourceText:'Café',kind:'literal' as const,reason:'名称。'},{sourceText:' 和 ',kind:'semantic' as const,reason:'普通关系。'},{sourceText:'Cafe\u0301',kind:'literal' as const,reason:'相同规范化名称的原始写法。'}]}]},a={schemaVersion:1 as const,contextSha256:c.contextSha256,proposalSha256:canonicalHash(p),facts:p.facts.map(f=>({...f,segments:f.segments.map(s=>({...s,result:'accept' as const}))}))};
+ const requirements=approvedRequirements(c,p,a);expect(requirements).toEqual([{factId:'flow',representation:'semantic',exactText:['Café']}]);
+ expect(()=>contentReviewContext({filmSha256:'b'.repeat(64),filmSpecSha256:'c'.repeat(64),factsManifestSha256:canonicalHash({schemaVersion:1,facts:c.facts}),facts:c.facts,requirements,fps:24,totalFrames:480,frames:[{id:'frame-0',frame:0,sha256:'d'.repeat(64),bytes:100}],transcripts:[]})).not.toThrow();
+});
+it('rejects audited punctuation-only literal criteria before immutable production freezing',()=>{
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text:'。'}]}),p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:[{sourceText:'。',kind:'literal' as const,reason:'不可作为有效字面条件的标点。'}]}]},a={schemaVersion:1 as const,contextSha256:c.contextSha256,proposalSha256:canonicalHash(p),facts:p.facts.map(f=>({...f,segments:f.segments.map(s=>({...s,result:'accept' as const}))}))};
+ expect(()=>approvedRequirements(c,p,a)).toThrow('CONTENT_REQUIREMENTS_INVALID');
+});
 it('freezes semantic conditions only after exact full-source proposal and independent audit agree',()=>{
  const c=context(),p=guardRequirementsProposal(proposal(),c),a=guardRequirementsAudit(audit(),c,p);
  expect(approvedRequirements(c,p,a)).toEqual([{factId:'flow',representation:'semantic',exactText:[]}]);
