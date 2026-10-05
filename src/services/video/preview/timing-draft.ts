@@ -1,4 +1,4 @@
-import {LegacyTimingFontSchema,BookTimingFontSchema,type BookTimingFont} from '../audio/book-font';
+import {LegacyTimingFontSchema,AnyBookTimingFontSchema,isBookTimingFont,type AnyBookTimingFont} from '../audio/book-font';
 import {hasVerifiedNarrationStatus} from '@/services/video/audio/asr';
 import {z} from 'zod';
 import type {Understanding} from '@/contracts/video/domain';
@@ -17,10 +17,10 @@ export const TimingDraftSchema=z.strictObject({schemaVersion:z.literal(1),briefV
  narration:z.array(z.strictObject({lineId:text,spokenText:text,displayText:text,expectedAsrText:text,startSample:sample,endSample:sample,voiceSha256:digest,voiceRuntimeDigest:digest,asrRuntimeDigest:digest})),
  captions:z.array(z.strictObject({lineId:text,text,startFrame:frame,endFrame:frame,voiceSha256:digest})),
  track:z.strictObject({outputPath:text,sha256:digest,samples:sample,runtimeDigest:digest,silence:z.boolean()}),
- font:z.union([LegacyTimingFontSchema,BookTimingFontSchema]).nullable(),
+ font:z.union([LegacyTimingFontSchema,AnyBookTimingFontSchema]).nullable(),
  qualityStatus:z.literal('semantic_not_checked')});
 export type TimingDraft=z.infer<typeof TimingDraftSchema>;
-export type TimingFont={family:'Noto Sans CJK SC';runtimeDigest:string;charsetSha256:string}|BookTimingFont;
+export type TimingFont={family:'Noto Sans CJK SC';runtimeDigest:string;charsetSha256:string}|AnyBookTimingFont;
 
 export function compileTimingDraft(rawTreatment:unknown,understanding:Understanding,voicePlan:NarrationPlan,verified:VerifiedNarrationManifest,cues:SubtitleCue[],track:NarrationTrack,font:TimingFont|null):TimingDraft{
  if(!understanding.preferences.styleSlug)throw Error('TREATMENT_BASELINE_CHANGED');
@@ -37,7 +37,7 @@ export function compileTimingDraft(rawTreatment:unknown,understanding:Understand
   narration.push({lineId:line.lineId,spokenText:line.spokenText,displayText:line.displayText,expectedAsrText:line.expectedAsrText,startSample,endSample,voiceSha256:line.voice.wav.sha256,voiceRuntimeDigest:line.voice.runtimeDigest,asrRuntimeDigest:line.asr.runtimeDigest});
  }
  if((understanding.preferences.captions==='none'&&cues.length!==0)||(understanding.preferences.captions==='auto'&&cues.length!==verified.lines.length)||Boolean(cues.length)!==Boolean(font))throw Error('TIMING_CAPTION_INVALID');
- if(font?.family==='Crayon Book Handwriting'&&treatment.styleSlug!=='crayon-book')throw Error('TIMING_CAPTION_INVALID');
+ if(isBookTimingFont(font)&&treatment.styleSlug!=='crayon-book')throw Error('TIMING_CAPTION_INVALID');
  if(font&&(font.runtimeDigest!==track.runtimeDigest||!digest.safeParse(font.charsetSha256).success))throw Error('TIMING_CAPTION_INVALID');
  const lines=new Map(verified.lines.map(line=>[line.lineId,line]));let captionEnd=0;
  const captions=cues.map(cue=>{
@@ -48,7 +48,7 @@ export function compileTimingDraft(rawTreatment:unknown,understanding:Understand
   return{lineId:cue.lineId,text:cue.text,startFrame:cue.startFrame,endFrame:cue.endFrame,voiceSha256:cue.voiceSha256};
  });
  const draft={schemaVersion:1 as const,briefVersion:treatment.briefVersion,styleSlug:treatment.styleSlug,styleRulesHash:treatment.styleRulesHash,durationMs:treatment.durationSec*1000,totalFrames,fps:treatment.fps,sampleRate:48000 as const,
-  shots:treatment.shots.map(shot=>({id:shot.id,startFrame:shot.startFrame,endFrame:shot.endFrame,visualIntent:shot.visualIntent,factIds:shot.factIds})),narration,captions,track:{outputPath:track.outputPath,sha256:track.wav.sha256,samples:track.wav.samples,runtimeDigest:track.runtimeDigest,silence:track.wav.silence},font:font?(font.family==='Crayon Book Handwriting'?BookTimingFontSchema.parse(font):{family:font.family,runtimeDigest:font.runtimeDigest,charsetSha256:font.charsetSha256}):null,qualityStatus:'semantic_not_checked' as const};
+  shots:treatment.shots.map(shot=>({id:shot.id,startFrame:shot.startFrame,endFrame:shot.endFrame,visualIntent:shot.visualIntent,factIds:shot.factIds})),narration,captions,track:{outputPath:track.outputPath,sha256:track.wav.sha256,samples:track.wav.samples,runtimeDigest:track.runtimeDigest,silence:track.wav.silence},font:font?(isBookTimingFont(font)?AnyBookTimingFontSchema.parse(font):{family:font.family,runtimeDigest:font.runtimeDigest,charsetSha256:font.charsetSha256}):null,qualityStatus:'semantic_not_checked' as const};
  const parsed=TimingDraftSchema.safeParse(draft);if(!parsed.success)throw Error('TIMING_DRAFT_INVALID');
  return parsed.data;
 }

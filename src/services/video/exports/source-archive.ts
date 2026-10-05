@@ -1,3 +1,4 @@
+import {isBookTimingFont,bookFontVersion} from '../audio/book-font';
 import {bookFontReceiptKey} from '../audio/book-font-receipt';
 import {trustedStyleFont} from '../media/font-catalog';
 import {constants} from 'node:fs';
@@ -75,15 +76,16 @@ export async function prepareFrozenSourceArchive(projects:ProjectStore,owner:str
   add('state/'+key+'.json',Buffer.from(canonicalJson((await projects.store.readFresh(key)).value)));
  }
  for(const file of runtimeFiles)add('runtime/media/'+file,await safeFile(join(process.cwd(),'runtime/media'),file,archiveByteLimit-total));
- const bookFont=frozen.timing.font?.family==='Crayon Book Handwriting'?frozen.timing.font:null;
- const captionFontReceipt=frozen.sourceManifest.captionStyles.length?(bookFont?bookFontReceiptKey(frozen.filmSpec.runtimeDigest):`runtime-receipts/${frozen.filmSpec.runtimeDigest}/subtitle-font`):null;
+ const bookFont=isBookTimingFont(frozen.timing.font)?frozen.timing.font:null;
+ const captionFontReceipt=frozen.sourceManifest.captionStyles.length?(bookFont?bookFontReceiptKey(frozen.filmSpec.runtimeDigest,bookFontVersion(bookFont)):`runtime-receipts/${frozen.filmSpec.runtimeDigest}/subtitle-font`):null;
  if(captionFontReceipt)add('state/'+captionFontReceipt+'.json',Buffer.from(canonicalJson((await projects.store.readFresh(captionFontReceipt)).value)));
  if(bookFont){
   const fonts=bookFont.faces.map(face=>{const locked=trustedStyleFont(face.id);return{...face,runtimePath:locked.runtimePath,sourceUrl:locked.font.url,licenseUrl:locked.licenseFile.url,metadataUrl:locked.metadata.url}});
   add('font-fetch-manifest.json',Buffer.from(canonicalJson({schemaVersion:2,fontBinariesIncluded:false,runtimeDigest:frozen.filmSpec.runtimeDigest,captionReceiptKey:captionFontReceipt,rendererSha256:bookFont.rendererSha256,producerSha256:bookFont.producerSha256,fonts,verification:'Acquire exactly the locked files and pinned media runtime. Verify font, notice, metadata and renderer digests before rebuilding; no font or model binaries are bundled.'})));
-  for(const name of ['book-caption.mjs','book-caption-producer.mjs','fonts.lock.json','FONTS.md']){
+  const rendererName=bookFontVersion(bookFont)===2?'book-caption-clear.mjs':'book-caption.mjs';
+  for(const name of [rendererName,'book-caption-producer.mjs','fonts.lock.json','FONTS.md']){
    const bytes=await safeFile(join(process.cwd(),'runtime/media'),name,1048576);
-   const expected=name==='book-caption.mjs'?bookFont.rendererSha256:name==='book-caption-producer.mjs'?bookFont.producerSha256:null;
+   const expected=name===rendererName?bookFont.rendererSha256:name==='book-caption-producer.mjs'?bookFont.producerSha256:null;
    if(expected&&createHash('sha256').update(bytes).digest('hex')!==expected)throw Error('SOURCE_CAPTION_RUNTIME_CHANGED');
    add('runtime/media/'+name,bytes);
   }

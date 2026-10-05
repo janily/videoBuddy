@@ -142,10 +142,12 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   const frozen=await loadVerifiedFilmPackage(projects.store,spec,root);
   const captionRef=frozen.sourceManifest.captionStyles[0].styleRef;
   const captionPackage=CaptionPackageSchema.parse((await projects.store.readFresh(captionRef.key)).value);
-  expect(captionPackage.schemaVersion).toBe(book?3:2);
+  expect(captionPackage.schemaVersion).toBe(book?4:2);
   expect(captionPackage.profiles.preview).toEqual(captionPackage.profiles.full);
   await expect(loadVerifiedFilmPackage(projects.store,{...spec,qualityPolicyVersion:'v5.1-package-1'},root)).rejects.toThrow('FILM_CAPTION_CHANGED');
   if(book){
+   expect(captionPackage.font.family).toBe('Crayon Book Clear Handwriting');
+   expect(()=>expectedCaptionPackage(captionPackage.font,spec.output,'v5.1-package-3-book-captions')).toThrow('FILM_CAPTION_CHANGED');
    expect(()=>expectedCaptionPackage(captionPackage.font,spec.output,'v5.1-package-1')).toThrow('FILM_CAPTION_CHANGED');
    expect(()=>expectedCaptionPackage(captionPackage.font,spec.output,'v5.1-package-2-caption-coordinates')).toThrow('FILM_CAPTION_CHANGED');
    expect(frozen.timeline.captions[0].stableReadableStartFrame).toBe(frozen.timeline.captions[0].startFrame+9);

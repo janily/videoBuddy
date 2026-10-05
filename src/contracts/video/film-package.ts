@@ -1,6 +1,6 @@
 import {frozenBookFontHashes} from '@/services/video/audio/book-font-receipt';
-import {LegacyTimingFontSchema,BookTimingFontSchema} from '@/services/video/audio/book-font';
-import {bookCaptionRendererSha256,bookCaptionProducerSha256} from '@/services/video/media/book-caption-layer';
+import {LegacyTimingFontSchema,BookTimingFontSchema,ClearBookTimingFontSchema,isBookTimingFont} from '@/services/video/audio/book-font';
+import {bookCaptionRendererSha256,clearBookCaptionRendererSha256,bookCaptionProducerSha256} from '@/services/video/media/book-caption-layer';
 import{z}from'zod';
 import{FactSchema,ObjectRefSchema,UnderstandingSchema,type ObjectRef}from'./domain';
 import{FilmSpecSchema,FilmTimelineSchema,validateFilmSpec,validateFilmTimeline,type TimelineReferences}from'./film';
@@ -15,7 +15,7 @@ import{guardAudioPlan,compileAudioCues}from'./audio-plan';
 import{CompleteVisualShotSchema,guardVisualShot}from'./visual-shot';
 import{TimingDraftSchema}from'@/services/video/preview/timing-draft';
 import{revisionSeed}from'@/services/video/timeline/seed';
-import{filmPackagePolicyVersion,legacyFilmPackagePolicyVersion,bookFilmPackagePolicyVersion,captionStyleId,captionStyleForProfile,frozenCaptions,narrationSilence}from'@/services/video/timeline/package';
+import{filmPackagePolicyVersion,legacyFilmPackagePolicyVersion,bookFilmPackagePolicyVersion,clearBookFilmPackagePolicyVersion,captionStyleId,captionStyleForProfile,frozenCaptions,narrationSilence}from'@/services/video/timeline/package';
 import{LocalAssetBytes}from'@/services/video/assets/local-bytes';
 
 const id=z.string().min(1).max(120);
@@ -28,14 +28,16 @@ export const SourceCodeSchema=z.strictObject({html:z.string().min(1),visualSourc
 const captionStyle=z.strictObject({fontSize:z.number().int(),marginV:z.number().int(),outline:z.number().int(),primary:z.string(),outlineColor:z.string()});
 const logicalCaptionStyle=captionStyle.extend({playResX:z.number().int().min(64).max(3840),playResY:z.number().int().min(64).max(3840)});
 const bookStyle=logicalCaptionStyle.extend({book:z.strictObject({schemaVersion:z.literal(1),rendererSha256:z.literal(bookCaptionRendererSha256),producerSha256:z.literal(bookCaptionProducerSha256),fonts:z.array(z.strictObject({id:z.string(),sha256:z.string().regex(/^[a-f0-9]{64}$/)})).length(2),safeBox:z.strictObject({x:z.number().int(),y:z.number().int(),width:z.number().int(),height:z.number().int()})})});
+const clearBookStyle=logicalCaptionStyle.extend({book:z.strictObject({schemaVersion:z.literal(2),rendererSha256:z.literal(clearBookCaptionRendererSha256),producerSha256:z.literal(bookCaptionProducerSha256),fonts:z.array(z.strictObject({id:z.string(),sha256:z.string().regex(/^[a-f0-9]{64}$/)})).length(2),safeBox:z.strictObject({x:z.number().int(),y:z.number().int(),width:z.number().int(),height:z.number().int()})})});
 export const CaptionPackageSchema=z.discriminatedUnion('schemaVersion',[
  z.strictObject({schemaVersion:z.literal(1),font:LegacyTimingFontSchema,profiles:z.strictObject({full:captionStyle,preview:captionStyle,probe:captionStyle})}),
  z.strictObject({schemaVersion:z.literal(2),font:LegacyTimingFontSchema,profiles:z.strictObject({full:logicalCaptionStyle,preview:logicalCaptionStyle,probe:logicalCaptionStyle})}),
  z.strictObject({schemaVersion:z.literal(3),font:BookTimingFontSchema,profiles:z.strictObject({full:bookStyle,preview:bookStyle,probe:bookStyle})}),
+ z.strictObject({schemaVersion:z.literal(4),font:ClearBookTimingFontSchema,profiles:z.strictObject({full:clearBookStyle,preview:clearBookStyle,probe:clearBookStyle})}),
 ]);
 export function expectedCaptionPackage(font:z.infer<typeof TimingDraftSchema>['font'],output:{width:number;height:number},policyVersion:string){
- if((policyVersion===bookFilmPackagePolicyVersion)!==(font?.family==='Crayon Book Handwriting'))throw Error('FILM_CAPTION_CHANGED');
- return CaptionPackageSchema.parse({schemaVersion:policyVersion===bookFilmPackagePolicyVersion?3:policyVersion===legacyFilmPackagePolicyVersion?1:2,font,profiles:{full:captionStyleForProfile('full',output,policyVersion),preview:captionStyleForProfile('preview',output,policyVersion),probe:captionStyleForProfile('probe',output,policyVersion)}});
+ if((policyVersion===bookFilmPackagePolicyVersion)!==(font?.family==='Crayon Book Handwriting')||(policyVersion===clearBookFilmPackagePolicyVersion)!==(font?.family==='Crayon Book Clear Handwriting'))throw Error('FILM_CAPTION_CHANGED');
+ return CaptionPackageSchema.parse({schemaVersion:policyVersion===clearBookFilmPackagePolicyVersion?4:policyVersion===bookFilmPackagePolicyVersion?3:policyVersion===legacyFilmPackagePolicyVersion?1:2,font,profiles:{full:captionStyleForProfile('full',output,policyVersion),preview:captionStyleForProfile('preview',output,policyVersion),probe:captionStyleForProfile('probe',output,policyVersion)}});
 }
 const RightsSchema=z.strictObject({basis:z.enum(['generated','licensed','user_supplied']),source:z.string().min(1)});
 
@@ -50,7 +52,7 @@ function parse<T>(schema:z.ZodType<T>,raw:unknown,errorCode='FILM_MANIFEST_INVAL
 
 export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknown,audioRoot=process.env.VIDEO_DATA_DIR){
  const parsed=FilmSpecSchema.safeParse(untrusted);if(!parsed.success)throw Error('FILM_SPEC_INVALID');
- if(![filmPackagePolicyVersion,legacyFilmPackagePolicyVersion,bookFilmPackagePolicyVersion].includes(parsed.data.qualityPolicyVersion))throw Error('FILM_POLICY_UNSUPPORTED');
+ if(![filmPackagePolicyVersion,legacyFilmPackagePolicyVersion,bookFilmPackagePolicyVersion,clearBookFilmPackagePolicyVersion].includes(parsed.data.qualityPolicyVersion))throw Error('FILM_POLICY_UNSUPPORTED');
  const spec=parsed.data,projectPrefix=`projects/${spec.projectId}/`,revisionPrefix=`${projectPrefix}revisions/${spec.revisionId}/`;
  const top=[spec.understandingRef,spec.treatmentRef,spec.factsRef,spec.timelineRef,spec.assetManifestRef,spec.sourceManifestRef,spec.audioManifestRef];
  if(!unique(top.map(ref=>ref.key)))throw Error('FILM_SPEC_INVALID');
@@ -76,7 +78,7 @@ export async function loadVerifiedFilmPackage(store:AtomicStore,untrusted:unknow
  const sourceIds=new Set(sources.modules.map(module=>module.id));
  const timing=parse(TimingDraftSchema,await readVerifiedJson(store,audio.timingDraftRef,`${revisionPrefix}timing-draft/`));
  if(spec.seed!==revisionSeed(spec.projectId,spec.revisionId)||timing.track.runtimeDigest!==spec.runtimeDigest||timing.font&&timing.font.runtimeDigest!==spec.runtimeDigest)throw Error('FILM_RUNTIME_CHANGED');
- if(timing.font?.family==='Crayon Book Handwriting'){if(spec.style.slug!=='crayon-book'||spec.qualityPolicyVersion!==bookFilmPackagePolicyVersion)throw Error('FILM_CAPTION_CHANGED');await frozenBookFontHashes(store,timing.font)}
+ if(isBookTimingFont(timing.font)){if(spec.style.slug!=='crayon-book'||spec.qualityPolicyVersion!==(timing.font.family==='Crayon Book Clear Handwriting'?clearBookFilmPackagePolicyVersion:bookFilmPackagePolicyVersion))throw Error('FILM_CAPTION_CHANGED');await frozenBookFontHashes(store,timing.font)}
  const plan=guardAudioPlan(await readVerifiedJson(store,audio.planRef,`${revisionPrefix}audio-plan/`),understanding,treatmentPlan,timing,audio.timingDraftRef.sha256,spec.seed);
   if((plan.music.length||plan.foley.length||plan.mix.voiceGainDb!==0)&&!audio.executionRef)throw Error('FILM_AUDIO_EXECUTION_NOT_READY');
  const executed=audio.executionRef?await loadAudioExecution(store,audioRoot||'',spec.projectId,spec.revisionId,audio.executionRef,audio.planRef,audio.timingDraftRef):null;
