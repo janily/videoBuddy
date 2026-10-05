@@ -114,3 +114,5 @@ Spec复核指出只匹配引导语开头还会误认“旁白原文出自‘你�
 新MVP冻结 `caption_shot_v3` / plan4，每批最多两帧，采样帧与plan3完全相同，两轮全部镜头/字幕覆盖不减。无字段旧plan2、已冻结v2/plan3全部保留原算法。诊断记录仅新增请求字节、imageCount、stream与限定UND_ERR错误码，原密钥/headers/body不输出。
 
 新行为RED2项；8文件30项通过（42.45秒），types/lint通过。上次全量154文件748项里3项因超时失败、745项通过（78.07秒，实际媒体渲染并行）；制作空闲后同一阈值重跑3文件14项全部通过（21.67秒），没有修改阈值，失败记录保留。最终全量检查改为媒体空闲后串行完成。新两帧正式策略尚待正常浏览器闭环。
+
+两轴复核指出独立诊断按key读取引用、未绑定原审批/影片。诊断改用完整ObjectRef核SHA/bytes/MIME/命名空间，冷核原preview冻结图、approval/bundle/composition/stage、完整frameSet及facts/style/runtime/geometry；发送fence重复读取整条来源。只读 `--verify-source-only` 实际通过，来源SHA `8049745d242b01252661350492e80c81ec7275c2c2491d269cfec22a99030f17`，零模型/媒体调用，旧付费报告不重写。正常页面新两帧preview操作 `b01e8063-0bd5-4819-aa66-19526cf19ca8` 已启动。
