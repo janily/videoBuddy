@@ -1,0 +1,47 @@
+{
+  "status": "actual_full_movie_all_png_hashes_and_four_owned_exited_containers_removed",
+  "movieSha256": "cb5ac8454a867abb361fbe13fafd9fd07e09335c76685a672e94cc931bc6d0fd",
+  "movieBytes": 10608051,
+  "pngFrames": 244,
+  "roundFrames": [
+    112,
+    132
+  ],
+  "visualBatches": 31,
+  "ownedCompletedInvocations": 9,
+  "sameMixedWavBytesAs720p": true,
+  "cachedOriginalAsrNotNewExecution": true,
+  "cleanup": [
+    {
+      "containerId": "5ac7d88ae333aaec42864b53e8f7b3cd5519d199c5e9ecf059a3ea61aaeb2c56",
+      "containerName": "vb-9e22708f-6757-4464-9d30-415316e41e6e-full-0",
+      "stageKey": "8a4fafa8a613d47c2b1026666ad433a3d0088e09f7543b63599e391e55de6d3f",
+      "terminalIdentityVerified": true,
+      "status": "removed"
+    },
+    {
+      "containerId": "1cd1770ea5ce3024e2699f22c0b8ca9da6db79f1b7fee3c0ffa596fcaae6d57d",
+      "containerName": "vb-9e22708f-6757-4464-9d30-415316e41e6e-full-1",
+      "stageKey": "7ace846787b0675031ec0b965acd2c841e8c62748b43f2d5d567b1de573b5c44",
+      "terminalIdentityVerified": true,
+      "status": "removed"
+    },
+    {
+      "containerId": "154d54087d3966bec44674e54ae197905115eba92c45a60ed6ef7da23400acd8",
+      "containerName": "vb-9e22708f-6757-4464-9d30-415316e41e6e-full-2",
+      "stageKey": "b043f4e31902528a66714686540f6d346d473ee2102efa98e35f425f11936bc9",
+      "terminalIdentityVerified": true,
+      "status": "removed"
+    },
+    {
+      "containerId": "700113612a9537956cc72f2765c253a4eae5a26ef4911a814f1ac659adf49fe6",
+      "containerName": "vb-9e22708f-6757-4464-9d30-415316e41e6e-full-3",
+      "stageKey": "87ef15b17196fbe0fa7cbd52893f8a1738dafef9c205901687f5a2a9e9e199c6",
+      "terminalIdentityVerified": true,
+      "status": "removed"
+    }
+  ],
+  "resultPublished": false,
+  "formalProductionApproval": false,
+  "newModelCalls": 0
+}

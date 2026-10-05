@@ -1,5 +1,7 @@
 # 当前阻断（更新至2026-10-05，自托管架构）
 
+2026-10-05 T10/T11 真实1080p技术全片：原冻结素材独占root渲染四镜头，20秒480帧1920×1080/24fps stereo AAC，SHA cb5ac845…10608051bytes；完整解码/metadata/−13.49LUFS/−2.23dBTP及冷compose/postmix通过，原项目control/budget/两旧op不变。四段混音WAV与720p精确同SHA，ASR复用原缓存；9owned native completed，0model/新TTS/音乐。两轮112/132共244 PNG/31批逐文件hash/尺寸/顺序实核；四owned exited容器精确身份核后无force清理，非全局T14完成。报告写盘P2修复，3协议RED→GREEN，固定ecf1db6双轴clean；实片进程先加载旧代码且写盘成功，与新错误分支测试区分。最终120文件616项52.96s/build通过；首次lint prefer-const失败修复后lint/构建后types通过。未正式批准/发布结果，抽帧尚未质量判定，全片语义事实/连续运动/听感/许可和公共闭环/43风格等仍待完成，C0/C1/C2未达，无push/部署。见 [全片技术验证](evidence/clear-full-film-validation.md)。
+
 2026-10-05 T10/T11 整组混音与真实清晰字幕预览发布：新增完整owner/epoch/FilmSpec/实际WAV/plan/downmix/runtime/8completed回执不可变证明，strict missing拒绝/read-only冷核，Frozen入口与单句review互斥，Composite分别读取原compose和精确postmix journal/结果refs；2项行为RED→GREEN。真实4299bytes ref907efe…cold+准入通过/0native/model/原状态不变；新op f08efd63…同revision/同MP4，Composition→Excerpt→Critic→publication成功，current preview92d993…，旧failed不重置。1真实Critic HTTP200/9427+6471/rawSHA ad9c…精确settled，style/readability pass无blocking，fact仍not_checked（preview允许，不算全片QA）。9.5秒真实AV预览03db064…冷包/字节核验；新真实28.56MB工程ZIP194c086…80entries/CRC/allhash/clearfont&renderer/无字体模型/env/chat通过，仅私有诊断无正式导出准入。初次audit明文查询hashledger错误保留/v2精确ID通过；追加ZIP私有路径P2修复：独占目录/拒rootlink/file+dir+root fsync，2真实filesystem RED→GREEN；v3同ZIP字节/边界/0700&0600实核通过。最终119文件613项51.95s、lint/build/构建后types通过，固定541c29e双轴clean。下一步1080p正式流水线/两轮全片QA与事实证据，公共确认/修改/43风格/完整验收未完，C0/C1/C2未达，无push/部署。见 [整组及真实发布验证](evidence/completed-clear-preview-validation.md)。
 
 
