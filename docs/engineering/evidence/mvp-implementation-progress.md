@@ -140,3 +140,5 @@ Spec复核指出只匹配引导语开头还会误认“旁白原文出自‘你�
 新的正常聊天已成功保存画风到objective，未增故事facts，随后页面启动新预览21281c85-8182-4c21-8d9e-1bdd3d4a739d。核对发现历史replace_summary仅比较summary，objective/subject/audience独立修改会漏增briefVersion；三项实际反例RED确认后修复，重复相同值仍不增版本。相关3文件24项11.35秒、types/lint通过。50项浏览器回归10.4秒通过（HTTP/API协议fixture，不代替真实媒体闭环）。当前新预览仍在创作，不宣称正式发布或下载完成。
 
 画风方向更新后的21281c85预览再次真实失败PREVIEW_QUALITY_BLOCKED，Critic发现不同镜头角色变为几何分面、网格覆盖和非蜡笔字体；未发布。现修复新MVP蜡笔片的创作上下文：第二镜头开始读取并绑定同版本首镜头的不可变源码，参考其角色比例/脸/调色/笔触函数，只按当前镜头改姿势与运动；参考不拥有权限，当前facts/clock/seed/源校验不变。新stage存continuityRef，冷读校验首镜头来源并拒绝篡改；旧stage不补写。明确不用规则网格/均匀条纹伪装蜡笔。错误seed/错误首镜头反例RED→GREEN、首源传递/冷读篡改反例通过，2文件11项10.67秒，types/lint通过。该证明仅是输入/持久化合同，真实画风仍由后续模型独立检查，不假称QA已经合格。
+
+continuity冷读审查P2已复现：首镜头归档含自引用continuityRef时会先递归后拒绝，测试通过5次读的有界拦截得到UNBOUNDED_CONTINUITY_READ（RED）。将首镜头禁止检查移至递归前，6项相关测试10.87秒及types/lint通过；正常真实新任务首镜头不含此字段，未重启或重放媒体任务。

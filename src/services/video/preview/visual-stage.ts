@@ -46,7 +46,7 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  const seed=revisionSeed(projectId,revisionId),shotKey=canonicalHash({shotId}),key=`${revisionPrefix}visual/${shotKey}`,effectKey=`${prefix}/operations/${operationId}/effects/visual/${revisionId}/${shotKey}`;
  async function verifyRecord(record:VisualStageRecord){
   if(record.schemaVersion!==1||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.shotId!==shotId||record.runtimeStatus!=='not_checked'||!record.sourceRef.key.startsWith(`${revisionPrefix}visual-source/${shotKey}/`))throw Error('VISUAL_STAGE_CONFLICT');
-  if(record.continuityRef){const first=await prepareVisualShotStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,plan.shots[0].id,{...options,mustExist:true});if(shotId===plan.shots[0].id||canonicalHash(first.sourceRef)!==canonicalHash(record.continuityRef))throw Error('VISUAL_BASELINE_CHANGED')}
+  if(record.continuityRef){if(shotId===plan.shots[0].id)throw Error('VISUAL_BASELINE_CHANGED');const first=await prepareVisualShotStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,plan.shots[0].id,{...options,mustExist:true});if(canonicalHash(first.sourceRef)!==canonicalHash(record.continuityRef))throw Error('VISUAL_BASELINE_CHANGED')}
   const archived=await readRef<VisualShotSource>(projects,record.sourceRef,revisionPrefix);
   guardVisualShot(archived,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
   if(createHash('sha256').update(archived.sourceHtml).digest('hex')!==record.sourceSha256)throw Error('VISUAL_REF_CHANGED');
