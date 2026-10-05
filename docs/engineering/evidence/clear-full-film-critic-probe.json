@@ -1,0 +1,788 @@
+{
+  "executedAt": "2026-10-05T02:16:31.401Z",
+  "status": "failed",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "sourceProjectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "technicalRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/clear-full-TMnPO7",
+  "sourceProofSha256": "9eb54b051f4f821bf5ff3a543d2df6ef1f9304c96274eba971fa3a244fec63db",
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "deliveryEligible": false,
+  "newNativeExecutions": 0,
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/clear-full-critic-UGy32l",
+  "diagnosticProjectId": "dd32e088-6fe3-46f6-bace-153f644860f0",
+  "baseline": {
+    "filmSha256": "cb5ac8454a867abb361fbe13fafd9fd07e09335c76685a672e94cc931bc6d0fd",
+    "filmSpecSha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "styleSlug": "crayon-book",
+    "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+    "facts": [
+      {
+        "id": "fact-seed-sprout-flow",
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。"
+      }
+    ]
+  },
+  "plan": {
+    "schemaVersion": 1,
+    "clock": {
+      "fps": 24,
+      "totalFrames": 480,
+      "shots": [
+        {
+          "id": "shot-01-seed-in-soil",
+          "startFrame": 0,
+          "endFrame": 120
+        },
+        {
+          "id": "shot-02-gentle-watering",
+          "startFrame": 120,
+          "endFrame": 240
+        },
+        {
+          "id": "shot-03-sprout-emergence",
+          "startFrame": 240,
+          "endFrame": 360
+        },
+        {
+          "id": "shot-04-caring-conclusion",
+          "startFrame": 360,
+          "endFrame": 480
+        }
+      ],
+      "captions": [
+        {
+          "startFrame": 0,
+          "endFrame": 110,
+          "stableReadableStartFrame": 9
+        },
+        {
+          "startFrame": 120,
+          "endFrame": 230,
+          "stableReadableStartFrame": 129
+        },
+        {
+          "startFrame": 240,
+          "endFrame": 350,
+          "stableReadableStartFrame": 249
+        },
+        {
+          "startFrame": 360,
+          "endFrame": 459,
+          "stableReadableStartFrame": 369
+        }
+      ]
+    },
+    "actionCoverage": "entire_shots",
+    "batchSize": 8,
+    "rounds": [
+      {
+        "round": 1,
+        "frames": [
+          0,
+          5,
+          9,
+          10,
+          14,
+          19,
+          24,
+          29,
+          34,
+          38,
+          43,
+          48,
+          53,
+          58,
+          62,
+          67,
+          72,
+          77,
+          82,
+          86,
+          91,
+          96,
+          101,
+          106,
+          109,
+          110,
+          115,
+          119,
+          120,
+          125,
+          129,
+          130,
+          134,
+          139,
+          144,
+          149,
+          154,
+          158,
+          163,
+          168,
+          173,
+          178,
+          182,
+          187,
+          192,
+          197,
+          202,
+          206,
+          211,
+          216,
+          221,
+          226,
+          229,
+          230,
+          235,
+          239,
+          240,
+          245,
+          249,
+          250,
+          254,
+          259,
+          264,
+          269,
+          274,
+          278,
+          283,
+          288,
+          293,
+          298,
+          302,
+          307,
+          312,
+          317,
+          322,
+          326,
+          331,
+          336,
+          341,
+          346,
+          349,
+          350,
+          355,
+          359,
+          360,
+          365,
+          369,
+          370,
+          374,
+          379,
+          384,
+          389,
+          394,
+          398,
+          403,
+          408,
+          413,
+          418,
+          422,
+          427,
+          432,
+          437,
+          442,
+          446,
+          451,
+          456,
+          458,
+          461,
+          466,
+          470,
+          475,
+          479
+        ],
+        "batches": [
+          {
+            "index": 0,
+            "frames": [
+              0,
+              5,
+              9,
+              10,
+              14,
+              19,
+              24,
+              29
+            ]
+          },
+          {
+            "index": 1,
+            "frames": [
+              34,
+              38,
+              43,
+              48,
+              53,
+              58,
+              62,
+              67
+            ]
+          },
+          {
+            "index": 2,
+            "frames": [
+              72,
+              77,
+              82,
+              86,
+              91,
+              96,
+              101,
+              106
+            ]
+          },
+          {
+            "index": 3,
+            "frames": [
+              109,
+              110,
+              115,
+              119,
+              120,
+              125,
+              129,
+              130
+            ]
+          },
+          {
+            "index": 4,
+            "frames": [
+              134,
+              139,
+              144,
+              149,
+              154,
+              158,
+              163,
+              168
+            ]
+          },
+          {
+            "index": 5,
+            "frames": [
+              173,
+              178,
+              182,
+              187,
+              192,
+              197,
+              202,
+              206
+            ]
+          },
+          {
+            "index": 6,
+            "frames": [
+              211,
+              216,
+              221,
+              226,
+              229,
+              230,
+              235,
+              239
+            ]
+          },
+          {
+            "index": 7,
+            "frames": [
+              240,
+              245,
+              249,
+              250,
+              254,
+              259,
+              264,
+              269
+            ]
+          },
+          {
+            "index": 8,
+            "frames": [
+              274,
+              278,
+              283,
+              288,
+              293,
+              298,
+              302,
+              307
+            ]
+          },
+          {
+            "index": 9,
+            "frames": [
+              312,
+              317,
+              322,
+              326,
+              331,
+              336,
+              341,
+              346
+            ]
+          },
+          {
+            "index": 10,
+            "frames": [
+              349,
+              350,
+              355,
+              359,
+              360,
+              365,
+              369,
+              370
+            ]
+          },
+          {
+            "index": 11,
+            "frames": [
+              374,
+              379,
+              384,
+              389,
+              394,
+              398,
+              403,
+              408
+            ]
+          },
+          {
+            "index": 12,
+            "frames": [
+              413,
+              418,
+              422,
+              427,
+              432,
+              437,
+              442,
+              446
+            ]
+          },
+          {
+            "index": 13,
+            "frames": [
+              451,
+              456,
+              458,
+              461,
+              466,
+              470,
+              475,
+              479
+            ]
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "frames": [
+          0,
+          5,
+          9,
+          10,
+          12,
+          14,
+          19,
+          24,
+          29,
+          34,
+          36,
+          38,
+          43,
+          48,
+          53,
+          58,
+          60,
+          62,
+          67,
+          72,
+          77,
+          82,
+          84,
+          86,
+          91,
+          96,
+          101,
+          106,
+          108,
+          109,
+          110,
+          115,
+          119,
+          120,
+          125,
+          129,
+          130,
+          132,
+          134,
+          139,
+          144,
+          149,
+          154,
+          156,
+          158,
+          163,
+          168,
+          173,
+          178,
+          180,
+          182,
+          187,
+          192,
+          197,
+          202,
+          204,
+          206,
+          211,
+          216,
+          221,
+          226,
+          228,
+          229,
+          230,
+          235,
+          239,
+          240,
+          245,
+          249,
+          250,
+          252,
+          254,
+          259,
+          264,
+          269,
+          274,
+          276,
+          278,
+          283,
+          288,
+          293,
+          298,
+          300,
+          302,
+          307,
+          312,
+          317,
+          322,
+          324,
+          326,
+          331,
+          336,
+          341,
+          346,
+          348,
+          349,
+          350,
+          355,
+          359,
+          360,
+          365,
+          369,
+          370,
+          372,
+          374,
+          379,
+          384,
+          389,
+          394,
+          396,
+          398,
+          403,
+          408,
+          413,
+          418,
+          420,
+          422,
+          427,
+          432,
+          437,
+          442,
+          444,
+          446,
+          451,
+          456,
+          458,
+          461,
+          466,
+          468,
+          470,
+          475,
+          479
+        ],
+        "batches": [
+          {
+            "index": 0,
+            "frames": [
+              0,
+              5,
+              9,
+              10,
+              12,
+              14,
+              19,
+              24
+            ]
+          },
+          {
+            "index": 1,
+            "frames": [
+              29,
+              34,
+              36,
+              38,
+              43,
+              48,
+              53,
+              58
+            ]
+          },
+          {
+            "index": 2,
+            "frames": [
+              60,
+              62,
+              67,
+              72,
+              77,
+              82,
+              84,
+              86
+            ]
+          },
+          {
+            "index": 3,
+            "frames": [
+              91,
+              96,
+              101,
+              106,
+              108,
+              109,
+              110,
+              115
+            ]
+          },
+          {
+            "index": 4,
+            "frames": [
+              119,
+              120,
+              125,
+              129,
+              130,
+              132,
+              134,
+              139
+            ]
+          },
+          {
+            "index": 5,
+            "frames": [
+              144,
+              149,
+              154,
+              156,
+              158,
+              163,
+              168,
+              173
+            ]
+          },
+          {
+            "index": 6,
+            "frames": [
+              178,
+              180,
+              182,
+              187,
+              192,
+              197,
+              202,
+              204
+            ]
+          },
+          {
+            "index": 7,
+            "frames": [
+              206,
+              211,
+              216,
+              221,
+              226,
+              228,
+              229,
+              230
+            ]
+          },
+          {
+            "index": 8,
+            "frames": [
+              235,
+              239,
+              240,
+              245,
+              249,
+              250,
+              252,
+              254
+            ]
+          },
+          {
+            "index": 9,
+            "frames": [
+              259,
+              264,
+              269,
+              274,
+              276,
+              278,
+              283,
+              288
+            ]
+          },
+          {
+            "index": 10,
+            "frames": [
+              293,
+              298,
+              300,
+              302,
+              307,
+              312,
+              317,
+              322
+            ]
+          },
+          {
+            "index": 11,
+            "frames": [
+              324,
+              326,
+              331,
+              336,
+              341,
+              346,
+              348,
+              349
+            ]
+          },
+          {
+            "index": 12,
+            "frames": [
+              350,
+              355,
+              359,
+              360,
+              365,
+              369,
+              370,
+              372
+            ]
+          },
+          {
+            "index": 13,
+            "frames": [
+              374,
+              379,
+              384,
+              389,
+              394,
+              396,
+              398,
+              403
+            ]
+          },
+          {
+            "index": 14,
+            "frames": [
+              408,
+              413,
+              418,
+              420,
+              422,
+              427,
+              432,
+              437
+            ]
+          },
+          {
+            "index": 15,
+            "frames": [
+              442,
+              444,
+              446,
+              451,
+              456,
+              458,
+              461,
+              466
+            ]
+          },
+          {
+            "index": 16,
+            "frames": [
+              468,
+              470,
+              475,
+              479
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "calls": [
+    {
+      "index": 0,
+      "stage": "round-1-batch-0",
+      "reservation": {
+        "projectId": "dd32e088-6fe3-46f6-bace-153f644860f0",
+        "stage": "round-1-batch-0",
+        "id": "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb",
+        "day": "2026-10-05",
+        "hash": "06bc24a79ba6e8d0bfa6fbe79207054a6d11995fa1a40acba039c37ac370b271",
+        "cost": {
+          "inputTokens": 86779,
+          "outputTokens": 16000
+        },
+        "mode": "unlimited_validation"
+      },
+      "contextRef": {
+        "key": "projects/dd32e088-6fe3-46f6-bace-153f644860f0/contexts/round-1-batch-0/f05986313c1e8ee3321c79ded6390aaf6cb509ae5997d12c276992a651a08d36",
+        "sha256": "f05986313c1e8ee3321c79ded6390aaf6cb509ae5997d12c276992a651a08d36",
+        "bytes": 1567,
+        "mime": "application/json"
+      },
+      "status": "blocked",
+      "errorCode": "The operation was aborted due to timeout",
+      "request": {
+        "model": "gemini-3.8-flash",
+        "maxTokens": 16000,
+        "startedAt": "2026-10-05T02:16:33.228Z",
+        "timeoutMs": 180000,
+        "errorName": "TimeoutError",
+        "finishedAt": "2026-10-05T02:19:33.233Z"
+      },
+      "actual": {
+        "state": "unknown",
+        "startedAt": "2026-10-05T02:16:32.480Z"
+      }
+    }
+  ],
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 16000,
+      "startedAt": "2026-10-05T02:16:33.228Z",
+      "timeoutMs": 180000,
+      "errorName": "TimeoutError",
+      "finishedAt": "2026-10-05T02:19:33.233Z"
+    }
+  ],
+  "errorCode": "CLEAR_FULL_CRITIC_USAGE_UNCERTAIN",
+  "originalControlBudgetOperationsUnchanged": true
+}

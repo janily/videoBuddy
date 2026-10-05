@@ -1,0 +1,62 @@
+{
+  "executedAt": "2026-10-05T02:21:53.565677+00:00",
+  "status": "timeout_unknown_usage_retained_no_followup_calls",
+  "sourceReportSha256": "0d8713ae4e7c855684735efa3d8c2d38ad125a96d374a34965075f9a3693954d",
+  "diagnosticRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/clear-full-critic-UGy32l",
+  "requests": 1,
+  "remainingBatchesNotCalled": 30,
+  "reservationId": "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb",
+  "reservedInputTokens": 86779,
+  "reservedOutputTokens": 16000,
+  "actualUsage": null,
+  "rawResponseAvailable": false,
+  "noAutomaticRetry": true,
+  "nativeExecutions": 0,
+  "originalStateUnchanged": true,
+  "ledgerRecords": {
+    "budgets/model-gate.json": {
+      "schemaVersion": 1,
+      "active": {
+        "id": "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb",
+        "projectId": "dd32e088-6fe3-46f6-bace-153f644860f0",
+        "day": "2026-10-05",
+        "hash": "06bc24a79ba6e8d0bfa6fbe79207054a6d11995fa1a40acba039c37ac370b271",
+        "state": "unknown",
+        "startedAt": "2026-10-05T02:16:32.480Z"
+      }
+    },
+    "budgets/daily/2026-10-05.json": {
+      "calls": 1,
+      "inputTokens": 86779,
+      "outputTokens": 16000,
+      "reservations": {
+        "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb": "06bc24a79ba6e8d0bfa6fbe79207054a6d11995fa1a40acba039c37ac370b271"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb": {
+          "state": "unknown",
+          "startedAt": "2026-10-05T02:16:32.480Z"
+        }
+      }
+    },
+    "projects/dd32e088-6fe3-46f6-bace-153f644860f0/budget.json": {
+      "calls": 1,
+      "inputTokens": 86779,
+      "outputTokens": 16000,
+      "reservations": {
+        "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb": "06bc24a79ba6e8d0bfa6fbe79207054a6d11995fa1a40acba039c37ac370b271"
+      },
+      "accountingVersion": 2,
+      "accounting": {
+        "5dd1833417ee752dc2af96fef7281593b22e1b0880cd37cb450ef23653015dbb": {
+          "state": "unknown",
+          "startedAt": "2026-10-05T02:16:32.480Z"
+        }
+      }
+    }
+  },
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "deliveryEligible": false
+}
