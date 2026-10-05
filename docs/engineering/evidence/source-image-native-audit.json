@@ -1,0 +1,285 @@
+{
+  "executedAt": "2026-10-05T07:12:16.471613+00:00",
+  "modelCalls": 0,
+  "stateWrites": 0,
+  "scope": "Only exact owned invocations in source image diagnostics; no native stops or restarts.",
+  "reports": [
+    {
+      "report": "source-image-probe.json",
+      "records": [
+        {
+          "invocation": "a54dc4bc-6a3a-43d7-8e69-8ae367dd94e8",
+          "argsSha256": "02ad2c670241c258cb6445491b21ebdbb803e714858edc24d9ad49c35a708a20",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-a54dc4bc-6a3a-43d7-8e69-8ae367dd94e8",
+          "absent": true
+        },
+        {
+          "invocation": "dae1578c-4c7b-4a2f-8eb6-4407c0ede469",
+          "argsSha256": "044d6914cf86808cb4dc1fb884cd488ee5a7fbbccfe373539e88ed0eee376bd0",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-dae1578c-4c7b-4a2f-8eb6-4407c0ede469",
+          "absent": true
+        },
+        {
+          "invocation": "960e98ba-7fdf-4df5-99b4-681a2c04eb3d",
+          "argsSha256": "124f3899ca4e5a10a60e19cea6d578d287d77dbe5b0884c405c7e76e8e51df26",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-960e98ba-7fdf-4df5-99b4-681a2c04eb3d",
+          "absent": true
+        },
+        {
+          "invocation": "1eb47559-34ec-478f-b981-03301e0a8d00",
+          "argsSha256": "13653132c26319791e65ebb162cb994596816e2b60d120c1a2a7ef4e30014593",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-1eb47559-34ec-478f-b981-03301e0a8d00",
+          "absent": true
+        },
+        {
+          "invocation": "228c2ce1-89ab-4bef-b05d-8f6a8775b910",
+          "argsSha256": "2fdd5321e42ca05f7ff4062852885db66783a3b38c6e078b355dc309444be030",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-228c2ce1-89ab-4bef-b05d-8f6a8775b910",
+          "absent": true
+        },
+        {
+          "invocation": "2a2d46aa-1932-413d-b917-4c777f693248",
+          "argsSha256": "3125a857bb5a36ff8ad0f5635b6f620c6d9eb3e3909cd9d4c58fd49760cf3827",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-2a2d46aa-1932-413d-b917-4c777f693248",
+          "absent": true
+        },
+        {
+          "invocation": "f709ae0c-da5e-48cc-b710-eee1b0c78dca",
+          "argsSha256": "4bc3ec9d99633e645d1082f68ba3aa1501d856800fb63f7f653d205c6fdaea30",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-f709ae0c-da5e-48cc-b710-eee1b0c78dca",
+          "absent": true
+        },
+        {
+          "invocation": "2fd18077-d463-4529-a6df-ade7e8079974",
+          "argsSha256": "5158b7d8e0725e67b846f166e3e9b4355630482f089ca5351c53c5ecff80b3dc",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-2fd18077-d463-4529-a6df-ade7e8079974",
+          "absent": true
+        },
+        {
+          "invocation": "5b254acb-913e-4c87-bd41-1e84e8f57699",
+          "argsSha256": "70fee9da65c86b9b91faec4e4f687dd1bc35dafe8322f23a96838293bfceb4aa",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-5b254acb-913e-4c87-bd41-1e84e8f57699",
+          "absent": true
+        },
+        {
+          "invocation": "8af4cd2c-20ad-49e6-8efe-fe03692fbfb6",
+          "argsSha256": "78f9a663970bae69fc92d56d9114d505d86edc19ca0cf2fc42cc09d076c8cbbd",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-8af4cd2c-20ad-49e6-8efe-fe03692fbfb6",
+          "absent": true
+        },
+        {
+          "invocation": "74e50895-0327-40f7-9ff8-4a8c4f3fb716",
+          "argsSha256": "7b3cd94e2b95933899789e5c030d7ce3e8f59bd5481d458dfde70ee1a117beb9",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-74e50895-0327-40f7-9ff8-4a8c4f3fb716",
+          "absent": true
+        },
+        {
+          "invocation": "b6f08b4b-60ec-4723-be1b-5511408cd314",
+          "argsSha256": "9e4914907e0e0c74679ce43d75fbaef63c50f1e6bdaef150a6e83476284f7ed9",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-b6f08b4b-60ec-4723-be1b-5511408cd314",
+          "absent": true
+        },
+        {
+          "invocation": "ee783618-9985-49a7-a72e-93086154fbbb",
+          "argsSha256": "ab7e831191de0fcdff0c5cc70bdf625da4b724255c318326925e8ce1daa583e2",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-ee783618-9985-49a7-a72e-93086154fbbb",
+          "absent": true
+        },
+        {
+          "invocation": "8264ff48-f38a-4de5-af20-fbb4b2196f2e",
+          "argsSha256": "c6571d2a855cb39c0ce3204138a7920029a6c25d30e1bea9107cbeb7e8560553",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-8264ff48-f38a-4de5-af20-fbb4b2196f2e",
+          "absent": true
+        },
+        {
+          "invocation": "4be5619f-bfea-4fd9-b7a0-a92b0f17e30e",
+          "argsSha256": "c8ac2eed8ae22355c4de36c0fd271a6266055a244ebc10bfe4996b9c482e8a59",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-4be5619f-bfea-4fd9-b7a0-a92b0f17e30e",
+          "absent": true
+        },
+        {
+          "invocation": "5640a6fb-4b1b-47d3-8300-89a33d3ed7be",
+          "argsSha256": "d3f3f85f56942e2b4b0639f6be4ffafbb7ef15d78a01bd45613ded16f31ee3dc",
+          "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-5640a6fb-4b1b-47d3-8300-89a33d3ed7be",
+          "absent": true
+        }
+      ],
+      "allCompletedAndAbsent": true
+    },
+    {
+      "report": "source-image-v2-probe.json",
+      "records": [
+        {
+          "invocation": "89c54eaf-8930-4f45-a6a1-36a996af72bf",
+          "argsSha256": "11dd668171350f4e5f56f982ffed50b3173833561e93014e98f4d00c924b0301",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-89c54eaf-8930-4f45-a6a1-36a996af72bf",
+          "absent": true
+        },
+        {
+          "invocation": "a8fa9d33-a7e6-4f9e-a4db-0dfcc72e094d",
+          "argsSha256": "264689c6b21f10b13a8eaec46c6db2e3c4ac30e28030e01a212de4e0e035c942",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-a8fa9d33-a7e6-4f9e-a4db-0dfcc72e094d",
+          "absent": true
+        },
+        {
+          "invocation": "37d00bbc-d424-4a64-abf3-f8c7f32bdbe1",
+          "argsSha256": "2a37e67f94cd5bd136f3d568e0f318596cc556135d2dbed538a4fd5f55932045",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-37d00bbc-d424-4a64-abf3-f8c7f32bdbe1",
+          "absent": true
+        },
+        {
+          "invocation": "34357ca9-0842-4ecc-9f47-45bbc326c3a6",
+          "argsSha256": "3c5016940228c7edc016b97fc761ad132a442f03b5a611dedbb658b63359de8e",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-34357ca9-0842-4ecc-9f47-45bbc326c3a6",
+          "absent": true
+        },
+        {
+          "invocation": "2fa3bd5c-32a7-4294-8683-2098618d9f2a",
+          "argsSha256": "46279a389e1a4c907fbd72ce4db32847ee3bae5d2629508e4031228e9887a28e",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-2fa3bd5c-32a7-4294-8683-2098618d9f2a",
+          "absent": true
+        },
+        {
+          "invocation": "347af3f3-895e-4d31-8ab6-5b0dab4ac9ce",
+          "argsSha256": "4ec9eb4e66821e4abb94aa7706d3f41a2dc1875330c3c08f23ca1ee83b2d4aca",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-347af3f3-895e-4d31-8ab6-5b0dab4ac9ce",
+          "absent": true
+        },
+        {
+          "invocation": "ceea2a36-2934-48e2-88b3-093f9163f17f",
+          "argsSha256": "5d5a121d4535407d62c15fba96e44fc45b6db7cf9af33d7f4a5e87a478224c5a",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-ceea2a36-2934-48e2-88b3-093f9163f17f",
+          "absent": true
+        },
+        {
+          "invocation": "d5ccf677-8fb4-4cca-827d-9dc62c773a34",
+          "argsSha256": "73eaa9fb018e383855ea1dd41cb9ad6a904d13a5737d3e8709cd7e4432f4100b",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-d5ccf677-8fb4-4cca-827d-9dc62c773a34",
+          "absent": true
+        },
+        {
+          "invocation": "11ee2b58-d921-4277-9758-fdfeec33fcc1",
+          "argsSha256": "9b06058995b781d1431d6f50db1120a1f28f77c425ec795fefcdc58e7b9cbfab",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-11ee2b58-d921-4277-9758-fdfeec33fcc1",
+          "absent": true
+        },
+        {
+          "invocation": "2400c5a4-3038-47d3-a340-c06afa93cf83",
+          "argsSha256": "9c6d26db18237c8f767ee176b8080783020f37ed5436e5d5b87844e0cdd5444d",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-2400c5a4-3038-47d3-a340-c06afa93cf83",
+          "absent": true
+        },
+        {
+          "invocation": "e283949e-508f-463b-b766-944339ae4fc0",
+          "argsSha256": "a4cfb1d7edbff2179d6669cfeba5b88c643d2eacc7e2bd4ea16bf6fc8871a4fd",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-e283949e-508f-463b-b766-944339ae4fc0",
+          "absent": true
+        },
+        {
+          "invocation": "1bb42019-7c47-4615-8aa6-45937bdecacf",
+          "argsSha256": "c1ccf1d7dc466542b2d4ddd4b5ce0671feaad87d6d2bd56ce9d23daa676df717",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-1bb42019-7c47-4615-8aa6-45937bdecacf",
+          "absent": true
+        },
+        {
+          "invocation": "1f44c3d7-f33d-450e-b690-d5e1edb3565e",
+          "argsSha256": "c48e0fa5e45f9fd24bf95b33ee11de5c66658704c995d3d440404ae98d5d477c",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-1f44c3d7-f33d-450e-b690-d5e1edb3565e",
+          "absent": true
+        },
+        {
+          "invocation": "d9339e7f-1fd2-400e-ae99-de493a4511b3",
+          "argsSha256": "c9598d06b24e21f535b51ff100cf880fcea8e4a84955f080a94d12c81c959f1d",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-d9339e7f-1fd2-400e-ae99-de493a4511b3",
+          "absent": true
+        },
+        {
+          "invocation": "1c14ad01-6abd-4c24-b443-caa2c276d8f2",
+          "argsSha256": "dbb2ab734b8d0cd0c0d5935c40fcb228069f722eea90ca40c36855f095d0d893",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-1c14ad01-6abd-4c24-b443-caa2c276d8f2",
+          "absent": true
+        },
+        {
+          "invocation": "7a10134b-fae2-4ffa-8008-b488156f8cdd",
+          "argsSha256": "e3f545f89e8657f74f9494073e1bda65312070933a6eb0b65d356db1e6a89a45",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-7a10134b-fae2-4ffa-8008-b488156f8cdd",
+          "absent": true
+        },
+        {
+          "invocation": "4deb650c-7304-4698-b916-e0835a96954f",
+          "argsSha256": "f5520001e4516559701699a9e14963a383f1bc520be6816ef273cf2d131c8778",
+          "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+          "journalState": "completed",
+          "exactOwnedName": "vb-media-4deb650c-7304-4698-b916-e0835a96954f",
+          "absent": true
+        }
+      ],
+      "allCompletedAndAbsent": true
+    }
+  ],
+  "status": "all_owned_invocations_completed_and_absent"
+}

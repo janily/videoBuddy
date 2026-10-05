@@ -1,0 +1,395 @@
+{
+  "executedAt": "2026-10-05T07:01:13.145Z",
+  "status": "failed",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-probe-SAeZeZ",
+  "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+  "build": {
+    "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-build-a37f12e2-01f4-4ffe-b3d4-8bad2cf38129",
+    "baseImage": "sha256:4c3bd5cce5df16440ad69efe217b901a1558443effe1e7226800f8f20e468ba2",
+    "baseReference": "videobuddy-media:source-image-base-4c3bd5cce5df16440ad69efe217b901a1558443effe1e7226800f8f20e468ba2",
+    "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+    "producerBytes": 6365,
+    "dockerfileSha256": "bed02085a8d9bdcaf407eee851226b71c7a3848c26af603008dac3c87c50627e"
+  },
+  "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+  "operationId": "e5d46b0c-662c-4e92-9147-c64cc6d5c860",
+  "modelCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "resultPublished": false,
+  "fixture": "Synthetic two-color 3000x1000 image; format/decode/resize/orientation tests only, no semantic QA.",
+  "views": [
+    {
+      "kind": "png",
+      "input": {
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "4f0efecd-ce27-4386-b635-3a38a0328249",
+        "sourceMime": "image/png",
+        "sourceSha256": "bb67fa873a722d6527a5c9cafbcd990e3c59c2f87f8890538a181019840eb4df",
+        "sourceBytes": 11245
+      },
+      "job": {
+        "schemaVersion": 1,
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "4f0efecd-ce27-4386-b635-3a38a0328249",
+        "sourceMime": "image/png",
+        "sourceSha256": "bb67fa873a722d6527a5c9cafbcd990e3c59c2f87f8890538a181019840eb4df",
+        "sourceBytes": 11245,
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "maxEdge": 2048,
+        "jobSha256": "ef76e0f3f4719d508e1de511b84baf1cee4bb62122e1edc7ef79bf9b795756ee"
+      },
+      "receipt": {
+        "schemaVersion": 1,
+        "jobSha256": "ef76e0f3f4719d508e1de511b84baf1cee4bb62122e1edc7ef79bf9b795756ee",
+        "assetId": "4f0efecd-ce27-4386-b635-3a38a0328249",
+        "sourceSha256": "bb67fa873a722d6527a5c9cafbcd990e3c59c2f87f8890538a181019840eb4df",
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "status": "pass",
+        "sourceMime": "image/png",
+        "sourceBytes": 11245,
+        "encodedWidth": 3000,
+        "encodedHeight": 1000,
+        "orientedWidth": 3000,
+        "orientedHeight": 1000,
+        "width": 2048,
+        "height": 683,
+        "mime": "image/png",
+        "sha256": "7532d95ebdfdb8c10983a39ebcd867852d594cbcbc231ddcba75b464d511aedf",
+        "bytes": 29682,
+        "transform": "full_image_resize",
+        "coordinates": "oriented_image_normalized"
+      },
+      "path": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-probe-SAeZeZ/media/ef76e0f3f4719d508e1de511b84baf1cee4bb62122e1edc7ef79bf9b795756ee/output/view.png",
+      "pixels": [
+        [
+          255,
+          0,
+          0
+        ],
+        [
+          0,
+          255,
+          0
+        ]
+      ],
+      "coldNoNewNativeInvocation": true,
+      "sourceTamperRejected": true,
+      "viewTamperRejected": true
+    },
+    {
+      "kind": "jpeg",
+      "input": {
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "a96c2530-6ed3-4324-8403-665ef7b9d4e4",
+        "sourceMime": "image/jpeg",
+        "sourceSha256": "6f8d5a6c522c482a0511ec900553b0f03534263de25d2165f145c14472027ecb",
+        "sourceBytes": 37907
+      },
+      "job": {
+        "schemaVersion": 1,
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "a96c2530-6ed3-4324-8403-665ef7b9d4e4",
+        "sourceMime": "image/jpeg",
+        "sourceSha256": "6f8d5a6c522c482a0511ec900553b0f03534263de25d2165f145c14472027ecb",
+        "sourceBytes": 37907,
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "maxEdge": 2048,
+        "jobSha256": "d35e1ba5b031b22ff05699492dad58b702d0e071aca34d41d4b18b2c54bd076f"
+      },
+      "receipt": {
+        "schemaVersion": 1,
+        "jobSha256": "d35e1ba5b031b22ff05699492dad58b702d0e071aca34d41d4b18b2c54bd076f",
+        "assetId": "a96c2530-6ed3-4324-8403-665ef7b9d4e4",
+        "sourceSha256": "6f8d5a6c522c482a0511ec900553b0f03534263de25d2165f145c14472027ecb",
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "status": "pass",
+        "sourceMime": "image/jpeg",
+        "sourceBytes": 37907,
+        "encodedWidth": 3000,
+        "encodedHeight": 1000,
+        "orientedWidth": 3000,
+        "orientedHeight": 1000,
+        "width": 2048,
+        "height": 683,
+        "mime": "image/png",
+        "sha256": "50dc59c64cc58898912d1c84dcb421b7d0512ecd770a07bb5bc2759fd383ffea",
+        "bytes": 29731,
+        "transform": "full_image_resize",
+        "coordinates": "oriented_image_normalized"
+      },
+      "path": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-probe-SAeZeZ/media/d35e1ba5b031b22ff05699492dad58b702d0e071aca34d41d4b18b2c54bd076f/output/view.png",
+      "pixels": [
+        [
+          254,
+          0,
+          0
+        ],
+        [
+          0,
+          255,
+          1
+        ]
+      ],
+      "coldNoNewNativeInvocation": true,
+      "sourceTamperRejected": true,
+      "viewTamperRejected": true
+    },
+    {
+      "kind": "webp",
+      "input": {
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "21dc919f-4c97-46e6-b51e-347cf56d1f0c",
+        "sourceMime": "image/webp",
+        "sourceSha256": "56038ad672c0cc229978bb37466fbd73be93dc5123ccabf50650160207bb7baa",
+        "sourceBytes": 192
+      },
+      "job": {
+        "schemaVersion": 1,
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "21dc919f-4c97-46e6-b51e-347cf56d1f0c",
+        "sourceMime": "image/webp",
+        "sourceSha256": "56038ad672c0cc229978bb37466fbd73be93dc5123ccabf50650160207bb7baa",
+        "sourceBytes": 192,
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "maxEdge": 2048,
+        "jobSha256": "b2987ab2ea7dcecd4328d86f022fc1cf4635113b9972a285efc6a73055ff076e"
+      },
+      "receipt": {
+        "schemaVersion": 1,
+        "jobSha256": "b2987ab2ea7dcecd4328d86f022fc1cf4635113b9972a285efc6a73055ff076e",
+        "assetId": "21dc919f-4c97-46e6-b51e-347cf56d1f0c",
+        "sourceSha256": "56038ad672c0cc229978bb37466fbd73be93dc5123ccabf50650160207bb7baa",
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "status": "pass",
+        "sourceMime": "image/webp",
+        "sourceBytes": 192,
+        "encodedWidth": 3000,
+        "encodedHeight": 1000,
+        "orientedWidth": 3000,
+        "orientedHeight": 1000,
+        "width": 2048,
+        "height": 683,
+        "mime": "image/png",
+        "sha256": "7532d95ebdfdb8c10983a39ebcd867852d594cbcbc231ddcba75b464d511aedf",
+        "bytes": 29682,
+        "transform": "full_image_resize",
+        "coordinates": "oriented_image_normalized"
+      },
+      "path": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-probe-SAeZeZ/media/b2987ab2ea7dcecd4328d86f022fc1cf4635113b9972a285efc6a73055ff076e/output/view.png",
+      "pixels": [
+        [
+          255,
+          0,
+          0
+        ],
+        [
+          0,
+          255,
+          0
+        ]
+      ],
+      "coldNoNewNativeInvocation": true,
+      "sourceTamperRejected": true,
+      "viewTamperRejected": true
+    },
+    {
+      "kind": "jpeg-exif6",
+      "input": {
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "3cdeeab6-fa05-41a2-92bb-69899d5bd4e3",
+        "sourceMime": "image/jpeg",
+        "sourceSha256": "ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436",
+        "sourceBytes": 37943
+      },
+      "job": {
+        "schemaVersion": 1,
+        "projectId": "8f9490cc-391c-4747-baf1-b3f28241684a",
+        "assetId": "3cdeeab6-fa05-41a2-92bb-69899d5bd4e3",
+        "sourceMime": "image/jpeg",
+        "sourceSha256": "ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436",
+        "sourceBytes": 37943,
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "maxEdge": 2048,
+        "jobSha256": "b32537eee435da16425eae7301d3184a1f8a5a5ad98616180efd295159ed9a25"
+      },
+      "receipt": {
+        "schemaVersion": 1,
+        "jobSha256": "b32537eee435da16425eae7301d3184a1f8a5a5ad98616180efd295159ed9a25",
+        "assetId": "3cdeeab6-fa05-41a2-92bb-69899d5bd4e3",
+        "sourceSha256": "ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436",
+        "runtimeDigest": "6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+        "producerSha256": "767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72",
+        "status": "pass",
+        "sourceMime": "image/jpeg",
+        "sourceBytes": 37943,
+        "encodedWidth": 3000,
+        "encodedHeight": 1000,
+        "orientedWidth": 1000,
+        "orientedHeight": 3000,
+        "width": 683,
+        "height": 2048,
+        "mime": "image/png",
+        "sha256": "6ac2494de7817c41db36c6d35e4373ea2b004f5f03deafbd34189d0a6a0cd37e",
+        "bytes": 35445,
+        "transform": "full_image_resize",
+        "coordinates": "oriented_image_normalized"
+      },
+      "path": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-probe-SAeZeZ/media/b32537eee435da16425eae7301d3184a1f8a5a5ad98616180efd295159ed9a25/output/view.png",
+      "pixels": [
+        [
+          254,
+          0,
+          0
+        ],
+        [
+          0,
+          255,
+          1
+        ]
+      ],
+      "coldNoNewNativeInvocation": true,
+      "sourceTamperRejected": true,
+      "viewTamperRejected": true
+    }
+  ],
+  "errorCode": "BROKEN_IMAGE_NOT_REJECTED",
+  "originalProjectModelAndNativeUnknownUnchanged": true,
+  "nativeJournal": [
+    {
+      "schemaVersion": 1,
+      "invocation": "a54dc4bc-6a3a-43d7-8e69-8ae367dd94e8",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "02ad2c670241c258cb6445491b21ebdbb803e714858edc24d9ad49c35a708a20",
+      "state": "completed",
+      "output": "{\"schemaVersion\":1,\"jobSha256\":\"b32537eee435da16425eae7301d3184a1f8a5a5ad98616180efd295159ed9a25\",\"assetId\":\"3cdeeab6-fa05-41a2-92bb-69899d5bd4e3\",\"sourceSha256\":\"ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436\",\"runtimeDigest\":\"6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24\",\"producerSha256\":\"767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72\",\"status\":\"pass\",\"sourceMime\":\"image/jpeg\",\"sourceBytes\":37943,\"encodedWidth\":3000,\"encodedHeight\":1000,\"orientedWidth\":1000,\"orientedHeight\":3000,\"width\":683,\"height\":2048,\"mime\":\"image/png\",\"sha256\":\"6ac2494de7817c41db36c6d35e4373ea2b004f5f03deafbd34189d0a6a0cd37e\",\"bytes\":35445,\"transform\":\"full_image_resize\",\"coordinates\":\"oriented_image_normalized\"}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "dae1578c-4c7b-4a2f-8eb6-4407c0ede469",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "044d6914cf86808cb4dc1fb884cd488ee5a7fbbccfe373539e88ed0eee376bd0",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "960e98ba-7fdf-4df5-99b4-681a2c04eb3d",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "124f3899ca4e5a10a60e19cea6d578d287d77dbe5b0884c405c7e76e8e51df26",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "1eb47559-34ec-478f-b981-03301e0a8d00",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "13653132c26319791e65ebb162cb994596816e2b60d120c1a2a7ef4e30014593",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "228c2ce1-89ab-4bef-b05d-8f6a8775b910",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "2fdd5321e42ca05f7ff4062852885db66783a3b38c6e078b355dc309444be030",
+      "state": "completed",
+      "output": "{\"schemaVersion\":1,\"jobSha256\":\"b2987ab2ea7dcecd4328d86f022fc1cf4635113b9972a285efc6a73055ff076e\",\"assetId\":\"21dc919f-4c97-46e6-b51e-347cf56d1f0c\",\"sourceSha256\":\"56038ad672c0cc229978bb37466fbd73be93dc5123ccabf50650160207bb7baa\",\"runtimeDigest\":\"6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24\",\"producerSha256\":\"767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72\",\"status\":\"pass\",\"sourceMime\":\"image/webp\",\"sourceBytes\":192,\"encodedWidth\":3000,\"encodedHeight\":1000,\"orientedWidth\":3000,\"orientedHeight\":1000,\"width\":2048,\"height\":683,\"mime\":\"image/png\",\"sha256\":\"7532d95ebdfdb8c10983a39ebcd867852d594cbcbc231ddcba75b464d511aedf\",\"bytes\":29682,\"transform\":\"full_image_resize\",\"coordinates\":\"oriented_image_normalized\"}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "2a2d46aa-1932-413d-b917-4c777f693248",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "3125a857bb5a36ff8ad0f5635b6f620c6d9eb3e3909cd9d4c58fd49760cf3827",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "f709ae0c-da5e-48cc-b710-eee1b0c78dca",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "4bc3ec9d99633e645d1082f68ba3aa1501d856800fb63f7f653d205c6fdaea30",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "2fd18077-d463-4529-a6df-ade7e8079974",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "5158b7d8e0725e67b846f166e3e9b4355630482f089ca5351c53c5ecff80b3dc",
+      "state": "completed",
+      "output": "{\"schemaVersion\":1,\"jobSha256\":\"ef76e0f3f4719d508e1de511b84baf1cee4bb62122e1edc7ef79bf9b795756ee\",\"assetId\":\"4f0efecd-ce27-4386-b635-3a38a0328249\",\"sourceSha256\":\"bb67fa873a722d6527a5c9cafbcd990e3c59c2f87f8890538a181019840eb4df\",\"runtimeDigest\":\"6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24\",\"producerSha256\":\"767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72\",\"status\":\"pass\",\"sourceMime\":\"image/png\",\"sourceBytes\":11245,\"encodedWidth\":3000,\"encodedHeight\":1000,\"orientedWidth\":3000,\"orientedHeight\":1000,\"width\":2048,\"height\":683,\"mime\":\"image/png\",\"sha256\":\"7532d95ebdfdb8c10983a39ebcd867852d594cbcbc231ddcba75b464d511aedf\",\"bytes\":29682,\"transform\":\"full_image_resize\",\"coordinates\":\"oriented_image_normalized\"}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "5b254acb-913e-4c87-bd41-1e84e8f57699",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "70fee9da65c86b9b91faec4e4f687dd1bc35dafe8322f23a96838293bfceb4aa",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "8af4cd2c-20ad-49e6-8efe-fe03692fbfb6",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "78f9a663970bae69fc92d56d9114d505d86edc19ca0cf2fc42cc09d076c8cbbd",
+      "state": "completed",
+      "output": "{\"schemaVersion\":1,\"jobSha256\":\"ec25c244c1fab6e9e230579e53b6e23de4c4f72f2da9e40ad26b972c87b2fc5f\",\"assetId\":\"7ffc3da8-78f5-4d3e-a06e-4592d37f559b\",\"sourceSha256\":\"a39016b0547b67784818397e4898c0fab5573c8fcc1c25b00de68b701faf6230\",\"runtimeDigest\":\"6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24\",\"producerSha256\":\"767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72\",\"status\":\"fail\",\"errorCode\":\"IMAGE_PIXEL_LIMIT\"}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "74e50895-0327-40f7-9ff8-4a8c4f3fb716",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "7b3cd94e2b95933899789e5c030d7ce3e8f59bd5481d458dfde70ee1a117beb9",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "b6f08b4b-60ec-4723-be1b-5511408cd314",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "9e4914907e0e0c74679ce43d75fbaef63c50f1e6bdaef150a6e83476284f7ed9",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "ee783618-9985-49a7-a72e-93086154fbbb",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "ab7e831191de0fcdff0c5cc70bdf625da4b724255c318326925e8ce1daa583e2",
+      "state": "completed",
+      "output": "{\"sha256\":\"767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72\"}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "8264ff48-f38a-4de5-af20-fbb4b2196f2e",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "c6571d2a855cb39c0ce3204138a7920029a6c25d30e1bea9107cbeb7e8560553",
+      "state": "completed",
+      "output": "{\"schemaVersion\":1,\"jobSha256\":\"d35e1ba5b031b22ff05699492dad58b702d0e071aca34d41d4b18b2c54bd076f\",\"assetId\":\"a96c2530-6ed3-4324-8403-665ef7b9d4e4\",\"sourceSha256\":\"6f8d5a6c522c482a0511ec900553b0f03534263de25d2165f145c14472027ecb\",\"runtimeDigest\":\"6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24\",\"producerSha256\":\"767fa4f48bdc07800a0bddf2c00730589184e0ed72b00a260abf67bb8e55ba72\",\"status\":\"pass\",\"sourceMime\":\"image/jpeg\",\"sourceBytes\":37907,\"encodedWidth\":3000,\"encodedHeight\":1000,\"orientedWidth\":3000,\"orientedHeight\":1000,\"width\":2048,\"height\":683,\"mime\":\"image/png\",\"sha256\":\"50dc59c64cc58898912d1c84dcb421b7d0512ecd770a07bb5bc2759fd383ffea\",\"bytes\":29731,\"transform\":\"full_image_resize\",\"coordinates\":\"oriented_image_normalized\"}"
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "4be5619f-bfea-4fd9-b7a0-a92b0f17e30e",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "c8ac2eed8ae22355c4de36c0fd271a6266055a244ebc10bfe4996b9c482e8a59",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "5640a6fb-4b1b-47d3-8300-89a33d3ed7be",
+      "image": "sha256:6085e297e348c8698f6f9793e80f3e16eb0ec15a33ac7c1cb584ecde19159d24",
+      "argsSha256": "d3f3f85f56942e2b4b0639f6be4ffafbb7ef15d78a01bd45613ded16f31ee3dc",
+      "state": "completed",
+      "output": ""
+    }
+  ]
+}

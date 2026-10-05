@@ -1,5 +1,7 @@
 # 开发任务与证据
 
+2026-10-05 T05 图片独立解码/缩图基础（`ebeae78`）：20MiB/30MP、实际codec/MIME、方向、透明度与原/视图SHA绑定；owned独立Chromium无场景代码、2048最长边全画幅、readonly原图/网络隔离/固定producer hash、冷复核与unknown不重试。30MP反例RED→GREEN；首轮损坏图分类不符failed保留，修正后v2四格式及v3含alpha五用例通过，RGBA alpha128/255实际保留，20owned completed且精确name全部absent。完整139文件696项70.85s，lint/build/构建后types通过；固定4acf8b7…ebeae78两轴最终clean。0新model/原项目与两个unknown根JSON不变；默认图片模型/Worker尚未消费解码视图，真实云语义未验，完整T05及C0/C1/C2未达，未push/部署。见 [图片预处理证据](evidence/source-image-validation.md)。
+
 2026-10-05 T05 图片理解与资料接线（`43ed2e3`）：真实私有PNG/JPEG/WebP字节绑定严格视觉观察/OCR/区域/不确定项合同，Mastra多模态适配、已计费持久effect/冷SHA恢复与Worker→ready→Director归档描述贯通。图观察仍不可信，所有图context user-sourced facts须完整真实用户原话，resolve_conflict亦核确认并保存来源，不能provided/mustInclude/否定子串绕过。暂停0预算/effect；真实FileStore归档create后ACK丢失可关闭generation冷恢复，producer仍1次；unknown不重试。反例RED→GREEN、最终137文件692项65.93s及build/lint通过，两轴clean。仅loopback/injected模型协议与临时真实文件测试，0新增云/媒体；真实云图识别/独立解码/缩图与多图要求尚未验收，旧Critic unknown保留，原项目/影片未写。完整T05、全片QA/公共修改导出/43风格与C0/C1/C2未达，无push/部署。见 [完整证据](evidence/image-understanding-validation.md)。
 
 

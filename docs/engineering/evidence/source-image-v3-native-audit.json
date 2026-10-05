@@ -1,0 +1,170 @@
+{
+  "executedAt": "2026-10-05T07:14:06.052000+00:00",
+  "report": "source-image-v3-probe.json",
+  "modelCalls": 0,
+  "stateWrites": 0,
+  "scope": "Exact source-image-v3 owned invocations only; no stops, removals or restarts.",
+  "status": "all_owned_invocations_completed_and_absent",
+  "records": [
+    {
+      "invocation": "d13ec097-1cc5-4413-961a-0812f413e1b8",
+      "argsSha256": "036752d87eda0394473d3b5a3bfc489abe1f76dccc7f9a78077407d060ee126a",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-d13ec097-1cc5-4413-961a-0812f413e1b8",
+      "absent": true
+    },
+    {
+      "invocation": "28ded896-e9c7-468b-ad99-54f542027db8",
+      "argsSha256": "07a9bacaf31fb65541ae2baff2aecb2b6086da287b9946e78d56e1ddfa29e050",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-28ded896-e9c7-468b-ad99-54f542027db8",
+      "absent": true
+    },
+    {
+      "invocation": "c228a737-4f09-40ed-af69-76f456b8afa8",
+      "argsSha256": "38bf9628a167f5a486a52fa2788a0fc13b1125594114d666bbcb690674737400",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-c228a737-4f09-40ed-af69-76f456b8afa8",
+      "absent": true
+    },
+    {
+      "invocation": "2a3bd127-8122-4602-bec3-c8e20b964010",
+      "argsSha256": "3c490ec60d4fd0585c5a904f25df71ace55b93707ede4e1beaa66906b520ce36",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-2a3bd127-8122-4602-bec3-c8e20b964010",
+      "absent": true
+    },
+    {
+      "invocation": "364ed6d2-ead6-4889-a6c9-5c21c6bc3b69",
+      "argsSha256": "41d5b53627effbf34845251eadaf3d02ed7c6db96da9175117a158d5ff605855",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-364ed6d2-ead6-4889-a6c9-5c21c6bc3b69",
+      "absent": true
+    },
+    {
+      "invocation": "66e0c9bb-4eb2-46c2-9e44-da1242e37f24",
+      "argsSha256": "432b00d4a071449e80f2bc00fe61e68e6fe56b5b86f0ec28f79a8a536bd342d7",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-66e0c9bb-4eb2-46c2-9e44-da1242e37f24",
+      "absent": true
+    },
+    {
+      "invocation": "1ac35040-3217-4892-8450-1ac085a56a4a",
+      "argsSha256": "5d5a121d4535407d62c15fba96e44fc45b6db7cf9af33d7f4a5e87a478224c5a",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-1ac35040-3217-4892-8450-1ac085a56a4a",
+      "absent": true
+    },
+    {
+      "invocation": "596c37f3-7696-47d4-abb0-cb73d32ad7e6",
+      "argsSha256": "6465bad2a5ddbf30f81c47c84b262e93d9f6379d7203df49a8cb6156e6758da6",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-596c37f3-7696-47d4-abb0-cb73d32ad7e6",
+      "absent": true
+    },
+    {
+      "invocation": "71faf714-6a19-4937-8ec2-50737b4ac26c",
+      "argsSha256": "6de8fae925e01abd871603ad3d129a2cada8484b9ffaca8ebf3c75e56d984f68",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-71faf714-6a19-4937-8ec2-50737b4ac26c",
+      "absent": true
+    },
+    {
+      "invocation": "5ed59340-9791-4541-935a-22bc1523a2ac",
+      "argsSha256": "7c77ee2346257139052a453857dad70ae613b2848050383fc3fbe7c086087c6d",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-5ed59340-9791-4541-935a-22bc1523a2ac",
+      "absent": true
+    },
+    {
+      "invocation": "fc4378d9-c958-4731-bd61-97f5a556d470",
+      "argsSha256": "8ff7355878289fe21e36c51ad5fc71db2ca6541251537d22f655e374a6832942",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-fc4378d9-c958-4731-bd61-97f5a556d470",
+      "absent": true
+    },
+    {
+      "invocation": "8cfd81d0-acf1-4f71-86ff-3ca0394e4e0f",
+      "argsSha256": "92254d28ed57cf02381d3d60e151f970318a2933acde5b7f0ae90a911b891700",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-8cfd81d0-acf1-4f71-86ff-3ca0394e4e0f",
+      "absent": true
+    },
+    {
+      "invocation": "0da6f2cf-fb10-4a22-863f-3249361107fa",
+      "argsSha256": "9234b49394470b440e9dec23b24ea4aeb0aa5622127ba1035defcd5fe5df0899",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-0da6f2cf-fb10-4a22-863f-3249361107fa",
+      "absent": true
+    },
+    {
+      "invocation": "ed3d8490-ac85-4ec1-bedb-58e087948b9e",
+      "argsSha256": "97a759f8f708f8371a5fa686c75de07c7d9130fad6af74f8d121d2ba33d2b23b",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-ed3d8490-ac85-4ec1-bedb-58e087948b9e",
+      "absent": true
+    },
+    {
+      "invocation": "58001de4-fe73-4367-a1b7-a3147128f870",
+      "argsSha256": "a7f7de87e564f8e33b63b30e40b259d178684ec8b0636acf3f9d585086b86b61",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-58001de4-fe73-4367-a1b7-a3147128f870",
+      "absent": true
+    },
+    {
+      "invocation": "ab61faff-3b4d-4d4f-a836-0d077a429ce6",
+      "argsSha256": "a88b8b557a924ca7ebb6dcdac08adb71f0d38a5a7183277e746748c7b8f30b62",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-ab61faff-3b4d-4d4f-a836-0d077a429ce6",
+      "absent": true
+    },
+    {
+      "invocation": "f9bde628-4b84-4861-9118-00f1f0e9ad55",
+      "argsSha256": "bae49379c5f1e3cd8b73504c6f5de1f70cd6a03cdb967089ecc0f75574aa3652",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-f9bde628-4b84-4861-9118-00f1f0e9ad55",
+      "absent": true
+    },
+    {
+      "invocation": "19788232-e4f5-45f6-8204-972bf69610be",
+      "argsSha256": "c5011cb7b256509e3e43695fcb652a2b7940696987910e438c06a0714b17e687",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-19788232-e4f5-45f6-8204-972bf69610be",
+      "absent": true
+    },
+    {
+      "invocation": "b0a0ad31-f442-451a-8924-685cccabda57",
+      "argsSha256": "e81c534ea384d42245803eba90b9004519bf216566f90ba98273efaf0546e6e4",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-b0a0ad31-f442-451a-8924-685cccabda57",
+      "absent": true
+    },
+    {
+      "invocation": "05b07a5c-3ef6-4787-9f1f-08ea407afee5",
+      "argsSha256": "ee7d4686af5298b722b9e896a6991a96fd763fec4f671a9c89c42324b3f31d50",
+      "image": "sha256:648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+      "journalState": "completed",
+      "exactOwnedName": "vb-media-05b07a5c-3ef6-4787-9f1f-08ea407afee5",
+      "absent": true
+    }
+  ]
+}
