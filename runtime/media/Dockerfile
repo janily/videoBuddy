@@ -13,6 +13,6 @@ RUN if [ -n "$APT_PROXY" ]; then printf 'Acquire::http::Proxy "%s";\n' "$APT_PRO
 WORKDIR /opt/videobuddy
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
-COPY render.mjs runtime-assets.mjs runner.py analyze-pdf.mjs ./
+COPY render.mjs runtime-assets.mjs prepare-image.mjs runner.py analyze-pdf.mjs ./
 
 CMD ["python3", "/opt/videobuddy/runner.py"]

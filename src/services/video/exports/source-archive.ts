@@ -15,7 +15,7 @@ import {WordTimingManifestSchema} from '@/services/video/audio/narration-package
 import {speechReviewExportAudit} from '@/services/video/audio/spoken-review';
 import {archiveByteLimit,encodeSourceArchive,type SourceArchiveEntry} from './source-zip';
 
-const runtimeFiles=['Dockerfile','package.json','package-lock.json','LICENSES.md','render.mjs','runtime-assets.mjs','runner.py','sound.py','master.py','analyze-pdf.mjs'] as const;
+const runtimeFiles=['Dockerfile','package.json','package-lock.json','LICENSES.md','render.mjs','runtime-assets.mjs','prepare-image.mjs','runner.py','sound.py','master.py','analyze-pdf.mjs'] as const;
 function sha(bytes:Buffer){return createHash('sha256').update(bytes).digest('hex')}
 async function safeFile(base:string,key:string,limit:number){
  const baseReal=await realpath(base),path=join(base,key),actual=await realpath(path);
