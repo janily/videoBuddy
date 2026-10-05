@@ -1,5 +1,9 @@
 # 当前工程交接（更新至2026-10-05）
 
+
+2026-10-05 修正更新：完整独立审核请求载荷的纯校验已提前到预算/effect 准入前（`c965061`），避免确定未发送的超限请求被锁为 unknown。修正后全套 129 文件、656 项通过（60.06 秒），lint、生产构建与构建后类型检查退出 0；固定快照两轴复核均 clean，仅覆盖该基础模块。
+2026-10-05 T11/T12 来源条件生产模块：完整来源连续分段、数字/日期/引文literal floor、两独立native Mastra分类/审核、逐项accept后持久冻结；普通名称仍需模型保守分类和独立审核，未宣称完整NER。当前control/op/revision/epoch/fence、completed再guard、unknown不重试、只读0writes；配置/预算提前准入，缺配置可补依赖。129文件655测试58.27s、lint/build/构建后types过。原真实1完整fact/frozen graph只读核，整体semantic因引文拒、全文literal候选仅结构有效，0云/媒体，原状态/unknown不变；无真实分类审核。尚未接新预览包和正式QA条件读取，现有approved条件不改；完整项目/C0/C1/C2未达，无push/部署。见 [来源条件验证](evidence/source-requirements-validation.md)。
+
 2026-10-05 T11/T12 正式内容QA接线：当前正式批准/owner/fence绑定的完整两轮持久stage、保守literal requirements、逐批副作用与只读冷核；正式pipeline新QA v2，新publication强制content覆盖并重验实际成片/所有图片/证据归属，原14项冻结policy和旧事实/听感等阻断保留。归档故障不吞、unknown不重试、取消不提交、completed归档恢复不重复决策。审查两P2已修正：completed缓存外层再guard、轮次/批次绑定context及effect防跨轮去重；反例RED→GREEN。最终126文件641测试61.84s，lint/build/构建后types通过，固定f43b2b59双轴clean；本轮0model/network/native，未改原真实项目/unknown预算。可信语义条件生产冻结、全片实际QA、公开完整闭环及43风格等仍未完，C0/C1/C2未达，无push/部署。见 [正式内容stage验证](evidence/approved-content-stage-validation.md)。
 
 2026-10-05 T11 独立内容 QA 基础：完整 frozen facts、FilmSpec、movie、帧、真实 ASR 与48k时窗/context SHA合同，新只读 Mastra Content Critic；旧 Visual v1 和正式 gate 不改。省略 literalChecks 绕名的 P2 已关闭：可信 requirements 逐 fact 冻结，完整唯一、非来源锚点/错字/标点拒，未分类旧事实默认全文 literal。8合同+2 native loopback/fence测试，相关 RED→GREEN；原ASR空白保持，独立121字符 cap 故障复现后恢复。最终124文件630项52.02s；lint/build/构建后types退出0，ee33face双轴clean，cf3d5ab3仅增强fixture。真实v2 ref dd509ab5 /2500bytes，4实际1080p帧9/129/249/369、1完整原fact、4原混音ASR冷核/独立hash审计通过，0model/fetch/新增native，原control/预算/op/9native及超时unknown不变；旧context保留。仅输入准备，可信语义条件生产冻结、持久stage与正式QA接线尚未完成；完整43风格等范围/C0/C1/C2未达，无push/部署。见 [内容QA验证](evidence/content-review-validation.md)。
