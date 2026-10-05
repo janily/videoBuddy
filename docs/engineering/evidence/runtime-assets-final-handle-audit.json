@@ -1,0 +1,90 @@
+{
+  "executedAt": "2026-10-05T06:02:02.764444+00:00",
+  "status": "all_owned_terminal_handles_verified_and_removed",
+  "modelCalls": 0,
+  "newMediaProducers": 0,
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "handles": [
+    {
+      "sourceReport": "runtime-assets-v4-probe.json",
+      "kind": "authorized",
+      "handle": {
+        "containerName": "vb-9c7aa2bb-9e0d-49af-896f-48ccf0533ff8-authorized-image",
+        "containerId": "16f987dfa48a82be03b13539789da15e0c8df19d86f35182e74f9c5d0d834b15",
+        "stageKey": "dab1d129ab70c4dbcf93237a34128db928554b0198efd089b5ca99de6dabc739",
+        "runtimeDigest": "101b286e4f85cadec2d792fc1fb5c3358616b723be8f0f2b3664fac0ed71043e"
+      },
+      "status": "exited",
+      "exitCode": 0,
+      "identityVerified": true,
+      "workerState": {
+        "status": "failed",
+        "outputs": [],
+        "errorCode": "RENDER_FAILED"
+      },
+      "cleanup": "removed_without_force"
+    },
+    {
+      "sourceReport": "runtime-assets-v5-probe.json",
+      "kind": "authorized",
+      "handle": {
+        "containerName": "vb-f3b1db49-657d-4c12-806e-2c98801fd709-authorized-image",
+        "containerId": "7ace1527a5b78ecca32e7b6baa6f3287ae783b7ede68765be9a1eef4a152f85a",
+        "stageKey": "3582295e98661bad2b661718ffb400f7082a9298eb0b25e4d0a169b48bb4c621",
+        "runtimeDigest": "4c3bd5cce5df16440ad69efe217b901a1558443effe1e7226800f8f20e468ba2"
+      },
+      "status": "exited",
+      "exitCode": 0,
+      "identityVerified": true,
+      "workerState": {
+        "status": "succeeded",
+        "outputs": [
+          "output/picture.mp4"
+        ]
+      },
+      "cleanup": "removed_without_force"
+    },
+    {
+      "sourceReport": "runtime-assets-v5-probe.json",
+      "kind": "undeclared",
+      "handle": {
+        "containerName": "vb-f3b1db49-657d-4c12-806e-2c98801fd709-undeclared-image",
+        "containerId": "7ac5c27c37a320292a682e78f5850beb8c6248d3487ab17cc87d445fb75a38c5",
+        "stageKey": "b87a62515d7b689582ae81fe71d60f92d04410e30d5a4bc7a71105860a445ddf",
+        "runtimeDigest": "4c3bd5cce5df16440ad69efe217b901a1558443effe1e7226800f8f20e468ba2"
+      },
+      "status": "exited",
+      "exitCode": 0,
+      "identityVerified": true,
+      "workerState": {
+        "status": "failed",
+        "outputs": [],
+        "errorCode": "RENDER_FAILED"
+      },
+      "cleanup": "removed_without_force"
+    },
+    {
+      "sourceReport": "runtime-assets-v5-probe.json",
+      "kind": "corrupt-decoder-override",
+      "handle": {
+        "containerName": "vb-f3b1db49-657d-4c12-806e-2c98801fd709-corrupt-decode",
+        "containerId": "f9f767194fc2897212280e89dfc45e89cf214ef83d896676b24a884a33983504",
+        "stageKey": "a6029969b11c75a8948162874c7a085d7d7581549da82d483414f9d5eb8ea782",
+        "runtimeDigest": "4c3bd5cce5df16440ad69efe217b901a1558443effe1e7226800f8f20e468ba2"
+      },
+      "status": "exited",
+      "exitCode": 0,
+      "identityVerified": true,
+      "workerState": {
+        "status": "failed",
+        "outputs": [],
+        "errorCode": "RENDER_FAILED"
+      },
+      "cleanup": "removed_without_force",
+      "nativeDecodeErrorObserved": true,
+      "errorExcerpt": "file:///opt/videobuddy/render.mjs:24\n  if(decoded!==true)throw Error('IMAGE_DECODE_FAILED');\n                          ^\n\nError: IMAGE_DECODE_FAILED\n    at file:///opt/videobuddy/render.mjs:24:27\n\nNode.js v22.23.1\n{\"status\": \"failed\", \"outputs\": [], \"errorCode\": \"RENDER_FAILED\"}\n"
+    }
+  ],
+  "originalAndUnknownJournalUnchanged": true
+}

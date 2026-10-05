@@ -1,0 +1,93 @@
+{
+  "executedAt": "2026-10-05T05:59:14.638Z",
+  "status": "failed",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/runtime-assets-probe-xOWMY6",
+  "image": "sha256:101b286e4f85cadec2d792fc1fb5c3358616b723be8f0f2b3664fac0ed71043e",
+  "build": {
+    "baseImage": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "baseReference": "videobuddy-media:asset-base-c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/runtime-assets-build-00a2b682-f17b-4585-8284-aab80af45bdd",
+    "files": {
+      "render.mjs": {
+        "sha256": "c09ed1feb3f087557945bc40a6a833d444cdf71bfca91e6c8a176f394d81e5c4",
+        "bytes": 4063
+      },
+      "runtime-assets.mjs": {
+        "sha256": "b448f449ae6cce134f6103976e26284fe1a99132d33eab4d4890e44250f90101",
+        "bytes": 2846
+      }
+    },
+    "dockerfileSha256": "ff0f02033e85a120cab3b2f920606e2c90a4159cc415c9f4998cc1414c99dd32"
+  },
+  "projectId": "5c037ed0-e00b-4cfb-8f00-75324075fab6",
+  "operationId": "9c7aa2bb-9e0d-49af-896f-48ccf0533ff8",
+  "modelCalls": 0,
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "deliveryEligible": false,
+  "fixture": "Synthetic two-color PNG used only to test actual private-image transport; no user semantic/style QA claimed.",
+  "asset": {
+    "id": "542aac96-97ef-4576-94b2-063b5da7a66e",
+    "mime": "image/png",
+    "bytes": 81,
+    "sha256": "f1eac94f9a31ada77bddaf4c877f82d85976f23fd0df3314021bcc1e02fe3154"
+  },
+  "stages": [
+    {
+      "kind": "authorized",
+      "job": {
+        "projectId": "5c037ed0-e00b-4cfb-8f00-75324075fab6",
+        "bundleHash": "823797eefd1ba4a5521ccbbdb6ad3d97d28137f1bba23078469fd36bae4df06e",
+        "runtimeDigest": "101b286e4f85cadec2d792fc1fb5c3358616b723be8f0f2b3664fac0ed71043e",
+        "sourceHtml": "<!doctype html><html><style>html,body{margin:0}canvas{display:block}</style><canvas width=\"320\" height=\"180\"></canvas><script>const img=new Image();img.onload=()=>window.READY=true;img.onerror=()=>window.READY=true;img.src=\"/assets/542aac96-97ef-4576-94b2-063b5da7a66e.bin\";window.render=t=>{if(!img.naturalWidth)throw Error('REQUIRED_IMAGE_MISSING');const ctx=document.querySelector('canvas').getContext('2d');ctx.reset();ctx.drawImage(img,0,0,320,180)};</script></html>",
+        "logicalWidth": 320,
+        "logicalHeight": 180,
+        "outputWidth": 320,
+        "outputHeight": 180,
+        "fps": 24,
+        "startFrame": 0,
+        "endFrame": 24,
+        "seed": 1,
+        "fence": 0,
+        "assets": [
+          {
+            "id": "542aac96-97ef-4576-94b2-063b5da7a66e",
+            "mime": "image/png",
+            "bytes": 81,
+            "sha256": "f1eac94f9a31ada77bddaf4c877f82d85976f23fd0df3314021bcc1e02fe3154"
+          }
+        ],
+        "operationId": "9c7aa2bb-9e0d-49af-896f-48ccf0533ff8",
+        "attemptId": "authorized-image",
+        "stageKey": "dab1d129ab70c4dbcf93237a34128db928554b0198efd089b5ca99de6dabc739"
+      },
+      "handle": {
+        "containerName": "vb-9c7aa2bb-9e0d-49af-896f-48ccf0533ff8-authorized-image",
+        "containerId": "16f987dfa48a82be03b13539789da15e0c8df19d86f35182e74f9c5d0d834b15",
+        "stageKey": "dab1d129ab70c4dbcf93237a34128db928554b0198efd089b5ca99de6dabc739",
+        "runtimeDigest": "101b286e4f85cadec2d792fc1fb5c3358616b723be8f0f2b3664fac0ed71043e"
+      }
+    }
+  ],
+  "legacyUndeclaredImageAccepted": true,
+  "errorCode": "CLEAR_FULL_FILM_PICTURE_FAILED",
+  "originalStateNativeAndModelUnknownUnchanged": true,
+  "nativeJournal": [
+    {
+      "schemaVersion": 1,
+      "invocation": "cf4930a2-3d8e-4fdf-832e-d32a5601ea1c",
+      "image": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "argsSha256": "0d751279d0a2b78a710f2a4d257add291f1b8e2e26677389ae1bd1aeff67d2b0",
+      "state": "completed",
+      "output": ""
+    },
+    {
+      "schemaVersion": 1,
+      "invocation": "d8e666a8-c7e1-4053-b346-a42a98036152",
+      "image": "sha256:101b286e4f85cadec2d792fc1fb5c3358616b723be8f0f2b3664fac0ed71043e",
+      "argsSha256": "9a32e493082d408fc9d0e5e7c8e1e6db8e05eec8eae6faadb9dff0c3e042788e",
+      "state": "completed",
+      "output": "c09ed1feb3f087557945bc40a6a833d444cdf71bfca91e6c8a176f394d81e5c4  /opt/videobuddy/render.mjs\nb448f449ae6cce134f6103976e26284fe1a99132d33eab4d4890e44250f90101  /opt/videobuddy/runtime-assets.mjs"
+    }
+  ]
+}

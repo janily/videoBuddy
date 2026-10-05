@@ -1,0 +1,39 @@
+{
+  "executedAt": "2026-10-05T05:33:52.269Z",
+  "status": "failed",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/runtime-assets-probe-ABhSJg",
+  "image": "sha256:3cbf509c349dd109c50c6cab3af283cf31253aa52c5a9584e4b7d1402bb6e496",
+  "build": {
+    "baseImage": "sha256:c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "baseReference": "videobuddy-media:asset-base-c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/runtime-assets-build-d4207dde-88bb-4152-9958-4cc36ccdb136",
+    "files": {
+      "render.mjs": {
+        "sha256": "21c7d45decc0c592ec31510a9a578034ab2e85905e3a38812c6f7f0564bd8604",
+        "bytes": 3551
+      },
+      "runtime-assets.mjs": {
+        "sha256": "b448f449ae6cce134f6103976e26284fe1a99132d33eab4d4890e44250f90101",
+        "bytes": 2846
+      }
+    },
+    "dockerfileSha256": "ff0f02033e85a120cab3b2f920606e2c90a4159cc415c9f4998cc1414c99dd32"
+  },
+  "projectId": "2621ff1e-b58d-49b5-8df9-900f032b4402",
+  "operationId": "3e437d17-eaf8-41e3-a8ef-c91a2f6f9cff",
+  "modelCalls": 0,
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "deliveryEligible": false,
+  "fixture": "Synthetic two-color PNG used only to test actual private-image transport; no user semantic/style QA claimed.",
+  "asset": {
+    "id": "b62381ba-29eb-4b5a-a546-a802d813de40",
+    "mime": "image/png",
+    "bytes": 81,
+    "sha256": "f1eac94f9a31ada77bddaf4c877f82d85976f23fd0df3314021bcc1e02fe3154"
+  },
+  "stages": [],
+  "errorCode": "MEDIA_JOURNAL_INVALID",
+  "originalStateNativeAndModelUnknownUnchanged": true,
+  "nativeJournal": []
+}

@@ -1,0 +1,31 @@
+{
+  "executedAt": "2026-10-05T05:54:29.317Z",
+  "status": "actual_decode_bypass_blocked",
+  "mode": "--after-fix",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/runtime-image-decode-Ebedri",
+  "image": "sha256:a2d21a33ca74893ef1b06f36fcc5362db56cf24f44dad4c0e77c99b57347771a",
+  "projectId": "8848967c-3c52-405e-a28b-5a4c6595033d",
+  "operationId": "a57f6366-aa77-45ef-80dd-a2989954c839",
+  "asset": {
+    "id": "064d85fe-58a5-4f2b-990f-a6fcba6965f3",
+    "mime": "image/png",
+    "bytes": 24,
+    "sha256": "a39016b0547b67784818397e4898c0fab5573c8fcc1c25b00de68b701faf6230"
+  },
+  "modelCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "fixture": "Truncated signature-valid PNG and generated scene overriding Image and native decode; no semantic/style QA.",
+  "output": null,
+  "errorCode": "MEDIA_STOP_UNKNOWN",
+  "originalStateNativeAndModelUnknownUnchanged": true,
+  "nativeJournal": [
+    {
+      "schemaVersion": 1,
+      "invocation": "940019da-2084-49e8-b093-dc189839f9ff",
+      "image": "sha256:a2d21a33ca74893ef1b06f36fcc5362db56cf24f44dad4c0e77c99b57347771a",
+      "argsSha256": "6e362c8fac0c6a3a187591ac00bb54c4aa8ff9f9c771709f92ceeb473c0e647b",
+      "state": "unknown"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "executedAt": "2026-10-05T05:53:35.925Z",
+  "status": "actual_decode_bypass_reproduced",
+  "mode": "--before-fix",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/runtime-image-decode-qm54nt",
+  "image": "sha256:3cbf509c349dd109c50c6cab3af283cf31253aa52c5a9584e4b7d1402bb6e496",
+  "projectId": "33f517f5-f048-4a9c-a407-56d4220150cf",
+  "operationId": "fe466798-e0ef-4e41-a98e-69a8cb6d1e70",
+  "asset": {
+    "id": "51a7ad9c-933a-445a-a2aa-a1c09f4596af",
+    "mime": "image/png",
+    "bytes": 24,
+    "sha256": "a39016b0547b67784818397e4898c0fab5573c8fcc1c25b00de68b701faf6230"
+  },
+  "modelCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "fixture": "Truncated signature-valid PNG and generated scene overriding Image and native decode; no semantic/style QA.",
+  "output": {
+    "bytes": 1593,
+    "sha256": "b234874e2a90f1b074f425bde22fe725fb31c313f795812a4df9029f4834c8be"
+  },
+  "originalStateNativeAndModelUnknownUnchanged": true,
+  "nativeJournal": [
+    {
+      "schemaVersion": 1,
+      "invocation": "9e5492c6-5769-43e9-a26d-3d19f5b90ce8",
+      "image": "sha256:3cbf509c349dd109c50c6cab3af283cf31253aa52c5a9584e4b7d1402bb6e496",
+      "argsSha256": "d6b8b8a785928761f2311799ad92838b30d85d2c8a253dae64f6113c211b8d15",
+      "state": "completed",
+      "output": ""
+    }
+  ]
+}

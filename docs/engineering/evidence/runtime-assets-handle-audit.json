@@ -1,0 +1,42 @@
+{
+  "executedAt": "2026-10-05T05:37:01.854830+00:00",
+  "sourceReport": "runtime-assets-v2-probe.json",
+  "status": "all_owned_terminal_handles_verified_and_removed",
+  "initialAuditFailure": "Incorrect expectation of controller exit 1 for the failed scene; controller records failed state and exits 0. First authorized handle had already been identity-verified and removed.",
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "modelCalls": 0,
+  "newMediaProducers": 0,
+  "handles": [
+    {
+      "kind": "authorized",
+      "handle": {
+        "containerName": "vb-20817281-faa5-4e26-a3d1-85bd69cf83fc-authorized-image",
+        "containerId": "bb64a4470dc32b709d1c38fbb069453b6d0848aa83553cf7e74f7a3d91eb3341",
+        "stageKey": "502862a588bf41d8b9524d9809157bcfc828b776bb19efc09fda25aa6aa10d08",
+        "runtimeDigest": "3cbf509c349dd109c50c6cab3af283cf31253aa52c5a9584e4b7d1402bb6e496"
+      },
+      "status": "absent_after_prior_verified_removal",
+      "priorToolInvocationVerifiedIdImageNameStageExitedZeroBeforeRemoval": true,
+      "cleanup": "removed_without_force_in_initial_audit"
+    },
+    {
+      "kind": "undeclared",
+      "handle": {
+        "containerName": "vb-20817281-faa5-4e26-a3d1-85bd69cf83fc-undeclared-image",
+        "containerId": "9f43ec86921fd670dfe78697cd49ddf059a0f0b26f4d88cd3c8b300f1dc44cc2",
+        "stageKey": "f34c9be73668ed5d0f72205c0e266909e15770a1231977fe15f56722c44fb8de",
+        "runtimeDigest": "3cbf509c349dd109c50c6cab3af283cf31253aa52c5a9584e4b7d1402bb6e496"
+      },
+      "status": "exited",
+      "exitCode": 0,
+      "workerState": {
+        "status": "failed",
+        "outputs": [],
+        "errorCode": "RENDER_FAILED"
+      },
+      "identityVerified": true,
+      "cleanup": "removed_without_force"
+    }
+  ]
+}
