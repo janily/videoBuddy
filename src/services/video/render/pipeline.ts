@@ -6,6 +6,7 @@ import {compileApprovedDeliveryChecks} from '@/services/video/quality/approved-d
 import {canonicalHash} from '@/services/video/domain/hash';
 import {createOrRead} from '@/services/video/storage/atomic-store';
 import {composeApprovedFilm} from './composition';
+import {reviewApprovedContent} from './content-review';
 import {reviewApprovedWholeFilm} from './visual-review';
 import {assertApprovedRenderFence,loadApprovedRenderInputs} from './approved-inputs';
 import {readConfiguration,requireGeneration} from '@/services/video/config/environment';
@@ -23,13 +24,17 @@ export async function renderApproved(projects:ProjectStore,owner:string,projectI
  await activity('critic','正在分两轮检查完整画面');
  const visual=await reviewApprovedWholeFilm(projects,owner,projectId,operationId,fence,{...options,mustExist:false});
  await assertApprovedRenderFence(projects,inputs);
+ await activity('content','正在核对完整影片里的内容');
+ const content=await reviewApprovedContent(projects,owner,projectId,operationId,fence,options);
+ await assertApprovedRenderFence(projects,inputs);
+ if(content.inputHash!==inputs.inputHash||content.compositionHash!==canonicalHash(composition)||content.report.filmSpecSha256!==inputs.bundle.filmSpecRef.sha256||content.report.factsManifestSha256!==inputs.frozen.filmSpec.factsRef.sha256)throw Error('RENDER_OUTPUT_CHANGED');
  const policy=filmDeliveryPolicy(inputs.frozen.timeline),qa=composition.movie.technicalQa;
  if(composition.inputHash!==inputs.inputHash||visual.inputHash!==inputs.inputHash||visual.report.filmSha256!==qa.sha256)throw Error('RENDER_OUTPUT_CHANGED');
  const technicalRef=prefix+'composite-v2-stage',visualRef=prefix+'whole-visual-review-v1-stage';
- const checks=compileApprovedDeliveryChecks(policy,composition,visual.report,technicalRef,visualRef);
+ const checks=compileApprovedDeliveryChecks(policy,composition,visual.report,technicalRef,visualRef,{report:content.report,ref:prefix+'content-review-v1-stage'});
  const result:ResultManifest={...targets,revisionId:inputs.bundle.revisionId,previewId:inputs.bundle.previewId,approvalId:inputs.approval.approvalId,bundleHash:inputs.bundle.bundleHash,mp4Sha256:qa.sha256,mp4Bytes:qa.bytes,qualityPolicy:policy,qualityChecks:checks};
- const report={schemaVersion:1,inputHash:inputs.inputHash,compositionHash:canonicalHash(composition),visualHash:canonicalHash(visual),result,deliveryEligible:false};
- const saved=await createOrRead(projects.store,prefix+'delivery-qa-v1-stage',report);if(canonicalHash(saved)!==canonicalHash(report))throw Error('RENDER_OUTPUT_CHANGED');
+ const report={schemaVersion:2,inputHash:inputs.inputHash,compositionHash:canonicalHash(composition),visualHash:canonicalHash(visual),contentHash:canonicalHash(content),result,deliveryEligible:false};
+ const saved=await createOrRead(projects.store,prefix+'delivery-qa-v2-stage',report);if(canonicalHash(saved)!==canonicalHash(report))throw Error('RENDER_OUTPUT_CHANGED');
  await assertApprovedRenderFence(projects,inputs);
  return{result,outputPath:composition.movie.outputPath};
 }

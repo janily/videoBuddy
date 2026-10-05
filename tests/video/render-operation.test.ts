@@ -1,3 +1,4 @@
+import {protocolContentVerifier} from './fixtures/protocol-content';
 import {expect,it} from 'vitest';
 import {rm,mkdir,writeFile,readFile} from 'node:fs/promises';
 import {randomUUID,createHash} from 'node:crypto';
@@ -43,15 +44,15 @@ async function protocolDelivery(f:Awaited<ReturnType<typeof seedApprovedProject>
  // Synthetic QA/non-video bytes verify lifecycle, never real media quality.
  const bytes=Buffer.alloc(2048,3),sha256=createHash('sha256').update(bytes).digest('hex'),outputPath=join(f.root,'composition','9'.repeat(64),'output','final.mp4');
  await mkdir(join(f.root,'composition','9'.repeat(64),'output'),{recursive:true});await writeFile(outputPath,bytes);
- return{outputPath,result:{...targets,revisionId:f.bundle.revisionId,previewId:f.bundle.previewId,approvalId:f.approval.approvalId,bundleHash:f.bundle.bundleHash,mp4Sha256:sha256,mp4Bytes:bytes.length,qualityPolicy:{schemaVersion:1 as const,audioIntent:'silent' as const,captions:false,requiredRules:[...mandatoryDeliveryRules]},qualityChecks:[...mandatoryDeliveryRules,'decoded_silence'].map(ruleId=>({ruleId,result:'pass' as const,severity:'blocking' as const,evidenceRefs:['synthetic-protocol-QA-not-real-video']}))}};
+ return{outputPath,result:{...targets,revisionId:f.bundle.revisionId,previewId:f.bundle.previewId,approvalId:f.approval.approvalId,bundleHash:f.bundle.bundleHash,mp4Sha256:sha256,mp4Bytes:bytes.length,qualityPolicy:{schemaVersion:1 as const,audioIntent:'silent' as const,captions:false,requiredRules:[...mandatoryDeliveryRules]},qualityChecks:[...[...mandatoryDeliveryRules,'decoded_silence'].map(ruleId=>({ruleId,result:'pass' as const,severity:'blocking' as const,evidenceRefs:['synthetic-protocol-QA-not-real-video']})),{ruleId:'content_coverage',result:'pass' as const,severity:'blocking' as const,evidenceRefs:[`projects/${f.projectId}/approvals/${f.approval.approvalId}/content-review-v1-stage`]}]}};
 }
 
 it('T12 successful qualified protocol result publishes once and cold finalization does not rerender',async()=>{
  const f=await seedApprovedProject(),events=new LocalEventLog(f.root);let builds=0;
  try{
   const build:typeof renderApproved=async(_p,_o,_id,_op,_fence,targets)=>{builds++;return protocolDelivery(f,targets)};
-  await runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build});
-  await runApprovedRenderOperation(f.projects.store,new LocalEventLog(f.root),f.projectId,f.operationId,{root:f.root,env:f.env,build});
+  await runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build,verifyContent:protocolContentVerifier(createHash('sha256').update(Buffer.alloc(2048,3)).digest('hex'),f.bundle.filmSpecRef.sha256)});
+  await runApprovedRenderOperation(f.projects.store,new LocalEventLog(f.root),f.projectId,f.operationId,{root:f.root,env:f.env,build,verifyContent:protocolContentVerifier(createHash('sha256').update(Buffer.alloc(2048,3)).digest('hex'),f.bundle.filmSpecRef.sha256)});
   expect(builds).toBe(1);expect((await f.projects.access('owner',f.projectId)).phase).toBe('ready');
   const log=await events.readFrom(f.projectId,f.operationId,0);expect(log.filter(({event})=>event.type==='result.ready')).toHaveLength(1);expect(log.filter(({event})=>event.type==='operation.terminal')).toHaveLength(1);
   expect((await f.projects.operation(f.projectId,f.operationId))?.status).toBe('succeeded');
@@ -62,10 +63,10 @@ it('T12 publication ACK loss then tombstone repairs success without rebuilding o
  try{
   f.projects.store.cas=async(key,etag,value)=>{await original(key,etag,value);if(key===`projects/${f.projectId}/control`&&(value as ProjectControl).phase==='ready'&&!lost){lost=true;throw Error('PUBLICATION_ACK_LOST')}};
   const build:typeof renderApproved=async(_p,_o,_id,_op,_fence,targets)=>{builds++;return protocolDelivery(f,targets)};
-  await expect(runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build})).rejects.toThrow('PUBLICATION_ACK_LOST');
+  await expect(runApprovedRenderOperation(f.projects.store,events,f.projectId,f.operationId,{root:f.root,env:f.env,build,verifyContent:protocolContentVerifier(createHash('sha256').update(Buffer.alloc(2048,3)).digest('hex'),f.bundle.filmSpecRef.sha256)})).rejects.toThrow('PUBLICATION_ACK_LOST');
   const c=await f.projects.access('owner',f.projectId),outcome=c.renderOutcomes![f.operationId],manifest=(await f.projects.store.readFresh<{artifactId:string}>(`projects/${f.projectId}/results/${outcome.resultId}/manifest`)).value;
   await f.projects.tombstone('owner',f.projectId);await rm(join(f.root,'objects'),{recursive:true,force:true});
-  const queue=new LocalOperationQueue(f.projects.store,f.root);await runQueuedOnce(queue,f.projects.store,job=>runApprovedRenderOperation(f.projects.store,events,job.projectId,job.operationId,{root:f.root,env:f.env,build}));
+  const queue=new LocalOperationQueue(f.projects.store,f.root);await runQueuedOnce(queue,f.projects.store,job=>runApprovedRenderOperation(f.projects.store,events,job.projectId,job.operationId,{root:f.root,env:f.env,build,verifyContent:protocolContentVerifier(createHash('sha256').update(Buffer.alloc(2048,3)).digest('hex'),f.bundle.filmSpecRef.sha256)}));
   expect(builds).toBe(1);expect(await queue.pending()).toEqual([]);expect((await f.projects.operation(f.projectId,f.operationId))?.status).toBe('succeeded');
   await expect(getArtifactAccess(f.projects,'owner',f.projectId,manifest.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
  }finally{await rm(f.root,{recursive:true,force:true})}

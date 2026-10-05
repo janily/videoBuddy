@@ -21,3 +21,10 @@ it('AT038 fails wrong-film loudness/ASR/visual evidence and preserves observed f
  const failed=compileApprovedDeliveryChecks(policy,composition,{...visual,result:'fail',criticalFactsResult:'fail'},'c','v');
  expect(failed.find(c=>c.ruleId==='critical_facts')?.result).toBe('fail');expect(failed.find(c=>c.ruleId==='visual_review')?.result).toBe('fail');
 });
+it('requires separate whole-content evidence without changing the frozen policy or overriding old fact failures',()=>{
+ const report={filmSha256:sha,result:'pass' as const,scope:'two_round_provided_frames_and_verified_transcripts' as const,deliveryEligible:false as const};
+ const missing=compileApprovedDeliveryChecks(policy,composition,visual,'c','v');expect(missing.find(c=>c.ruleId==='content_coverage')?.result).toBe('not_checked');
+ const checked=compileApprovedDeliveryChecks(policy,composition,{...visual,criticalFactsResult:'fail'},'c','v',{report,ref:'approved/content'});expect(checked.find(c=>c.ruleId==='content_coverage')?.result).toBe('pass');expect(checked.find(c=>c.ruleId==='critical_facts')?.result).toBe('fail');
+ expect(()=>compileApprovedDeliveryChecks(policy,composition,visual,'c','v',{report:{...report,filmSha256:'b'.repeat(64)},ref:'content'})).toThrow('RENDER_OUTPUT_CHANGED');
+ expect(()=>validateDelivery({policy,expectedPolicySha256:canonicalHash(policy),expectedFileSha256:sha,actualFileSha256:sha,checks:checked})).toThrow('QUALITY_BLOCKED');
+});

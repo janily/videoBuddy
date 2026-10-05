@@ -11,7 +11,7 @@ import {StreamEventSchema} from '@/contracts/video/commands';
 import type {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {canonicalHash} from '@/services/video/domain/hash';
 import type {ApprovalRecord} from '@/services/video/preview/approve';
-import {validateDelivery} from '@/services/video/quality/delivery';
+import {validateNewDelivery} from '@/services/video/quality/delivery';
 import {publishResult,readResultManifest} from '@/services/video/results/publish';
 import {renderApproved,type RenderTargets} from '@/services/video/render/pipeline';
 import {assertApprovedRenderFence,loadApprovedRenderInputs} from '@/services/video/render/approved-inputs';
@@ -22,7 +22,7 @@ import {claimOperation} from './claim';
 interface RenderOperation{id:string;projectId:string;commandId:string;kind:'render';status:string;canonicalRunId:string|null;streamEpoch:number;fence:number;approvalId:string;bundleHash:string;consentEpoch:number;mediaAttemptStarted?:boolean}
 type Outcome=NonNullable<ProjectControl['renderOutcomes']>[string];
 const safe=new Set(['QUALITY_BLOCKED','EFFECT_UNKNOWN','BUDGET_EXCEEDED','MODEL_BUDGET_OVERRUN','MODEL_USAGE_UNCERTAIN','MODEL_ACCOUNTING_MIGRATION_REQUIRED','GENERATION_DISABLED','CONFIGURATION_REQUIRED','QA_FAILED','RENDER_OUTPUT_CHANGED','RENDER_STAGE_CONFLICT','STAGE_UNKNOWN','COMPOSITION_STAGE_UNKNOWN','CRITIC_REVIEW_INVALID','ASR_MISMATCH','POSTMIX_ASR_MISMATCH','VISUAL_ASSET_RUNTIME_UNAVAILABLE','APPROVED_AUDIO_NOT_READY']);
-export async function runApprovedRenderOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:Parameters<typeof renderApproved>[6]&{build?:typeof renderApproved}){
+export async function runApprovedRenderOperation(store:AtomicStore,events:LocalEventLog,projectId:string,operationId:string,options:Parameters<typeof renderApproved>[6]&{build?:typeof renderApproved;verifyContent?:NonNullable<Parameters<typeof publishResult>[7]>['verifyContent']}){
  if(![projectId,operationId].every(id=>z.uuid().safeParse(id).success)||!isAbsolute(options.root))throw Error('VALIDATION_FAILED');
  const prefix=`projects/${projectId}`,key=prefix+'/operations/'+operationId,projects=new ProjectStore(store),before=(await store.readFresh<RenderOperation>(key)).value;
  if(before.id!==operationId||before.projectId!==projectId||before.kind!=='render')throw Error('RENDER_FENCED');
@@ -85,7 +85,7 @@ export async function runApprovedRenderOperation(store:AtomicStore,events:LocalE
   const file=await open(built.outputPath,constants.O_RDONLY|constants.O_NOFOLLOW);let bytes:Buffer;
   try{const info=await file.stat();if(!info.isFile()||info.nlink!==1||info.size!==result.mp4Bytes||info.size<1024||info.size>150*1024*1024)throw Error('RENDER_OUTPUT_CHANGED');bytes=await file.readFile();const after=await file.stat();if(after.size!==info.size||after.mtimeMs!==info.mtimeMs||after.ctimeMs!==info.ctimeMs||after.nlink!==1)throw Error('RENDER_OUTPUT_CHANGED')}finally{await file.close()}
   const actualSha=createHash('sha256').update(bytes).digest('hex');
-  validateDelivery({policy:result.qualityPolicy,expectedPolicySha256:inputs.bundle.renderInputs.qualityPolicySha256,expectedFileSha256:result.mp4Sha256,actualFileSha256:actualSha,checks:result.qualityChecks});
+  validateNewDelivery({policy:result.qualityPolicy,expectedPolicySha256:inputs.bundle.renderInputs.qualityPolicySha256,expectedFileSha256:result.mp4Sha256,actualFileSha256:actualSha,checks:result.qualityChecks});
   await assertApprovedRenderFence(projects,inputs);await activity('publication','正在保存完整视频');
   const objectRef={key:`projects/${projectId}/artifacts/${result.artifactId}/files/final.mp4`,sha256:actualSha,bytes:bytes.length,mime:'video/mp4'};
   await persistArchiveObject(options.root,objectRef.key,actualSha,bytes);
@@ -93,7 +93,7 @@ export async function runApprovedRenderOperation(store:AtomicStore,events:LocalE
   const artifact:ArtifactRecord={id:result.artifactId,revisionId:result.revisionId,objectRef,qaPassed:true,uploaded:true,filename:'VideoBuddy.mp4'};
   if(canonicalHash(await createOrRead(store,prefix+'/artifacts/'+result.artifactId+'/manifest',artifact))!==canonicalHash(artifact))throw Error('RENDER_OUTPUT_CHANGED');
   await assertApprovedRenderFence(projects,inputs);
-  await publishResult(projects,owner,projectId,operationId,op.fence,result,options.root);
+  await publishResult(projects,owner,projectId,operationId,op.fence,result,options.root,{env:options.env,verifyContent:options.verifyContent});
   const completed=await knownOutcome();if(!completed||completed.status!=='succeeded')throw Error('RENDER_OUTCOME_CHANGED');await finish(completed);
  }catch(error){
   // Never replace a committed publication or failure after losing its ACK.

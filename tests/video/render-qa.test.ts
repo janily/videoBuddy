@@ -1,3 +1,4 @@
+import {protocolContentVerifier} from './fixtures/protocol-content';
 import{it,expect}from'vitest';
 import{canonicalHash}from'@/services/video/domain/hash';
 import{validateDelivery}from'@/services/video/quality/delivery';
@@ -61,8 +62,8 @@ async function preparedRender(){
   const objectKey=`projects/${projectId}/artifacts/${artifactId}/files/final.mp4`;
   await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${artifactId}/files`),{recursive:true});await writeFile(join(dir,'objects',objectKey),media);
   await projects.store.create(`projects/${projectId}/artifacts/${artifactId}/manifest`,{id:artifactId,revisionId:bundle.revisionId,objectRef:{key:objectKey,sha256:actualSha,bytes:media.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'final.mp4'});
-  const result={resultId,artifactId,revisionId:bundle.revisionId,previewId:bundle.previewId,approvalId,bundleHash:bundle.bundleHash,mp4Sha256:actualSha,mp4Bytes:media.length,qualityPolicy:{...policy,audioIntent:'silent' as const,captions:false},qualityChecks:[...checks,evidence('decoded_silence')],createdAt:new Date().toISOString()};
-  return{dir,projects,owner,projectId,approved,result,media,objectKey};
+  const result={resultId,artifactId,revisionId:bundle.revisionId,previewId:bundle.previewId,approvalId,bundleHash:bundle.bundleHash,mp4Sha256:actualSha,mp4Bytes:media.length,qualityPolicy:{...policy,audioIntent:'silent' as const,captions:false},qualityChecks:[...checks,evidence('decoded_silence'),{...evidence('content_coverage'),evidenceRefs:[`projects/${projectId}/approvals/${approvalId}/content-review-v1-stage`]}],createdAt:new Date().toISOString()};
+  return{dir,projects,owner,projectId,approved,result,media,objectKey,verifyContent:protocolContentVerifier(actualSha,bundle.filmSpecRef.sha256)};
 }
 it('AT-037/039 publishes only the approved bundle and rejects a late result after cancellation',async()=>{
  const{dir,projects,owner,projectId,approved,result}=await preparedRender();
@@ -74,18 +75,28 @@ it('AT-037/039 publishes only the approved bundle and rejects a late result afte
  }finally{await rm(dir,{recursive:true,force:true})}
 });
 it('a matching approved result becomes the current immutable result only after file bytes and QA match',async()=>{
- const{dir,projects,owner,projectId,approved,result,media,objectKey}=await preparedRender();
+ const{dir,projects,owner,projectId,approved,result,media,objectKey,verifyContent}=await preparedRender();
  try{
   const path=join(dir,'objects',objectKey);
   await expect(resolveArtifact(projects,owner,projectId,result.artifactId)).rejects.toThrow('ACCESS_NOT_FOUND');
   await writeFile(path,Buffer.alloc(media.length,1));
   await expect(publishResult(projects,owner,projectId,approved.operationId!,0,result,dir)).rejects.toThrow('QUALITY_BLOCKED');
   await writeFile(path,media);
-  const view=await publishResult(projects,owner,projectId,approved.operationId!,0,result,dir);
+  const view=await publishResult(projects,owner,projectId,approved.operationId!,0,result,dir,{verifyContent});
   expect(view).toMatchObject({phase:'ready',currentResult:{resultId:result.resultId,artifactId:result.artifactId,bundleHash:result.bundleHash}});
   expect((await resolveArtifact(projects,owner,projectId,result.artifactId)).objectRef.sha256).toBe(result.mp4Sha256);
   expect((await projects.access(owner,projectId)).currentResultId).toBe(result.resultId);
   expect((await publishResult(projects,owner,projectId,approved.operationId!,0,result,dir)).currentResult?.resultId).toBe(result.resultId);
+ }finally{await rm(dir,{recursive:true,force:true})}
+});
+it('blocks new publication when content coverage is absent, belongs to another film, or names a foreign stage',async()=>{
+ const{dir,projects,owner,projectId,approved,result,verifyContent}=await preparedRender();try{
+  const publish=(value:typeof result,verify=verifyContent)=>publishResult(projects,owner,projectId,approved.operationId!,0,value,dir,{verifyContent:verify});
+  await expect(publish({...result,qualityChecks:result.qualityChecks.filter(c=>c.ruleId!=='content_coverage')})).rejects.toThrow('QUALITY_BLOCKED');
+  await expect(publish(result,async(...args)=>{const proof=await verifyContent(...args);return{...proof,report:{...proof.report,filmSha256:'f'.repeat(64)}}})).rejects.toThrow('QUALITY_BLOCKED');
+  await expect(publish({...result,qualityChecks:result.qualityChecks.map(c=>c.ruleId==='content_coverage'?{...c,evidenceRefs:['foreign/content-stage']}:c)})).rejects.toThrow('QUALITY_BLOCKED');
+  await expect(publish(result,async()=>{throw Error('CONTENT_REVIEW_MISSING')})).rejects.toThrow('CONTENT_REVIEW_MISSING');
+  expect((await projects.access(owner,projectId)).currentResultId).toBeUndefined();
  }finally{await rm(dir,{recursive:true,force:true})}
 });
 it('requires measured loudness and listening for music without narration',()=>{

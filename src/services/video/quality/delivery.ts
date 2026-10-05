@@ -31,3 +31,10 @@ export function validateDelivery(input:DeliveryInput){
  qualityGate(checks.data,allowed,required);
  return{status:'passed' as const,reportHash:canonicalHash({policySha256:input.expectedPolicySha256,fileSha256:input.actualFileSha256,checks:checks.data})};
 }
+/** New publications require content coverage without rewriting a previously
+ * frozen policy or changing validation of existing historical results. */
+export function validateNewDelivery(input:DeliveryInput){
+ const outcome=validateDelivery(input);
+ qualityGate(input.checks.filter(check=>check.ruleId==='content_coverage'),[],['content_coverage']);
+ return outcome;
+}
