@@ -22,7 +22,8 @@ try{
   try{
    await decoder.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
    const decoderPage=await decoder.newPage();
-   await decoderPage.evaluate(async({origin,assets})=>{for(const asset of assets){const image=new Image();image.src=origin+'/assets/'+asset.id+'.bin';await image.decode();if(!image.naturalWidth||!image.naturalHeight)throw Error('IMAGE_DECODE_FAILED')}},{origin,assets:job.assets});
+   const decoded=await decoderPage.evaluate(async({origin,assets})=>{try{for(const asset of assets){const image=new Image();image.src=origin+'/assets/'+asset.id+'.bin';await image.decode();if(!image.naturalWidth||!image.naturalHeight)return false}return true}catch{return false}},{origin,assets:job.assets});
+   if(decoded!==true)throw Error('IMAGE_DECODE_FAILED');
   }finally{await decoder.close()}
  }
  await page.goto(origin+'/scene.html',{waitUntil:'load'});await page.waitForFunction(()=>window.READY===true,{},{timeout:30000});await page.evaluate(()=>document.fonts.ready);

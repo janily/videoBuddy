@@ -21,7 +21,7 @@ it('checks the source fence after completion and stops its own handle if that fe
  expect(executor.cancel).toHaveBeenCalledExactlyOnceWith(handle);
 });
 it('accepts only a terminal failed negative probe and stops on its report failure',async()=>{
- const executor:MediaExecutor={...fixture(),inspect:vi.fn(async()=>({status:'failed',outputs:[]}))};
+ const executor:MediaExecutor={...fixture(),inspect:vi.fn(async()=>({status:'failed' as const,outputs:[]}))};
  const result=await observeProbePicture(executor,job,async()=>{},async()=>{},1000,'failed');
  expect(result).toEqual(handle);
  const failure=Error('NEGATIVE_REPORT_IO_FAILED');
