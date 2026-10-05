@@ -55,3 +55,12 @@ it('retains HTTP status and body failure without letting diagnostic flush replac
   expect(transport.requests[0].finishedAt).toBeTruthy();expect(transport.requests[0].usage).toBeUndefined();expect(transport.requests[0].responseFile).toBeUndefined();
  }finally{transport.restore();vi.unstubAllGlobals();await rm(root,{recursive:true,force:true})}
 });
+it('decodes only bounded inline PNG/WebP images locally without recording a paid request',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-probe-inline-'));vi.stubGlobal('fetch',async()=>new Response('local-inline-only'));
+ const transport=recordModelRequests(env,root,1);
+ try{
+  await fetch('data:image/png;base64,YQ==');await fetch('data:image/webp;base64,YQ==');expect(transport.requests).toHaveLength(0);
+  await expect(fetch('data:text/plain;base64,YQ==')).rejects.toThrow('MODEL_PROBE_UNEXPECTED_DESTINATION');
+  await expect(fetch('https://asset.invalid/image.webp')).rejects.toThrow('MODEL_PROBE_UNEXPECTED_DESTINATION');
+ }finally{transport.restore();vi.unstubAllGlobals();await rm(root,{recursive:true,force:true})}
+});

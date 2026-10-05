@@ -1,0 +1,41 @@
+{
+  "observedAt": "2026-10-05T12:34:21.802Z",
+  "filmSha256": "9d6676583f8778799b409abeb65b0d577b9ef347ca79d6ff86721dc277a7535a",
+  "sharpVersion": "0.35.5",
+  "sourceImages": 4,
+  "sourcePngBytes": 8518653,
+  "losslessWebpBytes": 5866516,
+  "frames": [
+    {
+      "id": "frame-59",
+      "pngBytes": 2487882,
+      "webpBytes": 1877262,
+      "decodedRgbaSha256": "eb0add029fe8bb71419f3e46f66f2fedf63984ad54da78809cdc0e77a657ecee",
+      "pixelBytesIdentical": true
+    },
+    {
+      "id": "frame-176",
+      "pngBytes": 2800244,
+      "webpBytes": 1917768,
+      "decodedRgbaSha256": "01d60b203285c150a0170af0039625385febc281ae7c0e02768f150a8de2d16d",
+      "pixelBytesIdentical": true
+    },
+    {
+      "id": "frame-302",
+      "pngBytes": 1704206,
+      "webpBytes": 1187244,
+      "decodedRgbaSha256": "03f864d9b36e460e5373661db45bb4716c202940c1003fa052eac59024d2e8df",
+      "pixelBytesIdentical": true
+    },
+    {
+      "id": "frame-403",
+      "pngBytes": 1526321,
+      "webpBytes": 884242,
+      "decodedRgbaSha256": "cd145bcacd63c9cd337e41d235acd863e134ed59fa38c1153a55a1ff20ae92bd",
+      "pixelBytesIdentical": true
+    }
+  ],
+  "newModelCalls": 0,
+  "newNativeCalls": 0,
+  "qualityPassed": false
+}

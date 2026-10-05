@@ -25,3 +25,18 @@ it('frees a deferred slot only after actual late usage settlement while retainin
  const d=await reserveModelBudget(new FileStore(root),'other','one',{inputTokens:100,outputTokens:50},limits);expect(d.reservation.projectId).toBe('other');
  expect((await store.readFresh(`budgets/model-unknown-recovery-history/${old.id}`)).value).toMatchObject({id:old.id,state:'unknown'});
 });
+it('extends the operator bound with an immutable old authorization, preserving costs and blocking replay',async()=>{
+ const {store,root,old}=await fixture(),original=auth();await authorizeUnknownModelRecovery(store,original);
+ const {extendUnknownModelRecovery,unknownModelRecoveryLimit}=await import('@/services/video/budget/unknown-recovery'),{canonicalHash}=await import('@/services/video/domain/hash');
+ const next=(await reserveModelBudget(store,'new','one',{inputTokens:100,outputTokens:50},limits)).reservation;await startModelAttempt(store,next);await markModelUsageUnknown(store,next);
+ await expect(reserveModelBudget(store,'third','one',{inputTokens:100,outputTokens:50},limits)).rejects.toThrow('MODEL_UNKNOWN_RECOVERY_LIMIT');
+ await expect(extendUnknownModelRecovery(store,{...original,schemaVersion:2,maxDeferredUnknown:9})).rejects.toThrow();
+ const gate=(await store.readFresh('budgets/model-gate')).value;
+ await extendUnknownModelRecovery(store,{...original,schemaVersion:2,authorizationId:randomUUID(),maxDeferredUnknown:8});
+ expect(await unknownModelRecoveryLimit(new FileStore(root))).toBe(8);
+ expect((await store.readFresh('budgets/model-gate')).value).toEqual(gate);
+ expect((await store.readFresh('budgets/model-unknown-recovery-authorization-history/'+canonicalHash(original))).value).toEqual(original);
+ const third=(await reserveModelBudget(store,'third','one',{inputTokens:100,outputTokens:50},limits)).reservation;await startModelAttempt(store,third);
+ await expect(startModelAttempt(store,old)).rejects.toThrow('MODEL_ATTEMPT_ALREADY_STARTED');
+ expect((await store.readFresh<{inputTokens:number}>('projects/old/budget')).value.inputTokens).toBe(100);
+});

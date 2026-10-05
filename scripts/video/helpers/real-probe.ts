@@ -18,7 +18,7 @@ export function recordModelRequests(env:Environment,root:string,maxCalls:number,
   const url=new URL(input instanceof Request?input.url:String(input));
   // Mastra decodes its generated inline image URI through fetch; this is local
   // byte decoding, not an HTTP request or an asset network permission.
-  if(url.protocol==='data:'&&/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(url.href)&&url.href.length<=12*1024*1024)return original(input,init);
+  if(url.protocol==='data:'&&/^data:image\/(?:png|webp);base64,[A-Za-z0-9+/=]+$/.test(url.href)&&url.href.length<=12*1024*1024)return original(input,init);
   if(url.origin!==provider.origin||url.pathname!==provider.pathname.replace(/\/$/,'')+'/chat/completions')throw Error('MODEL_PROBE_UNEXPECTED_DESTINATION');
   if(requests.length>=maxCalls)throw Error('MODEL_PROBE_CALL_LIMIT');
   const requestBody=String(init?.body||'{}'),body=JSON.parse(requestBody),entry:ProbeRequest={model:String(body.model),maxTokens:body.max_tokens??body.max_completion_tokens,requestBytes:Buffer.byteLength(requestBody),stream:body.stream===true,imageCount:Array.isArray(body.messages)?body.messages.reduce((n:number,m:{content?:unknown})=>n+(Array.isArray(m.content)?m.content.filter((p:{type?:string})=>p?.type==='image_url').length:0),0):0,startedAt:new Date().toISOString(),timeoutMs};requests.push(entry);

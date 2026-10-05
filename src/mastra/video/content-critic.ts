@@ -1,4 +1,5 @@
 import {createHash} from 'node:crypto';
+import {losslessReviewImage} from './review-image';
 import {noopLogger} from '@mastra/core/logger';
 import {ContentReviewSchema,contentReviewContext,guardContentReview,type ContentReviewContext} from '@/contracts/video/content-review';
 import type {Environment} from '@/services/video/config/environment';
@@ -14,12 +15,13 @@ export async function runContentCritic(rawContext:ContentReviewContext,images:Re
  if(!Number.isSafeInteger(maxOutputTokens)||maxOutputTokens<1000||maxOutputTokens>16000||images.size!==context.frames.length)throw Error('CONTENT_INPUT_INVALID');
  const text=JSON.stringify({context,limitations:{scope:'provided_frames_and_verified_transcripts',audio:'not_supplied',continuousMotion:'not_supplied',productionApproval:'not_supplied'}});
  if(Buffer.byteLength(text)>180000)throw Error('CONTEXT_LIMIT');
- const content:Array<{type:'text';text:string}|{type:'image';image:Uint8Array;mimeType:'image/png'}>=[{type:'text',text}];let bytes=0;
+ const content:Array<{type:'text';text:string}|{type:'image';image:Uint8Array;mimeType:'image/png'|'image/webp'}>=[{type:'text',text}];let bytes=0;
  for(const frame of context.frames){
   const original=images.get(frame.id),data=original?Buffer.from(original):undefined;
   if(!data||data.byteLength!==frame.bytes||createHash('sha256').update(data).digest('hex')!==frame.sha256||data.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')throw Error('CONTENT_IMAGE_CHANGED');
   bytes+=data.byteLength;if(bytes>24*1024*1024)throw Error('CONTEXT_LIMIT');
-  content.push({type:'text',text:JSON.stringify({frameId:frame.id,sourceFrame:frame.frame,sha256:frame.sha256})},{type:'image',image:data,mimeType:'image/png'});
+  const encoded=context.imageEncoding==='lossless_webp'?await losslessReviewImage(data,options.assertActive):data;
+  content.push({type:'text',text:JSON.stringify({frameId:frame.id,sourceFrame:frame.frame,sha256:frame.sha256,sourceFormat:'PNG',wireFormat:context.imageEncoding||'png'})},{type:'image',image:encoded,mimeType:context.imageEncoding==='lossless_webp'?'image/webp':'image/png'});
  }
  const agent=createVideoAgent('critic',instructions,env);agent.__registerPrimitives({logger:noopLogger});
  await options.assertActive?.();await markModelCallStarted();await options.assertActive?.();

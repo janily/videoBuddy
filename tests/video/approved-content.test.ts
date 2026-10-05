@@ -107,3 +107,31 @@ it('executes independent rounds even when a valid sampling clock yields identica
  expect(await f.projects.store.listKeys!(`projects/${f.projectId}/operations/${f.operationId}/effects/formal-content-critic`,1)).toHaveLength(stage.batches.length);
  }finally{sample.mockRestore();await rm(f.root,{recursive:true,force:true})}
 },30000);
+
+it('reviews all MVP caption frames in each independent round and cold-verifies every peer evidence',async()=>{
+ const realMvpPlan=sampling.mvpFilmVisualPlan;const sample=vi.spyOn(sampling,'mvpFilmVisualPlan').mockImplementation((clock,policy)=>realMvpPlan({...clock,shots:Array.from({length:4},(_,i)=>({id:'shot-'+i,startFrame:i*120,endFrame:(i+1)*120})),captions:Array.from({length:4},(_,i)=>({startFrame:i*120,endFrame:(i+1)*120,stableReadableStartFrame:i*120+12}))},policy));
+ const f=await seedApprovedProject();try{
+  const inputs=await loadApprovedRenderInputs(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env});
+  const {filmDeliveryPolicy}=await import('@/services/video/quality/delivery');
+  const policy=filmDeliveryPolicy(inputs.frozen.timeline,'mvp');
+  const ref=await f.projects.index.immutable(`projects/${f.projectId}/revisions/${f.bundle.revisionId}/quality-policy`,policy);
+  const {scriptHash,factsHash,bundleHash,expiresAt,...base}=f.bundle;void scriptHash;void factsHash;void bundleHash;void expiresAt;
+  const bundle=createPreviewBundle({...base,renderInputs:{...base.renderInputs,qualityPolicySha256:ref.sha256,qualityPolicyRef:{...ref,mime:'application/json'}}});
+  await updateJson(f.projects.store,`projects/${f.projectId}/previews/${bundle.previewId}/manifest`,()=>bundle);
+  await updateJson(f.projects.store,`projects/${f.projectId}/approvals/${f.approval.approvalId}`,(a:typeof f.approval)=>({...a,bundleHash:bundle.bundleHash}));
+  await updateJson(f.projects.store,`projects/${f.projectId}/operations/${f.operationId}`,(op:object)=>({...op,bundleHash:bundle.bundleHash}));
+  const options=await producers(f),visual=await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);let calls=0;
+  const stage=await reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,decide:async c=>{
+   calls++;expect(c.imageEncoding).toBe('lossless_webp');
+   expect(c.frames.map(frame=>frame.frame)).toEqual(visual.record.plan.rounds[c.reviewBatch!.round-1].frames);
+   expect(c.frames.length).toBeGreaterThan(visual.record.plan.rounds[0].batches[0].frames.length);
+   return response(c);
+  }});
+  expect(calls).toBe(2);expect(stage.schemaVersion).toBe(2);expect(stage.report.result).toBe('pass');
+  expect(stage.batches.every(b=>b.schemaVersion===2&&b.evidenceRefs.length>1)).toBe(true);
+  await expect(reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,mustExist:true,decide:async()=>{throw Error('MUST_NOT_CALL')}})).resolves.toEqual(stage);
+  const peer=visual.record.batches[1].evidenceRef;
+  await updateJson(f.projects.store,peer.key,(e:object)=>({...e,width:999}));
+  await expect(reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,mustExist:true,decide:async()=>{calls++;throw Error('MUST_NOT_CALL')}})).rejects.toThrow();expect(calls).toBe(2);
+ }finally{sample.mockRestore();await rm(f.root,{recursive:true,force:true})}
+},30000);

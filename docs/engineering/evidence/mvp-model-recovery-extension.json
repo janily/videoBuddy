@@ -1,0 +1,21 @@
+{
+  "status": "authorized",
+  "source": {
+    "instruction": "不限次数和费用上限；就按最新的研发安排来完成 MVP 开发",
+    "planSha256": "3541361e4652bec2305a064eb385d0d3d6971e1f800ff29c63ed66520d2a9f77",
+    "maxDeferredUnknown": 8
+  },
+  "authorization": {
+    "schemaVersion": 2,
+    "authorizationId": "12cad218-57db-4891-bd09-e86311914208",
+    "authorizedAt": "2026-10-05T12:54:09.449Z",
+    "source": "user_instruction",
+    "sourceSha256": "ce957ed8a07096fe7f327b64f5189bccabf4ba364f8556632a75ef76c3ccd2b5",
+    "maxDeferredUnknown": 8
+  },
+  "gateSha256": "140432b3f42331fa16bfc2063034aa8f8fdc90f45e2bd63871061637f81dba70",
+  "newModelCalls": 0,
+  "unknownChargesRetained": true,
+  "originalUnknownEffectsReplayable": false,
+  "originalGateUnchanged": true
+}

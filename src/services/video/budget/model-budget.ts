@@ -20,7 +20,7 @@ export interface ModelReservation{projectId:string;stage:string;id:string;day:st
 const empty:Counter={calls:0,inputTokens:0,outputTokens:0,reservations:{},accountingVersion:2};
 const gateKey='budgets/model-gate';
 const gateEntry=z.strictObject({id:digest,projectId:z.string(),day:z.string(),hash:digest,state:z.enum(['started','unknown','overrun']),startedAt:z.string().datetime()});
-const gateSchema=z.strictObject({schemaVersion:z.literal(1),active:gateEntry.nullable(),deferredUnknown:z.array(gateEntry.extend({state:z.literal('unknown')})).max(3).optional()}).refine(g=>new Set([...(g.deferredUnknown||[]).map(e=>e.id),...(g.active?[g.active.id]:[])]).size===(g.deferredUnknown?.length||0)+(g.active?1:0));
+const gateSchema=z.strictObject({schemaVersion:z.literal(1),active:gateEntry.nullable(),deferredUnknown:z.array(gateEntry.extend({state:z.literal('unknown')})).max(8).optional()}).refine(g=>new Set([...(g.deferredUnknown||[]).map(e=>e.id),...(g.active?[g.active.id]:[])]).size===(g.deferredUnknown?.length||0)+(g.active?1:0));
 type Gate=z.infer<typeof gateSchema>;
 async function readGate(store:AtomicStore){
  let raw:unknown;
