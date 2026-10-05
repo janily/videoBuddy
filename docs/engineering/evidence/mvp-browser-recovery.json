@@ -86,5 +86,18 @@
     "samePublishedResult": true,
     "activeOperationId": null,
     "scope": "Read-only persisted-state verification after restart; browser reconnect remains pending."
+  },
+  "authorizedChromeWindowRecovery": {
+    "observedAt": "2026-10-05T14:33:24.492405+00:00",
+    "userAuthorized": true,
+    "windowOpenCommandSucceeded": true,
+    "profile": "Default",
+    "browserSetupAndTabListSucceeded": true,
+    "projectTabId": "1393221538",
+    "projectTitle": "VideoBuddy · 边聊边做视频",
+    "projectDomSnapshot": "timeout after 30 seconds; connection still unusable",
+    "downloadVerified": false,
+    "editedFilmVerified": false,
+    "nextAction": "Reinstall Chrome plugin from ChatGPT plugin UI, per Chrome troubleshooting instructions; do not repair native host or switch browser control mechanisms."
   }
 }

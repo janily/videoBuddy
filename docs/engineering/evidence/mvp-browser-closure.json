@@ -1,5 +1,5 @@
 {
-  "observedAt": "2026-10-05T14:08:57.220877+00:00",
+  "observedAt": "2026-10-05T14:33:57.896977+00:00",
   "status": "first_formal_published_browser_connection_interrupted",
   "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
   "url": "http://localhost:3000/video/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
@@ -785,5 +785,11 @@
     "browserDownloadVerified": false,
     "screenshot": "mvp-first-final-ready.png",
     "pending": "Chrome connection failed during download verification; actual browser download not yet recorded."
+  },
+  "browserRecoveryAttempt": {
+    "userAuthorized": true,
+    "windowOpened": true,
+    "result": "connection still unusable; project DOM snapshot timed out after 30 seconds",
+    "nextAction": "Reinstall Chrome plugin from ChatGPT plugin UI"
   }
 }
