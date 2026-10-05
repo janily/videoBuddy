@@ -46,7 +46,11 @@ it('T06 Visual sends the selected STYLE and real timing through the compatible m
  });
  await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));const address=server.address();if(!address||typeof address==='string')throw Error('TEST_SERVER_FAILED');
  try{
-  const output=await runVisualShot(understanding,treatment,timing,timingHash,'opening',12000,{MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:`http://127.0.0.1:${address.port}/v1`,MODEL_API_KEY:'local-test-only',VIDEO_VISUAL_MODEL:'test-model'});
-  expect(output.sourceHtml).toBe(html);expect(requests.length).toBeGreaterThan(0);expect(JSON.stringify(requests[0])).toContain(style.rulesHash);expect(JSON.stringify(requests[0])).toContain(timingHash);
+  const imageId=randomUUID(),imageUnderstanding={...understanding,assetUses:[{assetId:imageId,purpose:'Protocol image',required:true}]};
+  const output=await runVisualShot(imageUnderstanding,treatment,timing,timingHash,'opening',12000,{MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:`http://127.0.0.1:${address.port}/v1`,MODEL_API_KEY:'local-test-only',VIDEO_VISUAL_MODEL:'test-model'},0,[{id:imageId,mime:'image/png'}]);
+  expect(JSON.stringify(requests[0]).includes('/assets/'+imageId+'.bin')).toBe(true);expect(output.sourceHtml).toBe(html);expect(requests.length).toBeGreaterThan(0);expect(JSON.stringify(requests[0])).toContain(style.rulesHash);expect(JSON.stringify(requests[0])).toContain(timingHash);
  }finally{await new Promise<void>(resolve=>server.close(()=>resolve()))}
+});
+it('rejects an undeclared image catalog before configuring or sending a model request',async()=>{
+ await expect(runVisualShot(understanding,treatment,timing,timingHash,'opening',12000,{},0,[{id:randomUUID(),mime:'image/png'}])).rejects.toThrow('VISUAL_ASSET_INVALID');
 });

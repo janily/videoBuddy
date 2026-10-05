@@ -57,11 +57,12 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  try{return await verifyRecord((await projects.store.readFresh<VisualStageRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(options.mustExist)throw Error('VISUAL_STAGE_MISSING');
  if(!options.decide){requireGeneration(readConfiguration(env));configuredModel('visual',env)}
- const contextBytes=Buffer.byteLength(canonicalJson({understanding,treatment:plan,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},shotId}))+Buffer.byteLength(knowledge.rules);
+ const imageAssets=control.assets.filter(asset=>asset.status==='ready'&&asset.rightsConfirmed&&['image/png','image/jpeg','image/webp'].includes(asset.declaredMime)&&understanding.assetUses.some(use=>use.assetId===asset.id)).map(asset=>({id:asset.id,mime:asset.declaredMime}));
+ const contextBytes=Buffer.byteLength(canonicalJson({understanding,treatment:plan,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},shotId,imageAssets:imageAssets.map(asset=>({...asset,runtimeUrl:'/assets/'+asset.id+'.bin'}))}))+Buffer.byteLength(knowledge.rules);
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-visual-${revisionId}-${shotKey}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
  const source=await runEffect<VisualShotSource>(projects.store,effectKey,async()=>{
-  const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed);
+  const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed,imageAssets);
   const raw=options.decide?await options.decide(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed):await withAccountedModel(projects.store,reservation.reservation,invoke);
   return guardVisualShot(raw,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
  });

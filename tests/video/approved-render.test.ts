@@ -1,6 +1,6 @@
 import {it,expect,vi} from 'vitest';
-import {randomUUID} from 'node:crypto';
-import {mkdtemp,rm} from 'node:fs/promises';
+import {randomUUID,createHash} from 'node:crypto';
+import {mkdtemp,rm,mkdir,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {FileStore} from '@/services/video/storage/file-store';
@@ -15,9 +15,11 @@ import type {MediaExecutor} from '@/services/video/media/executor';
 import {composeApprovedFilm} from '@/services/video/render/composition';
 import type {technicalVideoQa} from '@/services/video/media/technical-qa';
 import type {assemblePictureSequence} from '@/services/video/media/picture-sequence';
-async function setup(){
+async function setup(assetKind?:'image/png'|'text/markdown'){
  const root=await mkdtemp(join(tmpdir(),'vb-approved-render-')),projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});
- const bundle=await seedPreviewBundle(projects,{projectId,previewArtifactSha256:'7'.repeat(64)}),operationId=randomUUID(),approvalId=randomUUID(),commandId=randomUUID();
+ const assets=[];if(assetKind){const id=randomUUID(),data=assetKind==='text/markdown'?Buffer.from('# Source\n'):Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489','hex'),sha256=createHash('sha256').update(data).digest('hex');await mkdir(join(root,'assets',projectId),{recursive:true});await writeFile(join(root,'assets',projectId,id+'.bin'),data);const analysisRef=await projects.index.immutable(`projects/${projectId}/assets/${id}/analysis/${sha256}`,{assetId:id,sha256,mime:assetKind,trust:'untrusted_material'}),rightsRef=await projects.index.immutable(`projects/${projectId}/revisions/${randomUUID()}/rights`,{basis:'user_supplied',source:'protocol confirmed upload'});assets.push({id,analysisRef,rightsRef,originalRef:{key:`assets/${projectId}/${id}.bin`,sha256,bytes:data.length,mime:assetKind},usage:'Protocol source'});}
+ const revisionId=assets.length?assets[0].rightsRef.key.split('/')[3]:undefined;
+ const bundle=await seedPreviewBundle(projects,{projectId,revisionId,assets,visualAssetIds:assetKind==='image/png'?assets.map(a=>a.id):[],previewArtifactSha256:'7'.repeat(64)}),operationId=randomUUID(),approvalId=randomUUID(),commandId=randomUUID();
  await projects.store.create(`projects/${projectId}/previews/${bundle.previewId}/manifest`,bundle);
  const spec=(await projects.store.readFresh<{understandingRef:ProjectControl['understandingRef']}>(bundle.filmSpecRef.key)).value;
  const approval:ApprovalRecord={approvalId,projectId,previewId:bundle.previewId,revisionId:bundle.revisionId,bundleHash:bundle.bundleHash,scriptHash:bundle.scriptHash,factsHash:bundle.factsHash,briefVersion:bundle.briefVersion,clientCommandId:commandId,source:'preview_button',ownerKeyHash:'owner',approvedAt:new Date().toISOString(),consentEpoch:0};
@@ -25,7 +27,7 @@ async function setup(){
  await projects.store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,commandId,kind:'render',status:'running',canonicalRunId:operationId,streamEpoch:0,fence:0,approvalId,bundleHash:bundle.bundleHash,consentEpoch:0});
  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:bundle.briefVersion,understandingRef:spec.understandingRef,phase:'rendering' as const,currentPreviewId:bundle.previewId,currentApprovalId:approvalId,activeProduction:operationId,previewState:'ready' as const}));
  const env={VIDEO_MEDIA_IMAGE_REF:'sha256:'+'1'.repeat(64),VIDEO_MEDIA_RUNTIME_DIGEST:'1'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'600'};
- return{root,projects,projectId,operationId,bundle,approval,env};
+ return{root,projects,projectId,operationId,bundle,approval,env,assets};
 }
 it('approved inputs compile full-size jobs from exactly the frozen source without model configuration',async()=>{
  const f=await setup();try{
@@ -90,4 +92,8 @@ it('binds picture assembly to the approved operation journal',async()=>{
   await renderApprovedPictures(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env,executor,qa,assemble});
   expect(assemble.mock.calls[0][3]?.journal).toEqual({store:f.projects.store,prefix:`projects/${f.projectId}/operations/${f.operationId}/media-effects`});
  }finally{await rm(f.root,{recursive:true,force:true})}
+});
+
+it.each(['image/png','text/markdown'] as const)('uses only frozen picture resources while allowing %s as a source',async(kind)=>{
+ const f=await setup(kind);try{const inputs=await loadApprovedRenderInputs(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env});expect(inputs.frozen.assetManifest.assets).toHaveLength(1);if(kind==='image/png')expect(inputs.jobs[0].assets).toEqual(f.assets.map(a=>({id:a.id,mime:a.originalRef.mime,sha256:a.originalRef.sha256,bytes:a.originalRef.bytes})));else expect(inputs.jobs[0].assets||[]).toEqual([]);await writeFile(join(f.root,'assets',f.projectId,f.assets[0].id+'.bin'),Buffer.from('changed'));await expect(loadApprovedRenderInputs(f.projects,'owner',f.projectId,f.operationId,0,{root:f.root,env:f.env})).rejects.toThrow('PREVIEW_PACKAGE_INVALID')}finally{await rm(f.root,{recursive:true,force:true})}
 });

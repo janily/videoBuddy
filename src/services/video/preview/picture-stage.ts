@@ -14,6 +14,8 @@ import {TimingDraftSchema} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
 import {prepareVisualShotStage} from './visual-stage';
 import {revisionSeed} from '@/services/video/timeline/seed';
+import {selectedRuntimeAssets,verifyRuntimeAssets} from '@/services/video/media/runtime-assets';
+import {LocalAssetBytes} from '@/services/video/assets/local-bytes';
 
 type Qa=typeof technicalVideoQa;
 type Profile='full'|'preview'|'probe';
@@ -42,18 +44,28 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
  const timing=TimingDraftSchema.parse(await readRef<unknown>(projects,timingRecord.draftRef,revisionPrefix));
  const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,shotId,{root,env,mustExist:true});
  const source=await readRef<VisualShotSource>(projects,visual.sourceRef,`${revisionPrefix}visual-source/`);
- if(source.assetIds.length)throw Error('VISUAL_ASSET_RUNTIME_UNAVAILABLE');
+ const entries=[];
+ for(const id of source.assetIds){
+  const asset=control.assets.find(a=>a.id===id);
+  if(!asset||asset.status!=='ready'||!asset.rightsConfirmed||!asset.analysisRef||!asset.sha256||!asset.bytes)throw Error('VISUAL_ASSET_NOT_READY');
+  const analysis=await readRef<{assetId:string;sha256:string;mime:string;trust:string}>(projects,asset.analysisRef,`${prefix}/assets/${id}/analysis/`);
+  const actual=await new LocalAssetBytes(root).inspect(projectId,id,asset.declaredMime);
+  if(analysis.assetId!==id||analysis.sha256!==asset.sha256||analysis.mime!==asset.declaredMime||analysis.trust!=='untrusted_material'||actual.sha256!==asset.sha256||actual.bytes!==asset.bytes)throw Error('RUNTIME_ASSET_CHANGED');
+  entries.push({id,originalRef:{key:`assets/${projectId}/${id}.bin`,mime:actual.mime,sha256:actual.sha256,bytes:actual.bytes}});
+ }
+ const assets=selectedRuntimeAssets(projectId,source.assetIds,entries);
  const landscape=understanding.preferences.aspect==='16:9',logicalWidth=landscape?1920:1080,logicalHeight=landscape?1080:1920;
  const outputWidth=profile==='probe'?(landscape?320:180):profile==='preview'?(landscape?1280:720):logicalWidth,outputHeight=profile==='probe'?(landscape?180:320):profile==='preview'?(landscape?720:1280):logicalHeight;
  const shotKey=canonicalHash({shotId}),key=`${revisionPrefix}picture/${profile}/${shotKey}`;
  const config=dockerConfiguration(env,operationId);
  const bundleHash=canonicalHash({revisionId,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,visualSourceSha256:visual.sourceSha256,visualSourceRefSha256:visual.sourceRef.sha256,shotId});
- const seed=revisionSeed(projectId,revisionId),parameters={projectId,bundleHash,runtimeDigest:config.runtimeDigest,sourceHtml:source.sourceHtml,logicalWidth,logicalHeight,outputWidth,outputHeight,fps:timing.fps,startFrame:source.startFrame,endFrame:source.endFrame,seed,fence:expectedConsentEpoch};
+ const seed=revisionSeed(projectId,revisionId),parameters={projectId,bundleHash,runtimeDigest:config.runtimeDigest,sourceHtml:source.sourceHtml,logicalWidth,logicalHeight,outputWidth,outputHeight,fps:timing.fps,startFrame:source.startFrame,endFrame:source.endFrame,seed,fence:expectedConsentEpoch,...(assets.length?{assets}:{})};
  const stageKey=computeStageKey(parameters),stageDir=join(root,'media',stageKey),outputPath=join(stageDir,'output','picture.mp4');
  const expected={width:outputWidth,height:outputHeight,durationSec:(source.endFrame-source.startFrame)/timing.fps,fps:timing.fps,audio:false};
  const qa=options.qa||technicalVideoQa;
  async function verify(record:PictureShotRecord){
   if(record.schemaVersion!==2||record.seed!==seed||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.visualSourceSha256!==visual.sourceSha256||record.visualSourceRefSha256!==visual.sourceRef.sha256||record.shotId!==shotId||record.profile!==profile||record.stageKey!==stageKey||record.runtimeDigest!==config.runtimeDigest||record.outputPath!==outputPath)throw Error('PICTURE_STAGE_CONFLICT');
+  await verifyRuntimeAssets(stageDir,assets);
   const actual=await qa(stageDir,config.image,'output/picture.mp4',expected);
   if(canonicalHash(actual)!==canonicalHash(record.technicalQa))throw Error('PICTURE_OUTPUT_CHANGED');
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
@@ -62,7 +74,7 @@ export async function preparePictureShotStage(projects:ProjectStore,projectId:st
  }
  try{return await verify((await projects.store.readFresh<PictureShotRecord>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(options.mustExist)throw Error('PICTURE_STAGE_MISSING');
- const executor=options.executor||new DockerExecutor(root,env),job:MediaJob={...parameters,operationId,attemptId:`picture-${profile}-${shotKey.slice(0,12)}`,stageKey};
+ const executor=options.executor||new DockerExecutor(root,env,{assertActive:async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef}),journal:{store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`}}),job:MediaJob={...parameters,operationId,attemptId:`picture-${profile}-${shotKey.slice(0,12)}`,stageKey};
  const handle=await executor.submit(job),deadline=Date.now()+config.timeoutSeconds*1000+30000,pollMs=options.pollMs??1000;
  let status=await executor.inspect(handle);
  while(status.status==='running'&&Date.now()<deadline){

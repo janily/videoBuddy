@@ -1,8 +1,9 @@
+import {prepareRuntimeAssets} from '@/services/video/media/runtime-assets';
 import {expect,it,vi} from 'vitest';
 // Protocol fixture: synthetic PCM and mocked font metadata are never native QA.
 vi.mock('@/services/video/audio/style-font',()=>({readPinnedStyleFont:async(_env:unknown,id:string)=>{const {trustedStyleFont}=await import('@/services/video/media/font-catalog');const f=trustedStyleFont(id);return{id,family:f.family,runtimeDigest:'a'.repeat(64),fontSha256:f.font.sha256,fontBytes:f.font.bytes,licenseSha256:f.licenseFile.sha256,metadataSha256:f.metadata.sha256,charsetSha256:(id==='mashanzheng'?'d':'e').repeat(64),glyphs:new Set('欢迎参加。')}}}));
 import {createHash,randomUUID} from 'node:crypto';
-import {mkdtemp,mkdir,rm,writeFile} from 'node:fs/promises';
+import {mkdtemp,mkdir,rm,writeFile,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {initialUnderstanding} from '@/contracts/video/domain';
@@ -58,9 +59,11 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   await mkdir(join(root,'assets',projectId),{recursive:true});const assetPath=join(root,'assets',projectId,`${assetId}.bin`);await writeFile(assetPath,assetBytes);
   const analysisRef=await projects.index.immutable(`projects/${projectId}/assets/${assetId}/analysis/${assetSha256}`,{schemaVersion:5,assetId,mime:'text/markdown',sha256:assetSha256,text:assetBytes.toString(),trust:'untrusted_material'});
   const asset={id:assetId,commandId:randomUUID(),bodyHash:'c'.repeat(64),reservationId:randomUUID(),filename:'source.md',declaredBytes:assetBytes.length,declaredMime:'text/markdown',intendedUse:'活动资料',rightsConfirmed:true,status:'ready',expiresAt:new Date(Date.now()+60000).toISOString(),sha256:assetSha256,bytes:assetBytes.length,analysisRef,quotaReserved:true};
-  const understanding={...base,briefVersion:1,subject:'活动预告',assetUses:[{assetId,purpose:'活动资料',required:true}],preferences:{...base.preferences,durationSec:20,styleSlug:style.slug,voiceMode:'tts' as const,musicMode:'none' as const}};
+  let pictureAsset:typeof asset|undefined,pictureData:Buffer|undefined;
+  if(book){const id=randomUUID();pictureData=await readFile(join(process.cwd(),'docs/engineering/evidence/native-frame-3.png'));const sha256=createHash('sha256').update(pictureData).digest('hex');await writeFile(join(root,'assets',projectId,id+'.bin'),pictureData);const analysisRef=await projects.index.immutable(`projects/${projectId}/assets/${id}/analysis/${sha256}`,{schemaVersion:5,assetId:id,mime:'image/png',sha256,trust:'untrusted_material'});pictureAsset={...asset,id,declaredMime:'image/png',filename:'fixture.png',sha256,bytes:pictureData.length,declaredBytes:pictureData.length,analysisRef,intendedUse:'图片'};}
+  const understanding={...base,briefVersion:1,subject:'活动预告',assetUses:[{assetId,purpose:'活动资料',required:true},...(pictureAsset?[{assetId:pictureAsset.id,purpose:'图片',required:true}]:[])],preferences:{...base.preferences,durationSec:20,styleSlug:style.slug,voiceMode:'tts' as const,musicMode:'none' as const}};
   const understandingRef=await projects.index.immutable(`projects/${projectId}/understanding/1`,understanding);
-  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:1,understandingRef,assets:[asset],phase:'preparing_preview' as const,activeProduction:operationId}));
+  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,briefVersion:1,understandingRef,assets:[asset,...(pictureAsset?[pictureAsset]:[])],phase:'preparing_preview' as const,activeProduction:operationId}));
   const plan={schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,durationSec:20,aspect:'16:9',fps:24,summary:'活动预告',options:[{id:'a',concept:'绘图',visualApproach:'蜡笔',soundApproach:'鼓点',tradeoff:'动画多'},{id:'b',concept:'纸页',visualApproach:'翻页',soundApproach:'纸声',tradeoff:'人物少'},{id:'c',concept:'角色',visualApproach:'走路',soundApproach:'脚步',tradeoff:'造型复杂'}],selectedOptionId:'a',selectionReason:'信息清晰',shots:[{id:'shot',startFrame:0,endFrame:480,visualIntent:'活动日期',scriptLine:'欢迎参加。',factIds:[]}],script:['欢迎参加。']};
   const treatmentRef=await prepareTreatmentStage(projects,projectId,revisionId,operationId,0,{decide:async()=>plan,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:20000,dailyCalls:10}});
   const voicePath=join(root,'voice','fixture','narration.wav');let generated=0,recognized=0;
@@ -103,8 +106,8 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   const audio=await prepareAudioPlanStage(projects,projectId,revisionId,operationId,0,treatmentRef,audioOptions);
   expect(audio.executionStatus).toBe('not_started');
   expect(await prepareAudioPlanStage(projects,projectId,revisionId,operationId,0,treatmentRef,{root,mustExist:true})).toEqual(audio);expect(audioCalls).toBe(1);
-  const visualHtml='<!doctype html><html><meta charset="utf-8"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4efe3";x.fillRect(0,0,1920,1080);x.fillText("欢迎参加",100+10*Math.sin(t),200)};window.READY=true;</script></html>';
-  let visualCalls=0;const visualOptions={root,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:40000,dailyCalls:10},decide:async()=>{visualCalls++;return{schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:[],assetIds:[],sourceHtml:visualHtml,seed:revisionSeed(projectId,revisionId),direction:{purpose:'日期展示',framing:'全画幅二维画布',camera:'固定画布坐标',actorIds:[]}}}};
+  const visualHtml=(pictureAsset?`<img src="/assets/${pictureAsset.id}.bin">`:'')+'<!doctype html><html><meta charset="utf-8"><canvas id="c" width="1920" height="1080"></canvas><script>const c=document.getElementById("c"),x=c.getContext("2d");window.render=t=>{x.fillStyle="#f4efe3";x.fillRect(0,0,1920,1080);x.fillText("欢迎参加",100+10*Math.sin(t),200)};window.READY=true;</script></html>';
+  let visualCalls=0;const visualOptions={root,limits:{projectCalls:5,projectInputTokens:200000,projectOutputTokens:40000,dailyCalls:10},decide:async()=>{visualCalls++;return{schemaVersion:1,briefVersion:1,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash:timing.draftRef.sha256,shotId:'shot',startFrame:0,endFrame:480,factIds:[],assetIds:pictureAsset?[pictureAsset.id]:[],sourceHtml:visualHtml,seed:revisionSeed(projectId,revisionId),direction:{purpose:'日期展示',framing:'全画幅二维画布',camera:'固定画布坐标',actorIds:[]}}}};
   await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true})).rejects.toThrow('VISUAL_STAGE_MISSING');
   await expect(prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,env:{VIDEO_DATA_DIR:root}})).rejects.toThrow('GENERATION_DISABLED');
   const visual=await prepareVisualShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',visualOptions);
@@ -193,7 +196,7 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   let submitted:MediaJob|undefined,qaHash='e'.repeat(64),renderCalls=0;
   await expect(preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{root,mustExist:true,env:{VIDEO_MEDIA_IMAGE_REF:`sha256:${'a'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'120'}})).rejects.toThrow('PICTURE_STAGE_MISSING');
   const pictureOptions={root,env:{VIDEO_DATA_DIR:root,VIDEO_MEDIA_IMAGE_REF:`sha256:${'a'.repeat(64)}`,VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'120'},pollMs:1,
-   executor:{submit:async(job:MediaJob)=>{submitted=job;renderCalls++;return{containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}},inspect:async()=>({status:'succeeded' as const,outputs:['output/picture.mp4']}),cancel:async()=>({status:'cancelled' as const})},
+   executor:{submit:async(job:MediaJob)=>{submitted=job;renderCalls++;await mkdir(join(root,'media',job.stageKey),{recursive:true});await prepareRuntimeAssets(root,projectId,join(root,'media',job.stageKey),job.assets||[]);return{containerName:'test',containerId:'test',stageKey:job.stageKey,runtimeDigest:job.runtimeDigest}},inspect:async()=>({status:'succeeded' as const,outputs:['output/picture.mp4']}),cancel:async()=>({status:'cancelled' as const})},
    qa:async(_dir:string,_image:string,_path:string,expected:{width:number;height:number;durationSec:number;fps:number;audio:boolean})=>({result:'pass' as const,sha256:qaHash,bytes:1234,frames:Math.round(expected.durationSec*expected.fps),...expected})};
   const picture=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions);
   expect(submitted).toMatchObject({startFrame:0,endFrame:480,logicalWidth:1920,logicalHeight:1080,outputWidth:1920,outputHeight:1080,fps:24});
@@ -201,6 +204,7 @@ it.each([{model:'Systran/faster-whisper-small',trusted:false,book:false},{model:
   expect(picture.technicalQa).toMatchObject({durationSec:20,sha256:'e'.repeat(64)});
   expect(await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).toEqual(picture);
   expect(renderCalls).toBe(1);
+  if(pictureAsset&&pictureData){expect(submitted?.assets).toEqual([{id:pictureAsset.id,mime:'image/png',sha256:pictureAsset.sha256,bytes:pictureAsset.bytes}]);const copied=join(root,'media',picture.stageKey,'assets',pictureAsset.id+'.bin');await writeFile(copied,'tampered');await expect(preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',pictureOptions)).rejects.toThrow('RUNTIME_ASSET_CHANGED');expect(renderCalls).toBe(1);await writeFile(copied,pictureData);}
   const previewShot=await preparePictureShotStage(projects,projectId,revisionId,operationId,0,treatmentRef,'shot',{...pictureOptions,profile:'preview'});
   expect(previewShot.profile).toBe('preview');
   expect(submitted).toMatchObject({logicalWidth:1920,logicalHeight:1080,outputWidth:1280,outputHeight:720});

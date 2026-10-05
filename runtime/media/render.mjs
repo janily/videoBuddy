@@ -1,13 +1,14 @@
 // Trusted renderer baked into a pinned image. Never run generated scenes on the web host.
 import { chromium } from 'playwright';
-import { readFile, mkdir, realpath, stat } from 'node:fs/promises';
-import { dirname, join, extname } from 'node:path';
-import { createServer } from 'node:http';
+import { readFile, mkdir } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import {createRuntimeAssetServer,verifyRuntimeAssetInputs} from './runtime-assets.mjs';
 import { spawn } from 'node:child_process';
 const jobFile=process.argv[2];if(!/^\/work\/[a-f0-9]{64}\/job\.json$/.test(jobFile))throw Error('INVALID_JOB');
 const root=dirname(jobFile),job=JSON.parse(await readFile(jobFile,'utf8'));
 if(!Number.isSafeInteger(job.endFrame)||job.endFrame-job.startFrame>7200)throw Error('FRAME_LIMIT');
-const server=createServer(async(req,res)=>{try{const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);if(pathname.includes('..')||!/^\/(?:scene\.html|assets\/[-a-zA-Z0-9_./]+)$/.test(pathname))throw Error();const path=join(root,pathname);if(!(await realpath(path)).startsWith(root+'/')||(await stat(path)).nlink!==1)throw Error();const data=await readFile(path);res.writeHead(200,{'Content-Type':extname(path)==='.html'?'text/html':'application/octet-stream'});res.end(data)}catch{res.writeHead(404);res.end()}});
+await verifyRuntimeAssetInputs(root,job.assets||[]);
+const server=createRuntimeAssetServer(root,job.assets||[]);
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;
 let browser;
 try{
@@ -15,6 +16,9 @@ try{
  await context.route('**/*',route=>route.request().url().startsWith(origin+'/')?route.continue():route.abort());
  const page=await context.newPage();let runtimeError;page.on('pageerror',e=>runtimeError=e);page.on('response',r=>{if(r.status()>=400)runtimeError=Error('RESOURCE_MISSING')});
  await page.goto(origin+'/scene.html',{waitUntil:'load'});await page.waitForFunction(()=>window.READY===true,{},{timeout:30000});await page.evaluate(()=>document.fonts.ready);
+ // Decode every declared image in the actual isolated browser. Byte integrity
+ // alone does not prove that an uploaded file is a usable picture.
+ await page.evaluate(async assets=>{for(const asset of assets){const image=new Image();image.src='/assets/'+asset.id+'.bin';await image.decode()}},job.assets||[]);
  const output=join(root,'output'),frames=join(root,'frames');await mkdir(output,{recursive:true});await mkdir(frames,{recursive:true});
  const samples=[...new Set([job.startFrame,Math.floor((job.startFrame+job.endFrame)/2),job.endFrame-1])],baseline=new Map();
  for(const frame of samples){await page.evaluate(t=>window.render(t),frame/job.fps);if(runtimeError)throw runtimeError;baseline.set(frame,await page.screenshot({animations:'disabled'}))}

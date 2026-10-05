@@ -10,6 +10,8 @@ import {computeStageKey,dockerConfiguration} from '@/services/video/media/docker
 import {validateSource,type MediaJob} from '@/services/video/media/executor';
 import type {Environment} from '@/services/video/config/environment';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {CompleteVisualShotSchema} from '@/contracts/video/visual-shot';
+import {selectedRuntimeAssets} from '@/services/video/media/runtime-assets';
 
 export type ApprovedRenderInputs=Awaited<ReturnType<typeof loadApprovedRenderInputs>>;
 type RenderOperation={id:string;projectId:string;commandId:string;kind:string;status:string;fence:number;approvalId:string;bundleHash:string;consentEpoch:number};
@@ -42,9 +44,10 @@ export async function loadApprovedRenderInputs(projects:ProjectStore,owner:strin
   const sourceModule=frozen.sourceManifest.modules.find(entry=>entry.id===shot.sourceModule);if(!sourceModule)throw Error('FILM_VISUAL_SOURCE_CHANGED');
   const code=SourceCodeSchema.parse(await readNarrationJson(projects.store,sourceModule.sourceRef,`${prefix}/revisions/${bundle.revisionId}/`));
   validateSource(code.html);
-  if(frozen.assetManifest.assets.length)throw Error('VISUAL_ASSET_RUNTIME_UNAVAILABLE');
+  const visual=CompleteVisualShotSchema.parse(await readNarrationJson(projects.store,code.visualSourceRef,`${prefix}/revisions/${bundle.revisionId}/visual-source/`));
+  const assets=selectedRuntimeAssets(projectId,visual.assetIds,frozen.assetManifest.assets);
   const {width,height,fps}=frozen.filmSpec.output;
-  const parameters={projectId,bundleHash:bundle.bundleHash,runtimeDigest:config.runtimeDigest,sourceHtml:code.html,logicalWidth:width,logicalHeight:height,outputWidth:width,outputHeight:height,fps,startFrame:shot.startFrame,endFrame:shot.endFrame,seed:frozen.filmSpec.seed,fence:approval.consentEpoch};
+  const parameters={projectId,bundleHash:bundle.bundleHash,runtimeDigest:config.runtimeDigest,sourceHtml:code.html,logicalWidth:width,logicalHeight:height,outputWidth:width,outputHeight:height,fps,startFrame:shot.startFrame,endFrame:shot.endFrame,seed:frozen.filmSpec.seed,fence:approval.consentEpoch,...(assets.length?{assets}:{})};
   jobs.push({...parameters,operationId,attemptId:'approved-'+canonicalHash({shotId:shot.id}).slice(0,12),stageKey:computeStageKey(parameters)});
  }
  const inputs={projectId,owner,operationId,expectedFence,approval,bundle,frozen,jobs,inputHash:canonicalHash({approval,bundleHash:bundle.bundleHash,filmSpecRef:bundle.filmSpecRef,jobs})};
