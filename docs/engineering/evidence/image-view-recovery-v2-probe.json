@@ -1,0 +1,75 @@
+{
+  "executedAt": "2026-10-05T07:35:02.959Z",
+  "status": "five_actual_source_views_readonly_recovery_passed",
+  "sourceReport": "source-image-v3-probe.json",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/source-image-probe-1I8cgI",
+  "modelCalls": 0,
+  "nativeInvocations": 0,
+  "originalStateWrites": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "resultPublished": false,
+  "views": [
+    {
+      "kind": "png",
+      "proofSha256": "0717237964a86257cc5032649ac38e456f01dbecc71793b7a5282ce01ce7122f",
+      "sourceSha256": "bb67fa873a722d6527a5c9cafbcd990e3c59c2f87f8890538a181019840eb4df",
+      "viewSha256": "7532d95ebdfdb8c10983a39ebcd867852d594cbcbc231ddcba75b464d511aedf",
+      "bytes": 29682,
+      "width": 2048,
+      "height": 683,
+      "coordinates": "oriented_image_normalized",
+      "nativeState": "completed",
+      "actualOriginalAndViewVerified": true
+    },
+    {
+      "kind": "jpeg",
+      "proofSha256": "282c375292e6a4170d0ce06dfa1b1f6aa02bada46efd2268c8b939230bdb6d35",
+      "sourceSha256": "6f8d5a6c522c482a0511ec900553b0f03534263de25d2165f145c14472027ecb",
+      "viewSha256": "50dc59c64cc58898912d1c84dcb421b7d0512ecd770a07bb5bc2759fd383ffea",
+      "bytes": 29731,
+      "width": 2048,
+      "height": 683,
+      "coordinates": "oriented_image_normalized",
+      "nativeState": "completed",
+      "actualOriginalAndViewVerified": true
+    },
+    {
+      "kind": "webp",
+      "proofSha256": "36bfffd312bfe7f0b252fa1641a3462779d795a3da5d91a274fbca8dbe364ebf",
+      "sourceSha256": "56038ad672c0cc229978bb37466fbd73be93dc5123ccabf50650160207bb7baa",
+      "viewSha256": "7532d95ebdfdb8c10983a39ebcd867852d594cbcbc231ddcba75b464d511aedf",
+      "bytes": 29682,
+      "width": 2048,
+      "height": 683,
+      "coordinates": "oriented_image_normalized",
+      "nativeState": "completed",
+      "actualOriginalAndViewVerified": true
+    },
+    {
+      "kind": "jpeg-exif6",
+      "proofSha256": "044e88184400ba54105bbaffc80a899050436a009b508c52ff75e13eaae34b30",
+      "sourceSha256": "ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436",
+      "viewSha256": "6ac2494de7817c41db36c6d35e4373ea2b004f5f03deafbd34189d0a6a0cd37e",
+      "bytes": 35445,
+      "width": 683,
+      "height": 2048,
+      "coordinates": "oriented_image_normalized",
+      "nativeState": "completed",
+      "actualOriginalAndViewVerified": true
+    },
+    {
+      "kind": "png-alpha",
+      "proofSha256": "e5df63df83b5114285753aca7dde5fd82ff51e57a589e067cff474c0432b5a90",
+      "sourceSha256": "2bad3d2f16a77f88d6d329930ba6c7069560bea9e6b83a65d19ebfb3121234fe",
+      "viewSha256": "8cf7aeaf87d84fe22191e972957642e44075251eba0955ac07cb5eb172cabe56",
+      "bytes": 29685,
+      "width": 2048,
+      "height": 683,
+      "coordinates": "oriented_image_normalized",
+      "nativeState": "completed",
+      "actualOriginalAndViewVerified": true
+    }
+  ],
+  "originalProjectAndBothUnknownAndSourceJournalUnchanged": true
+}
