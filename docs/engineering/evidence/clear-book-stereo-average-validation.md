@@ -20,9 +20,9 @@
 
 ## 实现与实际验证
 
-新 clear policy4 且实测 stereo 的 Preview/正式 Composition 使用显式 `pan=mono|c0=0.5*c0+0.5*c1`。提取key为独立 `postmix-v2-stereo-average`，默认旧参数和 postmix-v1 key逐字保留。新 downmix 身份进入单句 challenge/context/proof，并由同源旁白policy读取同版本实际混音WAV；跨版本复核拒绝。旧冻包、旧 WAV、成片字节和渲染producer未改。
+新 clear policy4 且实测 stereo 的 Preview/正式 Composition 使用显式 `pan=mono|c0=0.5*c0+0.5*c1`。提取key为独立 `postmix-v2-stereo-average`，默认旧参数和 postmix-v1 key逐字保留。新 downmix 身份进入单句 challenge/context/proof，并由同源旁白policy读取同版本实际混音WAV；跨版本复核拒绝。新成功阶段保存 `postMixDownmix` 标记，冷读沿用该协议；已有无标记成功阶段保留原 v1，包括早期 policy4 stereo。错误 policy/channel 标记拒绝。旧冻包、旧 WAV、成片字节和渲染producer未改。
 
-RED：新算法参数测试先3pass/1fail（尚无filter）；实现后通过。追加旧key一致/新key隔离及可信复核绑定版本，相关2文件14项通过；最终117文件606项全部通过，50.61s。lint、Next16.3.8 build、构建后typecheck全部退出0。
+RED：新算法参数测试先3pass/1fail（尚无filter）；实现后通过。追加旧key一致/新key隔离及可信复核绑定版本，相关2文件14项通过。复核发现历史成功缓存兼容 P2，追加 selector RED（5pass/1fail）后修复；正式 Composition 存储回归同时覆盖新记录冷读与缺标记旧记录冷读/记录不变，最终相关3文件18项通过。最终117文件608项全部通过，53.25s。lint、Next16.3.8 build、构建后typecheck全部退出0。固定最终代码快照 `d2dfd0428c4db62d82da3fbb9858ed68661117be`（base `30381dfed5e68d997014d59556a776f6b56fef43`），Standards 与 Spec 两轴复审 clean，关闭历史缓存 P2。
 
 命令 `npx tsx scripts/video/probe-clear-book-postmix.ts --verify-clear-book-stereo-average`，实际8个owned native completed（4提取+4ASR），四句为 pass/trusted_policy/pass/pass；原识别原文保留，第二句洒/撒沿用负责人同源授权，不再问试听。冷恢复全部一致、0新增native；0模型调用；原control/budget/failed op及原native journal均不变。新首句 WAV SHA `e68471ec…`，峰值−2.794dBFS、93600 samples。
 
