@@ -1,5 +1,5 @@
 import {expect,it} from 'vitest';
-import {mkdtemp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
+import {mkdtemp,mkdir,readFile,writeFile,rm,rename,symlink,unlink} from 'node:fs/promises';
 import {join} from 'node:path';import {tmpdir} from 'node:os';
 import {FileStore} from '@/services/video/storage/file-store';
 import {readSourceImageView} from '@/services/video/assets/image-preparation';
@@ -9,6 +9,7 @@ it('cold-verifies fixed completed native receipt and actual bytes without writes
  try{await mkdir(join(stage,'assets'),{recursive:true});await mkdir(join(stage,'output'));await writeFile(join(stage,'assets',input.assetId+'.bin'),original);await writeFile(join(stage,'output/view.png'),data);await store.create(key,{schemaVersion:1,invocation:crypto.randomUUID(),image:'sha256:'+proof.job.runtimeDigest,argsSha256:proof.argumentsSha256,state:'completed',output:JSON.stringify(proof.receipt)});
  const originals=join(root,'assets',input.projectId);await mkdir(originals,{recursive:true});const originalPath=join(originals,input.assetId+'.bin');await writeFile(originalPath,original);
  const keys=await store.listKeys('projects',4);store.create=async()=>{throw Error('UNEXPECTED_WRITE')};let fences=0;const result=await readSourceImageView(root,input,proof,{journal,assertActive:async()=>{fences++}});expect(result.data.equals(data)).toBe(true);expect(fences).toBe(2);expect(await store.listKeys('projects',4)).toEqual(keys);
+ await rename(originals,originals+'-outside');await symlink(originals+'-outside',originals,'dir');await expect(readSourceImageView(root,input,proof,{journal,assertActive:async()=>{}}).then(value=>value.receipt.sha256)).rejects.toThrow('SOURCE_IMAGE_CHANGED');await unlink(originals);await rename(originals+'-outside',originals);
  const changedOriginal=Buffer.from(original);changedOriginal[changedOriginal.length-1]^=1;await writeFile(originalPath,changedOriginal);await expect(readSourceImageView(root,input,proof,{journal,assertActive:async()=>{}})).rejects.toThrow('IMAGE_INPUT_CHANGED');await writeFile(originalPath,original);
  await writeFile(join(stage,'output/view.png'),Buffer.from('changed'));await expect(readSourceImageView(root,input,proof,{journal,assertActive:async()=>{}})).rejects.toThrow('SOURCE_IMAGE_CHANGED');await writeFile(join(stage,'output/view.png'),data);
  await updateJson(store,key,(record:Record<string,unknown>)=>{const next:Record<string,unknown>={...record,state:'unknown'};delete next.output;return next});await expect(readSourceImageView(root,input,proof,{journal,assertActive:async()=>{}})).rejects.toThrow('MEDIA_STOP_UNKNOWN');expect(await store.listKeys('projects',4)).toEqual(keys);

@@ -42,6 +42,7 @@ export async function prepareSourceImage(root:string,raw:SourceImageInput,option
 /** Read-only recovery: no configuration, source producer or container admission. */
 export async function readSourceImageView(root:string,input:SourceImageInput,raw:SourceImageProof,options:{journal:DockerJournal;assertActive:()=>Promise<void>}){
  await options.assertActive();if(!isAbsolute(root)||/[\u0000-\u001f,]/.test(root))throw Error('SOURCE_IMAGE_INPUT_INVALID');const proof=guardSourceImageProof(raw,input);
+ await directory(root);await directory(join(root,'assets'));await directory(join(root,'assets',input.projectId));
  const original=await new LocalAssetBytes(root).inspect(input.projectId,input.assetId,input.sourceMime);if(original.sha256!==input.sourceSha256||original.bytes!==input.sourceBytes)throw Error('IMAGE_INPUT_CHANGED');
  if(options.journal.prefix!==`projects/${input.projectId}/operations/${proof.operationId}/media-effects`)throw Error('SOURCE_IMAGE_PROOF_CHANGED');
  const record=await readDockerInvocation(options.journal,proof.argumentsSha256,'sha256:'+proof.job.runtimeDigest);
