@@ -32,7 +32,7 @@ export function ResultStage({view,onExample,extra,onPreview,preparing=false,acti
    <div className="result-action"><p>{view.preferences.durationSec}秒 · {view.preferences.aspect==='16:9'?'横屏':'竖屏'}</p><button className="primary-action" disabled={!approval?.enabled||!confirmation||approvalLocked} title={approval?.disabledReason} onClick={()=>void confirmation?.approve(view)}>{confirming?'正在确认…':'就按这个做 →'}</button></div>
    {approval?.disabledReason&&<p className="welcome-note">{approval.disabledReason}</p>}{confirmationStatus}{extra}
    {existingResult&&<details><summary>查看已有视频</summary><PreviewPlayer projectId={view.projectId} artifactId={existingResult.artifactId} label="已有完整视频" onSelect={()=>onSelectFeedback?.(existingResult.artifactId,existingResult.revisionId)}/><ResultDownloads projectId={view.projectId} artifactId={existingResult.artifactId} productionActive={Boolean(view.activeProduction)}/></details>}
-   <button className="text-button" disabled={preparing||approvalLocked||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled)} onClick={onPreview}>{preview.state==='ready'?'重新看效果':'先看新效果'}</button>
+   <button className="text-button" disabled={preparing||confirming||confirmation?.state.phase==='uncertain'||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled)} onClick={onPreview}>{preview.state==='ready'?'重新看效果':'先看新效果'}</button>
   </div></section>;
  }
  if(view?.activeProduction)return<section className="work" aria-label="视频结果"><div className="work-inner"><span className="eyebrow">正在把想法变成画面</span><h1 className="result-title">效果片段正在准备中。</h1><p className="intro" role="status">{activity||'任务已经保存，正在准备效果。'}</p><p className="welcome-note">网络断开不会停止制作。你可以继续在右边聊天。</p>{extra}</div></section>;

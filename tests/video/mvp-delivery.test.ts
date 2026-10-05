@@ -19,3 +19,9 @@ it('freezes small-batch sampling in new policies while preserving old frozen MVP
  expect(()=>verifyFrozenDeliveryPolicy(timeline,{...policy,visualSampling:'unsupported'},u)).toThrow();
  const four=filmDeliveryPolicy(timeline,'mvp','caption_shot_v2');expect(verifyFrozenDeliveryPolicy(timeline,four,u)).toEqual(four);expect(canonicalHash(four)).not.toBe(canonicalHash(policy));
 });
+
+it('preserves historical policies without opting them into content pronunciation evidence',()=>{
+ const u=initialUnderstanding();u.preferences={...u.preferences,styleSlug:'crayon-book',durationSec:20};
+ const current=filmDeliveryPolicy(timeline,'mvp');expect(current).toHaveProperty('contentNarration','mandarin_pronunciation_v1');
+ const old=filmDeliveryPolicy(timeline,'mvp','caption_shot_v3','legacy');expect(old).not.toHaveProperty('contentNarration');expect(verifyFrozenDeliveryPolicy(timeline,old,u)).toEqual(old);expect(canonicalHash(current)).not.toBe(canonicalHash(old));
+});

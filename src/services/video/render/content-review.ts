@@ -5,6 +5,7 @@ import {runContentCritic} from '@/mastra/video/content-critic';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {StoreMissing,createOrRead,type AtomicStore} from '@/services/video/storage/atomic-store';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
+import {loadPackagedNarration} from '@/services/video/audio/narration-package';
 import {readNarrationJson} from '@/services/video/audio/narration-package';
 import {VisualEvidenceSchema,readVisualEvidence} from '@/services/video/quality/visual-evidence';
 import {wholeFilmVisualPlan,mvpFilmVisualPlan} from '@/services/video/quality/whole-visual-plan';
@@ -52,7 +53,14 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
   if(composition.postMix.status!=='pass'||composition.postMix.lines.length!==frozen.timeline.narration.length||new Set(composition.postMix.lines.map(l=>l.lineId)).size!==frozen.timeline.narration.length)throw Error('CONTENT_BASELINE_CHANGED');
   for(const clock of frozen.timeline.narration){
    const line=composition.postMix.lines.find(l=>l.lineId===clock.lineId);if(!line)throw Error('CONTENT_BASELINE_CHANGED');
-   transcripts.push({id:line.lineId,startSample:clock.startSample,endSample:clock.endSample,audioSha256:line.sourceSha256,text:line.recognizedText,verification:line.status});
+   let spokenTextEvidence:ContentReviewContext['transcripts'][number]['spokenTextEvidence'];
+   if(frozen.deliveryPolicy.schemaVersion===2&&frozen.deliveryPolicy.contentNarration==='mandarin_pronunciation_v1'&&line.status==='pass'){
+    const entry=frozen.audioManifest.sources.find(s=>s.id==='voice-'+line.lineId);if(!entry)throw Error('CONTENT_BASELINE_CHANGED');
+    const packaged=await loadPackagedNarration(projects.store,root,projectId,inputs.bundle.revisionId,entry.sourceRef);
+    if(packaged.source.lineId!==line.lineId)throw Error('CONTENT_BASELINE_CHANGED');
+    if(packaged.words.recognitionPolicy==='mandarin_pronunciation_v1'&&!/[\p{N}A-Za-z]/u.test(packaged.source.expectedAsrText+line.recognizedText))spokenTextEvidence={policy:packaged.words.recognitionPolicy,expectedText:packaged.source.expectedAsrText,sourceRef:entry.sourceRef};
+   }
+   transcripts.push({id:line.lineId,startSample:clock.startSample,endSample:clock.endSample,audioSha256:line.sourceSha256,text:line.recognizedText,verification:line.status,...(spokenTextEvidence?{spokenTextEvidence}:{})});
   }
  }else if(composition.postMix.lines.length)throw Error('CONTENT_BASELINE_CHANGED');
  const requirementsRecord=frozen.facts.schemaVersion===2&&frozen.contentRequirements?{schemaVersion:2,inputHash:inputs.inputHash,factsRef:frozen.filmSpec.factsRef,policy:'independently_audited_source' as const,sourceProofRef:frozen.facts.contentRequirementsRef,requirements:frozen.contentRequirements.requirements}:{schemaVersion:1,inputHash:inputs.inputHash,factsRef:frozen.filmSpec.factsRef,policy:'unclassified_facts_literal' as const,requirements:frozen.facts.facts.map(f=>({factId:f.id,representation:'literal' as const,exactText:[f.text]}))},requirementsRef=immutableRef(prefix+'content-requirements',requirementsRecord);

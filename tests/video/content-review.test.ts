@@ -41,3 +41,13 @@ it('defaults unclassified legacy facts to literal checks and freezes every trust
  expect(()=>contentReviewContext({...input,requirements:[input.requirements[0],{factId:'name',representation:'literal',exactText:['清和']}]})).toThrow('CONTENT_INPUT_INVALID');
  const known=contentReviewContext(input),changed={...known,requirements:[{factId:'flow',representation:'semantic' as const,exactText:[]},{factId:'name',representation:'semantic' as const,exactText:[]}]};expect(()=>guardContentReview(review(known),changed)).toThrow('CONTENT_INPUT_CHANGED');
 });
+
+it('keeps raw ASR quotations while accepting a frozen whole-line Mandarin pronunciation proof',()=>{
+ const literal='闭上眼睛，它轻轻入睡。',fact={...facts[0],id:'voice',text:'旁白原文为“'+literal+'”'},raw={...input,facts:[fact],factsManifestSha256:canonicalHash({schemaVersion:1,facts:[fact]}),requirements:[{factId:'voice',representation:'literal' as const,exactText:[literal]}],transcripts:[{...input.transcripts[0],text:'闭上眼睛 他轻轻入睡',spokenTextEvidence:{policy:'mandarin_pronunciation_v1' as const,expectedText:literal,sourceRef:{key:'projects/p/revisions/r/narration-source/source',sha256:'f'.repeat(64),bytes:100,mime:'application/json'}}}]};
+ const c=contentReviewContext(raw),quote={kind:'transcript' as const,transcriptId:'line',quote:'闭上眼睛 他轻轻入睡'},v:ContentReview={schemaVersion:1,contextSha256:c.contextSha256,scope:'provided_frames_and_verified_transcripts',observations:c.frames.map(f=>({frameId:f.id,description:'小猫安静入睡。',visibleText:[]})),facts:[{factId:'voice',result:'pass',coverage:'complete',reason:'最终音轨已按冻结全文发音验证，原始ASR选字保留。',evidence:[quote],literalChecks:[{sourceExcerpt:literal,result:'pass',evidence:[quote],reason:'完整发音核验证据'}]}],conflicts:[]};
+ expect(c.transcripts[0].text).toBe(raw.transcripts[0].text);expect(guardContentReview(v,c).facts[0].result).toBe('pass');
+ const {spokenTextEvidence,...legacy}=raw.transcripts[0];void spokenTextEvidence;const old=contentReviewContext({...raw,transcripts:[legacy]});expect(()=>guardContentReview({...v,contextSha256:old.contextSha256},old)).toThrow('CONTENT_LITERAL_EVIDENCE_INVALID');
+ expect(()=>contentReviewContext({...raw,transcripts:[{...raw.transcripts[0],text:'闭上眼睛 他轻轻离开'}]})).toThrow();
+ expect(()=>contentReviewContext({...raw,transcripts:[{...raw.transcripts[0],text:'1.8',spokenTextEvidence:{...raw.transcripts[0].spokenTextEvidence,expectedText:'18'}}]})).toThrow('CONTENT_INPUT_INVALID');
+ const fragment=structuredClone(v);fragment.facts[0].literalChecks[0].evidence[0]={...quote,quote:'他轻轻入睡'};expect(()=>guardContentReview(fragment,c)).toThrow('CONTENT_LITERAL_EVIDENCE_INVALID');
+});

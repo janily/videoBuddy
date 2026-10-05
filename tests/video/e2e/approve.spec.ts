@@ -25,3 +25,13 @@ test('selecting the existing movie under a new ready preview sends feedback for 
  await page.route('**/api/video/session',r=>r.fulfill({json:{status:'created'}}));let selected='';await page.route(`**/api/video/projects/${pid}/messages`,r=>{selected=r.request().postDataJSON().target?.artifactId;return r.fulfill({json:{status:'accepted'}})});
  await page.goto(`/video/${pid}`);await page.getByLabel('效果预览',{exact:true}).click();await page.getByText('查看已有视频',{exact:true}).click();await page.getByLabel('已有完整视频',{exact:true}).click();await page.getByRole('textbox').fill('把这支已有影片的标题改短');await page.getByRole('button',{name:'发送',exact:true}).click();await expect.poll(()=>selected).toBe(oldId);
 });
+
+test('acknowledged approval does not lock a new preview after formal production fails',async({page})=>{
+ await setup(page);let approved=false,approvals=0;
+ const failed={...initial,controlVersion:2,phase:'attention',currentPreview:{...initial.currentPreview,state:'superseded'},actions:[{kind:'approve_preview',enabled:false},{kind:'prepare_preview',enabled:true}],productionFailure:{operationId:crypto.randomUUID(),errorCode:'RENDER_FAILED',message:'本次完整视频制作未完成，效果片段和已有结果已保留。'}};
+ await page.route(`**/api/video/projects/${pid}`,r=>r.fulfill({json:approved?failed:initial}));
+ await page.route('**/preview/approve',r=>{approved=true;approvals++;return r.fulfill({json:{projectId:pid,controlVersion:2,status:'accepted'}})});
+ await page.goto(`/video/${pid}`);await page.getByRole('button',{name:'就按这个做 →'}).click();
+ await expect(page.getByText('制作请求已确认。',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'就按这个做 →'})).toBeDisabled();
+ await expect(page.getByRole('button',{name:'先看新效果',exact:true})).toBeEnabled({timeout:2000});expect(approvals).toBe(1);
+});
