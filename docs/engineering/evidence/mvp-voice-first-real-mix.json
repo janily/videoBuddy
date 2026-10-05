@@ -1,0 +1,90 @@
+{
+  "startedAt": "2026-10-05T09:42:07.799Z",
+  "status": "pass",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "revisionId": "dd3020f4-d222-4f52-893b-00e938e00830",
+  "diagnosticOperationId": "02b3d684-5666-4805-b54f-a5ae4daa36b2",
+  "newModelCalls": 0,
+  "deliveryEligible": false,
+  "limits": "Real archived voice, music, foley and picture. A new diagnostic mix and AAC only; does not publish a preview or approve production.",
+  "master": {
+    "stageKey": "578b7f918b05653619a520edfc3883b494135d0d30b21c0ba0af323b1636fc9e",
+    "speechPriority": "voice-first-v1",
+    "planSha256": "84b8020a9e847b5d8b6cbcb981b1417615f0ce9511d7413736a65a43d2d92fb6",
+    "toolSha256": "010d12035df69f48b844b46561904d48836f78105b099a871bec7a4c97868675",
+    "voiceSha256": "0176ae4f446f2800ffd39afa323f4fbbdd13639584b41bae21725bcbdeaef8dd",
+    "musicSha256": "958bdc461d40b693aa738ccea669d3b2230182b20376c1d5b34d342b2814201e",
+    "foleySha256": "e064cd14f382bdd0da2a6422a55c362001143c958d7be16b9b2530c11ee126ee",
+    "track": {
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/clear-full-critic-UGy32l/audio-master/578b7f918b05653619a520edfc3883b494135d0d30b21c0ba0af323b1636fc9e/output/master.wav",
+      "runtimeDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "wav": {
+        "codec": "pcm_f32le",
+        "sampleRate": 48000,
+        "channels": 2,
+        "samples": 960000,
+        "durationMs": 20000,
+        "bytes": 7680114,
+        "sha256": "b1f8c406a3b6c66317acd8460fa205e4da244314fa093eac2869ef5b9524f1a4",
+        "peakDbfs": -16.149497511483016,
+        "rmsDbfs": -31.83813302151169,
+        "silence": false
+      },
+      "kind": "film_mix",
+      "qaStatus": "not_checked"
+    },
+    "qualityStatus": "listening_not_checked"
+  },
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "d6fd71b34eac6139d10d679f33e3c4898b59b9cc6f35150bc3d37984ac8faa43",
+    "bytes": 5062773,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2
+  },
+  "postMix": {
+    "status": "pass",
+    "filmSha256": "d6fd71b34eac6139d10d679f33e3c4898b59b9cc6f35150bc3d37984ac8faa43",
+    "lines": [
+      {
+        "lineId": "line_1",
+        "recognizedText": "睡前小猫把小枕头摆好",
+        "sourceSha256": "00fa68ea8876f78075fe139c3a2255bc3364ab63e2e23ab35f8df12588924b8c",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 10,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_2",
+        "recognizedText": "閉上眼睛 她輕輕入睡",
+        "sourceSha256": "cace25374528a03258ca7837fb0af4dc6ff236b0c7664ce03a1c7a32aa1e1bad",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 9,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_3",
+        "recognizedText": "屋裡靜悄悄的 夜色好溫柔",
+        "sourceSha256": "d87c681f717cd8f807660c93f8cd83b43fafd4e1b47338b762e21f8dbb997cb4",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 11,
+        "status": "pass"
+      },
+      {
+        "lineId": "line_4",
+        "recognizedText": "晚安,小貓",
+        "sourceSha256": "b449483e3606038e42542f3358a4ed56dc12ac6b8986bb9f79bae17563dae1aa",
+        "asrRuntimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+        "wordCount": 4,
+        "status": "pass"
+      }
+    ]
+  },
+  "sourceStateUnchanged": true,
+  "finishedAt": "2026-10-05T09:42:30.158Z"
+}

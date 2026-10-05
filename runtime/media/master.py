@@ -27,7 +27,11 @@ def validate(job):
     expected = {"schemaVersion", "planSha256", "samples", "hasVoice", "mix", "filter", "inputSha256"}
     if job.get("schemaVersion") == 2:
         expected.add("musicGainDb")
-    if set(job) != expected or type(job["schemaVersion"]) is not int or job["schemaVersion"] not in (1, 2) or not isinstance(job["hasVoice"], bool):
+    if job.get("schemaVersion") == 3:
+        expected.add("speechPriority")
+        if job.get("speechPriority") != "voice-first-v1" or job.get("hasVoice") is not True:
+            raise ValueError("AUDIO_MIX_INVALID")
+    if set(job) != expected or type(job["schemaVersion"]) is not int or job["schemaVersion"] not in (1, 2, 3) or not isinstance(job["hasVoice"], bool):
         raise ValueError("AUDIO_MIX_INVALID")
     number(job["samples"], 960000, 5760000, True)
     if not re.fullmatch("[a-f0-9]{64}", job["planSha256"]) or set(job["inputSha256"]) != {"voice", "music", "foley"} or any(not re.fullmatch("[a-f0-9]{64}", digest) for digest in job["inputSha256"].values()):
@@ -50,7 +54,11 @@ def validate(job):
         number(job["musicGainDb"], -6, 0)
         music_gain = numeric_literal(job["filter"], music + ",volume=", "dB", job["musicGainDb"])
         music += ",volume=" + music_gain + "dB"
-    foley = "[2:a]aformat=sample_fmts=flt:channel_layouts=stereo[foley]"
+    foley = "[2:a]aformat=sample_fmts=flt:channel_layouts=stereo"
+    if job["schemaVersion"] == 3:
+        music += ",volume=-12dB"
+        foley += ",volume=-12dB"
+    foley += "[foley]"
     if job["hasVoice"]:
         match = re.search(r"sidechaincompress=threshold=([0-9.eE+-]+):ratio=", job["filter"])
         if not match or not math.isclose(float(match[1]), 10 ** (duck["thresholdDb"] / 20), rel_tol=1e-14):

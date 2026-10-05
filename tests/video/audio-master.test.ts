@@ -38,3 +38,13 @@ it.each([true,false])('attenuates the entire music bus before ducking while pres
  expect(check({...job,filter:filter+';movie=/tmp/injected'})).not.toBe(0);
  for(const gain of [NaN,Infinity,-7,1])expect(()=>masterMixFilter(mix,960000,hasVoice,gain)).toThrow('AUDIO_MIX_INVALID');
 });
+it('MVP voice-first mixing attenuates both masking buses and requires the exact trusted Python graph',()=>{
+ const filter=masterMixFilter(mix,960000,true,undefined,'voice-first-v1');
+ expect(filter).toContain('[1:a]aformat=sample_fmts=flt:channel_layouts=stereo,volume=-12dB');
+ expect(filter).toContain('[2:a]aformat=sample_fmts=flt:channel_layouts=stereo,volume=-12dB[foley]');
+ const job={schemaVersion:3,speechPriority:'voice-first-v1',planSha256:'a'.repeat(64),samples:960000,hasVoice:true,mix,filter,inputSha256:{voice:'b'.repeat(64),music:'c'.repeat(64),foley:'d'.repeat(64)}};
+ const check=(value:unknown)=>spawnSync('python3',['-c',"import sys,json;sys.path.insert(0,'runtime/media');import master;master.validate(json.load(sys.stdin))"],{input:JSON.stringify(value),encoding:'utf8'}).status;
+ expect(check(job)).toBe(0);expect(check({...job,filter:filter.replace('[foley]','[other]')})).not.toBe(0);expect(check({...job,hasVoice:false})).not.toBe(0);
+ expect(()=>masterMixFilter(mix,960000,false,undefined,'voice-first-v1')).toThrow('AUDIO_MIX_INVALID');
+ expect(()=>masterMixFilter(mix,960000,true,-3,'voice-first-v1')).toThrow('AUDIO_MIX_INVALID');
+});

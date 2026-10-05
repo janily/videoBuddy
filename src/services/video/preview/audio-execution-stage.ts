@@ -53,7 +53,7 @@ export async function prepareAudioExecutionStage(projects:ProjectStore,projectId
  const journal={store:projects.store,prefix:`${prefix}/operations/${operationId}/media-effects`};
  const stems=await buildSoundStems(root,plan,timing.durationMs,timing.fps,env,{assertActive:fence,journal});
  await fence();
- const master=await buildAudioMaster(root,plan,voice,stems,timing.durationMs,timing.fps,env,{assertActive:fence,journal});
+ const master=await buildAudioMaster(root,plan,voice,stems,timing.durationMs,timing.fps,env,{assertActive:fence,journal,...(env.VIDEO_DELIVERY_PROFILE==='mvp'&&!voice.wav.silence?{speechPriority:'voice-first-v1' as const}:{})});
  await fence();
  const packageRef=await archiveAudioExecution(projects,root,projectId,revisionId,audio.planRef,timingRecord.draftRef,voice,stems,master);
  await fence();

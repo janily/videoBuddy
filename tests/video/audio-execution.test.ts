@@ -28,12 +28,12 @@ function pcm(channels:1|2,active:boolean){
  if(active)for(let i=0;i<48000*channels;i++)bytes.writeFloatLE(0.1*Math.sin(i/10),44+i*4);
  return bytes;
 }
-async function fixture(root:string,musicGainDb?:number){
+async function fixture(root:string,musicGainDb?:number,speechPriority?:'voice-first-v1'){
  const projects=new ProjectStore(new FileStore(root)),projectId=randomUUID(),revisionId=randomUUID(),prefix='projects/'+projectId+'/revisions/'+revisionId,runtimeDigest='a'.repeat(64);
- const voiceBytes=pcm(1,false),musicBytes=pcm(2,true),foleyBytes=pcm(2,false),voicePath=join(root,'audio','fixture','track.wav');
+ const voiceBytes=pcm(1,Boolean(speechPriority)),musicBytes=pcm(2,true),foleyBytes=pcm(2,false),voicePath=join(root,'audio','fixture','track.wav');
  await mkdir(dirname(voicePath),{recursive:true});await writeFile(voicePath,voiceBytes);
  const voiceWav=probeTrackWav(voiceBytes,960000,true),musicWav=probeStereoTrackWav(musicBytes,960000,false),foleyWav=probeStereoTrackWav(foleyBytes,960000,true);
- const timing=TimingDraftSchema.parse({schemaVersion:1,briefVersion:1,styleSlug:'crayon-book',styleRulesHash:getStyle('crayon-book').rulesHash,durationMs:20000,totalFrames:480,fps:24,sampleRate:48000,shots:[{id:'shot',startFrame:0,endFrame:480,visualIntent:'展示主题',factIds:['fact-0']}],narration:[],captions:[],track:{outputPath:voicePath,sha256:voiceWav.sha256,samples:960000,runtimeDigest,silence:true},font:null,qualityStatus:'semantic_not_checked'});
+ const timing=TimingDraftSchema.parse({schemaVersion:1,briefVersion:1,styleSlug:'crayon-book',styleRulesHash:getStyle('crayon-book').rulesHash,durationMs:20000,totalFrames:480,fps:24,sampleRate:48000,shots:[{id:'shot',startFrame:0,endFrame:480,visualIntent:'展示主题',factIds:['fact-0']}],narration:speechPriority?[{lineId:'line-1',spokenText:'Hello',displayText:'Hello',expectedAsrText:'Hello',startSample:0,endSample:48000,voiceSha256:voiceWav.sha256,voiceRuntimeDigest:runtimeDigest,asrRuntimeDigest:runtimeDigest}]:[],captions:[],track:{outputPath:voicePath,sha256:voiceWav.sha256,samples:960000,runtimeDigest,silence:voiceWav.silence},font:null,qualityStatus:'semantic_not_checked'});
  const timingRef=await projects.index.immutable(prefix+'/timing-draft',timing);
  const plan=AudioPlanSchema.parse({schemaVersion:1,briefVersion:1,styleSlug:'crayon-book',styleRulesHash:getStyle('crayon-book').rulesHash,timingDraftHash:timingRef.sha256,seed:revisionSeed(projectId,revisionId),sections:[{id:'all',startFrame:0,endFrame:480,bpm:120,beatsPerBar:4,beatUnit:4,barOffset:0}],cues:[{id:'hit',sourceShotId:'shot',requestedTimeUs:0,alignmentPolicy:'audio'}],sources:[{id:'test-string',kind:'synthesis',description:'test fixture',material:'synthetic',recipe:{instrument:'sine',frequencyHz:220,attackMs:5,releaseMs:100}}],music:[{eventId:'note',cueId:'hit',source:'test-string',durationSamples:48000,gainDb:-20,pan:0}],foley:[],intentionalSilenceRanges:[],mix:{targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2,voiceGainDb:0,duck:{thresholdDb:-24,ratio:4,attackMs:10,releaseMs:180}},reasoning:'Package unit fixture, not evidence of rendering/listening.'});
  const planRef=await projects.index.immutable(prefix+'/audio-plan',plan),job=compileSoundJob(plan,20000,24);
@@ -43,7 +43,7 @@ async function fixture(root:string,musicGainDb?:number){
  const musicPath=join(root,'sound',soundKey,'output','music.wav'),foleyPath=join(dirname(musicPath),'foley.wav');
  await mkdir(dirname(musicPath),{recursive:true});await writeFile(musicPath,musicBytes);await writeFile(foleyPath,foleyBytes);
  const stems={stageKey:soundKey,planSha256:planRef.sha256,runtimeDigest,toolSha256:soundTool,music:{outputPath:musicPath,wav:musicWav},foley:{outputPath:foleyPath,wav:foleyWav},qualityStatus:'listening_not_checked' as const};
- const doc={schemaVersion:musicGainDb===undefined?1:2,...(musicGainDb===undefined?{}:{musicGainDb}),planSha256:planRef.sha256,samples:960000,hasVoice:false,mix:plan.mix,filter:masterMixFilter(plan.mix,960000,false,musicGainDb),inputSha256:{voice:voiceWav.sha256,music:musicWav.sha256,foley:foleyWav.sha256}};
+ const doc={schemaVersion:speechPriority?3:musicGainDb===undefined?1:2,...(speechPriority?{speechPriority}:{}),...(musicGainDb===undefined?{}:{musicGainDb}),planSha256:planRef.sha256,samples:960000,hasVoice:!voiceWav.silence,mix:plan.mix,filter:masterMixFilter(plan.mix,960000,!voiceWav.silence,musicGainDb,speechPriority),inputSha256:{voice:voiceWav.sha256,music:musicWav.sha256,foley:foleyWav.sha256}};
  const masterKey=canonicalHash({document:doc,runtimeDigest,toolSha256:masterTool}),masterPath=join(root,'audio-master',masterKey,'output','master.wav');
  const mixBytes=Buffer.from(musicBytes);if(musicGainDb!==undefined)for(let offset=44;offset<mixBytes.length;offset+=4)mixBytes.writeFloatLE(mixBytes.readFloatLE(offset)*10**(musicGainDb/20),offset);
  const mixWav=probeStereoTrackWav(mixBytes,960000,false);
@@ -53,7 +53,7 @@ async function fixture(root:string,musicGainDb?:number){
  await writeFile(join(root,'audio-master',masterKey,'job.json'),canonicalJson(doc));
  await writeFile(join(dirname(masterPath),'state.json'),JSON.stringify({schemaVersion:1,jobSha256:canonicalHash(doc),outputSha256:mixWav.sha256}));
  const narration={outputPath:voicePath,runtimeDigest,wav:voiceWav,kind:'narration_only' as const,qaStatus:'not_checked' as const};
- const master={stageKey:masterKey,...(musicGainDb===undefined?{}:{musicGainDb}),planSha256:planRef.sha256,toolSha256:masterTool,voiceSha256:voiceWav.sha256,musicSha256:musicWav.sha256,foleySha256:foleyWav.sha256,track:{outputPath:masterPath,runtimeDigest,wav:mixWav,kind:'film_mix' as const,qaStatus:'not_checked' as const},qualityStatus:'listening_not_checked' as const};
+ const master={stageKey:masterKey,...(speechPriority?{speechPriority}:{}),...(musicGainDb===undefined?{}:{musicGainDb}),planSha256:planRef.sha256,toolSha256:masterTool,voiceSha256:voiceWav.sha256,musicSha256:musicWav.sha256,foleySha256:foleyWav.sha256,track:{outputPath:masterPath,runtimeDigest,wav:mixWav,kind:'film_mix' as const,qaStatus:'not_checked' as const},qualityStatus:'listening_not_checked' as const};
  return {projects,projectId,revisionId,prefix,plan,planRef,timing,timingRef,narration,stems,master};
 }
 it('archives all four actual buses and reloads with no disposable audio directories',async()=>{
@@ -164,5 +164,25 @@ it('gain metadata cannot redirect a frozen master by re-signing its package and 
   const receipts=(await f.projects.store.readFresh<{schemaVersion:1;kind:string;soundState:unknown;masterState:{schemaVersion:1;jobSha256:string;outputSha256:string}}>(data.receiptsRef.key)).value;
   const forgedReceiptsRef=await f.projects.index.immutable(f.prefix+'/audio-receipts',{...receipts,masterState:{...receipts.masterState,jobSha256:canonicalHash(doc)}}),stageKey=canonicalHash({document:doc,runtimeDigest:data.runtimeDigest,toolSha256:data.master.toolSha256});
   const forged=await f.projects.index.immutable(f.prefix+'/audio-execution',{...data,master:{...data.master,musicGainDb:-4,stageKey},receiptsRef:forgedReceiptsRef});await expect(loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,forged,f.planRef,f.timingRef)).rejects.toThrow('AUDIO_EXECUTION_CHANGED');
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('freezes voice-first music and foley attenuation and verifies it after disposable directories are removed',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-voice-first-package-'));
+ try{
+  const f=await fixture(root,undefined,'voice-first-v1'),ref=await archiveAudioExecution(f.projects,root,f.projectId,f.revisionId,f.planRef,f.timingRef,f.narration,f.stems,f.master);
+  const before=await loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef);
+  expect(before.package).toMatchObject({schemaVersion:4,master:{speechPriority:'voice-first-v1'},tracks:{voice:{wav:{silence:false}}}});
+  const doc=JSON.parse(await readFile(join(root,'audio-master',f.master.stageKey,'job.json'),'utf8'));
+  expect(doc).toMatchObject({schemaVersion:3,speechPriority:'voice-first-v1',hasVoice:true});
+  expect(doc.filter).toContain('[1:a]aformat=sample_fmts=flt:channel_layouts=stereo,volume=-12dB');expect(doc.filter).toContain('[2:a]aformat=sample_fmts=flt:channel_layouts=stereo,volume=-12dB');
+  for(const dir of ['audio','sound','audio-master'])await rm(join(root,dir),{recursive:true});
+  expect(await loadAudioExecution(new FileStore(root),root,f.projectId,f.revisionId,ref,f.planRef,f.timingRef)).toEqual(before);
+  // Re-signing the package cannot remove the gain policy from its executed run.
+  if(before.package.schemaVersion!==4)throw Error('EXPECTED_VOICE_FIRST_PACKAGE');
+  const {speechPriority,...legacyMaster}=before.package.master;
+  expect(speechPriority).toBe('voice-first-v1');
+  const forged=await f.projects.index.immutable(f.prefix+'/audio-execution',{...before.package,schemaVersion:2,master:legacyMaster});
+  await expect(loadAudioExecution(f.projects.store,root,f.projectId,f.revisionId,forged,f.planRef,f.timingRef)).rejects.toThrow('AUDIO_EXECUTION_CHANGED');
  }finally{await rm(root,{recursive:true,force:true})}
 });
