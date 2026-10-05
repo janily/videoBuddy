@@ -74,3 +74,11 @@ MVP新有旁白的执行增加冻结 `voice-first-v1`：音乐和拟音各减12d
 - 最初真实夹具RED AUDIO_EVENT_INVALID；实现后旧夹具额外预约超测试预算，移至隔离测试，未提高真实预算门槛。Loopback provider返回500时SDK给MODEL_USAGE_INVALID而非服务错误原文，断言按实际unknown行为校正。新的五场景测试检查成功、再次无效停止、transport unknown不修正、非MVP保持原规则、取消后不发送修正HTTP。
 - Standards发现修正调用在账本mark CAS期间取消仍可发送；在actual adapter mark前后传入持久fence，回归第二次mark时cancelProduction，实际HTTP仍只有一次，保守保留未发HTTP的unknown账本，不伪造usage退款。
 - 相关3文件11项通过（20.86秒）；增加取消边界后2文件8项通过（9.59秒）；types与定向lint通过。新代码尚待本次真实闭环集成，不能宣称交付。
+
+## 截断画面响应的有界修正
+
+真实预览 `f4fac7c9-5194-4e13-bb6a-8364fc889053` 已生成并渲染两个镜头。第三镜头响应 `2c9b48767b50bc2ff4e40a9b788222f01c066662b5060d286f9df10657595b2d` 返回200/finish_reason=stop，原始JSON只有6702字符，在HTML绘图数组中途结束；无法完整解析，记录usage 8598/4141，账本settled。旧代码把源码失败映射为通用PROVIDER_UNAVAILABLE；原failed任务不修改。
+
+新增MVP每shot仅一次已完成响应修正：SDK warn只让实际usage先结算；显式Complete schema与完整静态guard继续严格拒绝坏方案。原方案/文本不可变归档、新预约/usage独立记录。模型重新生成完整紧凑源码，不续写残片，不补造固定画面；未知计费/transport/native不自动重试。mark前后均核持久fence，冷effect重放不发新HTTP。新增VISUAL_SOURCE_INVALID具体页面提示。
+
+实际RED：旧adapter严格schema在截断响应后抛异常，另两场景没有修正/取消fence。修复后3文件35项通过（12.50秒），包含真实loopback adapter/accounting/FileStore的五场景、旧Visual契约与错误提示。types、定向lint通过。最后完整153文件732项回归（70.80秒）及build在本次增量之前通过；本次后最终验证待集成里程碑。新页面attempt进行中，MVP仍未交付。

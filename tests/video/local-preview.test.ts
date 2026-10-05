@@ -166,6 +166,7 @@ it('a damaged queue record is reported while other queued operations continue',a
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
 it.each([
+ ['VISUAL_SOURCE_INVALID','画面源码未通过核验，资料和已生成画面已保留。'],
  ['PICTURE_RENDER_FAILED','画面渲染未通过，资料和已有内容已保留。'],
  ['ASR_TIMINGS_UNAVAILABLE','声音时序核验未通过，资料和已有片段已保留。'],
  ['MODEL_OUTPUT_INVALID','创作结果格式未通过核验，资料和已有内容已保留。'],

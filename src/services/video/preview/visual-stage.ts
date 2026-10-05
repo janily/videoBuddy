@@ -5,7 +5,7 @@ import type {ObjectRef,Understanding} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
 import {guardTreatment} from '@/contracts/video/treatment';
 import {guardVisualShot,type VisualShotSource} from '@/contracts/video/visual-shot';
-import {runVisualShot} from '@/mastra/video/visual-shot';
+import {runVisualShot,guardModelVisualSource,RejectedVisualSource,type VisualSourceCorrection} from '@/mastra/video/visual-shot';
 import {configuredModel} from '@/mastra/video/model-adapter';
 import {reserveModelBudget,modelLimits,type ModelLimits} from '@/services/video/budget/model-budget';
 import {runEffect} from '@/services/video/commands/effect-ledger';
@@ -19,7 +19,7 @@ import {prepareTimingStage} from './timing-stage';
 import {assertPreviewProductionFence} from './fence';
 import {revisionSeed} from '@/services/video/timeline/seed';
 
-type Decide=(understanding:Understanding,treatment:unknown,timing:ReturnType<typeof TimingDraftSchema.parse>,timingHash:string,shotId:string,maxOutputTokens:number,env:Environment,seed:number)=>Promise<unknown>;
+type Decide=(understanding:Understanding,treatment:unknown,timing:ReturnType<typeof TimingDraftSchema.parse>,timingHash:string,shotId:string,maxOutputTokens:number,env:Environment,seed:number,correction?:VisualSourceCorrection)=>Promise<unknown>;
 interface Options{root?:string;env?:Environment;decide?:Decide;limits?:ModelLimits;mustExist?:boolean}
 export interface VisualStageRecord{schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;shotId:string;sourceRef:ObjectRef;sourceSha256:string;runtimeStatus:'not_checked'}
 
@@ -62,9 +62,21 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-visual-${revisionId}-${shotKey}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
  const source=await runEffect<VisualShotSource>(projects.store,effectKey,async()=>{
-  const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed,imageAssets);
-  const raw=options.decide?await options.decide(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,reservation.maxOutputTokens,env,seed):await withAccountedModel(projects.store,reservation.reservation,invoke);
-  return guardVisualShot(raw,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
+  async function attempt(current:typeof reservation,correction?:VisualSourceCorrection){
+   const assertActive=async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
+   await assertActive();
+   const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,current.maxOutputTokens,env,seed,imageAssets,correction,assertActive);
+   const raw=options.decide?await options.decide(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,current.maxOutputTokens,env,seed,correction):await withAccountedModel(projects.store,current.reservation,invoke);
+   return guardModelVisualSource(raw,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
+  }
+  try{return await attempt(reservation)}catch(error){
+   if(env.VIDEO_DELIVERY_PROFILE!=='mvp'||!(error instanceof RejectedVisualSource))throw error;
+   await projects.index.immutable(`${revisionPrefix}visual-rejected/${shotKey}`,{schemaVersion:1,...error.correction});
+   const extraBytes=Buffer.byteLength(canonicalJson(error.correction))+2048;
+   if(contextBytes+extraBytes>180000)throw Error('CONTEXT_LIMIT');
+   const second=await reserveModelBudget(projects.store,projectId,`${operationId}-visual-${revisionId}-${shotKey}-correction-1`,{inputTokens:contextBytes+extraBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
+   return attempt(second,error.correction);
+  }
  });
  guardVisualShot(source,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
  if(source.assetIds.some(id=>!control.assets.some(asset=>asset.id===id&&asset.status==='ready')))throw Error('VISUAL_ASSET_NOT_READY');
