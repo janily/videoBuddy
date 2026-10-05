@@ -64,3 +64,9 @@ it('does not let an earlier narration quotation authorize a later screen name',(
  const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:parts.map(([sourceText,kind])=>({sourceText,kind,reason:'核验引文所属。'}))}]};
  expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
 });
+it('does not treat a narration source name as the narration body',()=>{
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text:'旁白原文出自“你好！李焕英”。'}]});
+ const parts:[string,'literal'|'semantic'][]=[['旁白原文出自“','semantic'],['你好！','literal'],['李焕英','literal'],['”。','semantic']];
+ const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:parts.map(([sourceText,kind])=>({sourceText,kind,reason:'来源名称不得拆分。'}))}]};
+ expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
+});

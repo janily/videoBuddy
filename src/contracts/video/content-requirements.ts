@@ -29,7 +29,7 @@ function literalFloors(source:string){
   const prefix=source.slice(0,match.index).split(/[“”‘’「」『』"'。！？；;，,]/).at(-1)??'';
   // Only an explicit narration quotation gets sentence-level verification.
   // Punctuation inside a title (e.g. 你好！李焕英) is part of its name.
-  const sentenceSequence=/^\s*旁白(?:原文|与字幕|文本|是|为|[:：])/.test(prefix)&&!/(?:名字|名称|片名|电影名|标题|标语|品牌|型号|署名|片尾|结尾|画面)/.test(prefix);
+  const sentenceSequence=/^\s*旁白(?:与字幕)?(?:原文|文本|均严格按指定原文使用且不改写)?(?:是|为)?\s*[:：]?\s*$/.test(prefix);
   spans.push({start:match.index+1,end:match.index+1+match[1].length,sentenceSequence});
  }
  return spans;
