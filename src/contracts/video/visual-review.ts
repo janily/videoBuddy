@@ -46,7 +46,8 @@ function containsLiteral(observed:string,expected:string){
   // each side of the exponent marker (Grade 8 / 8 eggs remain valid).
   const exponentBefore=/[0-9０-９][eEｅＥ][+＋\-−－]?$/.test(text.slice(0,index));
   const exponentAfter=/^[eEｅＥ][+＋\-−－]?[0-9０-９]/.test(text.slice(index+literal.length));
-  if(number.test(literal[0])&&(number.test(before)||numericContinuation.test(before)||exponentBefore))continue;
+  const startsNumber=number.test(literal[0])||/^[+＋\-−－]/.test(literal)&&number.test(literal[1]??'');
+  if(startsNumber&&(number.test(before)||numericContinuation.test(before)||exponentBefore))continue;
   if(number.test(literal.at(-1)!)&&(number.test(after)||numericContinuation.test(after)||exponentAfter))continue;
   return true;
  }
