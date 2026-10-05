@@ -26,10 +26,10 @@ function literalFloors(source:string){
  const patterns=[new RegExp(`(?:${digits}{2,4}年)?${digits}{1,3}月${digits}{1,3}(?:日|号)`,'g'),new RegExp(`${digits}+(?:年|月|日|号|天|元|个|秒|分|人)`,'g'),/[￥¥$€£]?[-+−]?\d+(?:[.,]\d+)*(?:%|％)?/g,/\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(?:\d{1,2}(?:st|nd|rd|th)?|[a-z]+(?:[ -][a-z]+)?)\b/gi];
  for(const pattern of patterns)for(const match of source.matchAll(pattern))spans.push({start:match.index,end:match.index+match[0].length});
  for(const pattern of [/“([^”]+)”/g,/‘([^’]+)’/g,/「([^」]+)」/g,/『([^』]+)』/g,/"([^"\n]+)"/g,/'([^'\n]+)'/g])for(const match of source.matchAll(pattern))if(match[1].trim()){
-  const prefix=source.slice(0,match.index);
+  const prefix=source.slice(0,match.index).split(/[“”‘’「」『』"'。！？；;，,]/).at(-1)??'';
   // Only an explicit narration quotation gets sentence-level verification.
   // Punctuation inside a title (e.g. 你好！李焕英) is part of its name.
-  const sentenceSequence=/旁白/.test(prefix)&&!/(?:名字|名称|片名|电影名|标题|标语|品牌|型号)/.test(prefix);
+  const sentenceSequence=/^\s*旁白(?:原文|与字幕|文本|是|为|[:：])/.test(prefix)&&!/(?:名字|名称|片名|电影名|标题|标语|品牌|型号|署名|片尾|结尾|画面)/.test(prefix);
   spans.push({start:match.index+1,end:match.index+1+match[1].length,sentenceSequence});
  }
  return spans;

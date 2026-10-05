@@ -58,3 +58,9 @@ it('keeps a title containing sentence punctuation as one complete literal anchor
  const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:[{sourceText:'电影名称必须是“',kind:'semantic' as const,reason:'标题要求。'},{sourceText:'你好！',kind:'literal' as const,reason:'错误拆分标题。'},{sourceText:'李焕英',kind:'literal' as const,reason:'错误拆分标题。'},{sourceText:'”。',kind:'semantic' as const,reason:'定界符。'}]}]};
  expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
 });
+it('does not let an earlier narration quotation authorize a later screen name',()=>{
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text:'旁白是“早点休息。”，片尾署名为“你好！李焕英”。'}]});
+ const parts:[string,'literal'|'semantic'][]=[['旁白是“','semantic'],['早点休息。','literal'],['”，片尾署名为“','semantic'],['你好！','literal'],['李焕英','literal'],['”。','semantic']];
+ const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:parts.map(([sourceText,kind])=>({sourceText,kind,reason:'核验引文所属。'}))}]};
+ expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
+});
