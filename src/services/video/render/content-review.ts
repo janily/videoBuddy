@@ -43,7 +43,7 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
  if(composition.inputHash!==inputs.inputHash||composition.deliveryEligible!==false||composition.qualityStatus!=='semantic_not_checked')throw Error('CONTENT_BASELINE_CHANGED');
  const compositionHash=canonicalHash(composition),filmSha256=composition.movie.technicalQa.sha256,{frozen}=inputs;
  if(composition.postMix.filmSha256!==filmSha256)throw Error('CONTENT_BASELINE_CHANGED');
- const rawEvidence=(await projects.store.readFresh<Awaited<ReturnType<typeof prepareApprovedVisualEvidence>>['record']>(prefix+'visual-evidence-v1-stage')).value,plan=frozen.deliveryPolicy.schemaVersion===2?mvpFilmVisualPlan(frozen.timeline):wholeFilmVisualPlan(frozen.timeline);
+ const rawEvidence=(await projects.store.readFresh<Awaited<ReturnType<typeof prepareApprovedVisualEvidence>>['record']>(prefix+'visual-evidence-v1-stage')).value,plan=frozen.deliveryPolicy.schemaVersion===2?mvpFilmVisualPlan(frozen.timeline,frozen.deliveryPolicy.visualSampling||'legacy'):wholeFilmVisualPlan(frozen.timeline);
  if(rawEvidence.inputHash!==inputs.inputHash||rawEvidence.compositionHash!==compositionHash||rawEvidence.deliveryEligible!==false||canonicalHash(rawEvidence.plan)!==canonicalHash(plan))throw Error('CONTENT_BASELINE_CHANGED');
  const expected=plan.rounds.flatMap(r=>r.batches.map(b=>({round:r.round,...b})));
  if(rawEvidence.batches.length!==expected.length)throw Error('CONTENT_COVERAGE_MISSING');

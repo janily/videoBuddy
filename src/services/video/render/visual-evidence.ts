@@ -15,7 +15,7 @@ interface Options{root:string;env?:Environment;mustExist?:boolean;compose?:typeo
 // quality pass or relax formal rendering into the preview production fence.
 export async function prepareApprovedVisualEvidence(projects:ProjectStore,owner:string,projectId:string,operationId:string,expectedFence:number,options:Options){
  const {root}=options,env=options.env||process.env,inputs=await loadApprovedRenderInputs(projects,owner,projectId,operationId,expectedFence,{root,env});
- const plan=inputs.frozen.deliveryPolicy.schemaVersion===2?mvpFilmVisualPlan(inputs.frozen.timeline):wholeFilmVisualPlan(inputs.frozen.timeline),prefix=`projects/${projectId}/approvals/${inputs.approval.approvalId}/`,key=prefix+'visual-evidence-v1-stage';
+ const plan=inputs.frozen.deliveryPolicy.schemaVersion===2?mvpFilmVisualPlan(inputs.frozen.timeline,inputs.frozen.deliveryPolicy.visualSampling||'legacy'):wholeFilmVisualPlan(inputs.frozen.timeline),prefix=`projects/${projectId}/approvals/${inputs.approval.approvalId}/`,key=prefix+'visual-evidence-v1-stage';
  let previous:unknown;try{previous=(await projects.store.readFresh(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(previous===undefined&&options.mustExist)throw Error('CRITIC_EVIDENCE_MISSING');
  const readOnly=options.mustExist||previous!==undefined;
