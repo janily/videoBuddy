@@ -1,0 +1,45 @@
+{
+  "executedAt": "2026-10-05T03:45:43.209Z",
+  "status": "actual_complete_source_literal_floor_verified_no_audit",
+  "sourceRoot": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "sourceProjectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "revisionId": "4838f74b-4b34-4156-9511-0629ec18cb78",
+  "modelCalls": 0,
+  "nativeCalls": 0,
+  "auditorRun": false,
+  "sourceClassificationApproved": false,
+  "formalProductionApproval": false,
+  "resultPublished": false,
+  "deliveryEligible": false,
+  "filmSpecRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "bytes": 2631,
+    "mime": "application/json"
+  },
+  "understandingRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+    "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+    "bytes": 1272,
+    "mime": "application/json"
+  },
+  "factsRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/facts/60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "sha256": "60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "bytes": 569,
+    "mime": "application/json"
+  },
+  "completeFacts": 1,
+  "contextSha256": "bb8c8b28a45f5a75ee63dbc14055db9a64742742b18cd1e07110d1efb7cd169b",
+  "fullSourceText": [
+    {
+      "factId": "fact-seed-sprout-flow",
+      "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。"
+    }
+  ],
+  "unsafeWholeSemanticRejection": "CONTENT_REQUIREMENTS_LITERAL_MISSING",
+  "conservativeCandidateValid": true,
+  "networkCalls": 0,
+  "originalStateAndNativeUnchanged": true,
+  "unknownBudgetGateUnchanged": true
+}
