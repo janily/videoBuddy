@@ -1,4 +1,4 @@
-import {AtomicStore} from '@/services/video/storage/atomic-store';
+import {AtomicStore,StoreMissing} from '@/services/video/storage/atomic-store';
 import {readdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import {expireReservations} from '@/services/video/assets/reservations';
@@ -25,6 +25,6 @@ export async function runQueuedOnce(queue:LocalOperationQueue,store:AtomicStore,
 export async function expirePendingUploads(root:string,store:AtomicStore){
  const dirs=await readdir(join(root,'projects'),{withFileTypes:true}).catch(error=>{if((error as NodeJS.ErrnoException).code==='ENOENT')return[];throw error});
  for(const dir of dirs){if(!dir.isDirectory()||!/^[a-f0-9-]{36}$/.test(dir.name))continue;
-  await expireReservations(store,`projects/${dir.name}/control`);
+  try{await expireReservations(store,`projects/${dir.name}/control`)}catch(error){if(!(error instanceof StoreMissing))throw error}
  }
 }

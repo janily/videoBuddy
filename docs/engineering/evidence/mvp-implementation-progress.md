@@ -32,3 +32,13 @@
 - 新预览下的已有视频点击/焦点会选择该影片的artifact/revision用于后续聊天。
 
 针对修复：3文件19项测试通过（5.28秒）；批准浏览器4项通过（3.4秒），包含跨标签页UUID保留和旧影片反馈对象。最后一次构建与类型检查继续验证；真实页面影片验收尚未发生。
+
+## 真实页面验收启动与最后发布修复
+
+2026-10-05 16:54（Asia/Shanghai）：真实浏览器从空页面提交纸飞机新主题；Director使用指定 `gemini-3.8-flash` 返回200，页面保存20秒横屏中文crayon-book理解与真实回复。正式结果仍未完成，不能据此宣称MVP交付。原未知计费gate使用已授权的有界恢复，授权见 `mvp-model-unknown-recovery-authorization.json`，全部历史账本保留。
+
+- 在历史预算诊断目录没有control时，上传维护原先会使Worker退出。行为回归实际复现STORE_NOT_FOUND，修复仅跳过缺control的目录，预算记录保持原样。
+- Spec第二轮发现字幕层消费者仍漏传 `mustExist`。新增真实字体解析→字幕层→只读verifierStore边界测试，实际RED为MEDIA_STOP_UNKNOWN/CONTENT_COLD_WRITE_FORBIDDEN；透传后冷核复用原字体和字幕completed回执，不发起任何native调用。
+- 上述定向4文件12项通过（943ms）；TypeScript、ESLint通过。全量集成检查留到真实闭环里程碑，不与媒体制作/构建争用资源。
+- 本地Next请求URL归一到localhost；配置和页面统一为 `http://localhost:3000`，保留来源验证。此前127.0.0.1首次请求403未启动模型制作；诊断日志代码已移除。
+- 浏览器点击正常“先看效果”按钮，Worker开始新主题实际预览；没有手工修改control、批准或复制旧影片。

@@ -1,0 +1,22 @@
+{
+  "executedAt": "2026-10-05T08:36:11.570Z",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/clear-full-critic-UGy32l",
+  "authorization": {
+    "schemaVersion": 1,
+    "authorizationId": "fc0241d1-1cfd-4b37-91b9-971ed9286b02",
+    "authorizedAt": "2026-10-05T08:36:11.538Z",
+    "source": "user_instruction",
+    "sourceSha256": "564dbceb30612236db0ef708077cc5378731aba3042a92e213ccdda04b30a0e7",
+    "maxDeferredUnknown": 3
+  },
+  "source": {
+    "instruction": "就按最新的研发安排来完成 MVP 开发",
+    "planSha256": "623a007f7a15ae371a5b6a842b95218b3d5d2cfe1a9856bc35d691242ca6753c",
+    "maxDeferredUnknown": 3
+  },
+  "gateSha256": "a234555e7127c3561b5b9cc4045934612033637814b1ca2c1b94fc668fd5a83b",
+  "newModelCalls": 0,
+  "newNativeExecutions": 0,
+  "unknownChargesRetained": true,
+  "originalUnknownEffectsReplayable": false
+}

@@ -25,3 +25,8 @@ it('worker scan processes queued work and does not reprocess terminal work after
  await runQueuedOnce(new LocalOperationQueue(new FileStore(dir),dir),store,async()=>{calls++});
  expect(calls).toBe(1);expect(await queue.pending()).toEqual([]);
 });
+it('upload maintenance skips budget-only historical diagnostics without changing their accounting',async()=>{
+ const {expirePendingUploads}=await import('@/services/video/commands/local-worker');
+ const root=dir,store=new FileStore(root),record={calls:1,inputTokens:100,outputTokens:50,reservations:{}};
+ await store.create(`projects/${projectId}/budget`,record);await expect(expirePendingUploads(root,store)).resolves.toBeUndefined();expect((await store.readFresh(`projects/${projectId}/budget`)).value).toEqual(record);
+});

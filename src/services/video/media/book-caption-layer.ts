@@ -42,7 +42,7 @@ export async function prepareBookCaptionLayer(root:string,cues:SubtitleCue[],sty
  if(digest(source)!==rendererHash||digest(runner)!==bookCaptionProducerSha256)throw Error('BOOK_CAPTION_RENDERER_CHANGED');
  const fonts=[];
  for(const id of style.book!.fonts.map(f=>f.id)){
-  const actual=await readPinnedStyleFont(env,id,{journal:options.journal,assertActive:options.assertActive}),font=trustedStyleFont(id);
+  const actual=await readPinnedStyleFont(env,id,{journal:options.journal,assertActive:options.assertActive,mustExist:options.mustExist}),font=trustedStyleFont(id);
   for(const cue of cues.filter(c=>(/\p{Script=Han}/u.test(c.text)?style.book!.fonts[0].id:'patrickhand')===id))for(const char of cue.text)if(!/^\s$/.test(char)&&!actual.glyphs.has(char))throw Error('FONT_GLYPH_MISSING');
   fonts.push({id,family:font.family,path:font.runtimePath,sha256:font.font.sha256});
  }
