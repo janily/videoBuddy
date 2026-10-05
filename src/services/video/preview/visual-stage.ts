@@ -19,9 +19,9 @@ import {prepareTimingStage} from './timing-stage';
 import {assertPreviewProductionFence} from './fence';
 import {revisionSeed} from '@/services/video/timeline/seed';
 
-type Decide=(understanding:Understanding,treatment:unknown,timing:ReturnType<typeof TimingDraftSchema.parse>,timingHash:string,shotId:string,maxOutputTokens:number,env:Environment,seed:number,correction?:VisualSourceCorrection)=>Promise<unknown>;
+type Decide=(understanding:Understanding,treatment:unknown,timing:ReturnType<typeof TimingDraftSchema.parse>,timingHash:string,shotId:string,maxOutputTokens:number,env:Environment,seed:number,correction?:VisualSourceCorrection,continuitySource?:VisualShotSource)=>Promise<unknown>;
 interface Options{root?:string;env?:Environment;decide?:Decide;limits?:ModelLimits;mustExist?:boolean}
-export interface VisualStageRecord{schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;shotId:string;sourceRef:ObjectRef;sourceSha256:string;runtimeStatus:'not_checked'}
+export interface VisualStageRecord{schemaVersion:1;briefVersion:number;treatmentSha256:string;timingDraftSha256:string;shotId:string;sourceRef:ObjectRef;sourceSha256:string;runtimeStatus:'not_checked';continuityRef?:ObjectRef}
 
 async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Promise<T>{
  if(ref.mime!=='application/json'||ref.bytes<1||!ref.key.startsWith(prefix))throw Error('VISUAL_REF_CHANGED');
@@ -46,6 +46,7 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  const seed=revisionSeed(projectId,revisionId),shotKey=canonicalHash({shotId}),key=`${revisionPrefix}visual/${shotKey}`,effectKey=`${prefix}/operations/${operationId}/effects/visual/${revisionId}/${shotKey}`;
  async function verifyRecord(record:VisualStageRecord){
   if(record.schemaVersion!==1||record.briefVersion!==control.briefVersion||record.treatmentSha256!==treatmentRef.sha256||record.timingDraftSha256!==timingRecord.draftRef.sha256||record.shotId!==shotId||record.runtimeStatus!=='not_checked'||!record.sourceRef.key.startsWith(`${revisionPrefix}visual-source/${shotKey}/`))throw Error('VISUAL_STAGE_CONFLICT');
+  if(record.continuityRef){const first=await prepareVisualShotStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,plan.shots[0].id,{...options,mustExist:true});if(shotId===plan.shots[0].id||canonicalHash(first.sourceRef)!==canonicalHash(record.continuityRef))throw Error('VISUAL_BASELINE_CHANGED')}
   const archived=await readRef<VisualShotSource>(projects,record.sourceRef,revisionPrefix);
   guardVisualShot(archived,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
   if(createHash('sha256').update(archived.sourceHtml).digest('hex')!==record.sourceSha256)throw Error('VISUAL_REF_CHANGED');
@@ -58,15 +59,17 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  if(options.mustExist)throw Error('VISUAL_STAGE_MISSING');
  if(!options.decide){requireGeneration(readConfiguration(env));configuredModel('visual',env)}
  const imageAssets=control.assets.filter(asset=>asset.status==='ready'&&asset.rightsConfirmed&&['image/png','image/jpeg','image/webp'].includes(asset.declaredMime)&&understanding.assetUses.some(use=>use.assetId===asset.id)).map(asset=>({id:asset.id,mime:asset.declaredMime}));
- const contextBytes=Buffer.byteLength(canonicalJson({understanding,treatment:plan,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},shotId,imageAssets:imageAssets.map(asset=>({...asset,runtimeUrl:'/assets/'+asset.id+'.bin'}))}))+Buffer.byteLength(knowledge.rules);
+ let continuityRef:ObjectRef|undefined,continuitySource:VisualShotSource|undefined;
+ if(env.VIDEO_DELIVERY_PROFILE==='mvp'&&understanding.preferences.styleSlug==='crayon-book'&&shotId!==plan.shots[0].id){const first=await prepareVisualShotStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef,plan.shots[0].id,{...options,mustExist:true});continuityRef=first.sourceRef;continuitySource=await readRef<VisualShotSource>(projects,first.sourceRef,revisionPrefix)}
+ const contextBytes=Buffer.byteLength(canonicalJson({understanding,treatment:plan,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},shotId,...(continuitySource?{continuitySource}:{}),imageAssets:imageAssets.map(asset=>({...asset,runtimeUrl:'/assets/'+asset.id+'.bin'}))}))+Buffer.byteLength(knowledge.rules);
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-visual-${revisionId}-${shotKey}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
  const source=await runEffect<VisualShotSource>(projects.store,effectKey,async()=>{
   async function attempt(current:typeof reservation,correction?:VisualSourceCorrection){
    const assertActive=async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
    await assertActive();
-   const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,current.maxOutputTokens,env,seed,imageAssets,correction,assertActive);
-   const raw=options.decide?await options.decide(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,current.maxOutputTokens,env,seed,correction):await withAccountedModel(projects.store,current.reservation,invoke);
+   const invoke=()=>runVisualShot(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,current.maxOutputTokens,env,seed,imageAssets,correction,assertActive,continuitySource);
+   const raw=options.decide?await options.decide(understanding,plan,timing,timingRecord.draftRef.sha256,shotId,current.maxOutputTokens,env,seed,correction,continuitySource):await withAccountedModel(projects.store,current.reservation,invoke);
    return guardModelVisualSource(raw,understanding,plan,timing,timingRecord.draftRef.sha256,seed);
   }
   try{return await attempt(reservation)}catch(error){
@@ -83,7 +86,7 @@ export async function prepareVisualShotStage(projects:ProjectStore,projectId:str
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
  if(source.assetIds.some(id=>!latest.assets.some(asset=>asset.id===id&&asset.status==='ready')))throw Error('VISUAL_ASSET_NOT_READY');
- const record:VisualStageRecord={schemaVersion:1,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,shotId,sourceRef:await projects.index.immutable(`${revisionPrefix}visual-source/${shotKey}`,source),sourceSha256:createHash('sha256').update(source.sourceHtml).digest('hex'),runtimeStatus:'not_checked'};
+ const record:VisualStageRecord={schemaVersion:1,briefVersion:control.briefVersion,treatmentSha256:treatmentRef.sha256,timingDraftSha256:timingRecord.draftRef.sha256,shotId,sourceRef:await projects.index.immutable(`${revisionPrefix}visual-source/${shotKey}`,source),sourceSha256:createHash('sha256').update(source.sourceHtml).digest('hex'),runtimeStatus:'not_checked',...(continuityRef?{continuityRef}:{})};
  const stored=await createOrRead(projects.store,key,record);
  if(canonicalHash(stored)!==canonicalHash(record))throw Error('VISUAL_STAGE_CONFLICT');
  return verifyRecord(stored);

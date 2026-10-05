@@ -54,3 +54,9 @@ it('T06 Visual sends the selected STYLE and real timing through the compatible m
 it('rejects an undeclared image catalog before configuring or sending a model request',async()=>{
  await expect(runVisualShot(understanding,treatment,timing,timingHash,'opening',12000,{},0,[{id:randomUUID(),mime:'image/png'}])).rejects.toThrow('VISUAL_ASSET_INVALID');
 });
+it('validates the immutable first-shot continuity reference before any model call',async()=>{
+ const second={...shot,id:'closing',startFrame:240},first={...shot,endFrame:240},plan={...treatment,shots:[first,second],script:[first.scriptLine,second.scriptLine]},clock=TimingDraftSchema.parse({...timing,shots:[{...timing.shots[0],endFrame:240},{...timing.shots[0],id:'closing',startFrame:240}]});
+ const hash=canonicalHash(clock),reference={...result,schemaVersion:1 as const,endFrame:240,timingDraftHash:hash,seed:0};
+ await expect(runVisualShot(understanding,plan,clock,hash,'closing',12000,{},0,[],undefined,undefined,{...reference,seed:1})).rejects.toThrow('VISUAL_BASELINE_CHANGED');
+ await expect(runVisualShot(understanding,plan,clock,hash,'closing',12000,{},0,[],undefined,undefined,{...reference,shotId:'closing',startFrame:240,endFrame:480})).rejects.toThrow('VISUAL_CONTINUITY_INVALID');
+});
