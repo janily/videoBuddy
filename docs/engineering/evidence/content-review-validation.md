@@ -18,7 +18,7 @@ ContentReviewContext绑定影片/FilmSpec SHA、完整原FactsManifest SHA及全
 
 额外纯标点/混引字形测试先RED，修标点后仍混引RED，再完整修复GREEN。raw ASR空白首RED，去掉trim后保留；121字符fact fixture去掉无关requirements，临时删真实cap时expect throw RED，恢复后GREEN。
 
-Spec复核发现P2：模型可删除literalChecks，把青禾观察为清和仍pass。真实纯合同反例与新增测试RED；固定可信requirements、完整覆盖及保守默认后GREEN。缺required fact、非来源锚点、篡改criteria SHA均拒。固定生产快照ee33face3f3c8bfda550f88a1a196081cd8ca092（base26b7695）双轴clean；最终仅加强id边界测试的cf3d5ab3f3ea9dfacfa7713ecc8e43fc09c267d3生产代码同字节，合同8项及transport2项通过。124文件630项54.14s全通过，lint/build/构建后typecheck退出0；最终测试fixture之后全套复跑结果另记录。
+Spec复核发现P2：模型可删除literalChecks，把青禾观察为清和仍pass。真实纯合同反例与新增测试RED；固定可信requirements、完整覆盖及保守默认后GREEN。缺required fact、非来源锚点、篡改criteria SHA均拒。固定生产快照ee33face3f3c8bfda550f88a1a196081cd8ca092（base26b7695）双轴clean；最终仅加强id边界测试的cf3d5ab3f3ea9dfacfa7713ecc8e43fc09c267d3生产代码同字节，合同8项及transport2项通过。124文件630项54.14s全通过，lint/build/构建后typecheck退出0；最终隔离id测试fixture后再跑124文件630项，52.02s全部通过。
 
 ## 真实输入与失败保留
 
