@@ -1,0 +1,443 @@
+{
+  "observedAt": "2026-10-05T12:54:10.929Z",
+  "status": "actual_complete_round_content_review_returned",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "sourceOperationId": "e89eeef4-e5e8-4402-983b-76f514798a4a",
+  "diagnosticId": "dc101d3c-5400-4280-b2bf-789af0ad3431",
+  "context": {
+    "imageEncoding": "lossless_webp",
+    "filmSha256": "9d6676583f8778799b409abeb65b0d577b9ef347ca79d6ff86721dc277a7535a",
+    "filmSpecSha256": "f1d2ccc777dddd56bb5736e46a3cda5825b044d30ee3d5b8926e146573755efb",
+    "factsManifestSha256": "fc788a8baae56a9b8edbcdfb09eca7f2c06f1ac1bfdb3f1bf31780e4f53710be",
+    "contentRequirementsRef": {
+      "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/4f938148-818b-4bf7-8682-446b92be3ef0/content-requirements-proof/139bfd28093853baf5fc1cae5116a343af77d1bbe76c09ac3b18e404c36dc1af",
+      "sha256": "139bfd28093853baf5fc1cae5116a343af77d1bbe76c09ac3b18e404c36dc1af",
+      "bytes": 1811,
+      "mime": "application/json"
+    },
+    "fps": 24,
+    "totalFrames": 480,
+    "facts": [
+      {
+        "id": "fact-bedtime-cat-sleep",
+        "text": "睡前小猫把枕头摆好，闭上眼睛，轻轻入睡。",
+        "sourceRefs": [
+          {
+            "type": "user_message",
+            "id": "42ad4b86-48a4-4e73-97d2-cecdaefdda30"
+          }
+        ],
+        "status": "provided",
+        "mustInclude": true,
+        "critical": false
+      },
+      {
+        "id": "fact-ending-goodnight-cat",
+        "text": "结尾画面显示“晚安，小猫”。",
+        "sourceRefs": [
+          {
+            "type": "user_message",
+            "id": "42ad4b86-48a4-4e73-97d2-cecdaefdda30"
+          }
+        ],
+        "status": "provided",
+        "mustInclude": true,
+        "critical": false
+      },
+      {
+        "id": "fact-voiceover-and-captions",
+        "text": "旁白与字幕均严格按指定原文使用且不改写：“睡前，小猫把小枕头摆好。闭上眼睛，它轻轻入睡。屋里静悄悄的，夜色好温柔。晚安，小猫。”",
+        "sourceRefs": [
+          {
+            "type": "user_message",
+            "id": "2f3210b3-10db-40af-84af-848aa8c3c9ef",
+            "excerpt": "旁白请按原文使用：睡前，小猫把小枕头摆好。闭上眼睛，它轻轻入睡。屋里静悄悄的，夜色好温柔。晚安，小猫。不要改写这段旁白，字幕与旁白一致。"
+          }
+        ],
+        "status": "provided",
+        "mustInclude": true,
+        "critical": false
+      }
+    ],
+    "frames": [
+      {
+        "id": "frame-59",
+        "frame": 59,
+        "sha256": "585688f5e52efe8968f17dd3dd68bcf19c55e2b04e5c569f9b77bb713943b462",
+        "bytes": 2487882
+      },
+      {
+        "id": "frame-176",
+        "frame": 176,
+        "sha256": "a172d9f24e1f019f38742d1ba820ba07e87341c576e2e242abfaf2056d5b852b",
+        "bytes": 2800244
+      },
+      {
+        "id": "frame-302",
+        "frame": 302,
+        "sha256": "11723fcbacaac671b17f4399cf56a794dd8a9bba5d4e6e06b1e517223c68f902",
+        "bytes": 1704206
+      },
+      {
+        "id": "frame-403",
+        "frame": 403,
+        "sha256": "342c30d141c4181014fa2d9abae6ca5e2ecfdb9b23a46e5969a869c64167a955",
+        "bytes": 1526321
+      }
+    ],
+    "transcripts": [
+      {
+        "id": "line_1",
+        "startSample": 0,
+        "endSample": 165600,
+        "audioSha256": "0f0426531b2eaa3b419264b5df8c1004131bbcfac9976b53d0cc2657c4ee1dfe",
+        "text": "睡前小貓把小枕頭擺好",
+        "verification": "pass",
+        "spokenTextEvidence": {
+          "policy": "mandarin_pronunciation_v1",
+          "expectedText": "睡前，小猫把小枕头摆好。",
+          "sourceRef": {
+            "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/4f938148-818b-4bf7-8682-446b92be3ef0/narration-source/75bbf8125bc81115105cf56a685a7fb2487b1063af8abb63159be3382d371139",
+            "sha256": "75bbf8125bc81115105cf56a685a7fb2487b1063af8abb63159be3382d371139",
+            "bytes": 1490,
+            "mime": "application/json"
+          }
+        }
+      },
+      {
+        "id": "line_2",
+        "startSample": 240000,
+        "endSample": 393600,
+        "audioSha256": "d8cdb1ad0752cc2f5f8aa7bb1a4963511921cb37719108ef431b2eaf6f89311e",
+        "text": "闭上眼睛 他轻轻入睡",
+        "verification": "pass",
+        "spokenTextEvidence": {
+          "policy": "mandarin_pronunciation_v1",
+          "expectedText": "闭上眼睛，它轻轻入睡。",
+          "sourceRef": {
+            "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/4f938148-818b-4bf7-8682-446b92be3ef0/narration-source/ad188a345ab0a4c21cbb7823d79ac525dceb9f0e9df1a9f8331de4b53357011b",
+            "sha256": "ad188a345ab0a4c21cbb7823d79ac525dceb9f0e9df1a9f8331de4b53357011b",
+            "bytes": 1486,
+            "mime": "application/json"
+          }
+        }
+      },
+      {
+        "id": "line_3",
+        "startSample": 480000,
+        "endSample": 658800,
+        "audioSha256": "2c5374075720d3d5cbd58cc70f6db419382e96e887454482d1d63813071cfb4e",
+        "text": "屋裡靜悄悄的 夜色好溫柔",
+        "verification": "pass",
+        "spokenTextEvidence": {
+          "policy": "mandarin_pronunciation_v1",
+          "expectedText": "屋里静悄悄的，夜色好温柔。",
+          "sourceRef": {
+            "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/4f938148-818b-4bf7-8682-446b92be3ef0/narration-source/07e7e44290f6d606b63ff1f06cd2f7c296da66a8a81c07e33f38e7a42297be94",
+            "sha256": "07e7e44290f6d606b63ff1f06cd2f7c296da66a8a81c07e33f38e7a42297be94",
+            "bytes": 1504,
+            "mime": "application/json"
+          }
+        }
+      },
+      {
+        "id": "line_4",
+        "startSample": 720000,
+        "endSample": 817200,
+        "audioSha256": "fe691ac5d9fa76d2c3ccd907412f772de4ea924ec18414de613c5f2219c78f87",
+        "text": "晚安小貓",
+        "verification": "pass",
+        "spokenTextEvidence": {
+          "policy": "mandarin_pronunciation_v1",
+          "expectedText": "晚安，小猫。",
+          "sourceRef": {
+            "key": "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/revisions/4f938148-818b-4bf7-8682-446b92be3ef0/narration-source/b25d0f3eb1af5311722477f94ede3b351cdb3a772fdff48ca4cc22c9ff1f2a65",
+            "sha256": "b25d0f3eb1af5311722477f94ede3b351cdb3a772fdff48ca4cc22c9ff1f2a65",
+            "bytes": 1439,
+            "mime": "application/json"
+          }
+        }
+      }
+    ],
+    "requirements": [
+      {
+        "factId": "fact-bedtime-cat-sleep",
+        "representation": "semantic",
+        "exactText": []
+      },
+      {
+        "factId": "fact-ending-goodnight-cat",
+        "representation": "semantic",
+        "exactText": [
+          "晚安，小猫"
+        ]
+      },
+      {
+        "factId": "fact-voiceover-and-captions",
+        "representation": "semantic",
+        "exactText": [
+          "睡前，小猫把小枕头摆好。",
+          "闭上眼睛，它轻轻入睡。",
+          "屋里静悄悄的，夜色好温柔。",
+          "晚安，小猫。"
+        ]
+      }
+    ],
+    "reviewBatch": {
+      "round": 1,
+      "index": 0
+    },
+    "contextSha256": "c9bd24a21925665ebb241b185d7836678d9a5513b53f5d1864693af3b624a8fb"
+  },
+  "sourcePngBytes": 8518653,
+  "newMediaProducerCalls": 0,
+  "productionApproval": false,
+  "resultPublished": false,
+  "review": {
+    "schemaVersion": 1,
+    "contextSha256": "c9bd24a21925665ebb241b185d7836678d9a5513b53f5d1864693af3b624a8fb",
+    "scope": "provided_frames_and_verified_transcripts",
+    "observations": [
+      {
+        "frameId": "frame-59",
+        "description": "画面中央是一只线描风格的浅色小猫坐在地毯上的垫子前，右上角有一扇方形窗户露出黄色月牙，底部有一行字幕卡片。",
+        "visibleText": [
+          "睡前，小猫把小枕头摆好。"
+        ]
+      },
+      {
+        "frameId": "frame-176",
+        "description": "画面特写小猫闭着双眼躺在黄色枕头与蓝色格纹被褥中入睡，耳边带有轻微睡眠符号‘Z’，底部配有字幕。",
+        "visibleText": [
+          "Z",
+          "闭上眼睛，它轻轻入睡。"
+        ]
+      },
+      {
+        "frameId": "frame-302",
+        "description": "画面呈左右撕纸拼接风格，左半部分是深蓝色夜景窗户带有月亮和星星，右侧小猫安稳睡在床铺上，上方浮现字母‘z’和‘Z’，底部带有字幕。",
+        "visibleText": [
+          "z",
+          "Z",
+          "屋里静悄悄的，夜色好温柔。"
+        ]
+      },
+      {
+        "frameId": "frame-403",
+        "description": "深蓝色夜景背景中，小猫在床铺上安睡，右上方窗外悬挂弯月与星星，画面中间偏下方显示白色文字‘晚安，小猫’，底部卡片显示字幕‘晚安，小猫。’。",
+        "visibleText": [
+          "晚安，小猫",
+          "晚安，小猫。"
+        ]
+      }
+    ],
+    "facts": [
+      {
+        "factId": "fact-bedtime-cat-sleep",
+        "result": "pass",
+        "coverage": "complete",
+        "reason": "提供的画面完整展现了小猫在睡前摆放好小枕头、闭上双眼入睡并在夜晚平稳安睡的画面过程。",
+        "evidence": [
+          {
+            "kind": "frame_scene",
+            "frameId": "frame-59",
+            "quote": "画面中央是一只线描风格的浅色小猫坐在地毯上的垫子前"
+          },
+          {
+            "kind": "frame_scene",
+            "frameId": "frame-176",
+            "quote": "画面特写小猫闭着双眼躺在黄色枕头与蓝色格纹被褥中入睡"
+          },
+          {
+            "kind": "transcript",
+            "transcriptId": "line_1",
+            "quote": "睡前小貓把小枕頭擺好"
+          },
+          {
+            "kind": "transcript",
+            "transcriptId": "line_2",
+            "quote": "闭上眼睛 他轻轻入睡"
+          }
+        ],
+        "literalChecks": []
+      },
+      {
+        "factId": "fact-ending-goodnight-cat",
+        "result": "pass",
+        "coverage": "complete",
+        "reason": "结尾画面frame-403画面中正中清晰显示画面文字“晚安，小猫”，字幕卡片亦显示“晚安，小猫。”，且语音转写与逐字要求完全匹配。",
+        "evidence": [
+          {
+            "kind": "frame_text",
+            "frameId": "frame-403",
+            "quote": "晚安，小猫"
+          },
+          {
+            "kind": "frame_scene",
+            "frameId": "frame-403",
+            "quote": "画面中间偏下方显示白色文字‘晚安，小猫’"
+          }
+        ],
+        "literalChecks": [
+          {
+            "sourceExcerpt": "晚安，小猫",
+            "result": "pass",
+            "evidence": [
+              {
+                "kind": "frame_text",
+                "frameId": "frame-403",
+                "quote": "晚安，小猫"
+              }
+            ],
+            "reason": "frame-403画面正中可见文字精确包含“晚安，小猫”。"
+          }
+        ]
+      },
+      {
+        "factId": "fact-voiceover-and-captions",
+        "result": "pass",
+        "coverage": "complete",
+        "reason": "画面字幕与核验旁白均完整覆盖指定四句原文，字幕精确匹配，旁白转写具备验证发音证据，无改写或冲突。",
+        "evidence": [
+          {
+            "kind": "frame_text",
+            "frameId": "frame-59",
+            "quote": "睡前，小猫把小枕头摆好。"
+          },
+          {
+            "kind": "frame_text",
+            "frameId": "frame-176",
+            "quote": "闭上眼睛，它轻轻入睡。"
+          },
+          {
+            "kind": "frame_text",
+            "frameId": "frame-302",
+            "quote": "屋里静悄悄的，夜色好温柔。"
+          },
+          {
+            "kind": "frame_text",
+            "frameId": "frame-403",
+            "quote": "晚安，小猫。"
+          },
+          {
+            "kind": "transcript",
+            "transcriptId": "line_1",
+            "quote": "睡前小貓把小枕頭擺好"
+          },
+          {
+            "kind": "transcript",
+            "transcriptId": "line_2",
+            "quote": "闭上眼睛 他轻轻入睡"
+          },
+          {
+            "kind": "transcript",
+            "transcriptId": "line_3",
+            "quote": "屋裡靜悄悄的 夜色好溫柔"
+          },
+          {
+            "kind": "transcript",
+            "transcriptId": "line_4",
+            "quote": "晚安小貓"
+          }
+        ],
+        "literalChecks": [
+          {
+            "sourceExcerpt": "睡前，小猫把小枕头摆好。",
+            "result": "pass",
+            "evidence": [
+              {
+                "kind": "frame_text",
+                "frameId": "frame-59",
+                "quote": "睡前，小猫把小枕头摆好。"
+              },
+              {
+                "kind": "transcript",
+                "transcriptId": "line_1",
+                "quote": "睡前小貓把小枕頭擺好"
+              }
+            ],
+            "reason": "字幕逐字精确一致，旁白经全句普通话发音核验证明与指定文本一致。"
+          },
+          {
+            "sourceExcerpt": "闭上眼睛，它轻轻入睡。",
+            "result": "pass",
+            "evidence": [
+              {
+                "kind": "frame_text",
+                "frameId": "frame-176",
+                "quote": "闭上眼睛，它轻轻入睡。"
+              },
+              {
+                "kind": "transcript",
+                "transcriptId": "line_2",
+                "quote": "闭上眼睛 他轻轻入睡"
+              }
+            ],
+            "reason": "字幕逐字精确一致，旁白经全句普通话发音核验证明与指定文本一致。"
+          },
+          {
+            "sourceExcerpt": "屋里静悄悄的，夜色好温柔。",
+            "result": "pass",
+            "evidence": [
+              {
+                "kind": "frame_text",
+                "frameId": "frame-302",
+                "quote": "屋里静悄悄的，夜色好温柔。"
+              },
+              {
+                "kind": "transcript",
+                "transcriptId": "line_3",
+                "quote": "屋裡靜悄悄的 夜色好溫柔"
+              }
+            ],
+            "reason": "字幕逐字精确一致，旁白经全句普通话发音核验证明与指定文本一致。"
+          },
+          {
+            "sourceExcerpt": "晚安，小猫。",
+            "result": "pass",
+            "evidence": [
+              {
+                "kind": "frame_text",
+                "frameId": "frame-403",
+                "quote": "晚安，小猫。"
+              },
+              {
+                "kind": "transcript",
+                "transcriptId": "line_4",
+                "quote": "晚安小貓"
+              }
+            ],
+            "reason": "字幕逐字精确一致，旁白经全句普通话发音核验证明与指定文本一致。"
+          }
+        ]
+      }
+    ],
+    "conflicts": []
+  },
+  "requests": [
+    {
+      "model": "gemini-3.8-flash",
+      "maxTokens": 8000,
+      "requestBytes": 7866389,
+      "stream": false,
+      "imageCount": 4,
+      "startedAt": "2026-10-05T12:54:21.855Z",
+      "timeoutMs": 600000,
+      "status": 200,
+      "finishedAt": "2026-10-05T12:54:49.933Z",
+      "responseSha256": "b17958b778627acb72d1ea0b750d9476f615de60279e74bd848b8d3c6f93d180",
+      "responseFile": "model-diagnostics/b17958b778627acb72d1ea0b750d9476f615de60279e74bd848b8d3c6f93d180.json",
+      "usage": {
+        "prompt_tokens": 9311,
+        "completion_tokens": 4139,
+        "total_tokens": 13450,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      }
+    }
+  ],
+  "originalSourceUnchanged": true
+}
