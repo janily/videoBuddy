@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "operationId": "63b312b3-f912-48c5-8527-001f6f4ddb48",
+  "argumentsSha256": "036752d87eda0394473d3b5a3bfc489abe1f76dccc7f9a78077407d060ee126a",
+  "job": {
+    "schemaVersion": 1,
+    "projectId": "a3ac9de3-eec0-406b-9d61-4886c8044a47",
+    "assetId": "2b39b1a4-f1ce-4a5a-8e72-7ccf5d183d5a",
+    "sourceMime": "image/jpeg",
+    "sourceSha256": "ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436",
+    "sourceBytes": 37943,
+    "runtimeDigest": "648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+    "producerSha256": "b6994af129c8a7751bcae64c4fe07e759641f72e5d6c48a2f830aa44fd741211",
+    "maxEdge": 2048,
+    "jobSha256": "c103e191601d6f88e436c6bc32676caa8271054e2daee89401b0b60a308475d1"
+  },
+  "receipt": {
+    "schemaVersion": 1,
+    "jobSha256": "c103e191601d6f88e436c6bc32676caa8271054e2daee89401b0b60a308475d1",
+    "assetId": "2b39b1a4-f1ce-4a5a-8e72-7ccf5d183d5a",
+    "sourceSha256": "ef7bdf157a1b90c6252252f49eb02b7d8852963e31b11aba6ee24a3c3c227436",
+    "runtimeDigest": "648079ca4f9e34970773e11940a5bb4eb29b565ef0dfcfd94533872bd65a06d7",
+    "producerSha256": "b6994af129c8a7751bcae64c4fe07e759641f72e5d6c48a2f830aa44fd741211",
+    "status": "pass",
+    "sourceMime": "image/jpeg",
+    "sourceBytes": 37943,
+    "encodedWidth": 3000,
+    "encodedHeight": 1000,
+    "orientedWidth": 1000,
+    "orientedHeight": 3000,
+    "width": 683,
+    "height": 2048,
+    "mime": "image/png",
+    "sha256": "6ac2494de7817c41db36c6d35e4373ea2b004f5f03deafbd34189d0a6a0cd37e",
+    "bytes": 35445,
+    "transform": "full_image_resize",
+    "coordinates": "oriented_image_normalized"
+  }
+}

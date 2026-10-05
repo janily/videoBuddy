@@ -3,10 +3,12 @@ import {constants} from 'node:fs';
 import {readFile,mkdir,lstat,open} from 'node:fs/promises';
 import {isAbsolute,join} from 'node:path';
 import {z} from 'zod';
-import {sourceImageJob,guardSourceImageReceipt,type SourceImageJob} from '@/contracts/video/source-image';
+import {LocalAssetBytes} from './local-bytes';
+import {canonicalHash} from '@/services/video/domain/hash';
+import {sourceImageJob,guardSourceImageReceipt,guardSourceImageProof,type SourceImageProof,type SourceImageJob} from '@/contracts/video/source-image';
 import type {Environment} from '@/services/video/config/environment';
 import {dockerConfiguration,writeStageInputs} from '@/services/video/media/docker-executor';
-import type {DockerJournal} from '@/services/video/media/docker-journal';
+import {readDockerInvocation,dockerArgumentsHash,type DockerJournal} from '@/services/video/media/docker-journal';
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
 import {prepareRuntimeAssets,verifyRuntimeAssets} from '@/services/video/media/runtime-assets';
 const Input=z.strictObject({projectId:z.uuid(),assetId:z.uuid(),sourceMime:z.enum(['image/png','image/jpeg','image/webp']),sourceSha256:z.string().regex(/^[a-f0-9]{64}$/),sourceBytes:z.number().int().positive().max(20*1024*1024)});
@@ -34,5 +36,19 @@ export async function prepareSourceImage(root:string,raw:SourceImageInput,option
  const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','128','--cpus','4','--memory','2g','--memory-swap','2g','--user',config.user,'--tmpfs','/tmp:rw,nosuid,size=256m','--mount',`type=bind,src=${stageDir},dst=/work/${job.jobSha256}`,'--mount',`type=bind,src=${stageDir}/job.json,dst=/work/${job.jobSha256}/job.json,readonly`,'--mount',`type=bind,src=${stageDir}/assets/${input.assetId}.bin,dst=/input/image.bin,readonly`,'--entrypoint','node',config.image,'/opt/videobuddy/prepare-image.mjs',`/work/${job.jobSha256}/job.json`];
  const receipt=guardSourceImageReceipt(JSON.parse(await runOwnedDocker(args,config.timeoutSeconds*1000,config.image,options.assertActive,options.journal)),job);await options.assertActive();await verifyRuntimeAssets(stageDir,assets);
  if(receipt.status==='fail')throw Error(receipt.errorCode);
- const data=await outputBytes(stageDir,receipt);await options.assertActive();return{job,receipt,path:join(stageDir,'output/view.png'),data};
+ const data=await outputBytes(stageDir,receipt);await options.assertActive();const proof=guardSourceImageProof({schemaVersion:1,operationId:scope[3],argumentsSha256:dockerArgumentsHash(args,config.image),job,receipt},input);return{job,receipt,path:join(stageDir,'output/view.png'),data,proof};
+}
+
+/** Read-only recovery: no configuration, source producer or container admission. */
+export async function readSourceImageView(root:string,input:SourceImageInput,raw:SourceImageProof,options:{journal:DockerJournal;assertActive:()=>Promise<void>}){
+ await options.assertActive();if(!isAbsolute(root)||/[\u0000-\u001f,]/.test(root))throw Error('SOURCE_IMAGE_INPUT_INVALID');const proof=guardSourceImageProof(raw,input);
+ const original=await new LocalAssetBytes(root).inspect(input.projectId,input.assetId,input.sourceMime);if(original.sha256!==input.sourceSha256||original.bytes!==input.sourceBytes)throw Error('IMAGE_INPUT_CHANGED');
+ if(options.journal.prefix!==`projects/${input.projectId}/operations/${proof.operationId}/media-effects`)throw Error('SOURCE_IMAGE_PROOF_CHANGED');
+ const record=await readDockerInvocation(options.journal,proof.argumentsSha256,'sha256:'+proof.job.runtimeDigest);
+ if(record.state!=='completed')throw Error('MEDIA_STOP_UNKNOWN');
+ const receipt=guardSourceImageReceipt(JSON.parse(record.output!),proof.job);
+ if(receipt.status!=='pass'||canonicalHash(receipt)!==canonicalHash(proof.receipt))throw Error('SOURCE_IMAGE_PROOF_CHANGED');
+ const stageDir=join(root,'media',proof.job.jobSha256);await directory(root);await directory(join(root,'media'));await directory(stageDir);
+ await verifyRuntimeAssets(stageDir,[{id:input.assetId,mime:input.sourceMime,sha256:input.sourceSha256,bytes:input.sourceBytes}]);
+ const data=await outputBytes(stageDir,receipt);await options.assertActive();return{job:proof.job,receipt,path:join(stageDir,'output/view.png'),data,proof};
 }

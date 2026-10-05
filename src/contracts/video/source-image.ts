@@ -21,3 +21,11 @@ export function guardSourceImageReceipt(raw:unknown,rawJob:SourceImageJob):Sourc
  }
  return receipt;
 }
+
+export const SourceImageProofSchema=z.strictObject({schemaVersion:z.literal(1),operationId:z.uuid(),argumentsSha256:digest,job:SourceImageJobSchema,receipt:SourceImageReceiptSchema}).refine(proof=>proof.receipt.status==='pass');
+export type SourceImageProof=z.infer<typeof SourceImageProofSchema>;
+export function guardSourceImageProof(raw:unknown,input:{projectId:string;assetId:string;sourceMime:string;sourceSha256:string;sourceBytes:number}):SourceImageProof{
+ const parsed=SourceImageProofSchema.safeParse(raw);if(!parsed.success)throw Error('SOURCE_IMAGE_PROOF_CHANGED');const proof=parsed.data;
+ for(const field of ['projectId','assetId','sourceMime','sourceSha256','sourceBytes'] as const)if(proof.job[field]!==input[field])throw Error('SOURCE_IMAGE_PROOF_CHANGED');
+ guardSourceImageReceipt(proof.receipt,proof.job);return proof;
+}
