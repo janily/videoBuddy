@@ -118,3 +118,13 @@ it('T10 recovers an interrupted publish in a cold process without accepting unex
   expect(await archiveVerifiedNarration(projects,root,projectId,revisionId,input.verified,input.narration)).toEqual(packaged);
  }finally{await rm(root,{recursive:true,force:true})}
 });
+
+it('MVP archives the pronunciation policy with raw homophone recognition and rechecks it on cold reads',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-mvp-words-')),projects=new ProjectStore(new FileStore(root)),projectId=randomUUID(),revisionId=randomUUID(),{verified,narration}=await fixture(root);
+ const line=verified.lines[0];line.spokenText=line.displayText=line.expectedAsrText='白纸沿中线轻轻对折。';line.recognizedText='白紙鹽中線輕輕對折';line.wordTimings[0].text=line.recognizedText;line.asr.recognitionPolicy='mandarin_pronunciation_v1';
+ Object.assign(narration[0],{spokenText:line.spokenText,displayText:line.displayText,expectedAsrText:line.expectedAsrText});
+ const archived=await archiveVerifiedNarration(projects,root,projectId,revisionId,verified,narration),loaded=await loadPackagedNarration(projects.store,root,projectId,revisionId,archived.sources[0].sourceRef);
+ expect(loaded.words).toMatchObject({recognizedText:'白紙鹽中線輕輕對折',recognitionPolicy:'mandarin_pronunciation_v1'});expect(loaded.source.displayText).toBe('白纸沿中线轻轻对折。');
+ delete line.asr.recognitionPolicy;
+ await expect(archiveVerifiedNarration(projects,root,projectId,randomUUID(),verified,narration)).rejects.toThrow('ASR_MISMATCH');
+});

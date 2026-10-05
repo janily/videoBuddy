@@ -9,7 +9,7 @@ import {VoiceResult} from './voice';
 import {NarrationManifest,NarrationPlan} from './narration';
 import {inspectVoiceWav,VoiceWavProbe} from './wav';
 import {canonicalHash} from '@/services/video/domain/hash';
-import {assertAsrExpected} from '@/services/video/timeline/compile';
+import {assertRecognitionExpected,type RecognitionPolicy} from './recognition-policy';
 import {assertSpeechReview,assertSpeechReviewLine,type ConfirmedSpeechReview} from './spoken-review';
 
 const wordSchema=z.strictObject({text:z.string().max(100),startMs:z.number().int().nonnegative(),endMs:z.number().int().nonnegative(),probability:z.number().min(0).max(1)});
@@ -79,20 +79,20 @@ export async function transcribeAudio(root:string,voice:AsrAudioInput,sourceDire
 export async function transcribeVoice(root:string,voice:VoiceResult,env:Environment=process.env):Promise<AsrTranscript>{
  return transcribeAudio(root,voice,'voice',env);
 }
-export function verifySpokenText(originalExpectedAsrText:string,proposedExpectedAsrText:string,transcript:AsrTranscript,review?:ConfirmedSpeechReview){
+export function verifySpokenText(originalExpectedAsrText:string,proposedExpectedAsrText:string,transcript:AsrTranscript,review?:ConfirmedSpeechReview,recognitionPolicy?:RecognitionPolicy){
  let status:'pass'|'trusted_review'='pass';
- try{assertAsrExpected(originalExpectedAsrText,proposedExpectedAsrText,transcript.recognizedText)}catch(error){
+ try{if(recognitionPolicy&&transcript.language!=='zh-CN')throw Error('ASR_POLICY_INVALID');assertRecognitionExpected(originalExpectedAsrText,proposedExpectedAsrText,transcript.recognizedText,recognitionPolicy)}catch(error){
   if((error as Error).message!=='ASR_MISMATCH'||!review)throw error;
   assertSpeechReview(originalExpectedAsrText,transcript,review);status='trusted_review';
  }
  const words=transcript.segments.flatMap(segment=>segment.words);
  if(words.length===0||words.some(word=>!word.text.trim()||word.endMs<=word.startMs))throw Error('ASR_TIMINGS_UNAVAILABLE');
  for(let i=1;i<words.length;i++)if(words[i].startMs<words[i-1].endMs)throw Error('ASR_TIMINGS_UNAVAILABLE');
- return{status,model:transcript.model,voiceSha256:transcript.voiceSha256,recognizedText:transcript.recognizedText,words,...(status==='trusted_review'?{speechReviewRef:review!.ref}:{})};
+ return{status,...(recognitionPolicy?{recognitionPolicy}:{}),model:transcript.model,voiceSha256:transcript.voiceSha256,recognizedText:transcript.recognizedText,words,...(status==='trusted_review'?{speechReviewRef:review!.ref}:{})};
 }
 
-export type VerifiedNarrationManifest={durationMs:number;lines:Array<Omit<NarrationManifest['lines'][number],'asrStatus'|'wordTimingsStatus'> & {asrStatus:'pass'|'trusted_review';speechReview?:SpeechReviewEvidence;wordTimingsStatus:'available';asr:{model:AsrTranscript['model'];runtimeDigest:string;voiceSha256:string};recognizedText:string;wordTimings:Array<{text:string;startMs:number;endMs:number;probability:number}>}>};
-export async function verifyNarration(originalPlan:NarrationPlan,manifest:NarrationManifest,root:string,recognize:(root:string,voice:VoiceResult)=>Promise<AsrTranscript>=transcribeVoice,resolveReview?:(line:NarrationPlan['lines'][number],voice:VoiceResult,transcript:AsrTranscript)=>Promise<ConfirmedSpeechReview|undefined>):Promise<VerifiedNarrationManifest>{
+export type VerifiedNarrationManifest={durationMs:number;lines:Array<Omit<NarrationManifest['lines'][number],'asrStatus'|'wordTimingsStatus'> & {asrStatus:'pass'|'trusted_review';speechReview?:SpeechReviewEvidence;wordTimingsStatus:'available';asr:{model:AsrTranscript['model'];runtimeDigest:string;voiceSha256:string;recognitionPolicy?:RecognitionPolicy};recognizedText:string;wordTimings:Array<{text:string;startMs:number;endMs:number;probability:number}>}>};
+export async function verifyNarration(originalPlan:NarrationPlan,manifest:NarrationManifest,root:string,recognize:(root:string,voice:VoiceResult)=>Promise<AsrTranscript>=transcribeVoice,resolveReview?:(line:NarrationPlan['lines'][number],voice:VoiceResult,transcript:AsrTranscript)=>Promise<ConfirmedSpeechReview|undefined>,recognitionPolicy?:RecognitionPolicy):Promise<VerifiedNarrationManifest>{
  if(originalPlan.durationMs!==manifest.durationMs||originalPlan.lines.length!==manifest.lines.length)throw Error('NARRATION_PLAN_CHANGED');
  const original=new Map(originalPlan.lines.map(line=>[line.lineId,line]));
  if(original.size!==originalPlan.lines.length||new Set(manifest.lines.map(line=>line.lineId)).size!==manifest.lines.length)throw Error('NARRATION_PLAN_CHANGED');
@@ -104,10 +104,12 @@ export async function verifyNarration(originalPlan:NarrationPlan,manifest:Narrat
   const transcript=await recognize(root,line.voice);
   if(transcript.voiceSha256!==line.voice.wav.sha256)throw Error('ASR_SOURCE_CHANGED');
   if(transcript.language!==line.language)throw Error('ASR_OUTPUT_INVALID');
-  const review=await resolveReview?.(source,line.voice,transcript);
+  const policy=line.language==='zh-CN'?recognitionPolicy:undefined;
+  let review:ConfirmedSpeechReview|undefined;
+  try{assertRecognitionExpected(source.expectedAsrText,line.expectedAsrText,transcript.recognizedText,policy)}catch(error){if((error as Error).message!=='ASR_MISMATCH')throw error;review=await resolveReview?.(source,line.voice,transcript)}
   if(review)assertSpeechReviewLine(review,source,line.voice.runtimeDigest,canonicalHash(originalPlan));
-  const verified=verifySpokenText(source.expectedAsrText,line.expectedAsrText,transcript,review);
-  lines.push({...line,asrStatus:verified.status,...(verified.status==='trusted_review'?{speechReview:{ref:review!.ref,planSha256:canonicalHash(originalPlan),transcript}}:{}),wordTimingsStatus:'available',asr:{model:transcript.model,runtimeDigest:transcript.runtimeDigest,voiceSha256:transcript.voiceSha256},recognizedText:verified.recognizedText,wordTimings:verified.words});
+  const verified=verifySpokenText(source.expectedAsrText,line.expectedAsrText,transcript,review,policy);
+  lines.push({...line,asrStatus:verified.status,...(verified.status==='trusted_review'?{speechReview:{ref:review!.ref,planSha256:canonicalHash(originalPlan),transcript}}:{}),wordTimingsStatus:'available',asr:{model:transcript.model,runtimeDigest:transcript.runtimeDigest,voiceSha256:transcript.voiceSha256,...(policy?{recognitionPolicy:policy}:{})},recognizedText:verified.recognizedText,wordTimings:verified.words});
  }
  return{durationMs:manifest.durationMs,lines};
 }

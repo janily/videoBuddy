@@ -35,7 +35,7 @@ function normalizeEnglishDate(value:string){
   return `${month} ${day}`;
  });
 }
-function normalizeAsr(value:string){
+export function normalizeAsr(value:string){
  return normalizeEnglishDate(traditionalToSimplified(value.normalize('NFKC'))).replace(/([零〇一二三四五六七八九十百千万两]+)(?=年|月|日|号|点|分|秒|个|次|元|米|公里|倍|层|页|天|小时|分钟|%|％)/gu,match=>chineseNumber(match)).replace(/[\p{P}\s]/gu,'').toLowerCase();
 }
 export function assertAsrExpected(originalExpected:string,proposedExpected:string,asr:string){if(originalExpected!==proposedExpected)throw Error('ASR_EXPECTATION_CHANGED');if(normalizeAsr(originalExpected)!==normalizeAsr(asr))throw Error('ASR_MISMATCH')}

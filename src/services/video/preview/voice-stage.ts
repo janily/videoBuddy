@@ -79,7 +79,7 @@ export async function prepareVoiceStage(projects:ProjectStore,projectId:string,r
    catch(error){if((error as Error).message!=='SPEECH_REVIEW_NOT_NEEDED')throw error}
   }
   return review;
- });
+ },env.VIDEO_DELIVERY_PROFILE==='mvp'?'mandarin_pronunciation_v1':undefined);
  assertManifest(plan,verified);for(const line of verified.lines)await assertVerifiedSpeechReview(projects.store,projectId,plan,line);await assertVoiceFiles(root,verified);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});

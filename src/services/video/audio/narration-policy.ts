@@ -41,7 +41,7 @@ export async function validateNarrationPolicySource(projects:ProjectStore,root:s
   const path=await realpath(line.voice.outputPath);if(!path.startsWith(base+'/'))throw Error('NARRATION_POLICY_CHANGED');
   if(canonicalHash(await inspectVoiceWav(line.voice.outputPath))!==canonicalHash(line.voice.wav))throw Error('NARRATION_POLICY_CHANGED');
   await assertVerifiedSpeechReview(projects.store,projectId,plan,line);
-  if(line.asrStatus==='pass')verifySpokenText(line.expectedAsrText,line.expectedAsrText,{language:line.language,model:line.asr.model,runtimeDigest:line.asr.runtimeDigest,voiceSha256:line.asr.voiceSha256,recognizedText:line.recognizedText,segments:[{text:line.recognizedText,startMs:0,endMs:line.durationMs,words:line.wordTimings}]});
+  if(line.asrStatus==='pass')verifySpokenText(line.expectedAsrText,line.expectedAsrText,{language:line.language,model:line.asr.model,runtimeDigest:line.asr.runtimeDigest,voiceSha256:line.asr.voiceSha256,recognizedText:line.recognizedText,segments:[{text:line.recognizedText,startMs:0,endMs:line.durationMs,words:line.wordTimings}]},undefined,line.asr.recognitionPolicy);
  }
  return{plan,verified};
 }

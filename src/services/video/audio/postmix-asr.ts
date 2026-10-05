@@ -89,7 +89,7 @@ export async function verifyPostMixNarration(root:string,film:PostMixFilm,origin
   const transcript=await transcribeAudio(root,{language:line.language,outputPath,wav},'postmix',env,options);
   await options.assertActive?.();
   let checked:ReturnType<typeof verifySpokenText>|ReturnType<typeof verifyPolicyPostMixText>;
-  try{checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript)}
+  try{checked=verifySpokenText(original.expectedAsrText,line.expectedAsrText,transcript,undefined,line.asr.recognitionPolicy)}
   catch(error){
    if((error as Error).message!=='ASR_MISMATCH')throw error;
    const context:PostMixReviewContext={film,plan:originalPlan,lineId:line.lineId,window,transcript},proof=await options.resolveReview?.(context);
