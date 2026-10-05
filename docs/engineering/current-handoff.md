@@ -1,5 +1,9 @@
 # 当前工程交接（更新至2026-10-05）
 
+2026-10-05 T11/T12 Visual v2 最终修正（`7f3913b`）：两轴复核发现并关闭数字子串、全角小数/百分比遗漏、英文 e 误拒及负号范围误匹配；真实反例逐项 RED→GREEN，旧v1不变。最终完整132文件669项65.28秒通过，固定39b6bf6...7f3913b两轴分别clean，build/lint/构建后types均退出0。真实旧影片31批244PNG本地请求preflight通过，0新云/媒体/状态写入，原未知预算保留；无真实新来源或完整全片QA、无正式制作批准/发布。43风格与完整范围/C0/C1/C2未达，未push/部署。见 [完整证据](evidence/audited-visual-criteria-validation.md)。
+
+2026-10-05 T11/T12 冻结来源视觉条件接线（`545e2ee`）：新 facts v2 全来源/不可变独立审核条件进入 Visual v2，每个字面条件须两轮实际帧证据；新版 critical_facts 同时要求同影片/spec/事实清单的完整 Content QA，纯语义不能靠抽帧通过。旧 v1 保留。共享请求校验提前到预算/effect前，已有 completed 恢复不重复请求且归档前再guard。完整132文件668测试66.16秒、build/构建后types/lint通过；真实旧全片31批244PNG全部本地preflight通过，第一归档context相同、成片SHA/全部原状态及unknown不变，0writes/network/model/native。两轴复核进行中；无真实新来源/v2模型QA、无正式制作批准或结果发布，43风格和完整范围/C0/C1/C2未达，无push/部署。见 [视觉条件验证](evidence/audited-visual-criteria-validation.md)。
+
 2026-10-05 T11/T12 来源证明接线（`4c1286d`）：新 preview 创作前完整来源分类/独立审核；新 facts v2 冻结完整 immutable proof，包装配绑定当前 operation/epoch/Understanding；正式内容 QA 读取冻结条件并绑定 proofRef/清单 SHA。旧已冻结包只读回用不升级，原 Visual v1/name/critical_facts/听感/运动/发布门禁不放宽。131 文件661项通过（65.71秒），lint/build/构建后types通过；本地 native loopback 源审核 reject 后只两次精确 settled，不进入创作。真实旧包 full graph 只读重验成功，原三个 SHA、生产状态/9 native/旧 unknown 不变，0writes/network/model/native。尚无真实新来源审核或完整全片 QA；全范围/C0/C1/C2未达，无push/部署；接线审查发现 NFC/标点条件生产消费不一致的P2，`f9a659d` 共享guard并保留首个原写法去重，两个合同RED→GREEN；并发首全套1项15秒test timeout保留记录，单独同代码/同阈值重跑131文件663项通过（63.30秒），lint/build/构建后types过，固定两轴clean。见 [接线验证](evidence/source-requirements-integration-validation.md)。
 
 
