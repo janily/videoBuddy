@@ -9,6 +9,8 @@ import {StreamEventSchema} from '@/contracts/video/commands';
 import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budget/model-budget';
 import {runDirector,runDirectorStream,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext,type DirectorProjectContext} from '@/mastra/video/director';
+import {guardImageUnderstanding,ImageAnalysisRecordSchema} from '@/contracts/video/image-understanding';
+import {readNarrationJson} from '@/services/video/audio/narration-package';
 import {TextAnalysis} from '@/services/video/assets/analysis';
 
 import {withAccountedModel} from '@/services/video/budget/model-call';
@@ -81,10 +83,11 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    ...(message.role==='user'&&message.target!==undefined?{target:message.target}:{}),
    ...(message.attachmentIds?.length?{attachments:await Promise.all(message.attachmentIds.map(async assetId=>{
     const asset=control.assets.find(item=>item.id===assetId);
-    if(!asset||asset.status!=='ready'||!['text/markdown','application/pdf','audio/wav','audio/mpeg','audio/mp4'].includes(asset.declaredMime)||!asset.analysisRef)throw Error('SOURCE_INVALID');
-    const analysis=(await store.readFresh<TextAnalysis>(asset.analysisRef.key)).value;
+    if(!asset||asset.status!=='ready'||!['text/markdown','application/pdf','audio/wav','audio/mpeg','audio/mp4','image/png','image/jpeg','image/webp'].includes(asset.declaredMime)||!asset.analysisRef)throw Error('SOURCE_INVALID');
+    const analysis=asset.declaredMime.startsWith('image/')?ImageAnalysisRecordSchema.parse(await readNarrationJson(store,asset.analysisRef,`${p}/assets/${assetId}/analysis/`)):(await store.readFresh<TextAnalysis>(asset.analysisRef.key)).value;
     if(analysis.assetId!==assetId||analysis.sha256!==asset.sha256||analysis.mime!==asset.declaredMime||analysis.trust!=='untrusted_material'||(asset.declaredMime==='application/pdf'&&!analysis.pages?.length)||(asset.declaredMime.startsWith('audio/')&&(!analysis.segments?.length||!analysis.language)))throw Error('SOURCE_INVALID');
-    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(analysis.pages?{pages:analysis.pages}:{}),...(analysis.segments?{segments:analysis.segments}:{})};
+    const imageAnalysis=asset.declaredMime.startsWith('image/')?guardImageUnderstanding(analysis.imageAnalysis,{assetId,mime:asset.declaredMime as 'image/png'|'image/jpeg'|'image/webp',sha256:asset.sha256!,bytes:asset.bytes!,intendedUse:asset.intendedUse}):undefined;
+    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(imageAnalysis?{imageAnalysis}:{}),...(analysis.pages?{pages:analysis.pages}:{}),...(analysis.segments?{segments:analysis.segments}:{})};
    }))}:{}),
   })));
   let classificationContext=savedInput?.classificationContext;

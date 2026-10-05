@@ -105,3 +105,13 @@ it.each(['before_call','during_success','during_failure'] as const)('deletion %s
  expect(await projects.messages((await store.readFresh<ProjectControl>(`projects/${projectId}/control`)).value)).toEqual([]);
  if(when==='during_failure')expect((await store.readFresh(`projects/${projectId}/operations/${operationId}/effects/director`)).value).toMatchObject({status:'started'});
 });
+it('passes persisted image observations to Director as untrusted material, without invented image facts',async()=>{
+ const store=new FileStore(dir),projects=new ProjectStore(store),events=new LocalEventLog(dir),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()}),assetId=crypto.randomUUID(),userId=crypto.randomUUID(),operationId=crypto.randomUUID(),sha256='d'.repeat(64);
+ const imageAnalysis={schemaVersion:1,assetId,sourceSha256:sha256,mime:'image/png',description:'可见一株绿色植物',observations:[],visibleText:[],uncertainties:['无法确定品种'],scope:'provided_image_only',trust:'untrusted_material'};
+ const analysisRef=await projects.index.immutable(`projects/${projectId}/assets/${assetId}/analysis/${sha256}`,{schemaVersion:5,assetId,mime:'image/png',sha256,text:imageAnalysis.description+'\n未确认：无法确定品种',imageAnalysis,trust:'untrusted_material'});
+ await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,activeConversation:operationId,assets:[{id:assetId,commandId:crypto.randomUUID(),bodyHash:sha256,reservationId:crypto.randomUUID(),filename:'参考.png',declaredBytes:100,declaredMime:'image/png',intendedUse:'参考画面',rightsConfirmed:true,status:'ready',expiresAt:new Date(Date.now()+60000).toISOString(),sha256,bytes:100,analysisRef,quotaReserved:true}],ordinalReservations:{[operationId]:{user:1,assistant:2}},nextOrdinal:3}));
+ await store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,commandId:crypto.randomUUID(),kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
+ await projects.archiveMessage(projectId,{id:userId,ordinal:1,role:'user',text:'用这张图片',attachmentIds:[assetId],status:'completed',contentVersion:1,operationId});let calls=0;
+ await runDirectorOperation(store,events,projectId,operationId,{decide:async(_u,messages)=>{calls++;expect(messages[0].attachments?.[0]).toMatchObject({assetId,mime:'image/png',imageAnalysis});return{action:'acknowledge',reply:'收到图片，植物品种还未确认。',effect:'no_change',executionIntent:'none',evidenceMessageIds:[userId]}},limits:{projectCalls:10,projectInputTokens:100000,projectOutputTokens:10000,dailyCalls:10}});
+ expect(calls).toBe(1);expect((await projects.view('owner',projectId)).messages.at(-1)?.text).toBe('收到图片，植物品种还未确认。');
+});

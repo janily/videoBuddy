@@ -4,9 +4,10 @@ import {ProjectControl} from '@/contracts/video/project';
 import {Understanding} from '@/contracts/video/domain';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {updateJson} from '@/services/video/storage/atomic-store';
+import type {ImageUnderstanding} from '@/contracts/video/image-understanding';
 import {probeMarkdown} from './probe';
 
-export interface TextAnalysis{schemaVersion:5;assetId:string;mime:'text/markdown'|'application/pdf'|'audio/wav'|'audio/mpeg'|'audio/mp4';sha256:string;text:string;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string;language?:'zh-CN'|'en'}>;language?:'zh-CN'|'en'|'mixed';durationMs?:number;asrRuntimeDigest?:string;mediaRuntimeDigest?:string;wavChunks?:Array<{startMs:number;sha256:string}>;chunkCount?:number;trust:'untrusted_material'}
+export interface TextAnalysis{schemaVersion:5;assetId:string;mime:'image/png'|'image/jpeg'|'image/webp'|'text/markdown'|'application/pdf'|'audio/wav'|'audio/mpeg'|'audio/mp4';sha256:string;text:string;imageAnalysis?:ImageUnderstanding;pages?:string[];segments?:Array<{startMs:number;endMs:number;text:string;language?:'zh-CN'|'en'}>;language?:'zh-CN'|'en'|'mixed';durationMs?:number;asrRuntimeDigest?:string;mediaRuntimeDigest?:string;wavChunks?:Array<{startMs:number;sha256:string}>;chunkCount?:number;trust:'untrusted_material'}
 export async function publishMarkdownAnalysis(projects:ProjectStore,projectId:string,assetId:string,path:string){
  const parsed=probeMarkdown(await readFile(path));
  const record:TextAnalysis={schemaVersion:5,assetId,mime:'text/markdown',sha256:parsed.sha256,text:parsed.text,trust:parsed.trust};
