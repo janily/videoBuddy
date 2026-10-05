@@ -16,7 +16,7 @@ import {readPinnedSubtitleFont} from '@/services/video/audio/subtitles';
 import type {Environment} from '@/services/video/config/environment';
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {dockerConfiguration} from '@/services/video/media/docker-executor';
-import {mandatoryDeliveryRules,type DeliveryPolicy} from '@/services/video/quality/delivery';
+import {filmDeliveryPolicy,verifyFrozenDeliveryPolicy} from '@/services/video/quality/delivery';
 import {createOrRead,StoreMissing} from '@/services/video/storage/atomic-store';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {getStyle} from '@/services/video/styles/registry';
@@ -117,7 +117,7 @@ export async function prepareFilmPackageStage(projects:ProjectStore,projectId:st
  };
  const spec=FilmSpecSchema.parse({schemaVersion:5,projectId,revisionId,briefVersion:control.briefVersion,style:{slug:style.slug,packVersion:style.packVersion,upstreamCommit:style.upstreamCommit},output:{width:landscape?1920:1080,height:landscape?1080:1920,fps:timing.fps,totalFrames:timing.totalFrames,sampleRate:48000},seed,understandingRef:control.understandingRef,
   treatmentRef:document('treatment',manifests.treatment),factsRef:document('facts',facts),timelineRef:document('timeline',manifests.timeline),assetManifestRef:document('asset-manifest',manifests.assets),sourceManifestRef:document('source-manifest',manifests.sources),audioManifestRef:document('audio-manifest',manifests.audio),runtimeDigest:runtime.runtimeDigest,qualityPolicyVersion:policyVersion});
- const policy:DeliveryPolicy={schemaVersion:1,audioIntent:narration.lines.length?'voiced':audio.music.length||audio.foley.length?'music':'silent',captions:Boolean(captions.length),requiredRules:[...mandatoryDeliveryRules]};
+ const policy=existing!==undefined?verifyFrozenDeliveryPolicy(manifests.timeline,await readNarrationJson(projects.store,RecordSchema.parse(existing).qualityPolicyRef,`${revisionPrefix}quality-policy/`),understanding):verifyFrozenDeliveryPolicy(manifests.timeline,filmDeliveryPolicy(manifests.timeline,env.VIDEO_DELIVERY_PROFILE==='mvp'?'mvp':'full'),understanding);
  const expected=RecordSchema.parse({schemaVersion:2,briefVersion:control.briefVersion,filmSpecRef:document('film',spec),qualityPolicyRef:document('quality-policy',policy),qualityStatus:'semantic_not_checked'});
  async function fence(){
   const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;

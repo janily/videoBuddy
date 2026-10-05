@@ -4,7 +4,8 @@ import{z}from'zod';
 import{canonicalHash,canonicalJson}from'@/services/video/domain/hash';
 import{loadVerifiedFilmPackage}from'@/contracts/video/film-package';
 import{readSubtitleFontReceipt}from'@/services/video/audio/font-receipt';
-import{filmDeliveryPolicy}from'@/services/video/quality/delivery';
+import{filmDeliveryPolicy,verifyFrozenDeliveryPolicy}from'@/services/video/quality/delivery';
+import {readNarrationJson} from '../audio/narration-package';
 import type{ProjectStore}from'@/services/video/storage/project-store';
 import type{PreviewBundle}from'./bundle';
 import{validatePreviewSegments}from'./render-excerpt';
@@ -21,7 +22,9 @@ export async function verifyPreviewPackage(projects:ProjectStore,projectId:strin
   const critical=facts.facts.filter(fact=>fact.critical).map(fact=>({text:fact.text,source:fact.status==='confirmed'?'用户确认':'用户提供'}));
   if(canonicalHash(shown)!==canonicalHash(bundle.facts)||canonicalHash(critical)!==canonicalHash(bundle.criticalFacts))throw Error('PREVIEW_PACKAGE_INVALID');
   const inputs=bundle.renderInputs,profile=inputs.profile;
-  if(inputs.qualityPolicySha256!==canonicalHash(filmDeliveryPolicy(timeline)))throw Error('PREVIEW_PACKAGE_INVALID');
+  const deliveryPolicy=inputs.qualityPolicyRef?verifyFrozenDeliveryPolicy(timeline,await readNarrationJson(projects.store,inputs.qualityPolicyRef,`projects/${projectId}/revisions/${bundle.revisionId}/quality-policy/`),verified.understanding):filmDeliveryPolicy(timeline);
+  if(inputs.qualityPolicyRef&&deliveryPolicy.schemaVersion!==2)throw Error('PREVIEW_PACKAGE_INVALID');
+  if(inputs.qualityPolicySha256!==canonicalHash(deliveryPolicy)||inputs.qualityPolicyRef&&inputs.qualityPolicyRef.sha256!==inputs.qualityPolicySha256)throw Error('PREVIEW_PACKAGE_INVALID');
   if(profile.width!==filmSpec.output.width||profile.height!==filmSpec.output.height||profile.fps!==filmSpec.output.fps||inputs.runtimeDigests.media!==filmSpec.runtimeDigest||
    inputs.timelineSha256!==filmSpec.timelineRef.sha256||inputs.audioSha256!==filmSpec.audioManifestRef.sha256||
    inputs.sourceCodeSha256!==canonicalHash(sourceManifest.modules.map(item=>({id:item.id,sha256:item.sourceRef.sha256}))))throw Error('PREVIEW_PACKAGE_INVALID');
@@ -37,6 +40,6 @@ export async function verifyPreviewPackage(projects:ProjectStore,projectId:strin
    for(const line of timeline.narration)if(line.startSample<end*48&&line.endSample>start*48&&(line.startSample<start*48||line.endSample>end*48))throw Error('PREVIEW_PACKAGE_INVALID');
   }
   if(audioManifest.buses.length===0)throw Error('PREVIEW_PACKAGE_INVALID');
-  return verified;
+  return{...verified,deliveryPolicy};
  }catch{throw Error('PREVIEW_PACKAGE_INVALID')}
 }

@@ -9,7 +9,7 @@ const RenderInputs=z.strictObject({
  sourceCodeSha256:Digest,timelineSha256:Digest,audioSha256:Digest,
  assetSha256s:z.array(Digest),fontSha256s:z.array(Digest),
  profile:z.strictObject({width:z.number().int().positive(),height:z.number().int().positive(),fps:z.union([z.literal(24),z.literal(30),z.literal(60)])}),
- runtimeDigests:z.record(z.string().min(1),Digest).refine(value=>value.media!==undefined),qualityPolicySha256:Digest
+ runtimeDigests:z.record(z.string().min(1),Digest).refine(value=>value.media!==undefined),qualityPolicySha256:Digest,qualityPolicyRef:ObjectRef.optional()
 });
 const Segment=z.strictObject({previewStartMs:z.number().int().nonnegative(),previewEndMs:z.number().int().positive(),sourceStartMs:z.number().int().nonnegative().nullable(),sourceEndMs:z.number().int().nonnegative().nullable(),shotId:z.string().min(1).nullable()});
 const Input=z.strictObject({

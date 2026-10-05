@@ -12,3 +12,14 @@ export function previewAction(control:ProjectControl,understanding:Understanding
   !['collecting','preview_ready','ready','attention','cancelled'].includes(control.phase)?'正在准备效果，请稍等。':undefined;
  return{kind:'prepare_preview',enabled:!disabledReason,...(disabledReason?{disabledReason}:{})};
 }
+
+import type {PreviewBundle} from './bundle';
+/** Presentation of the same readiness fences enforced again by approvePreview.
+ * Old full-certification previews remain explicitly unavailable for MVP. */
+export function approvalAction(control:ProjectControl,preview:PreviewBundle,config:Pick<ReturnType<typeof readConfiguration>,'generationEnabled'|'missing'>=readConfiguration(),now=Date.now()){
+ const disabledReason=Object.keys(control.unresolvedMediaStops||{}).length?unknownMediaStopMessage:!config.generationEnabled?'制作服务尚未开放。':config.missing.length?'制作服务尚未配置完成。':
+  control.activeConversation||control.activeProduction||control.inputPending?'正在处理当前任务，请稍等。':
+  control.phase!=='preview_ready'||control.previewState!=='ready'||control.currentPreviewId!==preview.previewId||control.briefVersion!==preview.briefVersion||Date.parse(preview.expiresAt)<=now?'效果已经变化，请先看新效果。':
+  !preview.renderInputs.qualityPolicyRef?'这个旧效果使用完整验收策略，请先生成新的 MVP 效果。':undefined;
+ return{kind:'approve_preview',enabled:!disabledReason,...(disabledReason?{disabledReason}:{})};
+}

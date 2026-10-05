@@ -13,7 +13,7 @@ import {recordSubtitleFontReceipt} from '@/services/video/audio/font-receipt';
 import type {Environment} from '@/services/video/config/environment';
 import {prepareVisualReviewBatch} from '@/services/video/quality/visual-review-stage';
 import {verifyCompositeForFilm} from '@/services/video/quality/composite-binding';
-import {filmDeliveryPolicy} from '@/services/video/quality/delivery';
+import {verifyFrozenDeliveryPolicy} from '@/services/video/quality/delivery';
 import {guardVisualReview,assertPreviewReviewEligible,type VisualReviewContext} from '@/contracts/video/visual-review';
 import type {FilmPackageStageRecord} from './film-package-stage';
 import type {PreviewExcerptRecord} from './excerpt-stage';
@@ -49,7 +49,7 @@ export async function publishPreparedPreview(projects:ProjectStore,raw:z.input<t
  const spec=frozen.filmSpec;
  if(spec.projectId!==projectId||spec.revisionId!==revisionId||spec.briefVersion!==control.briefVersion||canonicalHash(spec.understandingRef)!==canonicalHash(control.understandingRef))throw Error('PREVIEW_PACKAGE_INVALID');
  const policy=await readNarrationJson(projects.store,filmRecord.qualityPolicyRef,revisionPrefix+'quality-policy/');
- const expectedPolicy=filmDeliveryPolicy(frozen.timeline);
+ const expectedPolicy=verifyFrozenDeliveryPolicy(frozen.timeline,policy,frozen.understanding);
  if(canonicalHash(policy)!==canonicalHash(expectedPolicy))throw Error('PREVIEW_PACKAGE_INVALID');
  await verifyCompositeForFilm(projects,root,frozen,operationId,expectedConsentEpoch,'preview',env);
  const expectedSegments=selectPreviewExcerpt(frozen.timeline,frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(f=>f.id));
@@ -70,7 +70,7 @@ export async function publishPreparedPreview(projects:ProjectStore,raw:z.input<t
  const fontSha256s=frozen.sourceManifest.captionStyles.length?(isBookTimingFont(frozen.timing.font)?await frozenBookFontHashes(projects.store,frozen.timing.font):[await recordSubtitleFontReceipt(projects.store,spec.runtimeDigest,await readPinnedSubtitleFontFileHash(spec.runtimeDigest))]):[];
  const facts=frozen.facts.facts.map(f=>({text:f.text,source:f.status==='confirmed'?'用户确认':'用户提供'}));
  const bundle=createPreviewBundle({previewId,revisionId,briefVersion:spec.briefVersion,filmSpecRef:{...filmRecord.filmSpecRef,mime:'application/json'},
-  renderInputs:{sourceCodeSha256:canonicalHash(frozen.sourceManifest.modules.map(m=>({id:m.id,sha256:m.sourceRef.sha256}))),timelineSha256:spec.timelineRef.sha256,audioSha256:spec.audioManifestRef.sha256,assetSha256s,fontSha256s,profile:{width:spec.output.width,height:spec.output.height,fps:spec.output.fps},runtimeDigests:{media:spec.runtimeDigest},qualityPolicySha256:filmRecord.qualityPolicyRef.sha256},
+  renderInputs:{sourceCodeSha256:canonicalHash(frozen.sourceManifest.modules.map(m=>({id:m.id,sha256:m.sourceRef.sha256}))),timelineSha256:spec.timelineRef.sha256,audioSha256:spec.audioManifestRef.sha256,assetSha256s,fontSha256s,profile:{width:spec.output.width,height:spec.output.height,fps:spec.output.fps},runtimeDigests:{media:spec.runtimeDigest},qualityPolicySha256:filmRecord.qualityPolicyRef.sha256,...(expectedPolicy.schemaVersion===2?{qualityPolicyRef:{...filmRecord.qualityPolicyRef,mime:'application/json' as const}}:{})},
   script:frozen.treatment.script,facts,criticalFacts:frozen.facts.facts.filter(f=>f.critical).map(f=>({text:f.text,source:f.status==='confirmed'?'用户确认':'用户提供'})),summary:frozen.treatment.summary,
   previewArtifactId:excerpt.artifactId,previewArtifactSha256:excerpt.previewArtifactSha256,excerptMap:excerpt.excerptMap,sourceDurationMs:spec.output.totalFrames*1000/spec.output.fps,qualityEvidenceRefs:[evidenceRef.key,...reviews.map(r=>r.reviewRef.key)]});
  const saved=await createOrRead(projects.store,candidateKey,{inputHash,bundle});

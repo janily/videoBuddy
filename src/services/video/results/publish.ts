@@ -1,7 +1,8 @@
 import{z}from 'zod';
 import{canonicalHash}from '@/services/video/domain/hash';
 import{assertPublishable}from '@/services/video/quality/publish-gate';
-import{validateNewDelivery,mandatoryDeliveryRules}from '@/services/video/quality/delivery';
+import{validateNewDelivery,DeliveryPolicySchema}from '@/services/video/quality/delivery';
+import{verifyMvpPublication}from'@/services/video/render/mvp-publication';
 import{reviewApprovedContent}from '@/services/video/render/content-review';
 import type{Environment}from '@/services/video/config/environment';
 import{inspectArtifact}from '@/services/video/exports/access';
@@ -14,7 +15,7 @@ import type{ProjectControl}from '@/contracts/video/project';
 
 const Id=z.string().uuid(),Digest=z.string().regex(/^[a-f0-9]{64}$/);
 const Check=z.strictObject({ruleId:z.string().min(1),result:z.enum(['pass','fail','not_checked','not_applicable','waived']),severity:z.enum(['blocking','warning']),evidenceRefs:z.array(z.string().min(1)),reason:z.string().optional(),waiverActor:z.string().optional()});
-const Manifest=z.strictObject({resultId:Id,artifactId:Id,revisionId:Id,previewId:Id,approvalId:Id,bundleHash:Digest,mp4Sha256:Digest,mp4Bytes:z.number().int().positive(),qualityPolicy:z.strictObject({schemaVersion:z.literal(1),audioIntent:z.enum(['voiced','music','silent']),captions:z.boolean(),requiredRules:z.array(z.string().min(1)).min(mandatoryDeliveryRules.length)}),qualityChecks:z.array(Check),createdAt:z.string().datetime({offset:true})});
+const Manifest=z.strictObject({resultId:Id,artifactId:Id,revisionId:Id,previewId:Id,approvalId:Id,bundleHash:Digest,mp4Sha256:Digest,mp4Bytes:z.number().int().positive(),qualityPolicy:DeliveryPolicySchema,qualityChecks:z.array(Check),createdAt:z.string().datetime({offset:true})});
 export type ResultManifest=z.input<typeof Manifest>;
 function key(projectId:string,resultId:string){return`projects/${projectId}/results/${resultId}/manifest`}
 export async function readResultManifest(projects:ProjectStore,projectId:string,resultId:string){
@@ -46,6 +47,7 @@ export async function publishResult(projects:ProjectStore,owner:string,projectId
  const content=await(options.verifyContent||reviewApprovedContent)(projects,owner,projectId,operationId,expectedFence,{root:storageRoot,env:options.env,mustExist:true});
  const contentRef=`${p}/approvals/${approval.approvalId}/content-review-v1-stage`,check=result.qualityChecks.find(c=>c.ruleId==='content_coverage');
  if(content.report.result!=='pass'||content.report.filmSha256!==actualFileSha256||content.report.filmSpecSha256!==preview.filmSpecRef.sha256||content.report.scope!=='two_round_provided_frames_and_verified_transcripts'||content.deliveryEligible!==false||!check||canonicalHash(check.evidenceRefs)!==canonicalHash([contentRef]))throw Error('QUALITY_BLOCKED');
+ if(result.qualityPolicy.schemaVersion===2)await verifyMvpPublication(projects,owner,projectId,operationId,expectedFence,result,{root:storageRoot,env:options.env});
  const stored=await createOrRead(projects.store,key(projectId,result.resultId),result);
  if(canonicalHash(stored)!==canonicalHash(result))throw Error('RESULT_ID_CONFLICT');
  await updateJson(projects.store,`${p}/control`,async(control:ProjectControl)=>{

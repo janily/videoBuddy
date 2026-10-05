@@ -1,3 +1,4 @@
+import {assertMvpProfile} from '@/services/video/quality/delivery';
 import {readFrozenPreview} from './frozen-preview';
 import {UnderstandingSchema} from '@/contracts/video/domain';
 import {guardTreatment} from '@/contracts/video/treatment';
@@ -38,6 +39,8 @@ export async function buildPreviewPipeline(projects:ProjectStore,input:Parameter
  for(const role of ['director','visual','audio','critic'] as const)configuredModel(role,env);
  const baseline=(await projects.store.readFresh<ProjectControl>(prefix+'/control')).value;
  const understanding=UnderstandingSchema.parse(await readNarrationJson(projects.store,baseline.understandingRef,prefix+'/understanding/'));
+ if(env.VIDEO_DELIVERY_PROFILE&& !['mvp','full'].includes(env.VIDEO_DELIVERY_PROFILE))throw Error('CONFIGURATION_REQUIRED: VIDEO_DELIVERY_PROFILE');
+
  if(understanding.preferences.voiceMode!=='none'){voiceConfiguration(env);asrConfiguration(env)}
  async function stage(name:string,label:string){
   const c=(await projects.store.readFresh<ProjectControl>(prefix+'/control')).value;
@@ -45,6 +48,7 @@ export async function buildPreviewPipeline(projects:ProjectStore,input:Parameter
   await assertPreviewOperation(projects,c,operationId,revisionId,input.previewId,expectedConsentEpoch);await activity(name,label);
  }
  const retry=await readFrozenPreview(projects,root,projectId,operationId,revisionId,expectedConsentEpoch),mustExist=Boolean(retry);
+ if(!retry&&env.VIDEO_DELIVERY_PROFILE==='mvp')assertMvpProfile(understanding);
  if(!retry){await stage('source','正在核对资料的表达要求');await prepareContentRequirementsStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env})}
  await stage('treatment','正在构思故事');
  const treatmentRef=retry?.treatmentRef||await prepareTreatmentStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env});

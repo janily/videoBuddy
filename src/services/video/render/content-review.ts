@@ -7,7 +7,7 @@ import {StoreMissing,createOrRead,type AtomicStore} from '@/services/video/stora
 import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {readNarrationJson} from '@/services/video/audio/narration-package';
 import {VisualEvidenceSchema,readVisualEvidence} from '@/services/video/quality/visual-evidence';
-import {wholeFilmVisualPlan} from '@/services/video/quality/whole-visual-plan';
+import {wholeFilmVisualPlan,mvpFilmVisualPlan} from '@/services/video/quality/whole-visual-plan';
 import {readConfiguration,requireGeneration} from '@/services/video/config/environment';
 import {reserveModelBudget,modelLimits,type ModelLimits} from '@/services/video/budget/model-budget';
 import {withAccountedModel} from '@/services/video/budget/model-call';
@@ -23,7 +23,7 @@ function combine(values:Result[]):Result{return values.includes('fail')?'fail':v
 function immutableRef(prefix:string,value:unknown):ObjectRef{const body=canonicalJson(value),sha256=canonicalHash(value);return{key:prefix+'/'+sha256,sha256,bytes:Buffer.byteLength(body),mime:'application/json'}}
 // Some frozen producers use idempotent create even during replay. Permit only
 // identical existing values, without invoking any underlying mutation.
-function verifierStore(store:AtomicStore):AtomicStore{return{
+export function verifierStore(store:AtomicStore):AtomicStore{return{
  readFresh:store.readFresh.bind(store),
  async create(key,value){const existing=await store.readFresh(key);if(canonicalHash(existing.value)!==canonicalHash(value))throw Error('CONTENT_COLD_WRITE_FORBIDDEN')},
  async cas(){throw Error('CONTENT_COLD_WRITE_FORBIDDEN')},
@@ -43,7 +43,7 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
  if(composition.inputHash!==inputs.inputHash||composition.deliveryEligible!==false||composition.qualityStatus!=='semantic_not_checked')throw Error('CONTENT_BASELINE_CHANGED');
  const compositionHash=canonicalHash(composition),filmSha256=composition.movie.technicalQa.sha256,{frozen}=inputs;
  if(composition.postMix.filmSha256!==filmSha256)throw Error('CONTENT_BASELINE_CHANGED');
- const rawEvidence=(await projects.store.readFresh<Awaited<ReturnType<typeof prepareApprovedVisualEvidence>>['record']>(prefix+'visual-evidence-v1-stage')).value,plan=wholeFilmVisualPlan(frozen.timeline);
+ const rawEvidence=(await projects.store.readFresh<Awaited<ReturnType<typeof prepareApprovedVisualEvidence>>['record']>(prefix+'visual-evidence-v1-stage')).value,plan=frozen.deliveryPolicy.schemaVersion===2?mvpFilmVisualPlan(frozen.timeline):wholeFilmVisualPlan(frozen.timeline);
  if(rawEvidence.inputHash!==inputs.inputHash||rawEvidence.compositionHash!==compositionHash||rawEvidence.deliveryEligible!==false||canonicalHash(rawEvidence.plan)!==canonicalHash(plan))throw Error('CONTENT_BASELINE_CHANGED');
  const expected=plan.rounds.flatMap(r=>r.batches.map(b=>({round:r.round,...b})));
  if(rawEvidence.batches.length!==expected.length)throw Error('CONTENT_COVERAGE_MISSING');

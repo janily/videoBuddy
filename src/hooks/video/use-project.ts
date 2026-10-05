@@ -4,6 +4,7 @@ import {ProjectView} from '@/contracts/video/project';
 import {draftKey,readDraft,saveDraft,useDraft} from './use-draft';
 import {rememberProject} from './recent-projects';
 import {useProjectEvents} from './use-project-events';
+import {useApprovePreview} from './use-approve-preview';
 import {useRestoreResult} from './use-restore-result';
 import {useProjectRevalidation} from './use-project-revalidation';
 import {feedbackTarget,FeedbackSelectionSchema,parseMessageIntent,type MessageIntent} from '@/services/video/revisions/client-contract';
@@ -77,6 +78,7 @@ export function useProject(initialProjectId?:string){
  },[]);
  const refresh=useCallback(async()=>{if(!idRef.current)return;try{await readProject()}catch(e){setError(e instanceof Error?e.message:'无法恢复项目。')}},[readProject]);
  const restoration=useRestoreResult(projectId,readProject);
+ const approval=useApprovePreview(projectId,readProject);
  const projectUpdate=useProjectRevalidation(projectId,refresh);
  useEffect(()=>{if(initialProjectId)void readProject().catch(e=>setError(e instanceof Error?e.message:'无法恢复项目。'))},[initialProjectId,readProject]);
  const stream=useProjectEvents(projectId,view?.activeConversation?.id,view?.activeConversation?.streamEpoch||0,refresh);
@@ -162,5 +164,5 @@ export function useProject(initialProjectId?:string){
   finally{previewBusy.current=false;setPreparingPreview(false)}
  }
  const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:()=>send(),retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,preparePreview,preparingPreview,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:()=>send(),retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,preparePreview,preparingPreview,restoration,approval,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
 }

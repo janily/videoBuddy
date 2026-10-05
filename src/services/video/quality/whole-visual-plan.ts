@@ -21,12 +21,25 @@ export function wholeFilmVisualPlan(raw:Clock){
  });
  return{schemaVersion:1 as const,clock,actionCoverage:'entire_shots' as const,batchSize:8 as const,rounds};
 }
-export type WholeFilmVisualPlan=ReturnType<typeof wholeFilmVisualPlan>;
+/** MVP samples every shot and caption; no continuous action certification. */
+export function mvpFilmVisualPlan(raw:Clock){
+ const full=wholeFilmVisualPlan(raw),clock=full.clock;
+ if(clock.totalFrames>30*clock.fps)throw Error('MVP_PROFILE_UNSUPPORTED');
+ const rounds=([1,2] as const).map(round=>{
+  const set=new Set<number>();
+  for(const shot of clock.shots){const span=shot.endFrame-shot.startFrame;for(const frame of [shot.startFrame,shot.endFrame-1,shot.startFrame+Math.floor(span*(round===1?0.5:0.25))])set.add(frame)}
+  for(const cue of clock.captions){const span=cue.endFrame-cue.stableReadableStartFrame;set.add(cue.stableReadableStartFrame+Math.floor(span*(round===1?0.5:0.25)));set.add(cue.endFrame-1)}
+  const frames=[...set].sort((a,b)=>a-b),batches=[];for(let offset=0;offset<frames.length;offset+=8)batches.push({index:batches.length,frames:frames.slice(offset,offset+8)});
+  return{round,frames,batches};
+ });
+ return{schemaVersion:2 as const,profile:'mvp' as const,clock,actionCoverage:'sampled_shots' as const,batchSize:8 as const,rounds};
+}
+export type WholeFilmVisualPlan=ReturnType<typeof wholeFilmVisualPlan>|ReturnType<typeof mvpFilmVisualPlan>;
 export type VisualReviewBaseline=Omit<VisualReviewContext,'round'|'frames'|'frameSetSha256'>;
 type Result='pass'|'fail'|'not_checked';
 function combined(results:Result[]):Result{return results.includes('fail')?'fail':results.every(result=>result==='pass')?'pass':'not_checked'}
 export function aggregateWholeVisualReviews(plan:WholeFilmVisualPlan,baseline:VisualReviewBaseline,entries:Array<{context:VisualReviewContext;review:VisualReview}>){
- if(canonicalHash(wholeFilmVisualPlan(plan.clock))!==canonicalHash(plan))throw Error('WHOLE_VISUAL_PLAN_CHANGED');
+ if(canonicalHash(plan.schemaVersion===2?mvpFilmVisualPlan(plan.clock):wholeFilmVisualPlan(plan.clock))!==canonicalHash(plan))throw Error('WHOLE_VISUAL_PLAN_CHANGED');
  const batches=plan.rounds.flatMap(round=>round.batches.map(batch=>({round:round.round,frames:batch.frames}))),byBatch=new Map<string,VisualReview>();
  for(const entry of entries){
   const {context}=entry;
