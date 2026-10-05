@@ -1,0 +1,245 @@
+{
+  "executedAt": "2026-10-05T01:37:50.930Z",
+  "status": "failed",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "operationId": "f08efd63-86da-4144-98a7-c5788e95340c",
+  "newModelCalls": 0,
+  "newNativeCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "bundle": {
+    "previewId": "92d99397-4787-4760-8292-47e1099eb819",
+    "revisionId": "4838f74b-4b34-4156-9511-0629ec18cb78",
+    "briefVersion": 1,
+    "filmSpecRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "bytes": 2631,
+      "mime": "application/json"
+    },
+    "renderInputs": {
+      "sourceCodeSha256": "7995474dffe8c85b99e443d1594ba22c75093800f2cd59355c1c7db8eddf1035",
+      "timelineSha256": "5da417249a442f91d57f874287ab411baeebcff43801d8c04a3f3ae6dc8fa6ad",
+      "audioSha256": "2dca2b7f2fa900d2d3bd4f300dcbd99a66e18054cefe6b1c62b2f0aa9c90beef",
+      "assetSha256s": [],
+      "fontSha256s": [
+        "e5bf2c3f24ef2327c6f136d8f73e2f9dfdf44896fdbeb35a9515f44777bb91bc",
+        "0f173b3e6cb6d1af25babf7f0057c5ac4ee11f9992b0469bb817e967ef4ad0fc"
+      ],
+      "profile": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 24
+      },
+      "runtimeDigests": {
+        "media": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623"
+      },
+      "qualityPolicySha256": "9ae29a7379521b0b909f109b362d04d1833e5e9065873116026d8afd952410a7"
+    },
+    "script": [
+      "把小种子轻轻放进泥土里。",
+      "洒下适量的水，润湿土壤。",
+      "泥土里探出了嫩绿的小芽。",
+      "观察成长，耐心照料。"
+    ],
+    "facts": [
+      {
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。",
+        "source": "用户提供"
+      }
+    ],
+    "criticalFacts": [
+      {
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。",
+        "source": "用户提供"
+      }
+    ],
+    "summary": "针对小学生受众，采用蜡笔绘本风格（crayon-book），完整呈现播种、适量浇水、破土发芽的生命旅程，以‘观察成长，耐心照料’温暖收尾。全片严控语速与字数，不承诺具体天数，传递专注探索与爱护生命的自然理念。",
+    "previewArtifactId": "1aef31b5-6a9f-495a-9425-3b99c3c57b5d",
+    "previewArtifactSha256": "03db0648e8880f36726e4f464f274d99277c017dccac04529d91ad57cb8286b0",
+    "excerptMap": [
+      {
+        "previewStartMs": 0,
+        "previewEndMs": 4625,
+        "sourceStartMs": 0,
+        "sourceEndMs": 4625,
+        "shotId": "shot-01-seed-in-soil"
+      },
+      {
+        "previewStartMs": 4625,
+        "previewEndMs": 5000,
+        "sourceStartMs": 9625,
+        "sourceEndMs": 10000,
+        "shotId": "shot-02-gentle-watering"
+      },
+      {
+        "previewStartMs": 5000,
+        "previewEndMs": 5375,
+        "sourceStartMs": 14625,
+        "sourceEndMs": 15000,
+        "shotId": "shot-03-sprout-emergence"
+      },
+      {
+        "previewStartMs": 5375,
+        "previewEndMs": 9500,
+        "sourceStartMs": 15000,
+        "sourceEndMs": 19125,
+        "shotId": "shot-04-caring-conclusion"
+      }
+    ],
+    "sourceDurationMs": 20000,
+    "qualityEvidenceRefs": [
+      "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/preview-quality-evidence/34fd02dad3ba438ae5556f4cee482762583b910308ae6adfae151b46c50b976f",
+      "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review/efdf6fe69d59332cc1b6add3e5b3090263fd5507bf382158a1e82505c096e22a"
+    ],
+    "scriptHash": "242bab1fea5827826402f447ecd7959a90f0a8d3cb7a9865e0d0314cda51e08d",
+    "factsHash": "96e31d530ea120c02b008bd48c6285bb0ba0147cc6275f46b5f0348ae86d6659",
+    "bundleHash": "4d718e7330fc4b50a5da7e0b83cf9b1d8be468ef5fae683141b6ccedeb360628",
+    "expiresAt": "2026-10-06T01:35:52.555Z"
+  },
+  "completedVerificationMatches": true,
+  "reviews": [
+    {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review-batches/bda811d9bc0b2ec2c6edfea72eb1e6a1fa6c331075aee0fafa5d56c660252fb4",
+      "batch": {
+        "schemaVersion": 1,
+        "filmSpecRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+          "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+          "bytes": 2631,
+          "mime": "application/json"
+        },
+        "compositeSha256": "c04135145f4f2a03a7fc26e985dcf3e121b6f37ab9a2a16b19ce57a353d0b42e",
+        "evidenceRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-frame-evidence/7d8b645dbf588bb2b5f8b901c197a89e1eb39d3c29169cb19f7b53b955af9900",
+          "sha256": "7d8b645dbf588bb2b5f8b901c197a89e1eb39d3c29169cb19f7b53b955af9900",
+          "bytes": 926,
+          "mime": "application/json"
+        },
+        "contextRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review-context/06c365916053c6e1b05b576062ae731399fe0b1ece3d6796880e945433f99290",
+          "sha256": "06c365916053c6e1b05b576062ae731399fe0b1ece3d6796880e945433f99290",
+          "bytes": 1091,
+          "mime": "application/json"
+        },
+        "reviewRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review/efdf6fe69d59332cc1b6add3e5b3090263fd5507bf382158a1e82505c096e22a",
+          "sha256": "efdf6fe69d59332cc1b6add3e5b3090263fd5507bf382158a1e82505c096e22a",
+          "bytes": 2244,
+          "mime": "application/json"
+        },
+        "qualityStatus": "sampled_visuals_only"
+      },
+      "review": {
+        "schemaVersion": 1,
+        "filmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+        "filmSpecSha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+        "frameSetSha256": "1d4c871e34ae1bc6ba40c2d18391a35df999f7ee72a51bbedba8201e52d9f405",
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "round": 1,
+        "scope": "sampled_frames",
+        "observations": [
+          {
+            "frameId": "frame-55",
+            "visibleText": [
+              "把小种子轻轻放进泥土里。"
+            ],
+            "issues": []
+          },
+          {
+            "frameId": "frame-235",
+            "visibleText": [],
+            "issues": []
+          },
+          {
+            "frameId": "frame-355",
+            "visibleText": [],
+            "issues": []
+          },
+          {
+            "frameId": "frame-409",
+            "visibleText": [
+              "观察成长，耐心照料。"
+            ],
+            "issues": []
+          }
+        ],
+        "facts": [
+          {
+            "result": "not_checked",
+            "frameIds": [
+              "frame-55",
+              "frame-235",
+              "frame-355",
+              "frame-409"
+            ],
+            "reason": "规则要求 fact pass 必须至少一张引用帧完整显示该事实原文（仅忽略空格和常见标点）。虽然画面视觉流程包含播种（frame-55）、浇水（frame-235）、发芽（frame-355）并在尾帧展示文字“观察成长，耐心照料。”（frame-409），但没有任何单张抽帧完整呈现事实全部原文文本，且受限于 sampled_frames 抽帧范围无法核验未抽到的全部连续画面与声音，因此标记为 not_checked。",
+            "factId": "fact-seed-sprout-flow"
+          }
+        ],
+        "style": {
+          "result": "pass",
+          "frameIds": [
+            "frame-55",
+            "frame-235",
+            "frame-355",
+            "frame-409"
+          ],
+          "reason": "严格契合 crayon-book 规范：底色为带纸纹与暗角的暖白画纸；线稿采用深褐色而非纯黑；太阳、土壤与水壶具有明显的蜡笔排线笔触、疏密压感与边缘轻微溢出；frame-235 表现了水彩水渍晕染效果；frame-355 与 frame-409 中泥土下的白色幼根清晰呈现白蜡笔抗水（wax resist）质感；字幕使用手写体并置于底部纸张留白破边贴片上，未见任何 blocking 风格偏离。"
+        },
+        "readability": {
+          "result": "pass",
+          "frameIds": [
+            "frame-55",
+            "frame-409"
+          ],
+          "reason": "可见文字集中在 frame-55（“把小种子轻轻放进泥土里。”）与 frame-409（“观察成长，耐心照料。”），均居中位于底部干净的纸张破边留白区，字形清晰饱满，对比度充足，无任何裁切、遮挡或难读现象。"
+        }
+      },
+      "context": {
+        "filmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+        "filmSpecSha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "round": 1,
+        "frames": [
+          {
+            "id": "frame-55",
+            "frame": 55,
+            "sha256": "483ed1071246345ae2264f0527106ff53321508ae6c5b3f6430c5e2f4be541b7",
+            "bytes": 797208
+          },
+          {
+            "id": "frame-235",
+            "frame": 235,
+            "sha256": "dd04f636d4b1affde52fa9b9cf0d5a82d5f4be5ee1baf732b14a1547d0f1f12c",
+            "bytes": 954021
+          },
+          {
+            "id": "frame-355",
+            "frame": 355,
+            "sha256": "90b1333bd6c6fb4dea87651b790153957c0c55987128e79efea76cd8e12847e1",
+            "bytes": 720541
+          },
+          {
+            "id": "frame-409",
+            "frame": 409,
+            "sha256": "946a2678315e7d2628493a6649cce35294b1cb14f72c5214c960e646420c4162",
+            "bytes": 362703
+          }
+        ],
+        "facts": [
+          {
+            "id": "fact-seed-sprout-flow",
+            "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。"
+          }
+        ],
+        "frameSetSha256": "1d4c871e34ae1bc6ba40c2d18391a35df999f7ee72a51bbedba8201e52d9f405"
+      }
+    }
+  ],
+  "errorCode": "CLEAR_ACCOUNTING_CHANGED",
+  "sourceControlBudgetOperationsUnchanged": true
+}

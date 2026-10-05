@@ -1,0 +1,140 @@
+{
+  "executedAt": "2026-10-05T01:29:44.812Z",
+  "status": "completed_postmix_frozen_admission_and_cold_verified",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "sourceOperationId": "7abd57da-019e-4c7b-8a37-5921a6c3b3c5",
+  "newModelCalls": 0,
+  "newNativeCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "verificationRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-verifications/907efe22b9110a7e18c7c7da28f6c8107b9acb8494beeab37da08b259d32e4a9",
+    "sha256": "907efe22b9110a7e18c7c7da28f6c8107b9acb8494beeab37da08b259d32e4a9",
+    "bytes": 4299,
+    "mime": "application/json"
+  },
+  "verification": {
+    "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+    "sourceOperationId": "7abd57da-019e-4c7b-8a37-5921a6c3b3c5",
+    "sourceRevisionId": "4838f74b-4b34-4156-9511-0629ec18cb78",
+    "ownerKeyHash": "new-theme-validation",
+    "consentEpoch": 0,
+    "briefVersion": 1,
+    "filmSpecRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "bytes": 2631,
+      "mime": "application/json"
+    },
+    "film": {
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/1356b6ba3641ef93e900eaf4fdee512e4ebdb6a029f3c29c366520d8b44e2554/output/final.mp4",
+      "sha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+      "durationMs": 20000,
+      "technicalQa": "pass"
+    },
+    "schemaVersion": 1,
+    "kind": "completed_postmix_verification",
+    "journalOperationId": "39556e28-6381-431f-92f3-d25efa43e760",
+    "planRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/voice-plan/24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+      "sha256": "24cb6d8168c3036809c4d8f97cafc46f6948562b3e05f568cad2348524adf74d",
+      "bytes": 947,
+      "mime": "application/json"
+    },
+    "verifiedRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/voice-verified/c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+      "sha256": "c505dd1758f1b3e043f9005a7221a53fc7456af0726ca7f413b6b8664a2a41b2",
+      "bytes": 9709,
+      "mime": "application/json"
+    },
+    "downmix": "stereo_average",
+    "runtime": {
+      "mediaDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+      "asrDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+      "asrModel": "Systran/faster-whisper-medium"
+    },
+    "resultSha256": "c581438d6d74be63bdd7cf634265b0d9911585d4f081794f539f27120715792a",
+    "receipts": [
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/2b33c620481e9d7d575ba859a13594a3319c51a52ac1dfa6f5f20f9756cb4565",
+        "sha256": "04acb6e81bc5f1b75b31bc824d24dc17bff402220a2a16a3ff6b8b8c7d51a9fe",
+        "bytes": 265,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/3bed80fac520c12432e8608ce1ed093a5119ef465bad861ddfafc0abd0034b1a",
+        "sha256": "4961648bc2aebe53b6bde7e94562b72a47f37cb5c948fb4c93a21acbec2136e5",
+        "bytes": 1187,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/63f3ae85e5528eef3363132e0f215e6962334322e9abcfe1780ed8dfde326f3b",
+        "sha256": "2e3a2b79923d919188fa1fbe7490dbbe209460a39f180abd3a6cb7b18cb923c5",
+        "bytes": 265,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/70a0c2144becb6fe4f34b01e5ea419cb1f649d6d4b71c601cbef98892d6c748b",
+        "sha256": "3150927a79c10ab28a8e996f3ab49a743fcfb4c6e1fda719d3949ab31e61a54a",
+        "bytes": 1470,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/7ba5ccee1b703d8de845264fb2511431abe06b49b7542ecdedab911c9cc36620",
+        "sha256": "d607c686380ad7a25695174b47a62869709ecaaaa96fb9c85d976b2087c62ede",
+        "bytes": 1378,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/9009697b345d224ab34390e6fd138af08ce9b80930bb3b0149f951fb6fc06960",
+        "sha256": "fb0cc098a56d8fe823cd99a541d4cd701b8d88675f8a40e57d80c72d098323b4",
+        "bytes": 1475,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/9588ba5f84f46e7661c698af86cbc72d473df6d1ea7e2e75ab5bb4702b17ac31",
+        "sha256": "42e4bded79923170b4bc0078be6243d1e181fb5d97a886d132693b8533bea86f",
+        "bytes": 265,
+        "mime": "application/json"
+      },
+      {
+        "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/operations/39556e28-6381-431f-92f3-d25efa43e760/media-effects/d16fdc3de5ceb7408beb791c341eb3e635ece5ea9863e9ae07e0befb5db5cf6b",
+        "sha256": "eecebd0f1f49b595843ec798ad960569b4f6b0d0fa22dddcd2ac10b5a8993c8b",
+        "bytes": 265,
+        "mime": "application/json"
+      }
+    ]
+  },
+  "frozenInput": {
+    "sourceOperationId": "7abd57da-019e-4c7b-8a37-5921a6c3b3c5",
+    "filmSpecRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "bytes": 2631,
+      "mime": "application/json"
+    },
+    "film": {
+      "outputPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/composition/1356b6ba3641ef93e900eaf4fdee512e4ebdb6a029f3c29c366520d8b44e2554/output/final.mp4",
+      "sha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+      "durationMs": 20000,
+      "technicalQa": "pass"
+    },
+    "treatmentRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/treatment-plan/baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+      "sha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8",
+      "bytes": 4115,
+      "mime": "application/json"
+    },
+    "postMixVerificationRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/postmix-verifications/907efe22b9110a7e18c7c7da28f6c8107b9acb8494beeab37da08b259d32e4a9",
+      "sha256": "907efe22b9110a7e18c7c7da28f6c8107b9acb8494beeab37da08b259d32e4a9",
+      "bytes": 4299,
+      "mime": "application/json"
+    }
+  },
+  "admissionMatches": true,
+  "changedFilmRejected": "POSTMIX_SOURCE_CHANGED",
+  "sourceControlBudgetOperationUnchanged": true,
+  "nativeJournalsUnchanged": true
+}

@@ -1,0 +1,49 @@
+{
+  "status": "actual_clear_source_zip_crc_all_entries_hash_and_font_identity_verified",
+  "sha256": "194c086fe2dac056d77f75186dafba12750768b7d7cbf67b1d81dac72bc3b63c",
+  "bytes": 28556759,
+  "entries": 80,
+  "fontBinaryCount": 0,
+  "modelBinaryCount": 0,
+  "environmentFileCount": 0,
+  "chatFileCount": 0,
+  "clearRendererSha256": "f05641cb89861f8a931025b09637470dfe569ce0bacd0e9c6a8f391ebbf87591",
+  "fontManifest": {
+    "captionReceiptKey": "runtime-receipts/c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623/clear-book-font",
+    "fontBinariesIncluded": false,
+    "fonts": [
+      {
+        "charsetSha256": "2db3d9e3fc3bfc6ae8bb8a9843ad9cdb179509e65cb17dfae100dcc29c6659da",
+        "family": "Long Cang",
+        "fontBytes": 5162508,
+        "fontSha256": "e5bf2c3f24ef2327c6f136d8f73e2f9dfdf44896fdbeb35a9515f44777bb91bc",
+        "id": "longcang",
+        "licenseSha256": "603546b7219a94bb59bf8294458194a5010119486354092b66a09a3fd61aeacc",
+        "licenseUrl": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/OFL.txt",
+        "metadataSha256": "c7d6c01a886b37dcef3c1e89796424f34240647fedac0d37108309c02fa8f3a3",
+        "metadataUrl": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/METADATA.pb",
+        "runtimePath": "/usr/local/share/fonts/videobuddy/LongCang-Regular.ttf",
+        "sourceUrl": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/LongCang-Regular.ttf"
+      },
+      {
+        "charsetSha256": "44153d60f77e8c78b670626bc15be164fb7eab1277dd11f8fddbe10a62f7efb8",
+        "family": "Patrick Hand",
+        "fontBytes": 214772,
+        "fontSha256": "0f173b3e6cb6d1af25babf7f0057c5ac4ee11f9992b0469bb817e967ef4ad0fc",
+        "id": "patrickhand",
+        "licenseSha256": "377f4f9c19e935228552478eb68cc2ed82910988a60ba60e2ac73b09f32d02d1",
+        "licenseUrl": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/patrickhand/OFL.txt",
+        "metadataSha256": "13d8571de4dcba8a43f5485385a7d157f85585f2ffdbdc5a88aa3e7e5db4b08d",
+        "metadataUrl": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/patrickhand/METADATA.pb",
+        "runtimePath": "/usr/local/share/fonts/videobuddy/PatrickHand-Regular.ttf",
+        "sourceUrl": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/patrickhand/PatrickHand-Regular.ttf"
+      }
+    ],
+    "producerSha256": "826eacf6f5b7627557f85e6bb18f745eca74c13c8fedcd64b4157c0cc850d157",
+    "rendererSha256": "f05641cb89861f8a931025b09637470dfe569ce0bacd0e9c6a8f391ebbf87591",
+    "runtimeDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "schemaVersion": 2,
+    "verification": "Acquire exactly the locked files and pinned media runtime. Verify font, notice, metadata and renderer digests before rebuilding; no font or model binaries are bundled."
+  },
+  "diagnosticNote": "Initial manual assertion expected long-cang; catalog id is longcang. No archive bytes or manifest changed."
+}

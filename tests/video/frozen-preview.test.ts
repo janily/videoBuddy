@@ -11,7 +11,7 @@ import {updateJson} from '@/services/video/storage/atomic-store';
 import {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {canonicalHash} from '@/services/video/domain/hash';
 import {preparePreview,type PreviewOperation} from '@/services/video/preview/prepare';
-import {readFrozenPreview} from '@/services/video/preview/frozen-preview';
+import {FrozenPreviewSchema,readFrozenPreview} from '@/services/video/preview/frozen-preview';
 import {seedPreviewBundle} from './fixtures/preview-package';
 async function fixture(root:string){
  const store=new FileStore(root),projects=new ProjectStore(store),owner='owner',queue=new LocalOperationQueue(store,root),{projectId}=await projects.create(owner,{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),prefix=`projects/${projectId}`;
@@ -52,5 +52,15 @@ it('cold retry never falls back to creation after its command or film is lost',a
  await expect(readFrozenPreview(f.projects,root,f.projectId,next.id,next.revisionId,0)).rejects.toThrow('FROZEN_PREVIEW_CHANGED');
  await f.store.create(key,command);await writeFile(f.frozenPreview.film.outputPath,Buffer.alloc(2048,2));
  await expect(readFrozenPreview(f.projects,root,f.projectId,next.id,next.revisionId,0)).rejects.toThrow('POSTMIX_SOURCE_CHANGED');
+ }finally{await rm(root,{recursive:true,force:true})}
+});
+
+it('rejects competing review authorities and whole postmix evidence on a non-narrated film before activation',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-frozen-group-'));try{
+  const f=await fixture(root),ref={key:f.prefix+'/postmix-verifications/'+('b'.repeat(64)),sha256:'b'.repeat(64),bytes:100,mime:'application/json'};
+  expect(FrozenPreviewSchema.safeParse({...f.frozenPreview,reviewRef:ref,postMixVerificationRef:ref}).success).toBe(false);
+  const before=await f.projects.access(f.owner,f.projectId);
+  await expect(preparePreview(f.projects,f.queue,f.owner,f.projectId,f.request,{root,frozenPreview:{...f.frozenPreview,postMixVerificationRef:ref}})).rejects.toThrow('FROZEN_PREVIEW_CHANGED');
+  expect(await f.projects.access(f.owner,f.projectId)).toEqual(before);
  }finally{await rm(root,{recursive:true,force:true})}
 });

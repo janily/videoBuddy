@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {loadPostMixVerification} from '../audio/postmix-verification';
 import {ObjectRefSchema,UnderstandingSchema} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
 import {loadVerifiedFilmPackage} from '@/contracts/video/film-package';
@@ -12,7 +13,7 @@ import type {ProjectStore} from '@/services/video/storage/project-store';
 import {StoreMissing} from '@/services/video/storage/atomic-store';
 import {assertPreviewProductionFence} from './fence';
 const hash=z.string().regex(/^[a-f0-9]{64}$/);
-export const FrozenPreviewSchema=z.strictObject({sourceOperationId:z.uuid(),treatmentRef:ObjectRefSchema,filmSpecRef:ObjectRefSchema,reviewRef:ObjectRefSchema.optional(),film:z.strictObject({outputPath:z.string(),sha256:hash,durationMs:z.number().int(),technicalQa:z.literal('pass')})});
+export const FrozenPreviewSchema=z.strictObject({sourceOperationId:z.uuid(),treatmentRef:ObjectRefSchema,filmSpecRef:ObjectRefSchema,reviewRef:ObjectRefSchema.optional(),postMixVerificationRef:ObjectRefSchema.optional(),film:z.strictObject({outputPath:z.string(),sha256:hash,durationMs:z.number().int(),technicalQa:z.literal('pass')})}).refine(input=>!(input.reviewRef&&input.postMixVerificationRef),{message:'Choose one postmix verification authority'});
 export type FrozenPreview=z.infer<typeof FrozenPreviewSchema>;
 const sourceSchema=z.object({id:z.uuid(),projectId:z.uuid(),kind:z.literal('preview'),revisionId:z.uuid(),briefVersion:z.number().int(),consentEpoch:z.number().int(),understandingRef:ObjectRefSchema,status:z.literal('failed'),stage:z.literal('composition'),errorCode:z.enum(['POSTMIX_ASR_MISMATCH','PROVIDER_UNAVAILABLE','QA_FAILED','COMPOSITION_LOUDNESS_FAILED'])});
 /** A new technical attempt keeps the exact creative revision. No unknown model
@@ -26,10 +27,14 @@ export async function validateFrozenPreview(projects:ProjectStore,root:string,pr
  if(frozen.filmSpec.projectId!==projectId||frozen.filmSpec.revisionId!==source.revisionId||frozen.filmSpec.briefVersion!==control.briefVersion||canonicalHash(frozen.filmSpec.understandingRef)!==canonicalHash(control.understandingRef)||canonicalHash(frozen.treatment.planRef)!==canonicalHash(input.treatmentRef)||input.film.durationMs!==frozen.timeline.totalFrames*1000/frozen.timeline.fps)throw Error('FROZEN_PREVIEW_CHANGED');
  const understanding=UnderstandingSchema.parse(await readNarrationJson(projects.store,control.understandingRef,prefix+'understanding/')),treatment=await readNarrationJson(projects.store,input.treatmentRef,revisionPrefix+'treatment-plan/');
  if(frozen.timeline.narration.length){
+  if(input.postMixVerificationRef){
+   await loadPostMixVerification(projects,root,projectId,input.postMixVerificationRef,input);
+  }else{
   if(!input.reviewRef)throw Error('FROZEN_PREVIEW_REVIEW_REQUIRED');
   const proof=await loadConfirmedPostMixReview(projects.store,projectId,input.reviewRef);
   if(proof.challenge.sourceRevisionId!==source.revisionId||proof.challenge.filmSha256!==input.film.sha256||proof.challenge.planSha256!==canonicalHash(compileVoicePlan(treatment,understanding)))throw Error('FROZEN_PREVIEW_CHANGED');
- }else if(input.reviewRef||!['QA_FAILED','COMPOSITION_LOUDNESS_FAILED'].includes(source.errorCode))throw Error('FROZEN_PREVIEW_CHANGED');
+  }
+ }else if(input.reviewRef||input.postMixVerificationRef||!['QA_FAILED','COMPOSITION_LOUDNESS_FAILED'].includes(source.errorCode))throw Error('FROZEN_PREVIEW_CHANGED');
  await verifiedFilmHash(root,input.film);
  const audio=(await projects.store.readFresh<{status:string;output?:unknown}>(prefix+`operations/${source.id}/effects/audio/${source.revisionId}`)).value;
  if(audio.status!=='completed')throw Error('FROZEN_PREVIEW_EFFECT_UNKNOWN');

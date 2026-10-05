@@ -1,0 +1,14 @@
+{
+  "status": "private_exclusive_directory_same_zip_crc_every_entry_verified",
+  "sourceZipPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/clear-preview-source-tlMhRd/source.zip",
+  "sha256": "194c086fe2dac056d77f75186dafba12750768b7d7cbf67b1d81dac72bc3b63c",
+  "bytes": 28556759,
+  "entries": 80,
+  "sameBytesAsV2": true,
+  "directoryMode": "0700",
+  "fileMode": "0600",
+  "rootBoundaryVerified": true,
+  "newModelCalls": 0,
+  "newNativeCalls": 0,
+  "controlBudgetOperationsUnchanged": true
+}

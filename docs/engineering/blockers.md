@@ -1,5 +1,8 @@
 # 当前阻断（更新至2026-10-05，自托管架构）
 
+2026-10-05 T10/T11 整组混音与真实清晰字幕预览发布：新增完整owner/epoch/FilmSpec/实际WAV/plan/downmix/runtime/8completed回执不可变证明，strict missing拒绝/read-only冷核，Frozen入口与单句review互斥，Composite分别读取原compose和精确postmix journal/结果refs；2项行为RED→GREEN。真实4299bytes ref907efe…cold+准入通过/0native/model/原状态不变；新op f08efd63…同revision/同MP4，Composition→Excerpt→Critic→publication成功，current preview92d993…，旧failed不重置。1真实Critic HTTP200/9427+6471/rawSHA ad9c…精确settled，style/readability pass无blocking，fact仍not_checked（preview允许，不算全片QA）。9.5秒真实AV预览03db064…冷包/字节核验；新真实28.56MB工程ZIP194c086…80entries/CRC/allhash/clearfont&renderer/无字体模型/env/chat通过，仅私有诊断无正式导出准入。初次audit明文查询hashledger错误保留/v2精确ID通过；追加ZIP私有路径P2修复：独占目录/拒rootlink/file+dir+root fsync，2真实filesystem RED→GREEN；v3同ZIP字节/边界/0700&0600实核通过。最终119文件613项51.95s、lint/build/构建后types通过，固定541c29e双轴clean。下一步1080p正式流水线/两轮全片QA与事实证据，公共确认/修改/43风格/完整验收未完，C0/C1/C2未达，无push/部署。见 [整组及真实发布验证](evidence/completed-clear-preview-validation.md)。
+
+
 2026-10-05 T10/T11 清晰字幕新实片与立体声提取修正：新 operation 实际5HTTP200（42238 input/40568 output，5原始响应/settled精确一致）、四新Visual及Audio，20秒480帧720p stereo MP4 ceaa9448…5339754bytes，完整解码/−13.49LUFS/−2.23dBTP通过。composition仍failed：默认下混+3.01dB导致首句2超1采样，严格VOICE_OUTPUT_INVALID保留。独立显式0.5L+0.5R协议/缓存key/proof绑定修复，8owned native completed，四句pass/trusted_policy/pass/pass，cold0新增/0model/原failed control账本journal不变。新成功阶段固定标记、历史无标记成功阶段保留v1；复核P2 RED→GREEN及真实存储冷读回归。最终117文件608项53.25s、lint/build/构建后types通过，固定d2dfd04双轴clean。需将整组验证和精确journal接入冻结继续，再Excerpt/Critic/发布；未宣称新预览或全片QA，公共完整闭环和全部43风格仍未完，C0/C1/C2未达，无push/部署。见 [实片与提取验证](evidence/clear-book-stereo-average-validation.md)。
 
 

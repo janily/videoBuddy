@@ -1,0 +1,679 @@
+{
+  "executedAt": "2026-10-05T01:45:43.881Z",
+  "status": "published_preview_cold_accounted_source_zip_verified",
+  "root": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk",
+  "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+  "operationId": "f08efd63-86da-4144-98a7-c5788e95340c",
+  "newModelCalls": 0,
+  "newNativeCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "bundle": {
+    "previewId": "92d99397-4787-4760-8292-47e1099eb819",
+    "revisionId": "4838f74b-4b34-4156-9511-0629ec18cb78",
+    "briefVersion": 1,
+    "filmSpecRef": {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+      "bytes": 2631,
+      "mime": "application/json"
+    },
+    "renderInputs": {
+      "sourceCodeSha256": "7995474dffe8c85b99e443d1594ba22c75093800f2cd59355c1c7db8eddf1035",
+      "timelineSha256": "5da417249a442f91d57f874287ab411baeebcff43801d8c04a3f3ae6dc8fa6ad",
+      "audioSha256": "2dca2b7f2fa900d2d3bd4f300dcbd99a66e18054cefe6b1c62b2f0aa9c90beef",
+      "assetSha256s": [],
+      "fontSha256s": [
+        "e5bf2c3f24ef2327c6f136d8f73e2f9dfdf44896fdbeb35a9515f44777bb91bc",
+        "0f173b3e6cb6d1af25babf7f0057c5ac4ee11f9992b0469bb817e967ef4ad0fc"
+      ],
+      "profile": {
+        "width": 1920,
+        "height": 1080,
+        "fps": 24
+      },
+      "runtimeDigests": {
+        "media": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623"
+      },
+      "qualityPolicySha256": "9ae29a7379521b0b909f109b362d04d1833e5e9065873116026d8afd952410a7"
+    },
+    "script": [
+      "把小种子轻轻放进泥土里。",
+      "洒下适量的水，润湿土壤。",
+      "泥土里探出了嫩绿的小芽。",
+      "观察成长，耐心照料。"
+    ],
+    "facts": [
+      {
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。",
+        "source": "用户提供"
+      }
+    ],
+    "criticalFacts": [
+      {
+        "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。",
+        "source": "用户提供"
+      }
+    ],
+    "summary": "针对小学生受众，采用蜡笔绘本风格（crayon-book），完整呈现播种、适量浇水、破土发芽的生命旅程，以‘观察成长，耐心照料’温暖收尾。全片严控语速与字数，不承诺具体天数，传递专注探索与爱护生命的自然理念。",
+    "previewArtifactId": "1aef31b5-6a9f-495a-9425-3b99c3c57b5d",
+    "previewArtifactSha256": "03db0648e8880f36726e4f464f274d99277c017dccac04529d91ad57cb8286b0",
+    "excerptMap": [
+      {
+        "previewStartMs": 0,
+        "previewEndMs": 4625,
+        "sourceStartMs": 0,
+        "sourceEndMs": 4625,
+        "shotId": "shot-01-seed-in-soil"
+      },
+      {
+        "previewStartMs": 4625,
+        "previewEndMs": 5000,
+        "sourceStartMs": 9625,
+        "sourceEndMs": 10000,
+        "shotId": "shot-02-gentle-watering"
+      },
+      {
+        "previewStartMs": 5000,
+        "previewEndMs": 5375,
+        "sourceStartMs": 14625,
+        "sourceEndMs": 15000,
+        "shotId": "shot-03-sprout-emergence"
+      },
+      {
+        "previewStartMs": 5375,
+        "previewEndMs": 9500,
+        "sourceStartMs": 15000,
+        "sourceEndMs": 19125,
+        "shotId": "shot-04-caring-conclusion"
+      }
+    ],
+    "sourceDurationMs": 20000,
+    "qualityEvidenceRefs": [
+      "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/preview-quality-evidence/34fd02dad3ba438ae5556f4cee482762583b910308ae6adfae151b46c50b976f",
+      "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review/efdf6fe69d59332cc1b6add3e5b3090263fd5507bf382158a1e82505c096e22a"
+    ],
+    "scriptHash": "242bab1fea5827826402f447ecd7959a90f0a8d3cb7a9865e0d0314cda51e08d",
+    "factsHash": "96e31d530ea120c02b008bd48c6285bb0ba0147cc6275f46b5f0348ae86d6659",
+    "bundleHash": "4d718e7330fc4b50a5da7e0b83cf9b1d8be468ef5fae683141b6ccedeb360628",
+    "expiresAt": "2026-10-06T01:35:52.555Z"
+  },
+  "completedVerificationMatches": true,
+  "reviews": [
+    {
+      "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review-batches/bda811d9bc0b2ec2c6edfea72eb1e6a1fa6c331075aee0fafa5d56c660252fb4",
+      "batch": {
+        "schemaVersion": 1,
+        "filmSpecRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+          "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+          "bytes": 2631,
+          "mime": "application/json"
+        },
+        "compositeSha256": "c04135145f4f2a03a7fc26e985dcf3e121b6f37ab9a2a16b19ce57a353d0b42e",
+        "evidenceRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-frame-evidence/7d8b645dbf588bb2b5f8b901c197a89e1eb39d3c29169cb19f7b53b955af9900",
+          "sha256": "7d8b645dbf588bb2b5f8b901c197a89e1eb39d3c29169cb19f7b53b955af9900",
+          "bytes": 926,
+          "mime": "application/json"
+        },
+        "contextRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review-context/06c365916053c6e1b05b576062ae731399fe0b1ece3d6796880e945433f99290",
+          "sha256": "06c365916053c6e1b05b576062ae731399fe0b1ece3d6796880e945433f99290",
+          "bytes": 1091,
+          "mime": "application/json"
+        },
+        "reviewRef": {
+          "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-review/efdf6fe69d59332cc1b6add3e5b3090263fd5507bf382158a1e82505c096e22a",
+          "sha256": "efdf6fe69d59332cc1b6add3e5b3090263fd5507bf382158a1e82505c096e22a",
+          "bytes": 2244,
+          "mime": "application/json"
+        },
+        "qualityStatus": "sampled_visuals_only"
+      },
+      "review": {
+        "schemaVersion": 1,
+        "filmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+        "filmSpecSha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+        "frameSetSha256": "1d4c871e34ae1bc6ba40c2d18391a35df999f7ee72a51bbedba8201e52d9f405",
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "round": 1,
+        "scope": "sampled_frames",
+        "observations": [
+          {
+            "frameId": "frame-55",
+            "visibleText": [
+              "把小种子轻轻放进泥土里。"
+            ],
+            "issues": []
+          },
+          {
+            "frameId": "frame-235",
+            "visibleText": [],
+            "issues": []
+          },
+          {
+            "frameId": "frame-355",
+            "visibleText": [],
+            "issues": []
+          },
+          {
+            "frameId": "frame-409",
+            "visibleText": [
+              "观察成长，耐心照料。"
+            ],
+            "issues": []
+          }
+        ],
+        "facts": [
+          {
+            "result": "not_checked",
+            "frameIds": [
+              "frame-55",
+              "frame-235",
+              "frame-355",
+              "frame-409"
+            ],
+            "reason": "规则要求 fact pass 必须至少一张引用帧完整显示该事实原文（仅忽略空格和常见标点）。虽然画面视觉流程包含播种（frame-55）、浇水（frame-235）、发芽（frame-355）并在尾帧展示文字“观察成长，耐心照料。”（frame-409），但没有任何单张抽帧完整呈现事实全部原文文本，且受限于 sampled_frames 抽帧范围无法核验未抽到的全部连续画面与声音，因此标记为 not_checked。",
+            "factId": "fact-seed-sprout-flow"
+          }
+        ],
+        "style": {
+          "result": "pass",
+          "frameIds": [
+            "frame-55",
+            "frame-235",
+            "frame-355",
+            "frame-409"
+          ],
+          "reason": "严格契合 crayon-book 规范：底色为带纸纹与暗角的暖白画纸；线稿采用深褐色而非纯黑；太阳、土壤与水壶具有明显的蜡笔排线笔触、疏密压感与边缘轻微溢出；frame-235 表现了水彩水渍晕染效果；frame-355 与 frame-409 中泥土下的白色幼根清晰呈现白蜡笔抗水（wax resist）质感；字幕使用手写体并置于底部纸张留白破边贴片上，未见任何 blocking 风格偏离。"
+        },
+        "readability": {
+          "result": "pass",
+          "frameIds": [
+            "frame-55",
+            "frame-409"
+          ],
+          "reason": "可见文字集中在 frame-55（“把小种子轻轻放进泥土里。”）与 frame-409（“观察成长，耐心照料。”），均居中位于底部干净的纸张破边留白区，字形清晰饱满，对比度充足，无任何裁切、遮挡或难读现象。"
+        }
+      },
+      "context": {
+        "filmSha256": "ceaa9448c41fd7dd54e3cea4686f716524d9285c9e5cc4212a199bb6c3c5b552",
+        "filmSpecSha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+        "styleSlug": "crayon-book",
+        "styleRulesHash": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+        "round": 1,
+        "frames": [
+          {
+            "id": "frame-55",
+            "frame": 55,
+            "sha256": "483ed1071246345ae2264f0527106ff53321508ae6c5b3f6430c5e2f4be541b7",
+            "bytes": 797208
+          },
+          {
+            "id": "frame-235",
+            "frame": 235,
+            "sha256": "dd04f636d4b1affde52fa9b9cf0d5a82d5f4be5ee1baf732b14a1547d0f1f12c",
+            "bytes": 954021
+          },
+          {
+            "id": "frame-355",
+            "frame": 355,
+            "sha256": "90b1333bd6c6fb4dea87651b790153957c0c55987128e79efea76cd8e12847e1",
+            "bytes": 720541
+          },
+          {
+            "id": "frame-409",
+            "frame": 409,
+            "sha256": "946a2678315e7d2628493a6649cce35294b1cb14f72c5214c960e646420c4162",
+            "bytes": 362703
+          }
+        ],
+        "facts": [
+          {
+            "id": "fact-seed-sprout-flow",
+            "text": "内容表达从播种、适量浇水到发芽的过程，以“观察成长，耐心照料”结束；不承诺具体生长天数，不虚构名称、活动日期或数字。"
+          }
+        ],
+        "frameSetSha256": "1d4c871e34ae1bc6ba40c2d18391a35df999f7ee72a51bbedba8201e52d9f405"
+      }
+    }
+  ],
+  "modelAudit": {
+    "responseSha256": "ad9c610c8d8c14b98e6e1a10cb19a4079ac9ab4c0088ccc00c83276510940259",
+    "responseBytes": 3469,
+    "rawUsage": {
+      "prompt_tokens": 9427,
+      "completion_tokens": 6471,
+      "total_tokens": 15898,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": null
+    },
+    "accounting": [
+      [
+        "18bd99f57ec58b36d56e74162523cdeefe23842f90feafc53039574d84583d78",
+        {
+          "state": "settled",
+          "startedAt": "2026-10-05T01:34:52.208Z",
+          "inputTokens": 9427,
+          "outputTokens": 6471
+        }
+      ]
+    ]
+  },
+  "archive": {
+    "sha256": "194c086fe2dac056d77f75186dafba12750768b7d7cbf67b1d81dac72bc3b63c",
+    "manifest": {
+      "schemaVersion": 1,
+      "projectId": "4a5c6131-3842-440c-a551-7d8fcf6e7c95",
+      "revisionId": "4838f74b-4b34-4156-9511-0629ec18cb78",
+      "previewId": "92d99397-4787-4760-8292-47e1099eb819",
+      "bundleHash": "4d718e7330fc4b50a5da7e0b83cf9b1d8be468ef5fae683141b6ccedeb360628",
+      "entries": [
+        {
+          "path": "CREDITS.json",
+          "bytes": 6799,
+          "sha256": "7889366498b337466feea0a421ef6a10136f86c7115f312e47405035101c84aa"
+        },
+        {
+          "path": "REBUILD.md",
+          "bytes": 1617,
+          "sha256": "c9a088d71f64c3b55bd1c3659d79065cfc94ed0b0b96e49de8e0b84895c50fda"
+        },
+        {
+          "path": "TREATMENT.json",
+          "bytes": 827,
+          "sha256": "5a9cecfc2efcca8ecc8ecbb11d30bf9fac75a137b69fb1f7be479b5715975f0e"
+        },
+        {
+          "path": "audit/speech-reviews/5d6ffe0538ef769c1d918318b29cd180b8a8c105bbfa0f4b148746775678c38c.json",
+          "bytes": 1252,
+          "sha256": "ee1ad96c874c584f09f20286dfd0ffbb09080eca8e9a3a0a57c4faafb6da65ad"
+        },
+        {
+          "path": "film.json",
+          "bytes": 2631,
+          "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f"
+        },
+        {
+          "path": "font-fetch-manifest.json",
+          "bytes": 2332,
+          "sha256": "49aa20281b2e3beac7790ae864e16ee4ed066600c4f101cacc106b1343dfa420"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-files/3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02.wav",
+          "bytes": 324044,
+          "sha256": "3c9f907ed0e6af737c4d2a21c709e1306c784f32759f1eeeb08a0c25a25a6c02"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-files/763ccf341f8a75793fa1be3ec50888b775d16bdfbff94abf166bb0e31b68e310.wav",
+          "bytes": 319244,
+          "sha256": "763ccf341f8a75793fa1be3ec50888b775d16bdfbff94abf166bb0e31b68e310"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-files/8fb3651a37e778766fbb8daf45e38811bf9b47baafe7385d9643439ef670f0da.wav",
+          "bytes": 288044,
+          "sha256": "8fb3651a37e778766fbb8daf45e38811bf9b47baafe7385d9643439ef670f0da"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-files/e1392e0e195735978df21fedc35d0c7d235834109a4e42b7121cd9f349715a7a.wav",
+          "bytes": 345644,
+          "sha256": "e1392e0e195735978df21fedc35d0c7d235834109a4e42b7121cd9f349715a7a"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-files/6ed9e60506b25d0fd2c5a2ce0eb9bfee0863796f75a0116a73b2913ea7dc5c18.wav",
+          "bytes": 7680044,
+          "sha256": "6ed9e60506b25d0fd2c5a2ce0eb9bfee0863796f75a0116a73b2913ea7dc5c18"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-files/87cb573dfced0fac7db92992c1799c91151c44a4e222b38c500a42a56bd7bb98.wav",
+          "bytes": 7680044,
+          "sha256": "87cb573dfced0fac7db92992c1799c91151c44a4e222b38c500a42a56bd7bb98"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-files/b6560b0f862490cf139ed67757cc733561071656fe8222e1951c55e4e0ceaec5.wav",
+          "bytes": 3840114,
+          "sha256": "b6560b0f862490cf139ed67757cc733561071656fe8222e1951c55e4e0ceaec5"
+        },
+        {
+          "path": "objects/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-files/ecddac585b85ca9a2d6f556c09477ba5bf1f4b0d078ca8c353f700739b449b27.wav",
+          "bytes": 7680114,
+          "sha256": "ecddac585b85ca9a2d6f556c09477ba5bf1f4b0d078ca8c353f700739b449b27"
+        },
+        {
+          "path": "runtime-lock.json",
+          "bytes": 356,
+          "sha256": "82333587ff949621da4387e1f424fc4e7985be08e82e6bff5d228807a89bcfc1"
+        },
+        {
+          "path": "runtime/media/Dockerfile",
+          "bytes": 653,
+          "sha256": "55ccfe3bf4cc2741a4b9edbda60037c846067fb44a4ee57c3e42348302935305"
+        },
+        {
+          "path": "runtime/media/FONTS.md",
+          "bytes": 3860,
+          "sha256": "58ddacbcbc261dfa3f65aab331e7822cb55fbb2c7b8bf3dcd4af25a72b0e7dcc"
+        },
+        {
+          "path": "runtime/media/LICENSES.md",
+          "bytes": 1071,
+          "sha256": "d8d07d997af84bfff6bb80a61df8a298e9aab3eb8db9983cac42ce114ef6aadd"
+        },
+        {
+          "path": "runtime/media/analyze-pdf.mjs",
+          "bytes": 989,
+          "sha256": "ee076ddc44e850fea29437f71f7b077dd8e64d078669eb63253fadb6f8736ef9"
+        },
+        {
+          "path": "runtime/media/book-caption-clear.mjs",
+          "bytes": 4449,
+          "sha256": "f05641cb89861f8a931025b09637470dfe569ce0bacd0e9c6a8f391ebbf87591"
+        },
+        {
+          "path": "runtime/media/book-caption-producer.mjs",
+          "bytes": 5827,
+          "sha256": "826eacf6f5b7627557f85e6bb18f745eca74c13c8fedcd64b4157c0cc850d157"
+        },
+        {
+          "path": "runtime/media/fonts.lock.json",
+          "bytes": 4015,
+          "sha256": "5c5013a997769cdb712c30272b550986146f8d213122fd3015676196c77b8b7c"
+        },
+        {
+          "path": "runtime/media/master.py",
+          "bytes": 7158,
+          "sha256": "45f7df4359e854c27552a9e4758eb838542106df9c99eefe9683ebf13fc62716"
+        },
+        {
+          "path": "runtime/media/package-lock.json",
+          "bytes": 9457,
+          "sha256": "f11e8d09ddbd2c75e1c0c81b6c348818b3536be7f549c2698153b98e592d95f5"
+        },
+        {
+          "path": "runtime/media/package.json",
+          "bytes": 161,
+          "sha256": "ad7b7e4191a6f749db394abdcb615c813b8c912dd7cbdac02d6a2bf13bb0d7f3"
+        },
+        {
+          "path": "runtime/media/render.mjs",
+          "bytes": 3645,
+          "sha256": "12f6a250cf3bf8dfc7edc3dc3a71615efadcf44250362e21e287e9410e7845f4"
+        },
+        {
+          "path": "runtime/media/runner.py",
+          "bytes": 2410,
+          "sha256": "6f9c9c4c9c3eeac7aa30fc6d973094e55f7ab4e9b360bffd28957036799b962d"
+        },
+        {
+          "path": "runtime/media/sound.py",
+          "bytes": 7919,
+          "sha256": "b6b7d3cdbfea67cf128c0d8a8beee3d315cb0d2ae65e997f41253681def5b33c"
+        },
+        {
+          "path": "source/4496f663c6296ce6ab6deff917ce918202d0702e8f2c8fa8f715f8effea8634c.html",
+          "bytes": 16249,
+          "sha256": "748ec29172fbec4768dd5e599601bb1aa37b0c2b2d2aaeb98f138eda5c178120"
+        },
+        {
+          "path": "source/51b88a0df6df8ae9a20b451b3dc126365140649c356f8c8121a3b060a4e08d0c.html",
+          "bytes": 13747,
+          "sha256": "2430a493d74c9e836b1239ab02a01ac80d97b0f56f8d939b8b8dc9838eea7953"
+        },
+        {
+          "path": "source/722f5f356f257e1f845154f8ff9dbf061e8d67b93a08237c657ea7d8a87c9b39.html",
+          "bytes": 14729,
+          "sha256": "7fae4ac0e108fad2e88875d75a316fa55a9a83a4806f44a70a831adccc65bfe7"
+        },
+        {
+          "path": "source/f8f08d32927ac196974296db7321dfa6bc30be45a919a92be8ae23247c1f59b4.html",
+          "bytes": 15708,
+          "sha256": "76b376a22f3d560b186a0698909f45960add5fb8b24d70c5a04b32d4523f2a6b"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/asset-manifest/0c118f00b2d9eb9cb681dbe7f83868c9da1ba069b68921ba5a3d75b2650f7853.json",
+          "bytes": 31,
+          "sha256": "0c118f00b2d9eb9cb681dbe7f83868c9da1ba069b68921ba5a3d75b2650f7853"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-execution/1621b7a1802422e72854490b032c08fa3784df1b70311aaf24f771defc3c4f98.json",
+          "bytes": 4311,
+          "sha256": "1621b7a1802422e72854490b032c08fa3784df1b70311aaf24f771defc3c4f98"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-manifest/2dca2b7f2fa900d2d3bd4f300dcbd99a66e18054cefe6b1c62b2f0aa9c90beef.json",
+          "bytes": 7613,
+          "sha256": "2dca2b7f2fa900d2d3bd4f300dcbd99a66e18054cefe6b1c62b2f0aa9c90beef"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-plan/2e50866af6b28136de107e0c02ba89acb9a52292bb64f2a888d27154705326cd.json",
+          "bytes": 5015,
+          "sha256": "2e50866af6b28136de107e0c02ba89acb9a52292bb64f2a888d27154705326cd"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-receipts/db097adfd419d331df8816be9f4c46af05939ee140cd64ea9c3d7f6be51651d4.json",
+          "bytes": 522,
+          "sha256": "db097adfd419d331df8816be9f4c46af05939ee140cd64ea9c3d7f6be51651d4"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-run-receipts/master/d44dcd90fba6c665e72cec81b7693ef5c4d433632011998e7c6105ea1867a460.json",
+          "bytes": 180,
+          "sha256": "4a36f9689f5f50d6636b75a0aae9a75912f41959db59de5a1cbaf96512d699c7"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-run-receipts/sound/0e27d20cc2f5893b5fde6748bb309da9729c85862375eb8c9acb31411a58bd93.json",
+          "bytes": 260,
+          "sha256": "05c811a5015449530efde602e61405c047c5eae519ebee0630aeeafc3a4214e9"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-source/2ca14dd7f1bbf89bf52737d5f98f41fd9d870797f9711a9d3ee50854da250481.json",
+          "bytes": 729,
+          "sha256": "2ca14dd7f1bbf89bf52737d5f98f41fd9d870797f9711a9d3ee50854da250481"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-source/77bb080effb3e210ed88b811e15fc0fdfae162fcfda73c53de90226f16e78a7e.json",
+          "bytes": 709,
+          "sha256": "77bb080effb3e210ed88b811e15fc0fdfae162fcfda73c53de90226f16e78a7e"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-source/924660a08bf9dc3782876f74d33879549c5c591d59c196bd8c47e3e2fb0767ee.json",
+          "bytes": 734,
+          "sha256": "924660a08bf9dc3782876f74d33879549c5c591d59c196bd8c47e3e2fb0767ee"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-source/9520ffdedac5b3062d6d33c52281ef3530e154a5779b930e7cec39eb4d75de7a.json",
+          "bytes": 724,
+          "sha256": "9520ffdedac5b3062d6d33c52281ef3530e154a5779b930e7cec39eb4d75de7a"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-source/a88ac2ca72a88e8a520e9afb3324c02ac94ae146500343425134426c20577d49.json",
+          "bytes": 744,
+          "sha256": "a88ac2ca72a88e8a520e9afb3324c02ac94ae146500343425134426c20577d49"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-source/bda6f3fd3c657ea3ed2197d3c828d0579063a7958fe9c4dfd7bab79bda69dd13.json",
+          "bytes": 736,
+          "sha256": "bda6f3fd3c657ea3ed2197d3c828d0579063a7958fe9c4dfd7bab79bda69dd13"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/audio-tools/8c229866cc24262fd8347253b5712e039d4ef39923fcfdfbea812f13114d3184.json",
+          "bytes": 15989,
+          "sha256": "8c229866cc24262fd8347253b5712e039d4ef39923fcfdfbea812f13114d3184"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/caption-styles/cd30754483a2a13f7942a3403aa40b7e636c6229f7f1515316467eead441155d.json",
+          "bytes": 2950,
+          "sha256": "cd30754483a2a13f7942a3403aa40b7e636c6229f7f1515316467eead441155d"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/facts/60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26.json",
+          "bytes": 569,
+          "sha256": "60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-rights/859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb.json",
+          "bytes": 236,
+          "sha256": "859fd775dca29a4743e5583f2a8e38fb14dcf84dbe8453481f6bfda078e248eb"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-source/09ee33c0e2d174dfcf751e268a06762ebf0955f31704d69cb4cb97437230103b.json",
+          "bytes": 1489,
+          "sha256": "09ee33c0e2d174dfcf751e268a06762ebf0955f31704d69cb4cb97437230103b"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-source/52e7f737501c8d62a1ce9cef69af7cd0a99c1bb30c420ecce9b38e96f614e25e.json",
+          "bytes": 1494,
+          "sha256": "52e7f737501c8d62a1ce9cef69af7cd0a99c1bb30c420ecce9b38e96f614e25e"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-source/c18ba918c46333f1d1f4fbeeb8e9f8f29c3568801719e6bfb85f05775978f77a.json",
+          "bytes": 1494,
+          "sha256": "c18ba918c46333f1d1f4fbeeb8e9f8f29c3568801719e6bfb85f05775978f77a"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-source/d359aebc9b8efd5614ee0c9aa6b2028571b34ab80d9dd8a64ef36474a45cde1d.json",
+          "bytes": 1476,
+          "sha256": "d359aebc9b8efd5614ee0c9aa6b2028571b34ab80d9dd8a64ef36474a45cde1d"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-words/2a2d31ed4267de8e6b26d868ee0db12d7ba493e1788026fae8bd6f77fc4f9bc9.json",
+          "bytes": 1137,
+          "sha256": "2a2d31ed4267de8e6b26d868ee0db12d7ba493e1788026fae8bd6f77fc4f9bc9"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-words/60d3e753beac552b694916ba1d4ec36e4e9e376a15b2c5e1177eeeb5865806c6.json",
+          "bytes": 1144,
+          "sha256": "60d3e753beac552b694916ba1d4ec36e4e9e376a15b2c5e1177eeeb5865806c6"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-words/cb7305bd4efb23089e4e0648096b116567519905d2c89da8592503c3597095d2.json",
+          "bytes": 904,
+          "sha256": "cb7305bd4efb23089e4e0648096b116567519905d2c89da8592503c3597095d2"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/narration-words/f2b0280ac650aa5970a76b8e16b80071a227786ec2d6a8e921ab43d68bd7af82.json",
+          "bytes": 2562,
+          "sha256": "f2b0280ac650aa5970a76b8e16b80071a227786ec2d6a8e921ab43d68bd7af82"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-rights/0d8aa2ac57b7e1f4a457ca7714db4308c768a69c27bf2e091265da0dde9d3b57.json",
+          "bytes": 203,
+          "sha256": "0d8aa2ac57b7e1f4a457ca7714db4308c768a69c27bf2e091265da0dde9d3b57"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-rights/3bba1f4fa995c1e2e5038c19acceabae24538ab34f40aba4f7d9b9d1ee17d531.json",
+          "bytes": 203,
+          "sha256": "3bba1f4fa995c1e2e5038c19acceabae24538ab34f40aba4f7d9b9d1ee17d531"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-rights/9ab0f8befe1fb442b927d00be4d0cc94f4c42e099bd8a1857c510547d798be43.json",
+          "bytes": 203,
+          "sha256": "9ab0f8befe1fb442b927d00be4d0cc94f4c42e099bd8a1857c510547d798be43"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-rights/9fe60520527fb375f4680bd29674a09c85b883ef0f4d52551c8d6f9c7a660176.json",
+          "bytes": 203,
+          "sha256": "9fe60520527fb375f4680bd29674a09c85b883ef0f4d52551c8d6f9c7a660176"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-rights/a6f017ac8efbbbc278bca85bee3f17d3a0e79362b8ad96bc32523856345b6e04.json",
+          "bytes": 203,
+          "sha256": "a6f017ac8efbbbc278bca85bee3f17d3a0e79362b8ad96bc32523856345b6e04"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/sound-rights/f48f0bcd58d967919c6b42c2d59fdf4e0ceca3d29118e786f10121281078a6af.json",
+          "bytes": 203,
+          "sha256": "f48f0bcd58d967919c6b42c2d59fdf4e0ceca3d29118e786f10121281078a6af"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/source-manifest/077e038ff8621431fecdd34bdb666e49fd0022b994bfdf32e40fdbe6602e4ed0.json",
+          "bytes": 2601,
+          "sha256": "077e038ff8621431fecdd34bdb666e49fd0022b994bfdf32e40fdbe6602e4ed0"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/source-modules/module-10fc59a4cb325dbcfa1d9ab9/4496f663c6296ce6ab6deff917ce918202d0702e8f2c8fa8f715f8effea8634c.json",
+          "bytes": 17447,
+          "sha256": "4496f663c6296ce6ab6deff917ce918202d0702e8f2c8fa8f715f8effea8634c"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/source-modules/module-1ef816cfb5162a75f25e9d3b/51b88a0df6df8ae9a20b451b3dc126365140649c356f8c8121a3b060a4e08d0c.json",
+          "bytes": 14872,
+          "sha256": "51b88a0df6df8ae9a20b451b3dc126365140649c356f8c8121a3b060a4e08d0c"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/source-modules/module-31cdd4821750f28b4e433f2c/f8f08d32927ac196974296db7321dfa6bc30be45a919a92be8ae23247c1f59b4.json",
+          "bytes": 16861,
+          "sha256": "f8f08d32927ac196974296db7321dfa6bc30be45a919a92be8ae23247c1f59b4"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/source-modules/module-71badda7c92f58e5e616e578/722f5f356f257e1f845154f8ff9dbf061e8d67b93a08237c657ea7d8a87c9b39.json",
+          "bytes": 15831,
+          "sha256": "722f5f356f257e1f845154f8ff9dbf061e8d67b93a08237c657ea7d8a87c9b39"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/timeline/5da417249a442f91d57f874287ab411baeebcff43801d8c04a3f3ae6dc8fa6ad.json",
+          "bytes": 11340,
+          "sha256": "5da417249a442f91d57f874287ab411baeebcff43801d8c04a3f3ae6dc8fa6ad"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/timing-draft/1325edb320680c8200a6b8e4fad8becb4ba8ae44565c94688f644639035d388a.json",
+          "bytes": 5603,
+          "sha256": "1325edb320680c8200a6b8e4fad8becb4ba8ae44565c94688f644639035d388a"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/treatment-plan/baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8.json",
+          "bytes": 4115,
+          "sha256": "baee4ee2c8a4f8f8e5601717159e8d1440658222bc6d17662e8418d756febae8"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/treatment/5a9cecfc2efcca8ecc8ecbb11d30bf9fac75a137b69fb1f7be479b5715975f0e.json",
+          "bytes": 827,
+          "sha256": "5a9cecfc2efcca8ecc8ecbb11d30bf9fac75a137b69fb1f7be479b5715975f0e"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-source/10fc59a4cb325dbcfa1d9ab9b5749001c7012e750b7f2622cbbf40f6a0b7e296/bb6346388c0c74c03544a72181c3b8155973aae08f286a1ae29a9260d758acf9.json",
+          "bytes": 17883,
+          "sha256": "bb6346388c0c74c03544a72181c3b8155973aae08f286a1ae29a9260d758acf9"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-source/1ef816cfb5162a75f25e9d3b8a60f65d61c72cca4b7aceba359114df33c511c5/30207817ed0404707f54ad603727c7b434054be331be72eec5878052a325eb07.json",
+          "bytes": 15037,
+          "sha256": "30207817ed0404707f54ad603727c7b434054be331be72eec5878052a325eb07"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-source/31cdd4821750f28b4e433f2c5d4b0a0bcc2a8bd32e06daa50cfa191d1101794a/1bb4990bccfb8f17dbced23f64d935b1410a740fb2363324e798e265c56afbc4.json",
+          "bytes": 17157,
+          "sha256": "1bb4990bccfb8f17dbced23f64d935b1410a740fb2363324e798e265c56afbc4"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/visual-source/71badda7c92f58e5e616e578590fc68f9ed8bced5b750e28cf237098b7337f2e/c9851e97afed75b953e4507b051ed9588375f0402c9f35325e9d57afa819bc69.json",
+          "bytes": 15992,
+          "sha256": "c9851e97afed75b953e4507b051ed9588375f0402c9f35325e9d57afa819bc69"
+        },
+        {
+          "path": "state/projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043.json",
+          "bytes": 1272,
+          "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043"
+        },
+        {
+          "path": "state/runtime-receipts/c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623/clear-book-font.json",
+          "bytes": 1184,
+          "sha256": "3ac93ffcf5509a4e3712fc6744931dd6868996e4a2e7f387a5c2ddbf2f691bed"
+        },
+        {
+          "path": "timeline.json",
+          "bytes": 11340,
+          "sha256": "5da417249a442f91d57f874287ab411baeebcff43801d8c04a3f3ae6dc8fa6ad"
+        }
+      ]
+    }
+  },
+  "sourceZipPath": "/Users/janily/Desktop/dev/videoBuddy/.video-local/new-theme/seed-oD7Sxk/clear-preview-source-tlMhRd/source.zip",
+  "sourceZipSha256": "194c086fe2dac056d77f75186dafba12750768b7d7cbf67b1d81dac72bc3b63c",
+  "sourceZipBytes": 28556759,
+  "sourceControlBudgetOperationsUnchanged": true
+}
