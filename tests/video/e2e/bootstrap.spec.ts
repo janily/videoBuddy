@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 test('BT-07 React companion keeps a single draft and reports unavailable services honestly', async ({page}) => {
+ // Explicit unavailable-service fixture; never call the configured live model.
+ await page.route('**/api/video/session',r=>r.fulfill({status:503,json:{error:{message:'尚未配置服务'}}}));
  await page.goto('/video');
  await expect(page.getByRole('heading', {name:'先聊聊，你想做什么视频？'})).toBeVisible();
  const input=page.getByRole('textbox'); await expect(input).toHaveCount(1);

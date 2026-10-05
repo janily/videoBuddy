@@ -4,7 +4,7 @@ import {ObjectRefSchema,type ObjectRef,type Understanding} from '@/contracts/vid
 import {guardTreatment} from '@/contracts/video/treatment';
 import {guardAudioPlan,type AudioPlan} from '@/contracts/video/audio-plan';
 import type {ProjectControl} from '@/contracts/video/project';
-import {runAudioPlan} from '@/mastra/video/audio-plan';
+import {runAudioPlan,guardModelAudioPlan,RejectedAudioPlan,type AudioPlanCorrection} from '@/mastra/video/audio-plan';
 import {configuredModel} from '@/mastra/video/model-adapter';
 import {reserveModelBudget,modelLimits,type ModelLimits} from '@/services/video/budget/model-budget';
 import {runEffect} from '@/services/video/commands/effect-ledger';
@@ -23,7 +23,7 @@ import {withAccountedModel} from '@/services/video/budget/model-call';
 const digest=z.string().regex(/^[a-f0-9]{64}$/);
 const RecordSchema=z.strictObject({schemaVersion:z.literal(1),briefVersion:z.number().int().nonnegative(),understandingSha256:digest,treatmentSha256:digest,timingDraftSha256:digest,seed:z.number().int().min(0).max(0xffffffff),planRef:ObjectRefSchema,executionStatus:z.literal('not_started')});
 export type AudioPlanStageRecord=z.infer<typeof RecordSchema>;
-type Decide=(understanding:Understanding,treatment:unknown,timing:TimingDraft,timingHash:string,seed:number,maxOutputTokens:number,env:Environment)=>Promise<unknown>;
+type Decide=(understanding:Understanding,treatment:unknown,timing:TimingDraft,timingHash:string,seed:number,maxOutputTokens:number,env:Environment,correction?:AudioPlanCorrection)=>Promise<unknown>;
 interface Options{root?:string;env?:Environment;decide?:Decide;limits?:ModelLimits;mustExist?:boolean}
 
 async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Promise<T>{
@@ -59,9 +59,23 @@ export async function prepareAudioPlanStage(projects:ProjectStore,projectId:stri
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-audio-${revisionId}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
  const plan=await runEffect<AudioPlan>(projects.store,`${prefix}/operations/${operationId}/effects/audio/${revisionId}`,async()=>{
-  const invoke=()=>runAudioPlan(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,reservation.maxOutputTokens,env);
-  const raw=options.decide?await options.decide(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,reservation.maxOutputTokens,env):await withAccountedModel(projects.store,reservation.reservation,invoke);
-  return guardAudioPlan(raw,understanding,treatment,timing,timingRecord.draftRef.sha256,seed);
+  async function attempt(current:typeof reservation,correction?:AudioPlanCorrection){
+   const assertActive=async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
+   await assertActive();
+   const invoke=()=>runAudioPlan(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,current.maxOutputTokens,env,correction,assertActive);
+   const raw=options.decide?await options.decide(understanding,treatment,timing,timingRecord.draftRef.sha256,seed,current.maxOutputTokens,env,correction):await withAccountedModel(projects.store,current.reservation,invoke);
+   return guardModelAudioPlan(raw,understanding,treatment,timing,timingRecord.draftRef.sha256,seed);
+  }
+  try{return await attempt(reservation)}catch(error){
+   // Only a completed, accounted, schema-valid response can be corrected. No
+   // transport/usage/unknown replay and no automatic native producer retry.
+   if(env.VIDEO_DELIVERY_PROFILE!=='mvp'||!(error instanceof RejectedAudioPlan))throw error;
+   await projects.index.immutable(`${revisionPrefix}audio-rejected`,{schemaVersion:1,reason:error.reason,plan:error.plan});
+   const correction={reason:error.reason,previousPlan:error.plan},extraBytes=Buffer.byteLength(canonicalJson(correction))+2048;
+   if(contextBytes+extraBytes>180000)throw Error('CONTEXT_LIMIT');
+   const second=await reserveModelBudget(projects.store,projectId,`${operationId}-audio-${revisionId}-correction-1`,{inputTokens:contextBytes+extraBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
+   return attempt(second,correction);
+  }
  });
  guardAudioPlan(plan,understanding,treatment,timing,timingRecord.draftRef.sha256,seed);checkAssets(plan,control);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;

@@ -64,3 +64,13 @@ MVP新有旁白的执行增加冻结 `voice-first-v1`：音乐和拟音各减12d
 - 目标图测试实际RED；修复后4文件20项通过（6.13秒）。补充执行包冷读、移除策略篡改、生产端口范围与缓存不重做后4文件24项通过（7.03秒）。补测中两个夹具错误（缺旁白clock、图断言漏aformat）已修正并重跑。TypeScript、定向ESLint通过。
 - `mvp-voice-first-real-mix.json`：使用本次真实归档配音/音乐/拟音/画面，新诊断操作重新混音与AAC封装，20秒480帧1280×720立体声完整解码；四句最终AAC全部ASR通过。零模型调用，原控制态、预算与失败操作不变，不属于已发布预览或正式批准。
 - 页面已通过正常“先看效果”开启新attempt。原失败素材/响应/回执保留；不改旧操作，不将诊断片复制为正式结果。浏览器闭环尚待完成。
+
+## 集成回归与有界配乐修正
+
+2026-10-05 18:00：完整152文件727项回归通过（76.93秒），lint、build、构建后types通过。E2E首次配置127地址尝试启动第二个Next，被已有服务锁拒绝；统一localhost并把缺服务测试改为显式503协议夹具（避免当前机器配置真实Key后意外付费），49项通过（11.0秒）。本机临时启动构建版的HTTP写请求被原生产HTTPS要求拒绝；不改变保护，恢复 `npm run dev:mvp`。构建通过不等于HTTP生产部署。
+
+锁定旁白的新任务四句声音通过后，配乐模型200响应中的钢片琴事件72000样本，小于包络(10+1500)*48=72480，仍拒绝AUDIO_EVENT_INVALID。增加仅MVP的一次模型修正：原schema有效且usage已结算的EVENT/TIMELINE/SILENCE参数错误才触发；原proposal不可变归档，第二调用独立预约与用量记录，重新完整guard；不改旁白/事实/影片时长/seed/目标，不补造声音，也不重试unknown/transport/原failed操作。
+
+- 最初真实夹具RED AUDIO_EVENT_INVALID；实现后旧夹具额外预约超测试预算，移至隔离测试，未提高真实预算门槛。Loopback provider返回500时SDK给MODEL_USAGE_INVALID而非服务错误原文，断言按实际unknown行为校正。新的五场景测试检查成功、再次无效停止、transport unknown不修正、非MVP保持原规则、取消后不发送修正HTTP。
+- Standards发现修正调用在账本mark CAS期间取消仍可发送；在actual adapter mark前后传入持久fence，回归第二次mark时cancelProduction，实际HTTP仍只有一次，保守保留未发HTTP的unknown账本，不伪造usage退款。
+- 相关3文件11项通过（20.86秒）；增加取消边界后2文件8项通过（9.59秒）；types与定向lint通过。新代码尚待本次真实闭环集成，不能宣称交付。
