@@ -1,5 +1,8 @@
 # 开发任务与证据
 
+2026-10-05 T05 图片理解与资料接线（`43ed2e3`）：真实私有PNG/JPEG/WebP字节绑定严格视觉观察/OCR/区域/不确定项合同，Mastra多模态适配、已计费持久effect/冷SHA恢复与Worker→ready→Director归档描述贯通。图观察仍不可信，所有图context user-sourced facts须完整真实用户原话，resolve_conflict亦核确认并保存来源，不能provided/mustInclude/否定子串绕过。暂停0预算/effect；真实FileStore归档create后ACK丢失可关闭generation冷恢复，producer仍1次；unknown不重试。反例RED→GREEN、最终137文件692项65.93s及build/lint通过，两轴clean。仅loopback/injected模型协议与临时真实文件测试，0新增云/媒体；真实云图识别/独立解码/缩图与多图要求尚未验收，旧Critic unknown保留，原项目/影片未写。完整T05、全片QA/公共修改导出/43风格与C0/C1/C2未达，无push/部署。见 [完整证据](evidence/image-understanding-validation.md)。
+
+
 2026-10-05 T05/T09/T11/T12 私有图片运行时增量（`16858d2`）：冻结声明的私有图片按原 SHA/bytes 只读进入隔离容器，服务拒绝外来资源；独立浏览器在场景执行前真实解码，场景覆盖解码器不能自证通过。实际最终 PNG 视频320×180/1s/24帧2340bytes/SHA c6b6c426…与左右解码像素通过，外来图片及损坏图片明确拒绝 IMAGE_DECODE_FAILED；诊断只证明运输/解码，不是用户图片语义或全片QA。首次参数失败、旧解码绕过、direct native unknown误标、v3/v4浏览器断言失败均保留/单独纠错；unknown未reset，所属已知退出容器已精确核验并清理。最终135文件681项65.85s、build/构建后types通过，最终两轴clean。原项目/影片/未知模型预算无改、0新模型、无正式批准或结果发布。JPEG/WebP实际codec、T05语义/全部来源、全片QA/公共闭环/43风格与C0/C1/C2仍未达；未push/部署。见 [完整证据](evidence/runtime-assets-validation.md)。
 
 
