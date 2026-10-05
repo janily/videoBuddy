@@ -1,5 +1,8 @@
 # 当前工程交接（更新至2026-10-05）
 
+2026-10-05 T11/T12 来源证明接线（`4c1286d`）：新 preview 创作前完整来源分类/独立审核；新 facts v2 冻结完整 immutable proof，包装配绑定当前 operation/epoch/Understanding；正式内容 QA 读取冻结条件并绑定 proofRef/清单 SHA。旧已冻结包只读回用不升级，原 Visual v1/name/critical_facts/听感/运动/发布门禁不放宽。131 文件661项通过（65.71秒），lint/build/构建后types通过；本地 native loopback 源审核 reject 后只两次精确 settled，不进入创作。真实旧包 full graph 只读重验成功，原三个 SHA、生产状态/9 native/旧 unknown 不变，0writes/network/model/native。尚无真实新来源审核或完整全片 QA；全范围/C0/C1/C2未达，无push/部署；接线审查发现 NFC/标点条件生产消费不一致的P2，`f9a659d` 共享guard并保留首个原写法去重，两个合同RED→GREEN；并发首全套1项15秒test timeout保留记录，单独同代码/同阈值重跑131文件663项通过（63.30秒），lint/build/构建后types过，固定两轴clean。见 [接线验证](evidence/source-requirements-integration-validation.md)。
+
+
 
 2026-10-05 修正更新：完整独立审核请求载荷的纯校验已提前到预算/effect 准入前（`c965061`），避免确定未发送的超限请求被锁为 unknown。修正后全套 129 文件、656 项通过（60.06 秒），lint、生产构建与构建后类型检查退出 0；固定快照两轴复核均 clean，仅覆盖该基础模块。
 2026-10-05 T11/T12 来源条件生产模块：完整来源连续分段、数字/日期/引文literal floor、两独立native Mastra分类/审核、逐项accept后持久冻结；普通名称仍需模型保守分类和独立审核，未宣称完整NER。当前control/op/revision/epoch/fence、completed再guard、unknown不重试、只读0writes；配置/预算提前准入，缺配置可补依赖。129文件655测试58.27s、lint/build/构建后types过。原真实1完整fact/frozen graph只读核，整体semantic因引文拒、全文literal候选仅结构有效，0云/媒体，原状态/unknown不变；无真实分类审核。尚未接新预览包和正式QA条件读取，现有approved条件不改；完整项目/C0/C1/C2未达，无push/部署。见 [来源条件验证](evidence/source-requirements-validation.md)。

@@ -1,0 +1,33 @@
+{
+  "executedAt": "2026-10-05T04:17:55.181Z",
+  "implementationCommit": "4c1286d",
+  "status": "actual_historical_frozen_source_graph_verified_no_new_audit",
+  "modelCalls": 0,
+  "nativeCalls": 0,
+  "formalProductionApproval": false,
+  "deliveryEligible": false,
+  "filmSpecRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/film/2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "sha256": "2218d7f289a9c9e3e69e44975644fe2ad0340a1911eb98f77e7acf3fab89f93f",
+    "bytes": 2631,
+    "mime": "application/json"
+  },
+  "factsRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/revisions/4838f74b-4b34-4156-9511-0629ec18cb78/facts/60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "sha256": "60f3ad985e0c74086c1a435b921d4ef623603e564a633cbbeb04638245480b26",
+    "bytes": 569,
+    "mime": "application/json"
+  },
+  "understandingRef": {
+    "key": "projects/4a5c6131-3842-440c-a551-7d8fcf6e7c95/understanding/1/2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+    "sha256": "2b6fd6bebf2f200904672ea78bf22bfbe4017f2295ca81c49b450804355fb043",
+    "bytes": 1272,
+    "mime": "application/json"
+  },
+  "factsManifestVersion": 1,
+  "completeFacts": 1,
+  "sourceClassificationApproved": false,
+  "writes": 0,
+  "networkCalls": 0,
+  "originalStateNativeAndUnknownUnchanged": true
+}

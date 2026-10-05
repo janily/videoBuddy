@@ -2,6 +2,8 @@
 
 2026-10-05；base `bbb603699b3b4616131e2ccfdd92ac974cc47f78`，实现 `2e56e844cbe40e5b00468026f2e3d02f2be159a4`。
 
+本记录为来源基础模块及 `c965061` 修正的验证快照。后续 `4c1286d` 已实现新预览/冻结包/内容 QA 接线，见 [后续接线验证](source-requirements-integration-validation.md)；以下未接线说明属于本记录当时范围。
+
 ## 当前实现
 
 来源 context 绑定完整 active facts、全部 sourceRefs 与 immutable Understanding SHA。候选连续切分完整原文，segment 拼接必须逐字相等，不能删句、更正来源或丢否定条件；literal/semantic/restriction 条件在创作前生成，不由成片 Critic 自己选择。代码强制保留识别出的数字、日期和引文；这不是完整命名实体识别器，普通名称、身份等仍依赖分类员和独立审核员保守判为 literal。
