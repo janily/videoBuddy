@@ -15,7 +15,7 @@ export async function prepareMvpCoreEvidence(projects:ProjectStore,owner:string,
  const captions=frozen.timeline.captions,font=frozen.timing.font;
  if(captions.length){
   if(!isBookTimingFont(font))throw Error('MVP_FONT_UNSUPPORTED');
-  const actual=await readBookTimingFont(options.env||process.env,{version:bookFontVersion(font),journal:{store:projects.store,prefix:`projects/${projectId}/operations/${operationId}/media-effects`},assertActive:()=>assertApprovedRenderFence(projects,inputs)});
+  const actual=await readBookTimingFont(options.env||process.env,{version:bookFontVersion(font),mustExist:options.mustExist,journal:{store:projects.store,prefix:`projects/${projectId}/operations/${operationId}/media-effects`},assertActive:()=>assertApprovedRenderFence(projects,inputs)});
   if(canonicalHash(actual.font)!==canonicalHash(font))throw Error('FONT_RECEIPT_CHANGED');
   assertBookCaptionGlyphs(captions.map(c=>c.text),actual.glyphsById,bookFontVersion(font));
   validateCaptions(captions.map(c=>({text:c.text,startFrame:c.stableReadableStartFrame,endFrame:c.endFrame})),frozen.timeline.fps,new Set([...actual.glyphsById.values()].flatMap(glyphs=>[...glyphs])));

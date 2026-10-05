@@ -13,18 +13,21 @@ export function useApprovePreview(projectId:string|undefined,refresh:(minimumCon
  const key=`vb-approve:${projectId||'new'}`,[stored]=useDraft(key),[state,setState]=useState<State>({phase:'idle'});
  const intent=useRef<Intent|null>(null),busy=useRef(false),abort=useRef<AbortController|null>(null);
  useEffect(()=>{const controller=new AbortController();abort.current=controller;return()=>{controller.abort();abort.current=null;intent.current=null;busy.current=false}},[projectId]);
- const clear=useCallback((id:string)=>{if(parse(localStorage.getItem(key)||'',projectId)?.request.clientCommandId===id)localStorage.removeItem(key);window.dispatchEvent(new Event('vb-draft'));intent.current=null},[key,projectId]);
+ const clear=useCallback(async(id:string)=>{await navigator.locks.request(key,()=>{if(parse(localStorage.getItem(key)||'',projectId)?.request.clientCommandId===id)localStorage.removeItem(key)});window.dispatchEvent(new Event('vb-draft'));intent.current=null},[key,projectId]);
  const submit=useCallback(async(value:Intent)=>{
   const signal=abort.current?.signal;if(!signal||signal.aborted||busy.current||value.projectId!==projectId)return;
   busy.current=true;intent.current=value;setState({phase:'submitting',message:'正在确认完整视频制作…'});let acknowledged=false;
-  try{localStorage.setItem(key,JSON.stringify(value));window.dispatchEvent(new Event('vb-draft'))}catch{busy.current=false;intent.current=null;setState({phase:'failed',message:'无法保存制作请求，请检查浏览器存储后重试。'});return}
+  try{
+   if(!navigator.locks)throw Error('APPROVAL_STORAGE_UNAVAILABLE');
+   await navigator.locks.request(key,()=>{const raw=localStorage.getItem(key),pending=raw?parse(raw,projectId):null;if(raw&&pending?.request.clientCommandId!==value.request.clientCommandId)throw Error('APPROVAL_INTENT_REPLACED');localStorage.setItem(key,JSON.stringify(value))});window.dispatchEvent(new Event('vb-draft'));
+  }catch(error){busy.current=false;intent.current=null;setState({phase:'failed',message:error instanceof Error&&error.message==='APPROVAL_INTENT_REPLACED'?'制作请求已由其他页面更新，请刷新后继续。':'无法保存制作请求，请检查浏览器存储后重试。'});return}
   try{
    const response=await fetch(`/api/video/projects/${projectId}/preview/approve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(value.request),signal}),body=await response.json();
    if(signal.aborted||intent.current?.request.clientCommandId!==value.request.clientCommandId)return;
-   if(!response.ok){const code=String(body?.error?.code||'');if(['PREVIEW_STALE','VALIDATION_FAILED','ACCESS_NOT_FOUND','PROJECT_EXPIRED','ORIGIN_FORBIDDEN','IDEMPOTENCY_CONFLICT'].includes(code)){clear(value.request.clientCommandId);setState({phase:'failed',message:code==='PREVIEW_STALE'?'效果已变化，请先看新效果再确认。':'制作请求未通过，请重新读取项目后再试。'});await refresh(0).catch(()=>{});return}throw Error('APPROVAL_UNCERTAIN')}
+   if(!response.ok){const code=String(body?.error?.code||'');if(['PREVIEW_STALE','VALIDATION_FAILED','ACCESS_NOT_FOUND','PROJECT_EXPIRED','ORIGIN_FORBIDDEN','IDEMPOTENCY_CONFLICT'].includes(code)){await clear(value.request.clientCommandId);setState({phase:'failed',message:code==='PREVIEW_STALE'?'效果已变化，请先看新效果再确认。':'制作请求未通过，请重新读取项目后再试。'});await refresh(0).catch(()=>{});return}throw Error('APPROVAL_UNCERTAIN')}
    const confirmation=ConfirmationSchema.parse(body);if(confirmation.projectId!==projectId)throw Error('APPROVAL_RESPONSE_INVALID');
    acknowledged=true;await refresh(confirmation.controlVersion);
-   if(!signal.aborted&&intent.current?.request.clientCommandId===value.request.clientCommandId){clear(value.request.clientCommandId);setState({phase:'confirmed',message:'制作请求已确认。',previewId:value.request.previewId})}
+   if(!signal.aborted&&intent.current?.request.clientCommandId===value.request.clientCommandId){await clear(value.request.clientCommandId);setState({phase:'confirmed',message:'制作请求已确认。',previewId:value.request.previewId})}
   }catch{if(!signal.aborted&&intent.current?.request.clientCommandId===value.request.clientCommandId)setState({phase:'uncertain',message:acknowledged?'制作已确认，项目状态暂时无法读取。重新连接会继续同一请求。':'制作请求暂时无法确认。重新连接会继续同一请求。'})}
   finally{if(!signal.aborted)busy.current=false}
  },[projectId,key,clear,refresh]);

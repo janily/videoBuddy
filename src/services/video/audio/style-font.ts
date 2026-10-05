@@ -3,6 +3,7 @@ import {z} from 'zod';
 import type {Environment} from '@/services/video/config/environment';
 import {dockerConfiguration} from '@/services/video/media/docker-executor';
 import {runOwnedDocker} from '@/services/video/media/owned-docker';
+import {readDockerInvocation,dockerArgumentsHash} from '@/services/video/media/docker-journal';
 import type {DockerJournal} from '@/services/video/media/docker-journal';
 import {trustedStyleFont} from '@/services/video/media/font-catalog';
 import {parseFontCharset} from './subtitles';
@@ -20,10 +21,16 @@ print(json.dumps(dict(family=family,charset=charset,fontSha256=hashlib.sha256(fo
 `;
 // This reads preinstalled locked resources. It never fetches fonts or permits a
 // system fallback to masquerade as the requested face.
-export async function readPinnedStyleFont(env:Environment,id:string,options:{run?:typeof runOwnedDocker;journal?:DockerJournal;assertActive?:()=>Promise<void>}={}){
+export async function readPinnedStyleFont(env:Environment,id:string,options:{run?:typeof runOwnedDocker;journal?:DockerJournal;assertActive?:()=>Promise<void>;mustExist?:boolean}={}){
  const font=trustedStyleFont(id),config=dockerConfiguration(env,'style-font-'+id),doc='/usr/share/doc/videobuddy-fonts/'+font.id;
  const args=['run','--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--pids-limit','64','--cpus','1','--memory','256m','--memory-swap','256m','--user',config.user,config.image,'python3','-c',inspector,font.runtimePath,doc+'/OFL.txt',doc+'/METADATA.pb'];
- const raw=await (options.run||runOwnedDocker)(args,15000,config.image,options.assertActive,options.journal);
+ let raw:string;
+ if(options.mustExist){
+  if(!options.journal)throw Error('STYLE_FONT_PROOF_MISSING');
+  const receipt=await readDockerInvocation(options.journal,dockerArgumentsHash(args,config.image),config.image);
+  if(receipt.state!=='completed'||receipt.output===undefined)throw Error('MEDIA_STOP_UNKNOWN');
+  raw=receipt.output;
+ }else raw=await (options.run||runOwnedDocker)(args,15000,config.image,options.assertActive,options.journal);
  let actual:z.infer<typeof actualSchema>;let glyphs:Set<string>;
  try{
   actual=actualSchema.parse(JSON.parse(raw));

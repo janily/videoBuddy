@@ -111,6 +111,7 @@ export async function startModelAttempt(store:AtomicStore,r:ModelReservation){
  await readGate(store);
  await updateJson(store,gateKey,async(raw:unknown)=>{
   const g=gate(raw);if(ownGate(g,r))throw Error('MODEL_ATTEMPT_ALREADY_STARTED');await assertGateAvailable(store,g,r.mode);
+  if(g.active?.state==='unknown'){const history=await createOrRead(store,'budgets/model-unknown-recovery-history/'+g.active.id,g.active);if(canonicalHash(history)!==canonicalHash(g.active))throw Error('MODEL_ACCOUNTING_INVALID')}
   return{...g,...(g.active?.state==='unknown'?{deferredUnknown:[...(g.deferredUnknown||[]),{...g.active,state:'unknown' as const}]}:{}),schemaVersion:1 as const,active:{id:r.id,projectId:r.projectId,day:r.day,hash:r.hash,state:'started' as const,startedAt}};
  });
  try{for(const key of keys(r)){await updateJson(store,key,async(raw:unknown)=>{
@@ -160,7 +161,7 @@ export async function settleModelUsage(store:AtomicStore,r:ModelReservation,untr
  });
  await readGate(store);
  await updateJson(store,gateKey,(raw:unknown)=>{
-  const g=gate(raw);if(!ownGate(g,r))return g;
+  const g=gate(raw);if(!ownGate(g,r)){const deferred=g.deferredUnknown?.find(row=>row.id===r.id);if(!deferred)return g;if(deferred.projectId!==r.projectId||deferred.hash!==r.hash||deferred.day!==r.day)throw Error('MODEL_ACCOUNTING_INVALID');return{...g,deferredUnknown:g.deferredUnknown!.filter(row=>row.id!==r.id)}};
   return{...g,active:overrun&&!r.mode?{...g.active!,state:'overrun' as const}:null};
  });
  return{state,usage};

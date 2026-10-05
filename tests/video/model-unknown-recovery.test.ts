@@ -19,3 +19,9 @@ it('explicit bounded recovery permits a different call while preserving unknown 
 it('enforces the authorized unknown-slot bound across cold processes, never treating pending requests as stopped',async()=>{
  const {store,root}=await fixture();await authorizeUnknownModelRecovery(store,auth());const next=(await reserveModelBudget(store,'new','one',{inputTokens:100,outputTokens:50},limits)).reservation;await startModelAttempt(store,next);await markModelUsageUnknown(store,next);await expect(reserveModelBudget(new FileStore(root),'third','one',{inputTokens:1,outputTokens:1},limits)).rejects.toThrow('MODEL_UNKNOWN_RECOVERY_LIMIT');
 });
+it('frees a deferred slot only after actual late usage settlement while retaining immutable unknown history',async()=>{
+ const {store,root,old}=await fixture();await authorizeUnknownModelRecovery(store,auth());const b=(await reserveModelBudget(store,'new','one',{inputTokens:100,outputTokens:50},limits)).reservation;await startModelAttempt(store,b);await settleModelUsage(store,b,{inputTokens:40,outputTokens:30});
+ await settleModelUsage(store,old,{inputTokens:80,outputTokens:40});const c=(await reserveModelBudget(store,'new','two',{inputTokens:100,outputTokens:50},limits)).reservation;await startModelAttempt(store,c);await markModelUsageUnknown(store,c);
+ const d=await reserveModelBudget(new FileStore(root),'other','one',{inputTokens:100,outputTokens:50},limits);expect(d.reservation.projectId).toBe('other');
+ expect((await store.readFresh(`budgets/model-unknown-recovery-history/${old.id}`)).value).toMatchObject({id:old.id,state:'unknown'});
+});

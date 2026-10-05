@@ -21,3 +21,12 @@ it('verifies the clear handwriting face as a separate locked font without accept
  expect((await readPinnedStyleFont(env,'longcang',{run:async args=>{expect(args).toContain('/usr/local/share/fonts/videobuddy/LongCang-Regular.ttf');return JSON.stringify(long)}})).glyphs.has('料')).toBe(true);
  for(const value of [actual,{...long,fontSha256:'f'.repeat(64)},{...long,licenseSha256:'f'.repeat(64)},{...long,metadataSha256:'f'.repeat(64)}])await expect(readPinnedStyleFont(env,'longcang',{run:async()=>JSON.stringify(value)})).rejects.toThrow('STYLE_FONT_RUNTIME_CHANGED');
 });
+it('cold font verification consumes exact completed journal stdout with zero producer calls or store writes',async()=>{
+ const {mkdtemp}=await import('node:fs/promises'),{tmpdir}=await import('node:os'),{join}=await import('node:path'),{randomUUID}=await import('node:crypto'),{FileStore}=await import('@/services/video/storage/file-store'),{dockerArgumentsHash}=await import('@/services/video/media/docker-journal'),{verifierStore}=await import('@/services/video/render/content-review');
+ const root=await mkdtemp(join(tmpdir(),'vb-font-readonly-')),store=new FileStore(root),prefix=`projects/${randomUUID()}/operations/${randomUUID()}/media-effects`;let argumentsForProbe:string[]=[];
+ await readPinnedStyleFont(env,'mashanzheng',{run:async args=>{argumentsForProbe=args;return JSON.stringify(actual)}});
+ const argsSha256=dockerArgumentsHash(argumentsForProbe,env.VIDEO_MEDIA_IMAGE_REF),key=prefix+'/'+argsSha256,receipt={schemaVersion:1,invocation:randomUUID(),image:env.VIDEO_MEDIA_IMAGE_REF,argsSha256,state:'completed',output:JSON.stringify(actual)};await store.create(key,receipt);
+ let calls=0;const result=await readPinnedStyleFont(env,'mashanzheng',{mustExist:true,journal:{store:verifierStore(store),prefix},run:async()=>{calls++;throw Error('UNEXPECTED_FONT_PRODUCER')}});
+ expect(result.fontSha256).toBe(actual.fontSha256);expect(calls).toBe(0);expect((await store.readFresh(key)).value).toEqual(receipt);
+ await expect(readPinnedStyleFont(env,'mashanzheng',{mustExist:true,journal:{store,prefix:`projects/${randomUUID()}/operations/${randomUUID()}/media-effects`},run:async()=>{calls++;throw Error('UNEXPECTED_FONT_PRODUCER')}})).rejects.toThrow();expect(calls).toBe(0);
+});

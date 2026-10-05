@@ -21,7 +21,7 @@ export function ResultStage({view,onExample,extra,onPreview,preparing=false,acti
   </div></section>;
  }
  if(view?.currentPreview){
-  const preview=view.currentPreview,approval=view.actions.find(a=>a.kind==='approve_preview');
+  const preview=view.currentPreview,existingResult=view.currentResult,approval=view.actions.find(a=>a.kind==='approve_preview');
   return<section className="work" aria-label="视频结果"><div className="work-inner"><span className="eyebrow">先看一小段，不急着做整片</span><h1 className="result-title">先看看，这个感觉对不对？</h1><p className="intro">播放看看画面和节奏。想调整哪里，继续在右边告诉我。</p>
    {view.productionFailure&&<p role="alert">{view.productionFailure.message}</p>}
    {view.activeProduction&&<p role="status">{activity||'完整视频正在制作，任务已经保存。'}</p>}
@@ -31,7 +31,7 @@ export function ResultStage({view,onExample,extra,onPreview,preparing=false,acti
    {preview.criticalFacts.length>0&&<div className="preview-facts">{preview.criticalFacts.map((fact,i)=><p key={i}>{fact.text}<small> · {fact.source}</small></p>)}</div>}
    <div className="result-action"><p>{view.preferences.durationSec}秒 · {view.preferences.aspect==='16:9'?'横屏':'竖屏'}</p><button className="primary-action" disabled={!approval?.enabled||!confirmation||approvalLocked} title={approval?.disabledReason} onClick={()=>void confirmation?.approve(view)}>{confirming?'正在确认…':'就按这个做 →'}</button></div>
    {approval?.disabledReason&&<p className="welcome-note">{approval.disabledReason}</p>}{confirmationStatus}{extra}
-   {view.currentResult&&<details><summary>查看已有视频</summary><PreviewPlayer projectId={view.projectId} artifactId={view.currentResult.artifactId} label="已有完整视频"/><ResultDownloads projectId={view.projectId} artifactId={view.currentResult.artifactId} productionActive={Boolean(view.activeProduction)}/></details>}
+   {existingResult&&<details><summary>查看已有视频</summary><PreviewPlayer projectId={view.projectId} artifactId={existingResult.artifactId} label="已有完整视频" onSelect={()=>onSelectFeedback?.(existingResult.artifactId,existingResult.revisionId)}/><ResultDownloads projectId={view.projectId} artifactId={existingResult.artifactId} productionActive={Boolean(view.activeProduction)}/></details>}
    <button className="text-button" disabled={preparing||approvalLocked||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled)} onClick={onPreview}>{preview.state==='ready'?'重新看效果':'先看新效果'}</button>
   </div></section>;
  }

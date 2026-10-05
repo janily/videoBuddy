@@ -23,7 +23,7 @@ export function isBookTimingFont(font:{family:string}|null|undefined):font is An
 export function bookFontVersion(font:AnyBookTimingFont):1|2{return font.family==='Crayon Book Clear Handwriting'?2:1}
 export type BookTimingFont=z.infer<typeof BookTimingFontSchema>;
 export function bookFaceForText(text:string,version:1|2=1){return /\p{Script=Han}/u.test(text)?(version===2?'longcang':'mashanzheng'):'patrickhand'}
-export async function readBookTimingFont(env:Environment,options:{version?:1|2;journal?:DockerJournal;assertActive?:()=>Promise<void>}={}){
+export async function readBookTimingFont(env:Environment,options:{version?:1|2;journal?:DockerJournal;assertActive?:()=>Promise<void>;mustExist?:boolean}={}){
  const version=options.version||1,actual=[];for(const id of [version===2?'longcang':'mashanzheng','patrickhand'])actual.push(await readPinnedStyleFont(env,id,options));
  const faces=actual.map(f=>({id:f.id,family:f.family,fontSha256:f.fontSha256,fontBytes:f.fontBytes,licenseSha256:f.licenseSha256,metadataSha256:f.metadataSha256,charsetSha256:f.charsetSha256}));
  const font=AnyBookTimingFontSchema.parse({family:version===2?'Crayon Book Clear Handwriting':'Crayon Book Handwriting',runtimeDigest:actual[0].runtimeDigest,charsetSha256:canonicalHash(faces.map(f=>({id:f.id,charsetSha256:f.charsetSha256}))),revealMs:350,rendererSha256:version===2?clearBookCaptionRendererSha256:bookCaptionRendererSha256,producerSha256:bookCaptionProducerSha256,faces});
