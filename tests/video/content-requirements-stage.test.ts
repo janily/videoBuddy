@@ -4,7 +4,9 @@ import {it,expect} from 'vitest';
 import {seedApprovedProject} from './fixtures/approved-project';
 import {updateJson} from '@/services/video/storage/atomic-store';
 import type {ProjectControl} from '@/contracts/video/project';
+import type {Understanding} from '@/contracts/video/domain';
 import {canonicalHash} from '@/services/video/domain/hash';
+import {budgetKeys} from '@/services/video/config/environment';
 import {prepareContentRequirementsStage,loadContentRequirements} from '@/services/video/preview/content-requirements-stage';
 import type {RequirementsContext,RequirementsProposal} from '@/contracts/video/content-requirements';
 async function seed(){const f=await seedApprovedProject(),operationId=randomUUID();await updateJson(f.projects.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,phase:'preparing_preview' as const,activeProduction:operationId,currentApprovalId:undefined}));await f.projects.store.create(`projects/${f.projectId}/operations/${operationId}`,{id:operationId,projectId:f.projectId,kind:'preview',revisionId:f.bundle.revisionId,previewId:f.bundle.previewId,briefVersion:f.bundle.briefVersion,consentEpoch:0,understandingRef:(await f.projects.access('owner',f.projectId)).understandingRef,status:'running'});return{...f,operationId}}
@@ -37,5 +39,14 @@ it('fails configuration before creating an unknown effect and can proceed once t
  await expect(prepareContentRequirementsStage(f.projects,f.projectId,f.bundle.revisionId,f.operationId,0,{env:{VIDEO_GENERATION_ENABLED:'false'}})).rejects.toThrow('GENERATION_DISABLED');
  expect(await f.projects.store.listKeys!(`projects/${f.projectId}/operations/${f.operationId}/effects/content-requirements`,1)).toEqual([]);
  await expect(prepareContentRequirementsStage(f.projects,f.projectId,f.bundle.revisionId,f.operationId,0,{propose:async c=>proposal(c),audit:async(c,p)=>audit(c,p)})).resolves.toMatchObject({productionApproval:false});
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('checks the complete audit payload before budget or effect admission on every replay',async()=>{
+ const f=await seed();try{const c=await f.projects.access('owner',f.projectId),u=(await f.projects.store.readFresh<Understanding>(c.understandingRef.key)).value;
+ const updated={...u,facts:Array.from({length:65},(_,i)=>({...u.facts[0],id:'fact-'+i,text:'播种后浇水。'}))},ref=await f.projects.index.immutable(`projects/${f.projectId}/understanding/${c.briefVersion}`,updated);
+ await updateJson(f.projects.store,`projects/${f.projectId}/control`,(v:ProjectControl)=>({...v,understandingRef:ref}));await updateJson(f.projects.store,`projects/${f.projectId}/operations/${f.operationId}`,(v:object)=>({...v,understandingRef:ref}));
+ let proposals=0;const invoke=()=>prepareContentRequirementsStage(f.projects,f.projectId,f.bundle.revisionId,f.operationId,0,{env:{VIDEO_ENVIRONMENT:'local',VIDEO_APP_ORIGIN:'https://video.test',VIDEO_SESSION_SIGNING_KEY:'s'.repeat(64),VIDEO_DATA_DIR:f.root,VIDEO_GENERATION_ENABLED:'true',MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:'http://127.0.0.1:1/v1',MODEL_API_KEY:'unit-only',VIDEO_DIRECTOR_MODEL:'unit-model',VIDEO_CRITIC_MODEL:'unit-model',...Object.fromEntries(budgetKeys.map(key=>[key,'1000000']))},limits:{projectCalls:2,projectInputTokens:1000000,projectOutputTokens:1000000,dailyCalls:2},propose:async context=>{proposals++;return{schemaVersion:1,contextSha256:context.contextSha256,facts:context.facts.map(f=>({factId:f.id,segments:[{sourceText:f.text,kind:'literal',reason:'x'.repeat(3000)}]}))}}});
+ await expect(invoke()).rejects.toThrow('CONTEXT_LIMIT');await expect(invoke()).rejects.toThrow('CONTEXT_LIMIT');expect(proposals).toBe(1);
+ expect(await f.projects.store.listKeys!(`projects/${f.projectId}/operations/${f.operationId}/effects/content-requirements`,1)).toHaveLength(1);await expect(f.projects.store.readFresh(`projects/${f.projectId}/budget`)).rejects.toThrow();
  }finally{await rm(f.root,{recursive:true,force:true})}
 });

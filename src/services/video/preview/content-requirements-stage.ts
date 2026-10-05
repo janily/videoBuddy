@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {UnderstandingSchema,ObjectRefSchema} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
 import {requirementsContext,guardRequirementsProposal,guardRequirementsAudit,approvedRequirements,type RequirementsContext,type RequirementsProposal} from '@/contracts/video/content-requirements';
-import {runRequirementsProposal,runRequirementsAudit} from '@/mastra/video/content-requirements';
+import {runRequirementsProposal,runRequirementsAudit,requirementsPayload} from '@/mastra/video/content-requirements';
 import {configuredModel} from '@/mastra/video/model-adapter';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {createOrRead,StoreMissing,type AtomicStore} from '@/services/video/storage/atomic-store';
@@ -47,9 +47,10 @@ export async function prepareContentRequirementsStage(projects:ProjectStore,proj
   const decide=phase==='proposal'?options.propose:options.audit;let prior:unknown;
   try{prior=(await projects.store.readFresh(key)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
   let reservation:Awaited<ReturnType<typeof reserveModelBudget>>|undefined;
+  const payload=prior===undefined?requirementsPayload(context,proposal,8000):undefined;
   if(prior===undefined&&!decide){
    requireGeneration(readConfiguration(env));configuredModel(phase==='proposal'?'director':'critic',env);
-   reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-requirements-${identity}`,{inputTokens:Buffer.byteLength(canonicalJson({context,proposal:proposal||null}))+8192,outputTokens:8000},options.limits||modelLimits(env));await fence();
+   reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-requirements-${identity}`,{inputTokens:Buffer.byteLength(payload!)+8192,outputTokens:8000},options.limits||modelLimits(env));await fence();
   }
   const output=await runEffect(projects.store,key,async()=>{await fence();
    if(decide)return phase==='proposal'?options.propose!(context):options.audit!(context,proposal!);
