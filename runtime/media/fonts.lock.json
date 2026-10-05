@@ -53,6 +53,31 @@
         "buildPath": "patrickhand/METADATA.pb"
       },
       "runtimePath": "/usr/local/share/fonts/videobuddy/PatrickHand-Regular.ttf"
+    },
+    {
+      "id": "longcang",
+      "family": "Long Cang",
+      "filename": "LongCang-Regular.ttf",
+      "license": "OFL-1.1",
+      "runtimePath": "/usr/local/share/fonts/videobuddy/LongCang-Regular.ttf",
+      "font": {
+        "url": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/LongCang-Regular.ttf",
+        "sha256": "e5bf2c3f24ef2327c6f136d8f73e2f9dfdf44896fdbeb35a9515f44777bb91bc",
+        "bytes": 5162508,
+        "buildPath": "longcang/LongCang-Regular.ttf"
+      },
+      "licenseFile": {
+        "url": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/OFL.txt",
+        "sha256": "603546b7219a94bb59bf8294458194a5010119486354092b66a09a3fd61aeacc",
+        "bytes": 4390,
+        "buildPath": "longcang/OFL.txt"
+      },
+      "metadata": {
+        "url": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/METADATA.pb",
+        "sha256": "c7d6c01a886b37dcef3c1e89796424f34240647fedac0d37108309c02fa8f3a3",
+        "bytes": 601,
+        "buildPath": "longcang/METADATA.pb"
+      }
     }
   ],
   "policy": "Trusted build download only. Verify every pinned byte count and SHA before installing unmodified fonts; preserve OFL notices. No runtime font downloads or source ZIP font binaries."

@@ -16,3 +16,8 @@ it('rejects an unknown font or mutable media image before executing anything',as
  await expect(readPinnedStyleFont({...env,VIDEO_MEDIA_IMAGE_REF:'latest'},'mashanzheng',{run})).rejects.toThrow('CAPABILITY_UNAVAILABLE');
  expect(calls).toBe(0);
 });
+it('verifies the clear handwriting face as a separate locked font without accepting the legacy font',async()=>{
+ const long={family:'Long Cang',charset:'6599 79d1 7c73 79be',fontSha256:'e5bf2c3f24ef2327c6f136d8f73e2f9dfdf44896fdbeb35a9515f44777bb91bc',fontBytes:5162508,licenseSha256:'603546b7219a94bb59bf8294458194a5010119486354092b66a09a3fd61aeacc',metadataSha256:'c7d6c01a886b37dcef3c1e89796424f34240647fedac0d37108309c02fa8f3a3'};
+ expect((await readPinnedStyleFont(env,'longcang',{run:async args=>{expect(args).toContain('/usr/local/share/fonts/videobuddy/LongCang-Regular.ttf');return JSON.stringify(long)}})).glyphs.has('料')).toBe(true);
+ for(const value of [actual,{...long,fontSha256:'f'.repeat(64)},{...long,licenseSha256:'f'.repeat(64)},{...long,metadataSha256:'f'.repeat(64)}])await expect(readPinnedStyleFont(env,'longcang',{run:async()=>JSON.stringify(value)})).rejects.toThrow('STYLE_FONT_RUNTIME_CHANGED');
+});

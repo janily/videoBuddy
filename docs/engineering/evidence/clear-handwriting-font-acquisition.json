@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "status": "candidate_only_not_installed_in_production",
+  "upstreamCommit": "406197b91ff39a93061c2c2eeaee67ddf2ae1f0d",
+  "family": "Long Cang",
+  "license": "OFL-1.1",
+  "files": [
+    {
+      "filename": "LongCang-Regular.ttf",
+      "url": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/LongCang-Regular.ttf",
+      "sha256": "e5bf2c3f24ef2327c6f136d8f73e2f9dfdf44896fdbeb35a9515f44777bb91bc",
+      "bytes": 5162508
+    },
+    {
+      "filename": "OFL.txt",
+      "url": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/OFL.txt",
+      "sha256": "603546b7219a94bb59bf8294458194a5010119486354092b66a09a3fd61aeacc",
+      "bytes": 4390
+    },
+    {
+      "filename": "METADATA.pb",
+      "url": "https://raw.githubusercontent.com/google/fonts/406197b91ff39a93061c2c2eeaee67ddf2ae1f0d/ofl/longcang/METADATA.pb",
+      "sha256": "c7d6c01a886b37dcef3c1e89796424f34240647fedac0d37108309c02fa8f3a3",
+      "bytes": 601
+    }
+  ]
+}
