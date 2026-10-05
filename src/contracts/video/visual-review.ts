@@ -37,12 +37,13 @@ function normalized(text:string){return text.normalize('NFC').replace(/[\s，。
 // and removing a decimal point must not turn 1.8元 into evidence for 18元.
 function containsLiteral(observed:string,expected:string){
  const number=/[0-9０-９〇零一二三四五六七八九十百千万亿两壹贰叁肆伍陆柒捌玖拾佰仟]/u;
+ const numericContinuation=/[+＋\-−－.,，。．․﹒:：٫٬/／⁄%％‰‱eEｅＥ]/u;
  const normalize=(text:string)=>text.normalize('NFC').replace(/\s/g,'').replace(/[，。！？、：；,.!?:;]/g,(mark,index,whole)=>number.test(whole[index-1]??'')&&number.test(whole[index+1]??'')?mark:'');
  const text=normalize(observed),literal=normalize(expected);
  for(let index=text.indexOf(literal);index>=0;index=text.indexOf(literal,index+1)){
   const before=text[index-1]??'',after=text[index+literal.length]??'';
-  if(number.test(literal[0])&&(number.test(before)||/[+＋\-−－.,，。:：]/u.test(before)))continue;
-  if(number.test(literal.at(-1)!)&&(number.test(after)||/[.,，。:：]/u.test(after)))continue;
+  if(number.test(literal[0])&&(number.test(before)||numericContinuation.test(before)))continue;
+  if(number.test(literal.at(-1)!)&&(number.test(after)||numericContinuation.test(after)))continue;
   return true;
  }
  return false;
