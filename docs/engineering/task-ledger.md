@@ -1,5 +1,7 @@
 # 开发任务与证据
 
+当前研发优先级以 [MVP优先计划](MVP_FIRST.md) 为准（用户2026-10-05最新指示）：先接通正式确认、结果发布、下载和一次修改。下文图片接线等历史“下一步”暂移后续，不再作为MVP前置。
+
 2026-10-05 T05 模型视图/冷恢复接线前增量（`86102ce`）：Strict proof绑定原图与方向PNG及completed native；适配器实际发送快照PNG、保留JPEG原身份、区域按校正方向。原图篡改冷读反例RED→GREEN；真实5份已产源/view/回执只读重核通过，0新native/model/旧项目与两个unknown根无改。本地loopback测试协议，不证明云语义；完整141文件700项75.99s及lint/build/types通过；Spec父目录链接P2真实RED→GREEN，982ee1e补路径检查后86102ce两轴clean；同期构建全套2项旧voice测试15秒超时保留，同阈值单独全套141文件700项75.29秒通过。默认Worker/stage尚未选新view，需下一步冻结proof/按实际载荷预算/ready和Director接线，旧unknown不得换key。完整T05/C0/C1/C2未达，无push/部署。见 [模型视图验证](evidence/image-view-model-validation.md)。
 
 2026-10-05 T05 图片独立解码/缩图基础（`ebeae78`）：20MiB/30MP、实际codec/MIME、方向、透明度与原/视图SHA绑定；owned独立Chromium无场景代码、2048最长边全画幅、readonly原图/网络隔离/固定producer hash、冷复核与unknown不重试。30MP反例RED→GREEN；首轮损坏图分类不符failed保留，修正后v2四格式及v3含alpha五用例通过，RGBA alpha128/255实际保留，20owned completed且精确name全部absent。完整139文件696项70.85s，lint/build/构建后types通过；固定4acf8b7…ebeae78两轴最终clean。0新model/原项目与两个unknown根JSON不变；默认图片模型/Worker尚未消费解码视图，真实云语义未验，完整T05及C0/C1/C2未达，未push/部署。见 [图片预处理证据](evidence/source-image-validation.md)。

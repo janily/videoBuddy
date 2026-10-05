@@ -1,5 +1,7 @@
 # videoBuddy
 
+当前先交付可用MVP：文字需求 → 真实预览 → 一次确认 → 视频下载 → 聊天修改。开发顺序与当前阻断见 [MVP优先计划](docs/engineering/MVP_FIRST.md)；43风格完整交付保留为后续阶段。
+
 VideoBuddy v5.1 应用，直接初始化于本仓库根目录。开发基线为 [CODEX_START_HERE](docs/hand-off/videobuddy-v5.1/CODEX_START_HERE.md)，原视觉参照与文档保留。
 
 当前是**未完成的工程实现**，不是已验收的视频生成产品。没有数据库、登录或固定回复/示例视频；真实生成默认关闭。当前部署方向是单机自托管，见 [架构](docs/engineering/self-hosted-architecture.md) 和 [执行计划](docs/engineering/self-hosted-plan.md)。具体进度和缺项见 [任务记录](docs/engineering/task-ledger.md)。

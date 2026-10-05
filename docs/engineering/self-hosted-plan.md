@@ -1,5 +1,7 @@
 # Self-hosted migration and completion plan
 
+当前研发优先级以 [MVP优先计划](MVP_FIRST.md) 为准（用户2026-10-05最新指示）：先接通正式确认、结果发布、下载和一次修改。下文图片接线等历史“下一步”暂移后续，不再作为MVP前置。
+
 Execution is authorized by the user's 2026-10-02 instruction to redesign and build the complete project without Vercel. This plan changes infrastructure while retaining the v5.1 product and acceptance scope. Every implementation task uses a failing behavior test first and records actual results; no missing external service is marked passed.
 
 1. **Replace platform storage.** Promote the file adapter to production with cross-process locking, crash repair rules, fsync and path checks. Move `productionStore`, app configuration and probes to `VIDEO_DATA_DIR`. Exercise two cold processes against the same volume. Preserve anonymous scopes and immutable refs.
