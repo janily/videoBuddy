@@ -53,3 +53,8 @@ it.each(['“青禾学校”','“10月8日”','“￥39.90”'])('does not spl
  const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:[{sourceText:'“',kind:'semantic' as const,reason:'定界符。'},{sourceText:body.slice(0,1),kind:'literal' as const,reason:'错误拆分。'},{sourceText:body.slice(1),kind:'literal' as const,reason:'错误拆分。'},{sourceText:'”',kind:'semantic' as const,reason:'定界符。'}]}]};
  expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
 });
+it('keeps a title containing sentence punctuation as one complete literal anchor',()=>{
+ const c=requirementsContext({understandingSha256:'a'.repeat(64),facts:[{...fact,text:'电影名称必须是“你好！李焕英”。'}]});
+ const p={schemaVersion:1 as const,contextSha256:c.contextSha256,facts:[{factId:'flow',segments:[{sourceText:'电影名称必须是“',kind:'semantic' as const,reason:'标题要求。'},{sourceText:'你好！',kind:'literal' as const,reason:'错误拆分标题。'},{sourceText:'李焕英',kind:'literal' as const,reason:'错误拆分标题。'},{sourceText:'”。',kind:'semantic' as const,reason:'定界符。'}]}]};
+ expect(()=>guardRequirementsProposal(p,c)).toThrow('CONTENT_REQUIREMENTS_LITERAL_MISSING');
+});

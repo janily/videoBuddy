@@ -21,11 +21,17 @@ function verifyContext(context:RequirementsContext){const{contextSha256,...raw}=
  * not a complete name/entity recognizer. Unknown names require literal treatment
  * by the classifier and independent auditor, never by the film reviewer. */
 function literalFloors(source:string){
- const spans:Array<{start:number;end:number;quoted?:boolean}>=[];
+ const spans:Array<{start:number;end:number;sentenceSequence?:boolean}>=[];
  const digits='[0-9〇零一二三四五六七八九十百千万两]';
  const patterns=[new RegExp(`(?:${digits}{2,4}年)?${digits}{1,3}月${digits}{1,3}(?:日|号)`,'g'),new RegExp(`${digits}+(?:年|月|日|号|天|元|个|秒|分|人)`,'g'),/[￥¥$€£]?[-+−]?\d+(?:[.,]\d+)*(?:%|％)?/g,/\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+(?:\d{1,2}(?:st|nd|rd|th)?|[a-z]+(?:[ -][a-z]+)?)\b/gi];
  for(const pattern of patterns)for(const match of source.matchAll(pattern))spans.push({start:match.index,end:match.index+match[0].length});
- for(const pattern of [/“([^”]+)”/g,/‘([^’]+)’/g,/「([^」]+)」/g,/『([^』]+)』/g,/"([^"\n]+)"/g,/'([^'\n]+)'/g])for(const match of source.matchAll(pattern))if(match[1].trim())spans.push({start:match.index+1,end:match.index+1+match[1].length,quoted:true});
+ for(const pattern of [/“([^”]+)”/g,/‘([^’]+)’/g,/「([^」]+)」/g,/『([^』]+)』/g,/"([^"\n]+)"/g,/'([^'\n]+)'/g])for(const match of source.matchAll(pattern))if(match[1].trim()){
+  const prefix=source.slice(0,match.index);
+  // Only an explicit narration quotation gets sentence-level verification.
+  // Punctuation inside a title (e.g. 你好！李焕英) is part of its name.
+  const sentenceSequence=/旁白/.test(prefix)&&!/(?:名字|名称|片名|电影名|标题|标语|品牌|型号)/.test(prefix);
+  spans.push({start:match.index+1,end:match.index+1+match[1].length,sentenceSequence});
+ }
  return spans;
 }
 export function guardRequirementsProposal(raw:unknown,context:RequirementsContext):RequirementsProposal{
@@ -37,7 +43,7 @@ export function guardRequirementsProposal(raw:unknown,context:RequirementsContex
   let offset=0;const literals:Array<{start:number;end:number}>=[];for(const s of item.segments){const start=offset;offset+=s.sourceText.length;if(s.kind==='literal')literals.push({start,end:offset})}
   if(literalFloors(fact.text).some(floor=>{
    if(literals.some(span=>span.start<=floor.start&&span.end>=floor.end))return false;
-   if(!floor.quoted)return true;
+   if(!floor.sentenceSequence)return true;
    // A multi-sentence quotation may appear as consecutive captions. Preserve
    // every character literally, joining only at complete sentence boundaries.
    // A name, date, number or unfinished sentence cannot use fragmented proof.
