@@ -35,8 +35,16 @@ it('does not let an attachment-only instruction confirm uncertain OCR via a user
  const messages=[{id:userId,role:'user' as const,text:'请把这张照片作为参考。',attachments:[{assetId,filename:'照片.png',mime:input.mime,sha256:input.sha256,text:result.description,imageAnalysis:guardImageUnderstanding({...result,visibleText:[{text:'清和学校',region:{x:0,y:0,width:0.5,height:0.1},confidence:'uncertain'}]},input)}]}];
  const patch={baseBriefVersion:0,operations:[{op:'add_fact',sourceMessageIds:[userId],fact:{id:'school',text:'学校名称为清和学校。',sourceRefs:[{type:'user_message',id:userId}],status:'confirmed',critical:true,mustInclude:true}}]};
  expect(()=>applyUnderstandingPatch(initialUnderstanding(),patch,messages)).toThrow('SOURCE_INVALID');
+ const mandatory={...patch,operations:[{...patch.operations[0],fact:{...patch.operations[0].fact,status:'provided',critical:false}}]};
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),mandatory,messages)).toThrow('SOURCE_INVALID');
+ expect(()=>applyUnderstandingPatch(initialUnderstanding(),{...mandatory,operations:[{...mandatory.operations[0],fact:{...mandatory.operations[0].fact,mustInclude:false}}]},messages)).toThrow('SOURCE_INVALID');
  const viaConflict={baseBriefVersion:0,operations:[{...patch.operations[0],fact:{...patch.operations[0].fact,status:'provided',critical:false}},{op:'resolve_conflict',sourceMessageIds:[userId],factIds:['school'],selectedFactId:'school'}]};
  expect(()=>applyUnderstandingPatch(initialUnderstanding(),viaConflict,messages)).toThrow('SOURCE_INVALID');
+ const legacyBase={...initialUnderstanding(),facts:[{...patch.operations[0].fact,status:'provided' as const,sourceRefs:[{type:'user_message' as const,id:userId}]}]};
+ const resolveOnly={baseBriefVersion:0,operations:[viaConflict.operations[1]]};
+ expect(()=>applyUnderstandingPatch(legacyBase,resolveOnly,messages)).toThrow('SOURCE_INVALID');
+ const confirmingId=randomUUID(),resolved=applyUnderstandingPatch(legacyBase,{baseBriefVersion:0,operations:[{...viaConflict.operations[1],sourceMessageIds:[confirmingId]}]},[...messages,{id:confirmingId,role:'user',text:'学校名称为清和学校。'}]);
+ expect(resolved.facts[0].sourceRefs).toContainEqual({type:'user_message',id:confirmingId,excerpt:'学校名称为清和学校。'});
  expect(applyUnderstandingPatch(initialUnderstanding(),viaConflict,[{...messages[0],text:'学校名称为清和学校。'}]).facts[0].status).toBe('confirmed');
  expect(()=>applyUnderstandingPatch(initialUnderstanding(),patch,[{...messages[0],text:'我没有确认学校名称为清和学校。'}])).toThrow('SOURCE_INVALID');
  expect(applyUnderstandingPatch(initialUnderstanding(),patch,[{...messages[0],text:'学校名称为清和学校。'}]).facts[0].status).toBe('confirmed');
