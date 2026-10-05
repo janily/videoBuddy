@@ -33,6 +33,20 @@ export function visualReviewContext(raw:z.input<typeof input>):VisualReviewConte
  return{...value,frameSetSha256:canonicalHash(value.frames)};
 }
 function normalized(text:string){return text.normalize('NFC').replace(/[\s，。！？、：；,.!?:;]/g,'')}
+// Numeric punctuation and token boundaries carry meaning: 8日 is not 18日,
+// and removing a decimal point must not turn 1.8元 into evidence for 18元.
+function containsLiteral(observed:string,expected:string){
+ const number=/[0-9０-９〇零一二三四五六七八九十百千万亿两壹贰叁肆伍陆柒捌玖拾佰仟]/u;
+ const normalize=(text:string)=>text.normalize('NFC').replace(/\s/g,'').replace(/[，。！？、：；,.!?:;]/g,(mark,index,whole)=>number.test(whole[index-1]??'')&&number.test(whole[index+1]??'')?mark:'');
+ const text=normalize(observed),literal=normalize(expected);
+ for(let index=text.indexOf(literal);index>=0;index=text.indexOf(literal,index+1)){
+  const before=text[index-1]??'',after=text[index+literal.length]??'';
+  if(number.test(literal[0])&&(number.test(before)||/[+＋\-−－.,，。:：]/u.test(before)))continue;
+  if(number.test(literal.at(-1)!)&&(number.test(after)||/[.,，。:：]/u.test(after)))continue;
+  return true;
+ }
+ return false;
+}
 export function guardVisualReview(raw:unknown,context:VisualReviewContext):VisualReview{
  const {frameSetSha256,...input}=context,verified=visualReviewContext(input);if(verified.frameSetSha256!==frameSetSha256)throw Error('CRITIC_BASELINE_CHANGED');
  const parsed=VisualReviewSchema.safeParse(raw);if(!parsed.success)throw Error('CRITIC_REVIEW_INVALID');const value=parsed.data;
@@ -46,7 +60,7 @@ export function guardVisualReview(raw:unknown,context:VisualReviewContext):Visua
    const requirement=context.sourceCriteria!.requirements.find(r=>r.factId===check.factId)!;
    if(check.literalChecks.length!==requirement.exactText.length||!unique(check.literalChecks.map(c=>c.sourceExcerpt.normalize('NFC')))||check.literalChecks.some(c=>!requirement.exactText.includes(c.sourceExcerpt)))throw Error('CRITIC_FACT_EVIDENCE_INVALID');
    for(const literal of check.literalChecks){
-    if(!unique(literal.frameIds)||literal.frameIds.some(id=>!frames.has(id))||literal.result==='pass'&&(!literal.frameIds.length||!literal.frameIds.some(id=>value.observations.find(o=>o.frameId===id)!.visibleText.some(text=>normalized(text).includes(normalized(literal.sourceExcerpt))))))throw Error('CRITIC_FACT_EVIDENCE_INVALID');
+    if(!unique(literal.frameIds)||literal.frameIds.some(id=>!frames.has(id))||literal.result==='pass'&&(!literal.frameIds.length||!literal.frameIds.some(id=>value.observations.find(o=>o.frameId===id)!.visibleText.some(text=>containsLiteral(text,literal.sourceExcerpt)))))throw Error('CRITIC_FACT_EVIDENCE_INVALID');
    }
    if(check.result==='pass'&&(!check.literalChecks.length||check.literalChecks.some(c=>c.result!=='pass'||!c.frameIds.some(id=>check.frameIds.includes(id))))||check.result!=='fail'&&check.literalChecks.some(c=>c.result==='fail'))throw Error('CRITIC_FACT_EVIDENCE_INVALID');
   }
