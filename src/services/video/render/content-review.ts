@@ -16,7 +16,7 @@ import {assertApprovedRenderFence,loadApprovedRenderInputs} from './approved-inp
 import {composeApprovedFilm} from './composition';
 import type {prepareApprovedVisualEvidence} from './visual-evidence';
 const digest=z.string().regex(/^[a-f0-9]{64}$/);
-const BatchSchema=z.strictObject({schemaVersion:z.literal(1),inputHash:digest,compositionHash:digest,requirementsRef:ObjectRefSchema,contextRef:ObjectRefSchema,evidenceRef:ObjectRefSchema,reviewRef:ObjectRefSchema});
+const BatchSchema=z.strictObject({schemaVersion:z.literal(1),round:z.union([z.literal(1),z.literal(2)]),index:z.number().int().nonnegative(),inputHash:digest,compositionHash:digest,requirementsRef:ObjectRefSchema,contextRef:ObjectRefSchema,evidenceRef:ObjectRefSchema,reviewRef:ObjectRefSchema});
 type Options=Parameters<typeof prepareApprovedVisualEvidence>[5]&{limits?:ModelLimits;decide?:(context:ContentReviewContext,images:ReadonlyMap<string,Uint8Array>)=>Promise<ContentReview>};
 type Result='pass'|'fail'|'not_checked';
 function combine(values:Result[]):Result{return values.includes('fail')?'fail':values.every(value=>value==='pass')?'pass':'not_checked'}
@@ -62,7 +62,7 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
   const batch=rawEvidence.batches[index],evidence=VisualEvidenceSchema.parse(await readNarrationJson(projects.store,batch.evidenceRef,prefix+'visual-frame-evidence/'));
   if(batch.round!==expectedBatch.round||batch.index!==expectedBatch.index||evidence.filmSha256!==filmSha256||evidence.runtimeDigest!==frozen.filmSpec.runtimeDigest||evidence.width!==frozen.filmSpec.output.width||evidence.height!==frozen.filmSpec.output.height||canonicalHash(evidence.frames.map(f=>f.frame))!==canonicalHash(expectedBatch.frames))throw Error('CONTENT_COVERAGE_MISSING');
   await (options.readImages||readVisualEvidence)(root,evidence);await assertApprovedRenderFence(projects,inputs);
-  const context=contentReviewContext({filmSha256,filmSpecSha256:inputs.bundle.filmSpecRef.sha256,factsManifestSha256:frozen.filmSpec.factsRef.sha256,fps:frozen.timeline.fps,totalFrames:frozen.timeline.totalFrames,facts:frozen.facts.facts,requirements:requirementsRecord.requirements,frames:evidence.frames.map(({id,frame,sha256,bytes})=>({id,frame,sha256,bytes})),transcripts}),contextRef=immutableRef(prefix+'content-context',context);
+  const context=contentReviewContext({filmSha256,filmSpecSha256:inputs.bundle.filmSpecRef.sha256,factsManifestSha256:frozen.filmSpec.factsRef.sha256,fps:frozen.timeline.fps,totalFrames:frozen.timeline.totalFrames,facts:frozen.facts.facts,requirements:requirementsRecord.requirements,frames:evidence.frames.map(({id,frame,sha256,bytes})=>({id,frame,sha256,bytes})),transcripts,reviewBatch:{round:batch.round,index:batch.index}}),contextRef=immutableRef(prefix+'content-context',context);
   prepared.push({round:batch.round,index:batch.index,evidence,evidenceRef:batch.evidenceRef,context,contextRef});
  }
  await assertApprovedRenderFence(projects,inputs);
@@ -71,12 +71,12 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
  const reviews:Array<{round:1|2;review:ContentReview}>=[],batches:z.infer<typeof BatchSchema>[]=[];
  for(const item of prepared){
   await assertApprovedRenderFence(projects,inputs);
-  const stageKey=canonicalHash({inputHash:inputs.inputHash,compositionHash,requirementsRef,contextRef:item.contextRef,evidenceRef:item.evidenceRef}),batchKey=prefix+'content-review-batches-v1/'+stageKey;
+  const stageKey=canonicalHash({round:item.round,index:item.index,inputHash:inputs.inputHash,compositionHash,requirementsRef,contextRef:item.contextRef,evidenceRef:item.evidenceRef}),batchKey=prefix+'content-review-batches-v1/'+stageKey;
   let saved:z.infer<typeof BatchSchema>|undefined;
   try{saved=BatchSchema.parse((await projects.store.readFresh(batchKey)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
   let review:ContentReview;
   if(saved){
-   if(saved.inputHash!==inputs.inputHash||saved.compositionHash!==compositionHash||canonicalHash(saved.requirementsRef)!==canonicalHash(requirementsRef)||canonicalHash(saved.contextRef)!==canonicalHash(item.contextRef)||canonicalHash(saved.evidenceRef)!==canonicalHash(item.evidenceRef))throw Error('CONTENT_BASELINE_CHANGED');
+   if(saved.round!==item.round||saved.index!==item.index||saved.inputHash!==inputs.inputHash||saved.compositionHash!==compositionHash||canonicalHash(saved.requirementsRef)!==canonicalHash(requirementsRef)||canonicalHash(saved.contextRef)!==canonicalHash(item.contextRef)||canonicalHash(saved.evidenceRef)!==canonicalHash(item.evidenceRef))throw Error('CONTENT_BASELINE_CHANGED');
    const cold=await readNarrationJson(projects.store,saved.contextRef,prefix+'content-context/');if(canonicalHash(cold)!==canonicalHash(item.context))throw Error('CONTENT_BASELINE_CHANGED');
    review=guardContentReview(await readNarrationJson(projects.store,saved.reviewRef,prefix+'content-reviews/'),item.context);
   }else{
@@ -89,9 +89,9 @@ export async function reviewApprovedContent(projects:ProjectStore,owner:string,p
     const reservation=await reserveModelBudget(projects.store,projectId,operationId+'-content-'+stageKey,{inputTokens:Buffer.byteLength(canonicalJson(item.context))+8192+item.context.frames.length*8192,outputTokens:8000},options.limits||modelLimits(env));
     execute=()=>withAccountedModel(projects.store,reservation.reservation,()=>runContentCritic(item.context,images,reservation.maxOutputTokens,env,{assertActive:()=>assertApprovedRenderFence(projects,inputs)}));
    }
-   review=await runEffect(projects.store,`projects/${projectId}/operations/${operationId}/effects/formal-content-critic/${stageKey}`,async()=>{await assertApprovedRenderFence(projects,inputs);return guardContentReview(await execute(),item.context)});
+   review=guardContentReview(await runEffect(projects.store,`projects/${projectId}/operations/${operationId}/effects/formal-content-critic/${stageKey}`,async()=>{await assertApprovedRenderFence(projects,inputs);return guardContentReview(await execute(),item.context)}),item.context);
    await assertApprovedRenderFence(projects,inputs);await (options.readImages||readVisualEvidence)(root,item.evidence);await assertApprovedRenderFence(projects,inputs);
-   const reviewRef=await projects.index.immutable(prefix+'content-reviews',review),candidate={schemaVersion:1 as const,inputHash:inputs.inputHash,compositionHash,requirementsRef,contextRef:item.contextRef,evidenceRef:item.evidenceRef,reviewRef};
+   const reviewRef=await projects.index.immutable(prefix+'content-reviews',review),candidate={schemaVersion:1 as const,round:item.round,index:item.index,inputHash:inputs.inputHash,compositionHash,requirementsRef,contextRef:item.contextRef,evidenceRef:item.evidenceRef,reviewRef};
    await assertApprovedRenderFence(projects,inputs);saved=await createOrRead(projects.store,batchKey,candidate);if(canonicalHash(saved)!==canonicalHash(candidate))throw Error('CONTENT_BASELINE_CHANGED');
   }
   await assertApprovedRenderFence(projects,inputs);reviews.push({round:item.round,review});batches.push(saved);

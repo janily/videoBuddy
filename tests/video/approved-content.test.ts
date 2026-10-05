@@ -1,6 +1,7 @@
 import {rm} from 'node:fs/promises';
 import {join} from 'node:path';
-import {it,expect} from 'vitest';
+import {it,expect,vi} from 'vitest';
+import * as sampling from '@/services/video/quality/whole-visual-plan';
 import {seedApprovedProject} from './fixtures/approved-project';
 import {loadApprovedRenderInputs} from '@/services/video/render/approved-inputs';
 import {prepareApprovedVisualEvidence} from '@/services/video/render/visual-evidence';
@@ -55,4 +56,27 @@ it('stops on archive failure and reclaims a completed effect without another dec
  await expect(invoke()).rejects.toThrow('ARCHIVE_WRITE_FAILED');expect(calls).toBe(1);fail=false;
  const result=await invoke();expect(calls).toBe(result.batches.length);expect(result.report.result).toBe('pass');
  }finally{await rm(f.root,{recursive:true,force:true})}
+},30000);
+it.each(['baseline','literal'] as const)('revalidates completed effect %s before archiving or requesting another batch',async fault=>{
+ const f=await seedApprovedProject();try{const options=await producers(f);await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);let calls=0,fail=true;const create=f.projects.store.create.bind(f.projects.store);
+ f.projects.store.create=async(key,value)=>{if(fail&&key.includes('/content-reviews/'))throw Error('ARCHIVE_WRITE_FAILED');return create(key,value)};
+ const invoke=()=>reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,decide:async c=>{calls++;return response(c)}});
+ await expect(invoke()).rejects.toThrow('ARCHIVE_WRITE_FAILED');expect(calls).toBe(1);fail=false;
+ const effects=await f.projects.store.listKeys!(`projects/${f.projectId}/operations/${f.operationId}/effects/formal-content-critic`,1);expect(effects).toHaveLength(1);
+ await updateJson(f.projects.store,effects[0],(effect:{output:ContentReview})=>({...effect,output:{...effect.output,...(fault==='baseline'?{contextSha256:'0'.repeat(64)}:{facts:effect.output.facts.map(fact=>({...fact,literalChecks:[]}))})}}));
+ await expect(invoke()).rejects.toThrow(fault==='baseline'?'CONTENT_BASELINE_CHANGED':'CONTENT_LITERAL_EVIDENCE_INVALID');expect(calls).toBe(1);
+ expect(await f.projects.store.listKeys!(`projects/${f.projectId}/approvals/${f.approval.approvalId}/content-reviews`,1)).toEqual([]);
+ await expect(f.projects.store.readFresh(`projects/${f.projectId}/approvals/${f.approval.approvalId}/content-review-v1-stage`)).rejects.toThrow();
+ }finally{await rm(f.root,{recursive:true,force:true})}
+},30000);
+it('executes independent rounds even when a valid sampling clock yields identical frame batches',async()=>{
+ const realPlan=sampling.wholeFilmVisualPlan;
+ // Inject only the sampling boundary. This legal clock makes the true sampling
+ // algorithm select equal image sets; image reuse must not reuse QA decisions.
+ const sample=vi.spyOn(sampling,'wholeFilmVisualPlan').mockImplementation(clock=>realPlan({...clock,captions:Array.from({length:20},(_,i)=>({startFrame:i*24,endFrame:(i+1)*24,stableReadableStartFrame:i*24+12}))}));
+ const f=await seedApprovedProject();try{const options=await producers(f),evidence=await prepareApprovedVisualEvidence(f.projects,'owner',f.projectId,f.operationId,0,options);expect(evidence.record.plan.rounds[0].frames).toEqual(evidence.record.plan.rounds[1].frames);let calls=0;
+ const stage=await reviewApprovedContent(f.projects,'owner',f.projectId,f.operationId,0,{...options,decide:async c=>{calls++;return response(c)}});expect(calls).toBe(stage.batches.length);
+ expect(new Set(stage.batches.map(b=>b.contextRef.sha256)).size).toBe(stage.batches.length);expect(stage.batches.filter(b=>b.round===1)).toHaveLength(stage.batches.length/2);expect(stage.batches.filter(b=>b.round===2)).toHaveLength(stage.batches.length/2);
+ expect(await f.projects.store.listKeys!(`projects/${f.projectId}/operations/${f.operationId}/effects/formal-content-critic`,1)).toHaveLength(stage.batches.length);
+ }finally{sample.mockRestore();await rm(f.root,{recursive:true,force:true})}
 },30000);
