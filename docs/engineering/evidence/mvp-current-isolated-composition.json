@@ -1,0 +1,33 @@
+{
+  "observedAt": "2026-10-07T14:02:18.133Z",
+  "sourceOperationId": "76ea4e62-582a-4586-bce4-190ad1e39a3d",
+  "diagnosticOperationId": "8a8aea58-5a53-403f-b636-eba9c06fc495",
+  "status": "succeeded",
+  "originalInputsUnchanged": true,
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "9cd9f6898be411ec9244f9d53752a892a02e0063dbed72213aeaa52e9fa23c8c",
+    "bytes": 4766610,
+    "width": 1280,
+    "height": 720,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2
+  },
+  "loudness": {
+    "status": "pass",
+    "filmSha256": "9cd9f6898be411ec9244f9d53752a892a02e0063dbed72213aeaa52e9fa23c8c",
+    "runtimeDigest": "c91e4b1e1fe665b5017da982aed5a0f7b45fa11e2416207caa09304135d92623",
+    "integratedLufs": -13.87,
+    "truePeakDbtp": -2.7,
+    "targetLufs": -14,
+    "toleranceLu": 1,
+    "maxTruePeakDbtp": -1.2
+  },
+  "productionStateUntouched": true,
+  "originalProducerJournalUntouched": true,
+  "published": false,
+  "scope": "Independent isolated compositor diagnostic with actual current picture and audio inputs mounted read-only; not a production retry or approved delivery."
+}

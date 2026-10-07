@@ -11,5 +11,16 @@
   "diagnosticErrorCode": "COMPOSITION_PRODUCER_UNKNOWN",
   "productionStateUntouched": true,
   "mediaProducerRerun": false,
-  "doesNotAttestMissingNativeOutput": true
+  "doesNotAttestMissingNativeOutput": true,
+  "validity": "invalid_operation_lineage",
+  "invalidatedAt": "2026-10-07T14:06:15.526568+00:00",
+  "correction": {
+    "reason": "The inspected film and producer receipt belong to an earlier formal operation; the empty output came from a current font check, not a compositor invocation. Their artificial combination does not diagnose the source operation.",
+    "actualFilmSourceOperationId": "c2777e6d-7f2c-4f1f-873c-aaa43cd9d8f5",
+    "filmReceiptObservedAt": "2026-10-07T12:30:30.824Z",
+    "currentFontCheckObservedAt": "2026-10-07T13:31:11Z",
+    "emptyFontCheckOutputIsExpected": true,
+    "originalOperationCauseEstablished": false,
+    "retainedForAuditOnly": true
+  }
 }

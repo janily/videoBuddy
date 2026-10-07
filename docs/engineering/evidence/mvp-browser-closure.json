@@ -974,14 +974,32 @@
     "status": "failed",
     "stage": "composition",
     "storedErrorCode": "PROVIDER_UNAVAILABLE",
-    "diagnosticErrorCode": "COMPOSITION_PRODUCER_UNKNOWN",
-    "actualFilmSha256": "f6af20d0ef9ac6f0d40081cf0b34a74cdae93676759b9d2d40042390abe23b39",
-    "actualFilmBytes": 14017592,
-    "nativeReceiptOutputBytes": 0,
     "published": false,
     "oldResultIdRetained": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
-    "diagnosticEvidence": "mvp-empty-composition-receipt.json",
     "nativeStdoutProbe": "mvp-docker-stdout-diagnostic.json",
-    "doesNotProveNativeStdoutLossCause": true
+    "doesNotProveNativeStdoutLossCause": true,
+    "diagnosisStatus": "cause_undetermined",
+    "currentOperationCompositeProduced": false,
+    "currentOperationCompositorJournalExists": false,
+    "invalidatedPriorDiagnosis": {
+      "invalidatedAt": "2026-10-07T14:06:15.526568+00:00",
+      "reason": "Unrelated previous formal film was associated with the current font-check journal.",
+      "claims": {
+        "diagnosticErrorCode": "COMPOSITION_PRODUCER_UNKNOWN",
+        "actualFilmSha256": "f6af20d0ef9ac6f0d40081cf0b34a74cdae93676759b9d2d40042390abe23b39",
+        "actualFilmBytes": 14017592,
+        "nativeReceiptOutputBytes": 0,
+        "diagnosticEvidence": "mvp-empty-composition-receipt.json"
+      },
+      "evidenceValidity": "invalid_operation_lineage"
+    },
+    "diagnosticEvidence": [
+      "mvp-current-composite-preflight.json",
+      "mvp-current-compose-cache.json",
+      "mvp-current-isolated-composition.json"
+    ],
+    "isolatedCurrentInputComposition": "succeeded_diagnostic_only",
+    "isolatedDiagnosticPublished": false,
+    "doesNotProveOriginalFailureCause": true
   }
 }

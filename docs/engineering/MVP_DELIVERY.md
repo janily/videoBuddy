@@ -55,8 +55,14 @@ Chrome连接本次已恢复；旧Web与Worker进程已不存在，启动后原�
 
 进一步核对当前真实control（attention、previewState=ready、旧currentResult保留）发现恢复按钮仍被隐藏。新增该组合的页面回归测试先在“先看新效果”缺失处失败（2.4秒）；修复后7项批准/恢复相关页面测试通过（3.6秒），typecheck、lint通过。已补回attention状态下的既有预览按钮，仍受服务端action和提交锁限制，草稿与旧片下载保留。见 [失败重试入口证据](evidence/mvp-failed-formal-retry-ui.json)。用户刷新原项目页面即可继续手动验证，实际修改片发布和下载仍未完成。
 
-## 本次手动页面新尝试的实际阻断
+## 本次手动页面新尝试与诊断更正
 
-operation `76ea4e62-582a-4586-bce4-190ad1e39a3d` 已实际完成四段画面渲染及20秒预览合成，但在composition阶段失败，尚未发布可确认的新预览。实际MP4为14,017,592字节，SHA `f6af20d0ef9ac6f0d40081cf0b34a74cdae93676759b9d2d40042390abe23b39`，与文件中的合成回执一致；对应completed执行日志的native output为空。独立只读重跑回执校验复现 `COMPOSITION_PRODUCER_UNKNOWN`（277ms），未重放媒体或改写生产态，见 [诊断](evidence/mvp-empty-composition-receipt.json)。五次隔离固定镜像的输出采集均通过，不能据此断言本次输出丢失原因，见 [隔离检测](evidence/mvp-docker-stdout-diagnostic.json)。
+operation `76ea4e62-582a-4586-bce4-190ad1e39a3d` 已完成四段画面渲染，但在composition阶段以 `PROVIDER_UNAVAILABLE` 失败；本次没有启动字幕层或合成生产器，没有产出可确认的新预览。旧正式片保留。原异常被泛化后缺少足以确定根因的信息，当前根因未确定。
 
-已修复后续预览错误归类：缺失native回执保持具体错误码并在页面提示“合成来源未通过核验”，不再伪装成模型连接失败。新增公开Worker/SSE/ProjectView回归先失败，修复后四个相关测试文件56项通过（13.14秒），typecheck、lint通过。当前旧operation的泛化错误码不追溯改写，真实诊断另存。原任务未发布、新版完整闭环仍缺少；用户继续手动正常页面验证。
+上一轮把旧正式任务 `c2777e6d-7f2c-4f1f-873c-aaa43cd9d8f5` 的合成文件与本次字体检查日志关联，误判为合成native回执丢失。该结论不成立；[原诊断记录](evidence/mvp-empty-composition-receipt.json) 已明确标记无效关联并保留供审计，页面闭环记录同步更正。字体检查的空输出是正常行为，不能证明合成输出丢失。
+
+本次按实际revision只读复核前置检查，成功抵达合成调用，生产控制态未改写，见 [前置检查](evidence/mvp-current-composite-preflight.json)。缓存只读检查因本次合成尚未存在而返回ENOENT，此结果不是原失败原因，见 [缓存检查](evidence/mvp-current-compose-cache.json)。随后在独立目录和独立执行日志中，使用本次画面与音频的只读输入完成真实20秒720p合成，480帧、双声道、完整技术QA及音量检查通过，见 [隔离合成检查](evidence/mvp-current-isolated-composition.json)。它仅用于诊断，没有发布、没有替换原任务，也不能证明原页面失败的根因。
+
+此前补充的 `COMPOSITION_PRODUCER_UNKNOWN` 错误归类及公开Worker/SSE/ProjectView回归，四个相关测试文件56项通过（13.14秒），typecheck、lint通过；它覆盖该特定错误的呈现，不代表修复了本次泛化失败。五次 [隔离stdout检查](evidence/mvp-docker-stdout-diagnostic.json) 通过也不能归因本次故障。
+
+用户已选择手动页面验收。下一步仍通过原项目页面“先看新效果”生成新预览，确认标题和故事后点击“就按这个做”；新版正式发布后实际播放和下载，并保留旧片。完整MVP尚未通过，不将隔离诊断视频作为正式交付。

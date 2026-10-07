@@ -1,0 +1,8 @@
+{
+  "observedAt": "2026-10-07T14:00:38.925Z",
+  "operationId": "76ea4e62-582a-4586-bce4-190ad1e39a3d",
+  "diagnosticErrorCode": "ENOENT",
+  "mustExist": true,
+  "productionControlUnchanged": true,
+  "scope": "Actual current composition inputs; cache-only verification prohibits creation and producer replay. Expected cache-missing errors are diagnostic stops, not the original production cause."
+}

@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-10-07T13:58:44.299Z",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "revisionId": "03540576-e914-4c9d-9ecc-99d3dda3d9e7",
+  "operationId": "76ea4e62-582a-4586-bce4-190ad1e39a3d",
+  "diagnosticErrorCode": "DIAGNOSTIC_COMPOSE_REACHED",
+  "composeReached": true,
+  "blockedWrites": [],
+  "productionControlUnchanged": true,
+  "diagnosticOnly": true,
+  "scope": "Read-only stage preflight using an in-memory running-fence context; all persistent writes prohibited and compose replaced with a diagnostic stop. Not a production retry or publication."
+}
