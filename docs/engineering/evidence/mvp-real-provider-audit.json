@@ -1,9 +1,9 @@
 {
-  "observedAt": "2026-10-07T12:46:17.412035+00:00",
+  "observedAt": "2026-10-07T13:54:11.438848+00:00",
   "model": "gemini-3.8-flash",
-  "checkpointFiles": 26,
-  "distinctRequests": 179,
-  "completedResponses": 176,
+  "checkpointFiles": 28,
+  "distinctRequests": 187,
+  "completedResponses": 184,
   "transportFailuresWithoutResponse": 3,
   "pending": 0,
   "allCompletedRawResponsesShaVerified": true,
@@ -3723,6 +3723,182 @@
       },
       "rawResponseShaVerified": true,
       "responseFile": "model-diagnostics/d642420ec175b193dbf5c7116041747294ee4534b55c8f97443d18d273b5a98d.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:28:16.264Z",
+      "finishedAt": "2026-10-07T13:28:45.153Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 4197,
+      "responseSha256": "cfda4625fb272f93ecc42e3f9c8560e5b417ecdde6b42fdcca6be2260a31decb",
+      "usage": {
+        "prompt_tokens": 1210,
+        "completion_tokens": 3688,
+        "total_tokens": 4898,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/cfda4625fb272f93ecc42e3f9c8560e5b417ecdde6b42fdcca6be2260a31decb.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:28:45.554Z",
+      "finishedAt": "2026-10-07T13:29:13.369Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 7177,
+      "responseSha256": "e45fe63423ad987fc5544e87c8d43ddcc00cb298ca761c7cb0526a534eef82f0",
+      "usage": {
+        "prompt_tokens": 1991,
+        "completion_tokens": 2679,
+        "total_tokens": 4670,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/e45fe63423ad987fc5544e87c8d43ddcc00cb298ca761c7cb0526a534eef82f0.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:29:13.872Z",
+      "finishedAt": "2026-10-07T13:30:04.471Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 17738,
+      "responseSha256": "1d784b8d08a2fb4319ca883f5f81a2d15de4b21912cee4a995b0ad7f658ed863",
+      "usage": {
+        "prompt_tokens": 4693,
+        "completion_tokens": 5201,
+        "total_tokens": 9894,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/1d784b8d08a2fb4319ca883f5f81a2d15de4b21912cee4a995b0ad7f658ed863.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:30:06.334Z",
+      "finishedAt": "2026-10-07T13:31:09.763Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 34457,
+      "responseSha256": "ee9b0a106e5531cea43a062c2fa5c8ff04881088a1abcf2152383f8e9d9cf297",
+      "usage": {
+        "prompt_tokens": 10609,
+        "completion_tokens": 9582,
+        "total_tokens": 20191,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/ee9b0a106e5531cea43a062c2fa5c8ff04881088a1abcf2152383f8e9d9cf297.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:31:12.092Z",
+      "finishedAt": "2026-10-07T13:32:22.813Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 29584,
+      "responseSha256": "a5d04be502ff0889c685d5399cf92fd5aadb798874f1e3254f5965ad73f77dce",
+      "usage": {
+        "prompt_tokens": 9249,
+        "completion_tokens": 9252,
+        "total_tokens": 18501,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/a5d04be502ff0889c685d5399cf92fd5aadb798874f1e3254f5965ad73f77dce.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:32:53.352Z",
+      "finishedAt": "2026-10-07T13:33:58.276Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 44762,
+      "responseSha256": "5d88d1e384cb257bbfaaa4bb27a41bc134b76d4c6dd8c6935b82a275e54d909f",
+      "usage": {
+        "prompt_tokens": 15798,
+        "completion_tokens": 8564,
+        "total_tokens": 24362,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/5d88d1e384cb257bbfaaa4bb27a41bc134b76d4c6dd8c6935b82a275e54d909f.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:34:27.805Z",
+      "finishedAt": "2026-10-07T13:35:26.901Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 44738,
+      "responseSha256": "24c5cfc040636e7cbb941d0a6139955b3dbee21f8f07273373b8365915d382c5",
+      "usage": {
+        "prompt_tokens": 15799,
+        "completion_tokens": 9277,
+        "total_tokens": 25076,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/24c5cfc040636e7cbb941d0a6139955b3dbee21f8f07273373b8365915d382c5.json"
+    },
+    {
+      "model": "gemini-3.8-flash",
+      "startedAt": "2026-10-07T13:36:00.642Z",
+      "finishedAt": "2026-10-07T13:37:02.230Z",
+      "status": 200,
+      "stream": false,
+      "imageCount": 0,
+      "requestBytes": 44741,
+      "responseSha256": "aa1b2a2af0ab6ed04327187bd77ff684599b476675625bef58aa585762f6ac45",
+      "usage": {
+        "prompt_tokens": 15793,
+        "completion_tokens": 8692,
+        "total_tokens": 24485,
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        },
+        "completion_tokens_details": null
+      },
+      "rawResponseShaVerified": true,
+      "responseFile": "model-diagnostics/aa1b2a2af0ab6ed04327187bd77ff684599b476675625bef58aa585762f6ac45.json"
     }
   ]
 }

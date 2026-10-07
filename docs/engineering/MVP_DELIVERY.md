@@ -54,3 +54,9 @@ Chrome连接本次已恢复；旧Web与Worker进程已不存在，启动后原�
 ## 失败后正常页面重试入口
 
 进一步核对当前真实control（attention、previewState=ready、旧currentResult保留）发现恢复按钮仍被隐藏。新增该组合的页面回归测试先在“先看新效果”缺失处失败（2.4秒）；修复后7项批准/恢复相关页面测试通过（3.6秒），typecheck、lint通过。已补回attention状态下的既有预览按钮，仍受服务端action和提交锁限制，草稿与旧片下载保留。见 [失败重试入口证据](evidence/mvp-failed-formal-retry-ui.json)。用户刷新原项目页面即可继续手动验证，实际修改片发布和下载仍未完成。
+
+## 本次手动页面新尝试的实际阻断
+
+operation `76ea4e62-582a-4586-bce4-190ad1e39a3d` 已实际完成四段画面渲染及20秒预览合成，但在composition阶段失败，尚未发布可确认的新预览。实际MP4为14,017,592字节，SHA `f6af20d0ef9ac6f0d40081cf0b34a74cdae93676759b9d2d40042390abe23b39`，与文件中的合成回执一致；对应completed执行日志的native output为空。独立只读重跑回执校验复现 `COMPOSITION_PRODUCER_UNKNOWN`（277ms），未重放媒体或改写生产态，见 [诊断](evidence/mvp-empty-composition-receipt.json)。五次隔离固定镜像的输出采集均通过，不能据此断言本次输出丢失原因，见 [隔离检测](evidence/mvp-docker-stdout-diagnostic.json)。
+
+已修复后续预览错误归类：缺失native回执保持具体错误码并在页面提示“合成来源未通过核验”，不再伪装成模型连接失败。新增公开Worker/SSE/ProjectView回归先失败，修复后四个相关测试文件56项通过（13.14秒），typecheck、lint通过。当前旧operation的泛化错误码不追溯改写，真实诊断另存。原任务未发布、新版完整闭环仍缺少；用户继续手动正常页面验证。

@@ -1,0 +1,33 @@
+{
+  "observedAt": "2026-10-07T13:51:28.120Z",
+  "scope": "Five isolated fresh pinned-runtime stdout diagnostics; no production records or media artifacts were replayed or altered.",
+  "records": [
+    {
+      "index": 0,
+      "stdoutBytes": 40,
+      "matchesExpected": true
+    },
+    {
+      "index": 1,
+      "stdoutBytes": 40,
+      "matchesExpected": true
+    },
+    {
+      "index": 2,
+      "stdoutBytes": 40,
+      "matchesExpected": true
+    },
+    {
+      "index": 3,
+      "stdoutBytes": 40,
+      "matchesExpected": true
+    },
+    {
+      "index": 4,
+      "stdoutBytes": 40,
+      "matchesExpected": true
+    }
+  ],
+  "allPassed": true,
+  "doesNotProveCauseOfPriorEmptyOutput": true
+}

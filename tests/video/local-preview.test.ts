@@ -21,6 +21,16 @@ async function setup(){
  await store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,kind:'preview',commandId:randomUUID(),status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,revisionId,previewId,briefVersion:c.briefVersion,consentEpoch:c.consentEpoch,understandingRef:c.understandingRef});
  return{root,store,projects,projectId,operationId,revisionId,previewId,events:new LocalEventLog(root)};
 }
+it('missing native composition attestation is retained in terminal SSE and the recovery view',async()=>{
+ const f=await setup();try{
+  await runPreviewOperation(f.store,f.events,f.projectId,f.operationId,{root:f.root,build:async()=>{throw Error('COMPOSITION_PRODUCER_UNKNOWN')}});
+  const last=(await f.events.readFrom(f.projectId,f.operationId,0)).at(-1)!.event;
+  expect(last.payload).toMatchObject({status:'failed',errorCode:'COMPOSITION_PRODUCER_UNKNOWN'});
+  const view=await new ProjectStore(new FileStore(f.root)).view('owner',f.projectId);
+  expect(view.phase).toBe('attention');expect(view.activeProduction).toBeNull();
+  expect(view.productionFailure).toMatchObject({errorCode:'COMPOSITION_PRODUCER_UNKNOWN',message:'合成来源未通过核验，资料和已有视频已保留。请重新生成效果。'});
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
 it.each(['retry','queue'])('unclaimed cancellation repairs a lost blocker-clearing ACK via %s without starting media',async recovery=>{
  const f=await setup(),cas=f.store.cas.bind(f.store);let controls=0,calls=0;
  try{

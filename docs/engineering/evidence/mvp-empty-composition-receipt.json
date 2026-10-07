@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-10-07T13:49:28.542Z",
+  "operationId": "76ea4e62-582a-4586-bce4-190ad1e39a3d",
+  "stageKey": "185869979366f7474b5048244d63be56bab95b88635b42fcb2a38b52a570ec7d",
+  "journalInvocation": "fb677a3b-0c91-4a33-8538-109e9e60acc5",
+  "journalState": "completed",
+  "nativeOutputBytes": 0,
+  "actualFilmSha256": "f6af20d0ef9ac6f0d40081cf0b34a74cdae93676759b9d2d40042390abe23b39",
+  "actualFilmBytes": 14017592,
+  "fileMatchesProducerReceipt": true,
+  "diagnosticErrorCode": "COMPOSITION_PRODUCER_UNKNOWN",
+  "productionStateUntouched": true,
+  "mediaProducerRerun": false,
+  "doesNotAttestMissingNativeOutput": true
+}

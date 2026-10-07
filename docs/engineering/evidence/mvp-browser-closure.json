@@ -966,5 +966,22 @@
       "doesNotProveActualEditedMovieDownload": true
     },
     "restartedHttpHealthStatus": 200
+  },
+  "manualValidationPreview": {
+    "operationId": "76ea4e62-582a-4586-bce4-190ad1e39a3d",
+    "revisionId": "03540576-e914-4c9d-9ecc-99d3dda3d9e7",
+    "previewId": "70eb52e7-4efb-484f-9674-e47598557936",
+    "status": "failed",
+    "stage": "composition",
+    "storedErrorCode": "PROVIDER_UNAVAILABLE",
+    "diagnosticErrorCode": "COMPOSITION_PRODUCER_UNKNOWN",
+    "actualFilmSha256": "f6af20d0ef9ac6f0d40081cf0b34a74cdae93676759b9d2d40042390abe23b39",
+    "actualFilmBytes": 14017592,
+    "nativeReceiptOutputBytes": 0,
+    "published": false,
+    "oldResultIdRetained": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "diagnosticEvidence": "mvp-empty-composition-receipt.json",
+    "nativeStdoutProbe": "mvp-docker-stdout-diagnostic.json",
+    "doesNotProveNativeStdoutLossCause": true
   }
 }
