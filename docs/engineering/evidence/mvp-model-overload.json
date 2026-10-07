@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-10-07T10:48:57.237764+00:00",
+  "operationId": "a8c18654-81a2-4e38-b0cb-bfd40bff55ee",
+  "stage": "source",
+  "provider": "grsaiapi.com",
+  "model": "gemini-3.8-flash",
+  "responseStatus": 400,
+  "errorMessage": "The model load is too high, please try again later",
+  "responseSha256": "9d826236b46651b02ef11de4655fd10c3617bdb95771f39bea924e8cf04ddd81",
+  "startedAt": "2026-10-07T10:27:03.093Z",
+  "finishedAt": "2026-10-07T10:27:14.581Z",
+  "unknownUsageRetained": true,
+  "productionNotStarted": true,
+  "published": false
+}

@@ -1,0 +1,90 @@
+{
+  "startedAt": "2026-10-07T11:51:40.027Z",
+  "sourceOperationId": "f2c5f13b-3c35-4c10-a46a-a100317781aa",
+  "sourceFilmSha256": "0e96c397cae13a388b5e0e62847d1f83c76121d95df894aeb5c6e8b66c322219",
+  "sourceWavSha256": "adc7637a07f3f8bf0753ccfaded3d480432da685b1574da76ff399dc10addff3",
+  "diagnosticOnly": true,
+  "modelCalls": 0,
+  "originalProducerReplayed": false,
+  "originalCacheUnchanged": true,
+  "published": false,
+  "status": "succeeded",
+  "transcript": {
+    "language": "zh-CN",
+    "model": "Systran/faster-whisper-medium",
+    "segments": [
+      {
+        "text": "睡前小猫把小枕头摆好",
+        "startMs": 0,
+        "endMs": 2720,
+        "words": [
+          {
+            "text": "睡",
+            "startMs": 0,
+            "endMs": 540,
+            "probability": 0.9819715619087219
+          },
+          {
+            "text": "前",
+            "startMs": 540,
+            "endMs": 900,
+            "probability": 0.9984270334243774
+          },
+          {
+            "text": "小",
+            "startMs": 900,
+            "endMs": 1180,
+            "probability": 0.48940950632095337
+          },
+          {
+            "text": "猫",
+            "startMs": 1180,
+            "endMs": 1420,
+            "probability": 0.8808131814002991
+          },
+          {
+            "text": "把",
+            "startMs": 1420,
+            "endMs": 1600,
+            "probability": 0.9889026284217834
+          },
+          {
+            "text": "小",
+            "startMs": 1600,
+            "endMs": 1880,
+            "probability": 0.9986396431922913
+          },
+          {
+            "text": "枕",
+            "startMs": 1880,
+            "endMs": 2100,
+            "probability": 0.9994603097438812
+          },
+          {
+            "text": "头",
+            "startMs": 2100,
+            "endMs": 2260,
+            "probability": 0.9888728260993958
+          },
+          {
+            "text": "摆",
+            "startMs": 2260,
+            "endMs": 2500,
+            "probability": 0.9963593780994415
+          },
+          {
+            "text": "好",
+            "startMs": 2500,
+            "endMs": 2720,
+            "probability": 0.9984000325202942
+          }
+        ]
+      }
+    ],
+    "voiceSha256": "adc7637a07f3f8bf0753ccfaded3d480432da685b1574da76ff399dc10addff3",
+    "runtimeDigest": "caa3fca3e3e6866dab7351346367768db612bb411f06fbd4a7a44f767747f5d4",
+    "recognizedText": "睡前小猫把小枕头摆好"
+  },
+  "finishedAt": "2026-10-07T11:51:46.367Z",
+  "originalWavUnchanged": true
+}

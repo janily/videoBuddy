@@ -826,10 +826,82 @@
   },
   "correctedTitleCase": {
     "briefVersion": 4,
-    "previewOperationId": null,
+    "previewOperationId": "f545abde-d42e-4fa9-abdc-fbe68a2411e7",
     "submittedThroughNormalChatAndButton": true,
     "currentPublishedResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
-    "status": "preparing_preview",
-    "priorInvalidTitlePreviewNotApproved": true
+    "status": "failed",
+    "priorInvalidTitlePreviewNotApproved": true,
+    "revisionId": "3bfbf163-7fd1-4a13-9739-97110073e176",
+    "stage": "source",
+    "errorCode": "PROVIDER_UNAVAILABLE",
+    "modelTransport": {
+      "startedAt": "2026-10-07T09:17:39.677Z",
+      "finishedAt": "2026-10-07T09:34:59.848Z",
+      "errorName": "TimeoutError",
+      "timeoutMs": 600000,
+      "responseReceived": false
+    },
+    "formalApproved": false,
+    "published": false
+  },
+  "correctedTitleRecovery": {
+    "originalFailedOperationId": "f545abde-d42e-4fa9-abdc-fbe68a2411e7",
+    "newOperationId": "a8c18654-81a2-4e38-b0cb-bfd40bff55ee",
+    "requestedThroughNormalButton": true,
+    "replayedOriginalEffect": false,
+    "unknownRecordsKept": true,
+    "deferredUnknownBeforeAttempt": 4,
+    "authorizationCapacity": 8,
+    "domainConnectivityHttpStatus": 404,
+    "status": "failed",
+    "errorCode": "PROVIDER_UNAVAILABLE",
+    "providerStatus": 400,
+    "providerMessage": "The model load is too high, please try again later",
+    "formalApproved": false,
+    "published": false
+  },
+  "correctedTitleSecondRecovery": {
+    "operationId": "f2c5f13b-3c35-4c10-a46a-a100317781aa",
+    "status": "failed",
+    "priorOverloadAndTimeoutRetained": true,
+    "requestedThroughNormalButton": true,
+    "currentResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "noOriginalEffectReplay": true,
+    "stage": "composition",
+    "errorCode": "PROVIDER_UNAVAILABLE",
+    "compositionSucceeded": true,
+    "compositionSha256": "0e96c397cae13a388b5e0e62847d1f83c76121d95df894aeb5c6e8b66c322219",
+    "nativeAsrJournalState": "stopped",
+    "asrTranscriptMissing": true,
+    "isolatedAsrDiagnostic": "succeeded",
+    "originalAsrEffectReplayed": false
+  },
+  "correctedTitleThirdRecovery": {
+    "operationId": "79dcb8c1-a69f-43b1-ba01-72db76352907",
+    "status": "failed",
+    "requestedThroughNormalButton": true,
+    "oldResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "stage": "visual",
+    "errorCode": "VISUAL_SOURCE_INVALID",
+    "rawResponseHashes": [
+      "986781ed2a2209f8d23a3bd16241f3e53ada96d28964de21d814c9a2851ed170",
+      "f415847b8a8c601d4021d2f44f053028f769468ff39fd0d97ff4a665f6c792ae"
+    ],
+    "reason": "Both successful provider responses report finish_reason=stop but contain incomplete JSON ending inside the sourceHtml string; initial response and one bounded correction were rejected.",
+    "formalApproved": false
+  },
+  "correctedTitleCompactSourceRecovery": {
+    "operationId": "a91a4ba5-4d54-4722-8545-f34618278791",
+    "revisionId": "85c0a0ce-0e12-4c84-b70b-39ad109ec37c",
+    "requestedThroughNormalButton": true,
+    "status": "running",
+    "sourcePromptChange": "Concise reusable drawing functions; target sourceHtml below 9000 characters without dropping actors, actions, labels, font requirements or closing tags.",
+    "oldResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "typecheck": "passed",
+    "lint": "passed",
+    "visualGuardTests": {
+      "passed": 5,
+      "durationMs": 436
+    }
   }
 }
