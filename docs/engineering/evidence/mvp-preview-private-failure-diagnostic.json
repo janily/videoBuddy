@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-10-07T14:12:41.124387+00:00",
+  "scope": "Preview worker diagnostics for subsequent real page attempts; does not establish the cause of operation 76ea4e62-582a-4586-bce4-190ad1e39a3d.",
+  "productionOperationChanged": false,
+  "red": {
+    "command": "npx vitest run tests/video/local-preview.test.ts -t 'private preview diagnostic'",
+    "failedTests": 3,
+    "failure": "STORE_NOT_FOUND reading the missing private diagnostic",
+    "durationSec": 2.04
+  },
+  "green": {
+    "command": "npx vitest run tests/video/local-preview.test.ts tests/video/local-worker.test.ts tests/video/local-stream.test.ts",
+    "files": 3,
+    "tests": 38,
+    "durationSec": 16.15,
+    "result": "pass"
+  },
+  "checks": {
+    "typecheck": "pass after correcting optional persisted stage access",
+    "lint": "pass"
+  },
+  "guarantees": [
+    "Explicit internal-code allowlist; unknown messages recorded only as a SHA256 fingerprint",
+    "No raw error text, paths, stack traces, credentials or provider response bodies recorded",
+    "Diagnostic stays under the private operation prefix and is absent from SSE and ProjectView",
+    "Diagnostic write failure does not prevent original terminal outcome",
+    "Cold recovery retains the diagnostic and does not rerun failed media"
+  ],
+  "mvpModificationDelivery": "not_yet_verified"
+}

@@ -66,3 +66,7 @@ operation `76ea4e62-582a-4586-bce4-190ad1e39a3d` 已完成四段画面渲染，�
 此前补充的 `COMPOSITION_PRODUCER_UNKNOWN` 错误归类及公开Worker/SSE/ProjectView回归，四个相关测试文件56项通过（13.14秒），typecheck、lint通过；它覆盖该特定错误的呈现，不代表修复了本次泛化失败。五次 [隔离stdout检查](evidence/mvp-docker-stdout-diagnostic.json) 通过也不能归因本次故障。
 
 用户已选择手动页面验收。下一步仍通过原项目页面“先看新效果”生成新预览，确认标题和故事后点击“就按这个做”；新版正式发布后实际播放和下载，并保留旧片。完整MVP尚未通过，不将隔离诊断视频作为正式交付。
+
+## 后续页面失败的内部诊断
+
+预览Worker现在为后续失败保存私有 `failure-diagnostic`：具体阶段、显式允许的内部错误类别、错误类型及不可逆消息指纹，不保存原始错误文本、路径、stack、密钥或模型响应。公开SSE和ProjectView仍只包含既有安全错误码；诊断写入失败也不妨碍原任务终态保存，冷恢复不重放失败媒体。三项新增记录回归先因缺失记录失败（2.04秒）；三个相关文件38项测试通过（16.15秒），typecheck、lint通过，见 [记录证据](evidence/mvp-preview-private-failure-diagnostic.json)。这项改动只补后续定位信息，没有确定或修复历史composition泛化失败的根因。

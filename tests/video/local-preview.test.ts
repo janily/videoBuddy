@@ -31,6 +31,36 @@ it('missing native composition attestation is retained in terminal SSE and the r
   expect(view.productionFailure).toMatchObject({errorCode:'COMPOSITION_PRODUCER_UNKNOWN',message:'合成来源未通过核验，资料和已有视频已保留。请重新生成效果。'});
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
+it.each([
+ {error:Error('COMPOSITE_FONT_CHANGED: /private/provider-secret'),internalCode:'COMPOSITE_FONT_CHANGED',errorClass:'Error'},
+ {error:Object.assign(Error('open /private/provider-secret failed'),{code:'ENOENT'}),internalCode:'ENOENT',errorClass:'Error'},
+ {error:TypeError('provider-secret https://private.example/?token=secret'),internalCode:'UNCLASSIFIED',errorClass:'TypeError'},
+])('a private preview diagnostic retains $internalCode without exposing error text',async({error,internalCode,errorClass})=>{
+ const f=await setup();try{
+  await runPreviewOperation(f.store,f.events,f.projectId,f.operationId,{root:f.root,build:async(_projects,_input,_options,activity)=>{await activity('composition','正在合成画面和声音');throw error}});
+  const diagnostic=(await new FileStore(f.root).readFresh(`projects/${f.projectId}/operations/${f.operationId}/failure-diagnostic`)).value;
+  expect(diagnostic).toMatchObject({schemaVersion:1,operationId:f.operationId,revisionId:f.revisionId,stage:'composition',internalCode,errorClass,publicErrorCode:'PROVIDER_UNAVAILABLE'});
+  expect(JSON.stringify(diagnostic)).not.toContain('provider-secret');expect(JSON.stringify(diagnostic)).not.toContain('private.example');
+  const view=await new ProjectStore(new FileStore(f.root)).view('owner',f.projectId);
+  expect(view.productionFailure?.errorCode).toBe('PROVIDER_UNAVAILABLE');
+  const events=(await f.events.readFrom(f.projectId,f.operationId,0)).map(({event})=>event);
+  expect(JSON.stringify({view,events})).not.toContain('internalCode');expect(JSON.stringify({view,events})).not.toContain('provider-secret');
+  await runPreviewOperation(f.store,f.events,f.projectId,f.operationId,{root:f.root,build:async()=>{throw Error('MUST_NOT_RETRY')}});
+  expect((await f.store.readFresh(`projects/${f.projectId}/operations/${f.operationId}/failure-diagnostic`)).value).toEqual(diagnostic);
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
+it('diagnostic storage failure preserves the original terminal outcome and does not retry media',async()=>{
+ const f=await setup(),create=f.store.create.bind(f.store);let calls=0;
+ try{
+  f.store.create=async(key,value)=>{if(key.endsWith('/failure-diagnostic'))throw Error('STORE_IO_FAILED');return create(key,value)};
+  const options={root:f.root,build:async()=>{calls++;throw Error('COMPOSITE_FONT_CHANGED')}};
+  await runPreviewOperation(f.store,f.events,f.projectId,f.operationId,options);
+  await runPreviewOperation(f.store,f.events,f.projectId,f.operationId,options);
+  expect(calls).toBe(1);
+  expect((await f.events.readFrom(f.projectId,f.operationId,0)).at(-1)?.event.payload).toMatchObject({status:'failed',errorCode:'PROVIDER_UNAVAILABLE'});
+  expect((await f.projects.view('owner',f.projectId)).activeProduction).toBeNull();
+ }finally{await rm(f.root,{recursive:true,force:true})}
+});
 it.each(['retry','queue'])('unclaimed cancellation repairs a lost blocker-clearing ACK via %s without starting media',async recovery=>{
  const f=await setup(),cas=f.store.cas.bind(f.store);let controls=0,calls=0;
  try{
