@@ -4,7 +4,7 @@
 
 VideoBuddy v5.1 应用，直接初始化于本仓库根目录。开发基线为 [CODEX_START_HERE](docs/hand-off/videobuddy-v5.1/CODEX_START_HERE.md)，原视觉参照与文档保留。
 
-当前已通过正常页面预览和批准，真实20秒1080p正式影片已发布，15项MVP必需质量检查全部通过。浏览器下载与修改后新版本仍待本轮验收；具体状态见 [MVP验收记录](docs/engineering/MVP_DELIVERY.md)。没有数据库、登录或固定回复/示例视频；通用示例配置默认关闭真实生成。当前部署方向是单机自托管，见 [架构](docs/engineering/self-hosted-architecture.md) 和 [执行计划](docs/engineering/self-hosted-plan.md)。具体进度和缺项见 [任务记录](docs/engineering/task-ledger.md)。
+当前已通过正常页面预览和批准，真实20秒1080p正式影片已发布，15项MVP必需质量检查全部通过。首片浏览器下载已通过；修改版的正确标题预览已通过，但正式检查发现结尾标题动画漏字，未发布新版；具体状态见 [MVP验收记录](docs/engineering/MVP_DELIVERY.md)。没有数据库、登录或固定回复/示例视频；通用示例配置默认关闭真实生成。当前部署方向是单机自托管，见 [架构](docs/engineering/self-hosted-architecture.md) 和 [执行计划](docs/engineering/self-hosted-plan.md)。具体进度和缺项见 [任务记录](docs/engineering/task-ledger.md)。
 
 Linux 服务模板和部署前检查见 [自托管部署草案](deploy/README.md)；仓库中的模板尚未被用于生产部署。
 

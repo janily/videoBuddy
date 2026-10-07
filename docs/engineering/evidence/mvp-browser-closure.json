@@ -894,7 +894,7 @@
     "operationId": "a91a4ba5-4d54-4722-8545-f34618278791",
     "revisionId": "85c0a0ce-0e12-4c84-b70b-39ad109ec37c",
     "requestedThroughNormalButton": true,
-    "status": "running",
+    "status": "succeeded",
     "sourcePromptChange": "Concise reusable drawing functions; target sourceHtml below 9000 characters without dropping actors, actions, labels, font requirements or closing tags.",
     "oldResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
     "typecheck": "passed",
@@ -902,6 +902,69 @@
     "visualGuardTests": {
       "passed": 5,
       "durationMs": 436
+    },
+    "previewId": "e0f6232c-4be6-4d9b-a53f-a3d122f71dee",
+    "previewNativePlayback": {
+      "duration": 9.125,
+      "currentTime": 9.125,
+      "width": 1280,
+      "height": 720,
+      "ended": true,
+      "error": null
+    },
+    "titleAccepted": true,
+    "titleReview": {
+      "timeSeconds": 2.759957,
+      "text": "甜甜的梦",
+      "correctChineseGlyphs": true,
+      "topTitleSeparateFromBottomCaption": true,
+      "screenshot": "mvp-corrected-title-visible.png"
+    },
+    "formalApprovalRequestedThroughNormalButton": true,
+    "formal": {
+      "operationId": "c2777e6d-7f2c-4f1f-873c-aaa43cd9d8f5",
+      "approvalId": "7901324a-e037-47bd-b1ba-63eb2546ec2d",
+      "status": "failed",
+      "stage": "content",
+      "errorCode": "RENDER_FAILED",
+      "reason": "First complete content round observed end-title progressively revealed as 晚安，小 at frame-415 and rejected missing 猫; second round included the complete bottom caption but did not override the earlier failure.",
+      "contentRawResponseHashes": [
+        "b975791212a3e136e8461a797cc3d0ef8e98a52c61b6d3d05aac81821774f9c6",
+        "d642420ec175b193dbf5c7116041747294ee4534b55c8f97443d18d273b5a98d"
+      ],
+      "published": false
     }
+  },
+  "chromeFinalPlaybackRecovery": {
+    "status": "failed",
+    "tabClaimTimeoutMs": 30000,
+    "chromeRunning": true,
+    "extensionInstalledEnabled": true,
+    "nativeHostManifestValid": true,
+    "authorizedRecoveryWindowOpened": true,
+    "claimAfterRecovery": "timeout",
+    "requiredExternalAction": "Reinstall Chrome plugin through ChatGPT plugin management; per Chrome troubleshooting documentation.",
+    "userSelectedRecovery": "manual normal-page validation; plugin reinstallation is not required to continue"
+  },
+  "finalE2eAttempt": {
+    "status": "interrupted",
+    "reason": "Existing Next dev server stopped responding (HTTP request timed out in 10 seconds); no tests ran. Next process used 103 percent CPU; stopped process before independent production build.",
+    "isTestPass": false
+  },
+  "finalChecks20261007": {
+    "visualGuardTests": {
+      "passed": 5,
+      "durationMs": 496
+    },
+    "lint": "passed",
+    "typecheck": "passed before final title-display prompt; final Next build TypeScript passed",
+    "productionBuild": "passed Next.js 16.3.8",
+    "pageE2e": {
+      "passed": 51,
+      "durationSeconds": 13.4,
+      "usesFixtures": true,
+      "doesNotProveActualEditedMovieDownload": true
+    },
+    "restartedHttpHealthStatus": 200
   }
 }

@@ -40,7 +40,7 @@ export async function runVisualShot(understanding:Understanding,rawTreatment:unk
  const imageInstructions=' 私有图片只能使用所给imageAssets的runtimeUrl，并将实际绘制的id列入assetIds。图片必须真实decode完成才能READY；缺失或解码失败明确失败，不替换为示例图片。Markdown/PDF/语音等资料用于理解与事实，不能声明成可绘制图片。画面标题与事实标签必须逐字使用所给原文。中文汉字不得用自编路径、几何线段或近似笔画拼成伪字；使用Canvas fillText或SVG text和已安装的所选风格字体；存在timing.font.faces时使用其中匹配语言的family，手写质感由真实手写字体提供。字体就绪后才能READY。动画可逐字揭示完整字形，不得改变字的笔画或遗漏部件。';
  const imageContext=JSON.stringify({imageAssets:imageAssets.map(asset=>({...asset,runtimeUrl:'/assets/'+asset.id+'.bin'}))});
  if(Buffer.byteLength(context)+Buffer.byteLength(imageContext)>180000)throw Error('CONTEXT_LIMIT');
- const agent=createVideoAgent('visual',instructions+imageInstructions+(env.VIDEO_DELIVERY_PROFILE==='mvp'?' 使用可复用绘图函数保持sourceHtml紧凑，目标不超过9000字符。不要输出长注释或重复的绘图片段；共用短小完整的纹理、轮廓与角色函数，留足字数完成标题、render和闭合标签。crayon-book的角色和背景必须保持手绘不规则轮廓与短小不规则蜡笔排线；不要几何分面、光滑矢量线稿、规则网格或覆盖全画面的均匀条纹来伪装纹理。纸纹细小、低对比，角色轮廓有自然轻微抖动，夜色仍保留相同角色造型与蜡笔笔触。输出一个完整JSON对象，不加Markdown围栏；不能以代码长度为由省略角色、动作或结束标签。':''),env);
+ const agent=createVideoAgent('visual',instructions+imageInstructions+(env.VIDEO_DELIVERY_PROFILE==='mvp'?' 使用可复用绘图函数保持sourceHtml紧凑，目标不超过9000字符。MVP画面标题和事实文字必须从对应镜头第一帧起完整显示并持续可读，不使用逐字揭示、迟到显现或遮盖文字的动画；角色与其他画面仍按要求运动。不要输出长注释或重复的绘图片段；共用短小完整的纹理、轮廓与角色函数，留足字数完成标题、render和闭合标签。crayon-book的角色和背景必须保持手绘不规则轮廓与短小不规则蜡笔排线；不要几何分面、光滑矢量线稿、规则网格或覆盖全画面的均匀条纹来伪装纹理。纸纹细小、低对比，角色轮廓有自然轻微抖动，夜色仍保留相同角色造型与蜡笔笔触。输出一个完整JSON对象，不加Markdown围栏；不能以代码长度为由省略角色、动作或结束标签。':''),env);
  await assertActive?.();
  await markModelCallStarted();
  await assertActive?.();
