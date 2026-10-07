@@ -18,7 +18,7 @@ export function ResultStage({view,onExample,extra,onPreview,preparing=false,acti
    <ResultDownloads key={`downloads:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} productionActive={Boolean(view.activeProduction)} history={restoration&&<ResultHistory view={view} locked={['submitting','uncertain'].includes(restoration.state.phase)} onRestore={artifactId=>void restoration.restore(artifactId,view)} onSelectFeedback={onSelectFeedback}/>}/>
    {restoration?.state.message&&<p role={restoration.state.phase==='failed'?'alert':'status'} aria-live="polite">{restoration.state.message}</p>}
    {restoration?.state.phase==='uncertain'&&<button className="text-button" onClick={()=>void restoration.reconnect()}>重新连接恢复</button>}{confirmationStatus}{extra}
-   {view.currentPreview?.state!=='ready'&&view.actions.some(a=>a.kind==='prepare_preview')&&<button className="text-button" disabled={preparing||confirming||confirmation?.state.phase==='uncertain'||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled)} onClick={onPreview}>{preparing?'正在提交…':'先看新效果'}</button>}
+   {(view.currentPreview?.state!=='ready'||view.phase==='attention')&&view.actions.some(a=>a.kind==='prepare_preview')&&<button className="text-button" disabled={preparing||confirming||confirmation?.state.phase==='uncertain'||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled)} onClick={onPreview}>{preparing?'正在提交…':'先看新效果'}</button>}
   </div></section>;
  }
  if(view?.currentPreview){

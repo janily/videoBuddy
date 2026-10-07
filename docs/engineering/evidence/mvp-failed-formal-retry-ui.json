@@ -1,0 +1,31 @@
+{
+  "observedAt": "2026-10-07T13:28:39.601927+00:00",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "actualControl": {
+    "phase": "attention",
+    "previewState": "ready",
+    "currentResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "currentPreviewId": "e0f6232c-4be6-4d9b-a53f-a3d122f71dee",
+    "briefVersion": 4,
+    "controlVersion": 112,
+    "activeProduction": null
+  },
+  "symptom": "Published movie branch hid the new-preview button after failed formal production when current preview remained ready.",
+  "regressionTest": "tests/video/e2e/approve.spec.ts: a failed formal revision keeps a new preview action beside the previous published movie",
+  "red": {
+    "exitCode": 1,
+    "durationMs": 2400,
+    "assertion": "Expected enabled button 先看新效果; element not found within 2000ms."
+  },
+  "green": {
+    "relatedE2ePassed": 7,
+    "durationSeconds": 3.6,
+    "newRegressionDurationMs": 314,
+    "typecheck": "passed",
+    "lint": "passed"
+  },
+  "fix": "Show existing new-preview action for attention phase even when retained preview state is ready; unchanged action-enabled gate, submission/uncertain locks and old-movie download controls.",
+  "actualManualPageVerification": "pending user",
+  "usesFixtures": true,
+  "doesNotProveModifiedVideoPublished": true
+}

@@ -43,3 +43,21 @@ test('a changed brief can request a new preview while the published movie stays 
  await page.goto(`/video/${pid}`);await expect(page.getByLabel('完整视频',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'下载视频',exact:true})).toBeEnabled();await page.getByRole('textbox').fill('尚未发送的草稿');
  await page.getByRole('button',{name:'先看新效果',exact:true}).click();await expect.poll(()=>requests.length).toBe(1);expect(requests[0]).toMatchObject({expectedBriefVersion:3});await expect(page.getByRole('textbox')).toHaveValue('尚未发送的草稿');await expect(page.getByLabel('完整视频',{exact:true})).toBeVisible();
 });
+
+test('a failed formal revision keeps a new preview action beside the previous published movie',async({page})=>{
+ await setup(page);
+ const failed={...initial,phase:'attention',currentResult:{resultId:crypto.randomUUID(),artifactId:'60000000-0000-4000-8000-000000000006',revisionId,bundleHash:'d'.repeat(64),createdAt:new Date().toISOString()},actions:[{kind:'prepare_preview',enabled:true},{kind:'approve_preview',enabled:false}],productionFailure:{operationId:crypto.randomUUID(),errorCode:'RENDER_FAILED',message:'本次完整视频制作未完成，效果片段和已有结果已保留。'}};
+ await page.route(`**/api/video/projects/${pid}`,r=>r.fulfill({json:failed}));
+ const requests:Record<string,unknown>[]=[];
+ await page.route(`**/api/video/projects/${pid}/preview`,r=>{requests.push(r.request().postDataJSON());return r.fulfill({json:{status:'accepted'}})});
+ await page.goto(`/video/${pid}`);
+ await expect(page.getByLabel('完整视频',{exact:true})).toBeVisible();
+ await expect(page.getByText(failed.productionFailure.message,{exact:true})).toBeVisible();
+ await page.getByRole('textbox').fill('保留失败后的草稿');
+ const retry=page.getByRole('button',{name:'先看新效果',exact:true});
+ await expect(retry).toBeEnabled({timeout:2000});await retry.click();
+ await expect.poll(()=>requests.length).toBe(1);expect(requests[0]).toMatchObject({expectedBriefVersion:2});
+ await expect(page.getByRole('textbox')).toHaveValue('保留失败后的草稿');
+ await expect(page.getByLabel('完整视频',{exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'下载视频',exact:true})).toBeEnabled();
+});

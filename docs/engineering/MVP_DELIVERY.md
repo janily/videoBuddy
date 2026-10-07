@@ -50,3 +50,7 @@ Chrome连接本次已恢复；旧Web与Worker进程已不存在，启动后原�
 已将MVP画面必要标题/事实文字的生成要求改为对应镜头第一帧起完整可读，不采用逐字显现；角色动作保留。该提示词修改尚未通过新的真实预览，不能宣称已解决正式漏字。Chrome标签页接管再次30秒超时；运行/扩展/manifest检查均通过，按已授权步骤打开恢复窗口后仍超时。依据 [Chrome故障流程](/Users/janily/.codex/plugins/cache/openai-bundled/chrome/26.715.72359/docs/chrome-troubleshooting.md)请求恢复后，用户选择手动验证；无需等待重装，后续由用户在正常页面生成新预览、确认、播放与下载，研发继续读取实际任务结果。
 
 本轮最终相关检查：5项Visual测试通过（496ms），lint通过，Next.js 16.3.8生产构建及TypeScript通过，51项页面E2E通过（13.4秒）。页面fixtures不代表新版实际播放下载验收。首次E2E启动因原Next开发服务器不响应而中断，没有测试结果；停止该服务器后独立重跑通过。Web与Worker已重新启动，HTTP健康检查200。模型对账179次本轮请求，176份响应SHA核验通过，3次无响应传输失败保留未知成本，0pending。首片下载MP4保留，完整MVP仍等待修改版发布、播放、下载与新版下旧片保留验收。
+
+## 失败后正常页面重试入口
+
+进一步核对当前真实control（attention、previewState=ready、旧currentResult保留）发现恢复按钮仍被隐藏。新增该组合的页面回归测试先在“先看新效果”缺失处失败（2.4秒）；修复后7项批准/恢复相关页面测试通过（3.6秒），typecheck、lint通过。已补回attention状态下的既有预览按钮，仍受服务端action和提交锁限制，草稿与旧片下载保留。见 [失败重试入口证据](evidence/mvp-failed-formal-retry-ui.json)。用户刷新原项目页面即可继续手动验证，实际修改片发布和下载仍未完成。
