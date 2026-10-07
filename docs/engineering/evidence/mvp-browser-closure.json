@@ -809,6 +809,27 @@
     "briefVersion": 3,
     "previewOperationId": "f66e003e-de13-492d-afe0-defab4cbce94",
     "previousResultRetained": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
-    "previewRequestedThroughNormalButton": true
+    "previewRequestedThroughNormalButton": true,
+    "previewStatus": "succeeded",
+    "previewPublished": true,
+    "previewNativePlayback": {
+      "durationSec": 9,
+      "width": 1280,
+      "height": 720,
+      "endedTimeSec": 9,
+      "error": null
+    },
+    "titleAccepted": false,
+    "titleIssue": "At 2.698834 sec, rendered title uses invalid manually constructed Han glyphs for the two characters meaning sweet. Do not approve this known-invalid preview.",
+    "formalApproved": false,
+    "screenshot": "mvp-edited-title-visible.png"
+  },
+  "correctedTitleCase": {
+    "briefVersion": 4,
+    "previewOperationId": null,
+    "submittedThroughNormalChatAndButton": true,
+    "currentPublishedResultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "status": "preparing_preview",
+    "priorInvalidTitlePreviewNotApproved": true
   }
 }
