@@ -1,0 +1,189 @@
+{
+  "observedAt": "2026-10-07T08:27:54.041Z",
+  "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
+  "resultId": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+  "artifactId": "7cd2294a-0954-4306-8007-ddb101c25a20",
+  "downloadedFile": "/Users/janily/Desktop/dev/videoBuddy/docs/hand-off/VideoBuddy.mp4",
+  "actualBrowserDownload": true,
+  "browserDownloadProvenance": "user_confirmed_page_download_and_moved_to_repository",
+  "matchesPublishedManifest": true,
+  "technicalQa": {
+    "result": "pass",
+    "sha256": "5b4b28a785604913d79964c4e177241c5d35017a0d887f581dd7393fe794df6a",
+    "bytes": 17551276,
+    "width": 1920,
+    "height": 1080,
+    "durationSec": 20,
+    "fps": 24,
+    "frames": 480,
+    "audio": true,
+    "audioChannels": 2
+  },
+  "qualityChecks": [
+    {
+      "ruleId": "decode",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "media_metadata",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "duration",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "file_hash",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "source_integrity",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "resource_ready",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "license",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/mvp-core-v1-stage"
+      ]
+    },
+    {
+      "ruleId": "critical_facts",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/whole-visual-review-v1-stage",
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/content-review-v1-stage"
+      ]
+    },
+    {
+      "ruleId": "sampled_visual_review",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/whole-visual-review-v1-stage"
+      ]
+    },
+    {
+      "ruleId": "loudness",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "true_peak",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "subtitle_sync",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/mvp-core-v1-stage"
+      ]
+    },
+    {
+      "ruleId": "font_coverage",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/mvp-core-v1-stage"
+      ]
+    },
+    {
+      "ruleId": "postmix_narration",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ]
+    },
+    {
+      "ruleId": "content_coverage",
+      "result": "pass",
+      "severity": "blocking",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/content-review-v1-stage"
+      ]
+    },
+    {
+      "ruleId": "visual_review",
+      "result": "not_checked",
+      "severity": "warning",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/whole-visual-review-v1-stage"
+      ],
+      "reason": "Continuous motion is not certified in MVP."
+    },
+    {
+      "ruleId": "listening_review",
+      "result": "not_checked",
+      "severity": "warning",
+      "evidenceRefs": [
+        "projects/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8/approvals/9f283ae9-0648-43b2-a3f6-cb28ec5e28bd/composite-v2-stage"
+      ],
+      "reason": "Full aesthetic listening is not certified in MVP."
+    }
+  ],
+  "qualityPolicy": {
+    "schemaVersion": 2,
+    "profile": "mvp",
+    "contentNarration": "mandarin_pronunciation_v1",
+    "visualSampling": "caption_shot_v3",
+    "audioIntent": "voiced",
+    "captions": true,
+    "requiredRules": [
+      "decode",
+      "media_metadata",
+      "duration",
+      "file_hash",
+      "source_integrity",
+      "resource_ready",
+      "license",
+      "critical_facts",
+      "sampled_visual_review",
+      "loudness",
+      "true_peak",
+      "subtitle_sync",
+      "font_coverage",
+      "postmix_narration",
+      "content_coverage"
+    ]
+  },
+  "limits": "Two warning checks remain explicitly not_checked: continuous-motion certification and full aesthetic listening. MVP is not C1/C2 or all 43 styles."
+}

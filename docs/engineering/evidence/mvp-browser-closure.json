@@ -1,6 +1,6 @@
 {
   "observedAt": "2026-10-05T14:33:57.896977+00:00",
-  "status": "first_formal_published_browser_connection_interrupted",
+  "status": "first_formal_playback_verified_title_edit_submitted",
   "projectId": "0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
   "url": "http://localhost:3000/video/0c5e1563-7bf4-4fbd-b876-ecec6c8634f8",
   "profile": {
@@ -781,15 +781,34 @@
       "paused": false,
       "error": null
     },
-    "browserPlaybackEndedVerified": false,
-    "browserDownloadVerified": false,
+    "browserPlaybackEndedVerified": true,
+    "browserDownloadVerified": true,
     "screenshot": "mvp-first-final-ready.png",
-    "pending": "Chrome connection failed during download verification; actual browser download not yet recorded."
+    "pending": "Chrome connection failed during download verification; actual browser download not yet recorded.",
+    "browserNativePlayback": {
+      "observedAt": "2026-10-07T08:27:13.744548+00:00",
+      "durationSec": 20,
+      "width": 1920,
+      "height": 1080,
+      "endedTimeSec": 20,
+      "ended": true,
+      "paused": true,
+      "error": null
+    },
+    "browserDownloadProvenance": "User confirmed normal page download, moved to docs/hand-off/VideoBuddy.mp4; full independent technical QA and exact published hash match."
   },
   "browserRecoveryAttempt": {
     "userAuthorized": true,
     "windowOpened": true,
     "result": "connection still unusable; project DOM snapshot timed out after 30 seconds",
     "nextAction": "Reinstall Chrome plugin from ChatGPT plugin UI"
+  },
+  "editedCase": {
+    "requestedChange": "Add first-shot title 甜甜的梦 at top, retain all four narration/caption lines, end title, story, duration, style and music.",
+    "submittedThroughNormalBrowserChat": true,
+    "briefVersion": 3,
+    "previewOperationId": "f66e003e-de13-492d-afe0-defab4cbce94",
+    "previousResultRetained": "48989a1e-9d48-47fc-ba0e-6a3732e277e7",
+    "previewRequestedThroughNormalButton": true
   }
 }
