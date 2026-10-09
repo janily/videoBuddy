@@ -13,6 +13,7 @@ import {canonicalHash,canonicalJson} from '@/services/video/domain/hash';
 import {createOrRead,StoreMissing} from '@/services/video/storage/atomic-store';
 import type {ProjectStore} from '@/services/video/storage/project-store';
 import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
+import {getStyle} from '@/services/video/styles/registry';
 import {revisionSeed} from '@/services/video/timeline/seed';
 import {TimingDraftSchema,type TimingDraft} from './timing-draft';
 import {prepareTimingStage} from './timing-stage';
@@ -32,6 +33,16 @@ async function readRef<T>(projects:ProjectStore,ref:ObjectRef,prefix:string):Pro
 }
 function checkAssets(plan:AudioPlan,control:ProjectControl){for(const source of plan.sources)if(source.kind==='user_track'&&!control.assets.some(asset=>asset.id===source.assetId&&asset.status==='ready'))throw Error('AUDIO_ASSET_NOT_READY')}
 
+/** Deterministic plan for a film with no narration and no music: one neutral
+ * section over the whole timeline and no events, so the mix is decoded silence. */
+export function silentAudioPlan(understanding:Understanding,treatment:ReturnType<typeof guardTreatment>,timing:TimingDraft,timingDraftHash:string,seed:number):AudioPlan{
+ const style=getStyle(understanding.preferences.styleSlug!);
+ return{schemaVersion:1,briefVersion:understanding.briefVersion,styleSlug:style.slug,styleRulesHash:style.rulesHash,timingDraftHash,seed,
+  sections:[{id:'silent',startFrame:0,endFrame:timing.totalFrames,bpm:60,beatsPerBar:4,beatUnit:4,barOffset:0}],
+  cues:[],sources:[],music:[],foley:[],intentionalSilenceRanges:[],
+  mix:{targetLufs:-14,toleranceLu:1,maxTruePeakDbtp:-1.2,voiceGainDb:0,duck:{thresholdDb:-30,ratio:4,attackMs:10,releaseMs:200}},
+  reasoning:`Visual-only film for ${treatment.shots.length} shots: no narration, no music and no sound effects by configuration.`};
+}
 export async function prepareAudioPlanStage(projects:ProjectStore,projectId:string,revisionId:string,operationId:string,expectedConsentEpoch:number,treatmentRef:ObjectRef,options:Options={}):Promise<AudioPlanStageRecord>{
  if(![projectId,revisionId,operationId].every(id=>z.uuid().safeParse(id).success)||!Number.isSafeInteger(expectedConsentEpoch)||expectedConsentEpoch<0)throw Error('VALIDATION_FAILED');
  const env=options.env||process.env,root=options.root||env.VIDEO_DATA_DIR;
@@ -54,11 +65,17 @@ export async function prepareAudioPlanStage(projects:ProjectStore,projectId:stri
  }
  try{return await verify((await projects.store.readFresh<unknown>(key)).value)}catch(error){if(!(error instanceof StoreMissing))throw error}
  if(options.mustExist)throw Error('AUDIO_STAGE_MISSING');
+ // Visual-only films (no narration, no music) need no sound design: a fixed silent
+ // plan replaces the audio model call. Injected deciders (tests, probes) still run.
+ const silent=!options.decide&&understanding.preferences.voiceMode==='none'&&understanding.preferences.musicMode==='none';
+ let plan:AudioPlan;
+ if(silent)plan=silentAudioPlan(understanding,treatment,timing,timingRecord.draftRef.sha256,seed);
+ else{
  if(!options.decide){requireGeneration(readConfiguration(env));configuredModel('audio',env)}
  const contextBytes=Buffer.byteLength(canonicalJson({understanding,treatment,timing:{...timing,track:{sha256:timing.track.sha256,samples:timing.track.samples,silence:timing.track.silence}},seed}))+Buffer.byteLength(knowledge.rules);
  if(contextBytes>180000)throw Error('CONTEXT_LIMIT');
  const reservation=await reserveModelBudget(projects.store,projectId,`${operationId}-audio-${revisionId}`,{inputTokens:contextBytes+4096,outputTokens:12000},options.limits||modelLimits(env));
- const plan=await runEffect<AudioPlan>(projects.store,`${prefix}/operations/${operationId}/effects/audio/${revisionId}`,async()=>{
+ plan=await runEffect<AudioPlan>(projects.store,`${prefix}/operations/${operationId}/effects/audio/${revisionId}`,async()=>{
   async function attempt(current:typeof reservation,correction?:AudioPlanCorrection){
    const assertActive=async()=>assertPreviewProductionFence((await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});
    await assertActive();
@@ -77,6 +94,7 @@ export async function prepareAudioPlanStage(projects:ProjectStore,projectId:stri
    return attempt(second,correction);
   }
  });
+ }
  guardAudioPlan(plan,understanding,treatment,timing,timingRecord.draftRef.sha256,seed);checkAssets(plan,control);
  const latest=(await projects.store.readFresh<ProjectControl>(`${prefix}/control`)).value;
  assertPreviewProductionFence(latest,projectId,operationId,expectedConsentEpoch,{briefVersion:control.briefVersion,understandingRef:control.understandingRef});checkAssets(plan,latest);

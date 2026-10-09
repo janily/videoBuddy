@@ -26,7 +26,7 @@ function FlowSteps({view}:{view:ProjectView}){
 function Chat(){return<><span className="on-wide">右边</span><span className="on-narrow">「聊想法」里</span></>}
 function preferenceLine(view:ProjectView){
  const p=view.preferences,style=p.styleSlug?listStyles().find(s=>s.id===p.styleSlug)?.nameZh:undefined;
- return [style,`${p.durationSec}秒`,p.aspect==='16:9'?'横屏':'竖屏',p.language==='zh-CN'?'中文':'英文'].filter(Boolean).join(' · ');
+ return [style,`${p.durationSec}秒`,p.aspect==='16:9'?'横屏':'竖屏',p.voiceMode==='none'&&p.musicMode==='none'?'无声画面':p.language==='zh-CN'?'中文':'英文'].filter(Boolean).join(' · ');
 }
 
 export function ResultStage({view,onExample,extra,onPreview,preparing=false,activity,restoration,approval:confirmation,projectUpdate,onSelectFeedback}:{extra?:React.ReactNode;view:ProjectView|null;onExample:(text:string)=>void;onPreview?:()=>void;preparing?:boolean;activity?:string;restoration?:ReturnType<typeof useRestoreResult>;approval?:ReturnType<typeof useApprovePreview>;projectUpdate?:string;onSelectFeedback?:(artifactId:string,revisionId:string)=>void}){

@@ -14,6 +14,10 @@ function videoSignature(view:ProjectView|null){
  if(!view)return '';
  return [view.currentPreview?.previewArtifactId,view.currentResult?.artifactId,view.activeProduction?.id,view.productionFailure?.operationId].filter(Boolean).join('|');
 }
+/** What the person has said so far, for suggesting styles. */
+function styleHint(view:ProjectView|null,draft:string){
+ return [view?.understanding.subject,...(view?.understanding.summary||[]),...(view?.messages||[]).filter(m=>m.role==='user').slice(-6).map(m=>m.text),draft].filter(Boolean).join('\n');
+}
 function focusComposer(){requestAnimationFrame(()=>{const input=document.querySelector<HTMLTextAreaElement>('.composer textarea');if(input){input.focus();input.setSelectionRange(input.value.length,input.value.length)}})}
 
 export function CompanionShell({projectId}:{projectId?:string}){
@@ -30,7 +34,7 @@ export function CompanionShell({projectId}:{projectId?:string}){
    <button aria-pressed={tab==='video'} onClick={()=>show('video')}>看视频{unseenVideo&&<span className="mobile-dot" aria-hidden="true"/>}</button>
   </div>
   <div className="shell" data-tab={tab}>
-   <ResultStage extra={<StylePicker current={project.view?.preferences.styleSlug} onSelect={style=>{project.setDraft(`${project.draft}${project.draft?"\n":""}画风想用「${style.nameZh}」（${style.id}）`);show('chat');focusComposer()}}/>} view={project.view} onSelectFeedback={project.selectFeedback} restoration={project.restoration} approval={project.approval} projectUpdate={project.projectUpdate} preparing={project.preparingPreview} activity={project.productionActivity?.label} onPreview={project.preparePreview} onExample={text=>{project.setDraft(text);show('chat');focusComposer()}}/>
+   <ResultStage extra={<StylePicker current={project.view?.preferences.styleSlug} hint={styleHint(project.view,project.draft)} onSelect={style=>{project.setDraft(`${project.draft}${project.draft?"\n":""}画风想用「${style.nameZh}」（${style.id}）`);show('chat');focusComposer()}}/>} view={project.view} onSelectFeedback={project.selectFeedback} restoration={project.restoration} approval={project.approval} projectUpdate={project.projectUpdate} preparing={project.preparingPreview} activity={project.productionActivity?.label} onPreview={project.preparePreview} onExample={text=>{project.setDraft(text);show('chat');focusComposer()}}/>
    <ConversationSidebar project={project}/>
   </div>
  </main>;

@@ -221,6 +221,10 @@ button.style-card:hover{border-color:var(--vb-control-line);background:var(--vb-
 .style-card .style-en{font-size:12px;color:var(--vb-secondary)}
 .style-card small{font-size:12px;color:var(--vb-muted);line-height:1.6}
 .style-card .style-category{margin-top:4px;color:var(--vb-accent)}
+.style-recommended{margin:14px 0 4px;padding:14px;border-radius:14px;background:var(--vb-soft)}
+.style-recommended h3{font-size:13px;font-weight:600;color:var(--vb-accent);margin:0 0 10px}
+.style-card.is-featured{border-color:var(--vb-control-line)}
+.style-card .style-look{color:var(--vb-muted);opacity:.85}
 .empty-note{padding:32px 0;text-align:center;color:var(--vb-muted)}
 .style-trigger{padding-left:0}
 .project-list{display:flex;flex-direction:column}

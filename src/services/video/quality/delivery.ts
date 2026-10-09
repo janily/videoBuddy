@@ -3,6 +3,7 @@ import{canonicalHash}from '@/services/video/domain/hash';
 import{qualityGate,type QualityCheck}from './publish-gate';
 import type{Understanding}from '@/contracts/video/domain';
 import type{FilmTimeline}from '@/contracts/video/film';
+import{listStyles}from '@/services/video/styles/registry';
 
 export const mandatoryDeliveryRules=[
  'decode','media_metadata','duration','file_hash','source_integrity','resource_ready','license','critical_facts',
@@ -44,17 +45,32 @@ export function validateNewDelivery(input:DeliveryInput){
  return outcome;
 }
 
-/** The only profile the MVP pipeline can deliver. Kept in one place so the
- * preview button, the director and the worker cannot disagree about it. */
-export const mvpProfile={styleSlugs:['crayon-book'],aspect:'16:9',minDurationSec:20,maxDurationSec:30,languages:['zh-CN','en']} as const;
+/** What the MVP pipeline can deliver. Kept in one place so the preview button,
+ * the director and the worker cannot disagree about it. Every style pack goes
+ * through the same generic visual agent and renderer, so all of them qualify. */
+export const mvpProfile={styleSlugs:listStyles().map(style=>style.id) as readonly string[],aspect:'16:9',minDurationSec:20,maxDurationSec:30,languages:['zh-CN','en'] as readonly string[]} as const;
 /** User-facing reason the current preferences fall outside the MVP profile, or undefined when supported. */
 export function mvpProfileGap(understanding:Pick<Understanding,'preferences'>):string|undefined{
  const p=understanding.preferences;
- if(!p.styleSlug||!(mvpProfile.styleSlugs as readonly string[]).includes(p.styleSlug))return '当前版本先支持“蜡笔儿童绘本”画风，选好后就能先看效果。';
+ if(!p.styleSlug||!mvpProfile.styleSlugs.includes(p.styleSlug))return '先选一种画风，就能先看效果。';
  if(p.aspect!==mvpProfile.aspect)return '当前版本先支持横屏（16:9）视频。';
  if(p.durationSec<mvpProfile.minDurationSec||p.durationSec>mvpProfile.maxDurationSec)return `当前版本先支持 ${mvpProfile.minDurationSec}–${mvpProfile.maxDurationSec} 秒的视频，告诉我想要多长就行。`;
- if(!(mvpProfile.languages as readonly string[]).includes(p.language))return '当前版本先支持中文或英文旁白。';
+ if(!mvpProfile.languages.includes(p.language))return '当前版本先支持中文或英文。';
  return undefined;
+}
+/** Sound (narration, music, captions bound to narration) is switched off: VIDEO_SOUND=off,
+ * or unset in MVP mode. Visual-only films skip voice synthesis, ASR and the audio model. */
+export function soundEnabled(env:Record<string,string|undefined>=process.env){return env.VIDEO_SOUND?env.VIDEO_SOUND==='on':env.VIDEO_DELIVERY_PROFILE!=='mvp'}
+export function soundGap(understanding:Pick<Understanding,'preferences'>):string|undefined{
+ const p=understanding.preferences;
+ return p.voiceMode!=='none'||p.musicMode!=='none'?'当前版本先只做画面（无旁白、无配乐）。跟助手说一句“不要声音”就能继续。':undefined;
+}
+/** First reason a new preview cannot be delivered under the configured profile. Applies to new previews only. */
+export function deliveryGap(understanding:Pick<Understanding,'preferences'>,env:Record<string,string|undefined>=process.env):{code:'MVP_PROFILE_UNSUPPORTED'|'SOUND_DISABLED';message:string}|undefined{
+ const profile=env.VIDEO_DELIVERY_PROFILE==='mvp'?mvpProfileGap(understanding):undefined;
+ if(profile)return{code:'MVP_PROFILE_UNSUPPORTED',message:profile};
+ const sound=soundEnabled(env)?undefined:soundGap(understanding);
+ return sound?{code:'SOUND_DISABLED',message:sound}:undefined;
 }
 export function assertMvpProfile(understanding:Understanding){
  if(mvpProfileGap(understanding))throw Error('MVP_PROFILE_UNSUPPORTED');

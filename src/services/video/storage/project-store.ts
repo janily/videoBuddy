@@ -2,6 +2,7 @@ import {randomUUID}from 'node:crypto';
 import {AtomicStore,createOrRead,updateJson,StoreMissing}from './atomic-store';
 import {IndexStore}from './index-store';
 import {initialUnderstanding,Understanding}from '@/contracts/video/domain';
+import {mvpProfile,soundEnabled}from '@/services/video/quality/delivery';
 import {ProjectControl,ProjectView,ArchivedMessage,PublicOperation}from '@/contracts/video/project';
 import {CreateProjectRequest}from '@/contracts/video/commands';
 import {canonicalHash}from '@/services/video/domain/hash';
@@ -15,12 +16,17 @@ import {unknownMediaStopMessage} from '@/services/video/media/stop-state';
  * stays the placeholder. Prefer the understood subject for display. */
 const placeholderTitle='新视频';
 export function displayTitle(title:string,subject:string){const s=subject.trim().replace(/\s+/g,' ');return title&&title!==placeholderTitle?title:s?(s.length>24?s.slice(0,24)+'…':s):placeholderTitle}
+/** New projects start inside what the configured delivery can make, so the
+ * conversation does not have to undo defaults (45s, narration, music) first. */
+function deliveryDefaults(env:Record<string,string|undefined>=process.env):Partial<Understanding['preferences']>{
+ return{...(env.VIDEO_DELIVERY_PROFILE==='mvp'?{durationSec:mvpProfile.maxDurationSec}:{}),...(soundEnabled(env)?{}:{voiceMode:'none' as const,musicMode:'none' as const,captions:'none' as const})};
+}
 export class ProjectStore{
  readonly index:IndexStore;constructor(readonly store:AtomicStore){this.index=new IndexStore(store)}
  async create(owner:string,input:CreateProjectRequest){
   const intent=await createOrRead(this.store,`create-intents/${owner}/${input.clientCreateId}`,{projectId:randomUUID(),hash:canonicalHash(input),title:input.title||'新视频'});
   if(intent.hash!==canonicalHash(input))throw Error('IDEMPOTENCY_CONFLICT');
-  const p=`projects/${intent.projectId}`;const now=new Date().toISOString();const understanding=initialUnderstanding();if(input.preferences)understanding.preferences={...understanding.preferences,...input.preferences};
+  const p=`projects/${intent.projectId}`;const now=new Date().toISOString();const understanding=initialUnderstanding();understanding.preferences={...understanding.preferences,...deliveryDefaults()};if(input.preferences)understanding.preferences={...understanding.preferences,...input.preferences};
   const control:ProjectControl={schemaVersion:5,projectId:intent.projectId,ownerKeyHash:owner,controlVersion:0,briefVersion:0,createdAt:now,lastUserActivityAt:now,expiresAt:new Date(Date.now()+30*86400000).toISOString(),reviewPolicy:'preview_first',phase:'collecting',understandingRef:await this.index.immutable(`${p}/understanding/0`,understanding),messagesIndexRef:await this.index.empty(`${p}/indexes/messages`),revisionIndexRef:await this.index.empty(`${p}/indexes/revisions`),assets:[],inputPending:false,previewState:'none',receipts:[],consentEpoch:0,nextOrdinal:1,ordinalReservations:{}};
   await createOrRead(this.store,`${p}/control`,control);await createOrRead(this.store,`${p}/metadata`,{title:intent.title});return{projectId:intent.projectId,controlVersion:0};
  }
@@ -56,7 +62,7 @@ export class ProjectStore{
    if(!outcome)try{outcome=(await this.store.readFresh<NonNullable<ProjectControl['previewOutcomes']>[string]>(`projects/${id}/operations/${last.operationId}/${isRender?'render':'preview'}-outcome`)).value}catch(error){if(!(error instanceof StoreMissing))throw error}
    if(outcome?.status==='failed'||outcome?.status==='interrupted'){
     const code=outcome.errorCode||'PROVIDER_UNAVAILABLE';
-    const message=code==='COMPOSITION_PRODUCER_UNKNOWN'?'合成来源未通过核验，资料和已有视频已保留。请重新生成效果。':code==='MVP_PROFILE_UNSUPPORTED'?'当前版本先支持蜡笔儿童绘本画风、横屏、20–30 秒的视频，请在聊天里调整后再看效果。':code==='MODEL_OUTPUT_INVALID'?'创作结果格式未通过核验，资料和已有内容已保留。':['AUDIO_PLAN_INVALID','AUDIO_EVENT_INVALID','AUDIO_TIMELINE_INVALID'].includes(code)?'音乐或音效的编排未通过核验，资料和已有声音已保留。':code==='VISUAL_SOURCE_INVALID'?'画面源码未通过核验，资料和已生成画面已保留。':code==='PICTURE_RENDER_FAILED'?'画面渲染未通过，资料和已有内容已保留。':code==='ASR_TIMINGS_UNAVAILABLE'?'声音时序核验未通过，资料和已有片段已保留。':code==='QUALITY_BLOCKED'?'完整视频的视听质量或许可证据尚未通过，效果片段和已有结果已保留。':code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':['ASR_MISMATCH','POSTMIX_ASR_MISMATCH'].includes(code)?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':isRender?'本次完整视频制作未完成，效果片段和已有结果已保留。':'本次效果制作未完成，资料和已有内容已保留。';
+    const message=code==='COMPOSITION_PRODUCER_UNKNOWN'?'合成来源未通过核验，资料和已有视频已保留。请重新生成效果。':code==='MVP_PROFILE_UNSUPPORTED'?'当前版本先支持横屏、20–30 秒的视频，请在聊天里调整后再看效果。':code==='SOUND_DISABLED'?'当前版本先只做画面（无旁白、无配乐）。跟助手说一句“不要声音”就能继续。':code==='MODEL_OUTPUT_INVALID'?'创作结果格式未通过核验，资料和已有内容已保留。':['AUDIO_PLAN_INVALID','AUDIO_EVENT_INVALID','AUDIO_TIMELINE_INVALID'].includes(code)?'音乐或音效的编排未通过核验，资料和已有声音已保留。':code==='VISUAL_SOURCE_INVALID'?'画面源码未通过核验，资料和已生成画面已保留。':code==='PICTURE_RENDER_FAILED'?'画面渲染未通过，资料和已有内容已保留。':code==='ASR_TIMINGS_UNAVAILABLE'?'声音时序核验未通过，资料和已有片段已保留。':code==='QUALITY_BLOCKED'?'完整视频的视听质量或许可证据尚未通过，效果片段和已有结果已保留。':code==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':['ASR_MISMATCH','POSTMIX_ASR_MISMATCH'].includes(code)?'声音核验未通过，资料和已有片段已保留。':['EFFECT_UNKNOWN','MODEL_USAGE_UNCERTAIN','MODEL_BUDGET_OVERRUN','MODEL_ACCOUNTING_MIGRATION_REQUIRED'].includes(code)?'上次模型调用的用量需要核实，资料已保留。':isRender?'本次完整视频制作未完成，效果片段和已有结果已保留。':'本次效果制作未完成，资料和已有内容已保留。';
     productionFailure={operationId:last.operationId,errorCode:code,message};
    }
   }

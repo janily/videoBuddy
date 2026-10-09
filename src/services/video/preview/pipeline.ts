@@ -36,12 +36,14 @@ export async function buildPreviewPipeline(projects:ProjectStore,input:Parameter
  const {projectId,revisionId,operationId,expectedConsentEpoch}=input,{root}=options,env=options.env||process.env,prefix=`projects/${projectId}`,revisionPrefix=`${prefix}/revisions/${revisionId}/`;
  // Pure configuration checks precede every paid creation request.
  dockerConfiguration(env,operationId);
- for(const role of ['director','visual','audio','critic'] as const)configuredModel(role,env);
+ for(const role of ['director','visual','critic'] as const)configuredModel(role,env);
  const baseline=(await projects.store.readFresh<ProjectControl>(prefix+'/control')).value;
  const understanding=UnderstandingSchema.parse(await readNarrationJson(projects.store,baseline.understandingRef,prefix+'/understanding/'));
  if(env.VIDEO_DELIVERY_PROFILE&& !['mvp','full'].includes(env.VIDEO_DELIVERY_PROFILE))throw Error('CONFIGURATION_REQUIRED: VIDEO_DELIVERY_PROFILE');
 
  if(understanding.preferences.voiceMode!=='none'){voiceConfiguration(env);asrConfiguration(env)}
+ // Visual-only films use a fixed silent audio plan, so the audio model is optional for them.
+ if(understanding.preferences.voiceMode!=='none'||understanding.preferences.musicMode!=='none')configuredModel('audio',env);
  async function stage(name:string,label:string){
   const c=(await projects.store.readFresh<ProjectControl>(prefix+'/control')).value;
   assertPreviewProductionFence(c,projectId,operationId,expectedConsentEpoch,{briefVersion:baseline.briefVersion,understandingRef:baseline.understandingRef});
@@ -53,15 +55,15 @@ export async function buildPreviewPipeline(projects:ProjectStore,input:Parameter
  await stage('treatment','正在构思故事');
  const treatmentRef=retry?.treatmentRef||await prepareTreatmentStage(projects,projectId,revisionId,operationId,expectedConsentEpoch,{env});
  const treatment=guardTreatment(await readNarrationJson(projects.store,treatmentRef,revisionPrefix+'treatment-plan/'),understanding,getStyle(understanding.preferences.styleSlug!).rulesHash);
- const args=[projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef] as const;
- await stage('voice','正在制作和核验声音');await prepareVoiceStage(...args,{root,env,mustExist});
+ const args=[projects,projectId,revisionId,operationId,expectedConsentEpoch,treatmentRef] as const,silentFilm=understanding.preferences.voiceMode==='none'&&understanding.preferences.musicMode==='none';
+ await stage('voice',silentFilm?'正在排定镜头时间':'正在制作和核验声音');await prepareVoiceStage(...args,{root,env,mustExist});
  await stage('timing','正在安排画面和字幕');await prepareTimingStage(...args,{root,env,mustExist});await prepareNarrationPackageStage(...args,{root,env,mustExist});
- await stage('audio','正在编排音乐和音效');await prepareAudioPlanStage(...args,{root,env,mustExist});await prepareAudioExecutionStage(...args,{root,env,mustExist});
+ await stage('audio',silentFilm?'正在准备无声音轨':'正在编排音乐和音效');await prepareAudioPlanStage(...args,{root,env,mustExist});await prepareAudioExecutionStage(...args,{root,env,mustExist});
  for(const [index,shot] of treatment.shots.entries()){
   await stage('visual',`正在创作第 ${index+1} 段画面`);await prepareVisualShotStage(...args,shot.id,{root,env,mustExist});
   await stage('picture',`正在生成第 ${index+1} 段画面`);await preparePictureShotStage(...args,shot.id,{root,env,profile:'preview',mustExist});
  }
- await stage('composition','正在合成画面和声音');await preparePictureSequenceStage(...args,{root,env,profile:'preview',mustExist});
+ await stage('composition',silentFilm?'正在合成画面':'正在合成画面和声音');await preparePictureSequenceStage(...args,{root,env,profile:'preview',mustExist});
  const film=await prepareFilmPackageStage(...args,{root,env,mustExist});await prepareCompositeStage(...args,{root,env,profile:'preview',frozenFilm:retry?.film});
  const frozen=await loadVerifiedFilmPackage(projects.store,await readNarrationJson(projects.store,film.filmSpecRef,revisionPrefix+'film/'),root);
  const segments=selectPreviewExcerpt(frozen.timeline,frozen.facts.facts.filter(f=>f.critical||f.mustInclude).map(f=>f.id));
