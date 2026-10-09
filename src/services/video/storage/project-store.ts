@@ -7,7 +7,9 @@ import {ProjectControl,ProjectView,ArchivedMessage,PublicOperation}from '@/contr
 import {CreateProjectRequest}from '@/contracts/video/commands';
 import {canonicalHash}from '@/services/video/domain/hash';
 import {readPreviewBundle}from '@/services/video/preview/commit';
-import {readResultManifest}from '@/services/video/results/publish';
+import {readAnyResultManifest}from '@/services/video/results/publish';
+import {quickFlow,readQuickSettings}from '@/services/video/quick/settings';
+import {loadMusicLibrary,publicTracks}from '@/services/video/music/library';
 import {previewAction,approvalAction}from '@/services/video/preview/action';
 import {assertLiveProject}from '@/services/video/commands/user-activity';
 import {pendingFeedbackMessageIds}from '@/services/video/revisions/pending-feedback';
@@ -51,7 +53,7 @@ export class ProjectStore{
   const c=await this.access(owner,id);const u=(await this.store.readFresh<Understanding>(c.understandingRef.key)).value;const meta=(await this.store.readFresh<{title:string}>(`projects/${id}/metadata`)).value;
   const preview=c.currentPreviewId?await readPreviewBundle(this,id,c.currentPreviewId):null;
   const currentPreview=preview?{previewId:preview.previewId,revisionId:preview.revisionId,briefVersion:preview.briefVersion,previewArtifactId:preview.previewArtifactId,bundleHash:preview.bundleHash,scriptHash:preview.scriptHash,factsHash:preview.factsHash,script:preview.script,criticalFacts:preview.criticalFacts,summary:preview.summary,expiresAt:preview.expiresAt,state:c.previewState}:null;
-  const publicResult=async(resultId?:string)=>{if(!resultId)return null;const result=await readResultManifest(this,id,resultId);return{resultId:result.resultId,artifactId:result.artifactId,revisionId:result.revisionId,bundleHash:result.bundleHash,createdAt:result.createdAt}};
+  const publicResult=async(resultId?:string)=>{if(!resultId)return null;const result=await readAnyResultManifest(this,id,resultId);return{resultId:result.resultId,artifactId:result.artifactId,revisionId:result.revisionId,bundleHash:result.bundleHash,createdAt:result.createdAt,...(result.kind==='quick'?{kind:'quick' as const,quick:{styleSlug:result.styleSlug,aspect:result.aspect,durationSec:result.durationSec,shots:result.shots.map(({id,scriptLine,take})=>({id,scriptLine,take})),music:result.music}}:{})}};
   let productionFailure:ProjectView['productionFailure'];
   const renderLast=c.latestRenderOutcome,previewLast=c.latestPreviewOutcome;
   const order=(marker:typeof renderLast)=>marker?.controlVersion??c.receipts.filter(r=>r.operationId===marker?.operationId).at(-1)?.controlVersion??-1;
@@ -68,7 +70,7 @@ export class ProjectStore{
   }
   const unresolved=Object.keys(c.unresolvedMediaStops||{})[0];
   if(unresolved&&!c.activeProduction)productionFailure={operationId:unresolved,errorCode:'MEDIA_STOP_UNKNOWN',message:unknownMediaStopMessage};
-  return{productionFailure,projectId:id,title:displayTitle(meta.title,u.subject),controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.publicMessages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:await pendingFeedbackMessageIds(this,c),actions:[previewAction(c,u),...(preview?[approvalAction(c,preview)]:[])],expiresAt:c.expiresAt};
+  return{productionFailure,projectId:id,title:displayTitle(meta.title,u.subject),controlVersion:c.controlVersion,briefVersion:c.briefVersion,phase:c.phase,understanding:{summary:u.summary,subject:u.subject},preferences:u.preferences,assets:c.assets.map(a=>({id:a.id,filename:a.filename,status:a.status,intendedUse:a.intendedUse,errorCode:a.errorCode})),messages:(await this.publicMessages(c)).slice(-50),currentPreview,currentResult:await publicResult(c.currentResultId),previousResult:await publicResult(c.previousResultId),activeConversation:await this.operation(id,c.activeConversation),activeProduction:await this.operation(id,c.activeProduction),pendingInputs:await pendingFeedbackMessageIds(this,c),actions:[previewAction(c,u),...(preview&&!quickFlow()?[approvalAction(c,preview)]:[])],expiresAt:c.expiresAt,...(quickFlow()?{quick:{music:(await readQuickSettings(this.store,id)).music,tracks:publicTracks(await loadMusicLibrary().catch(()=>null))}}:{})};
  }
  async lookup(owner:string,ids:string[]){
   if(ids.length>20)throw Error('VALIDATION_FAILED');

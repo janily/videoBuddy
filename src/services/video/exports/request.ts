@@ -5,6 +5,7 @@ import type {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {createOrRead,StoreMissing,StoreConflict,updateJson} from '@/services/video/storage/atomic-store';
 import {canonicalHash} from '@/services/video/domain/hash';
 import {getArtifactAccess} from './access';
+import {readAnyResultManifest} from '@/services/video/results/publish';
 import {exportBaseline,exportKey,ExportPublicationSchema} from './publication';
 import type {ExportOperation} from './operation';
 import {actualArtifactSha256} from './verified-file';
@@ -19,6 +20,15 @@ export async function requestExport(projects:ProjectStore,queue:LocalOperationQu
  const hash=canonicalHash({kind:'export',body:request}),prefix=`projects/${projectId}`;
  const intentKey=prefix+'/commands/'+request.clientCommandId,intent=await createOrRead<ExportIntent>(projects.store,intentKey,{kind:'export',hash});
  if(intent.hash!==hash)throw Error('IDEMPOTENCY_CONFLICT');
+ // Quick-flow films are a single MP4; the staged package exports (poster, captions, source zip) do not apply.
+ const control=await projects.access(owner,projectId);
+ for(const resultId of [control.currentResultId,control.previousResultId]){
+  if(!resultId)continue;const result=await readAnyResultManifest(projects,projectId,resultId);
+  if(result.kind!=='quick'||result.artifactId!==request.artifactId)continue;
+  if(request.format!=='mp4')throw Error('CAPABILITY_UNAVAILABLE');
+  await recordUserCommandActivity(projects,owner,projectId,request.clientCommandId,hash);
+  return{status:200 as const,artifactId:request.artifactId,access:await getArtifactAccess(projects,owner,projectId,request.artifactId,'download')};
+ }
  const baseline=await exportBaseline(projects,owner,projectId,request.artifactId,root);
  const activityControl=await recordUserCommandActivity(projects,owner,projectId,request.clientCommandId,hash);
  if(request.format==='mp4')return{status:200 as const,artifactId:request.artifactId,access:await getArtifactAccess(projects,owner,projectId,request.artifactId,'download')};

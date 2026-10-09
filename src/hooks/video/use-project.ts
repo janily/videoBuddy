@@ -155,7 +155,8 @@ export function useProject(initialProjectId?:string){
   finally{setSending(false)}
  }
  async function stopReply(){const op=view?.activeConversation;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'reply'});await refresh()}catch(e){setError(e instanceof Error?e.message:'无法停止回复。')}}
- async function preparePreview(){
+ async function preparePreview(current:ProjectView|null=view){
+  const view=current;
   if(!projectId||!view||previewBusy.current||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled))return;
   previewBusy.current=true;setPreparingPreview(true);setError('');
   const command=previewCommand.current?.briefVersion===view.briefVersion?previewCommand.current:{briefVersion:view.briefVersion,commandId:crypto.randomUUID()};previewCommand.current=command;
@@ -163,6 +164,12 @@ export function useProject(initialProjectId?:string){
   catch(e){setError(e instanceof Error?e.message:'效果请求未完成，资料和草稿已保留。');await refresh()}
   finally{previewBusy.current=false;setPreparingPreview(false)}
  }
+ /** Quick flow: change the music or redraw one shot, then generate again (unchanged parts are reused). */
+ async function updateQuick(change:{music:NonNullable<ProjectView['quick']>['music']}|{redoShotId:string}){
+  if(!projectId||previewBusy.current)return;setError('');
+  try{const next=await api<ProjectView>(`/api/video/projects/${projectId}/quick`,{schemaVersion:5,...change});setView(next);await preparePreview(next)}
+  catch(e){setError(e instanceof Error?e.message:'暂时无法更新，已有视频仍可观看。')}
+ }
  const messages=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:()=>send(),retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,preparePreview,preparingPreview,restoration,approval,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:()=>send(),retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,preparePreview:()=>preparePreview(),updateQuick,preparingPreview,restoration,approval,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection,refresh};
 }

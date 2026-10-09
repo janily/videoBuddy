@@ -34,7 +34,7 @@ export function CompanionShell({projectId}:{projectId?:string}){
    <button aria-pressed={tab==='video'} onClick={()=>show('video')}>看视频{unseenVideo&&<span className="mobile-dot" aria-hidden="true"/>}</button>
   </div>
   <div className="shell" data-tab={tab}>
-   <ResultStage extra={<StylePicker current={project.view?.preferences.styleSlug} hint={styleHint(project.view,project.draft)} onSelect={style=>{project.setDraft(`${project.draft}${project.draft?"\n":""}画风想用「${style.nameZh}」（${style.id}）`);show('chat');focusComposer()}}/>} view={project.view} onSelectFeedback={project.selectFeedback} restoration={project.restoration} approval={project.approval} projectUpdate={project.projectUpdate} preparing={project.preparingPreview} activity={project.productionActivity?.label} onPreview={project.preparePreview} onExample={text=>{project.setDraft(text);show('chat');focusComposer()}}/>
+   <ResultStage extra={<StylePicker current={project.view?.preferences.styleSlug} hint={styleHint(project.view,project.draft)} onSelect={style=>{project.setDraft(`${project.draft}${project.draft?"\n":""}画风想用「${style.nameZh}」（${style.id}）`);show('chat');focusComposer()}}/>} view={project.view} onSelectFeedback={project.selectFeedback} restoration={project.restoration} approval={project.approval} projectUpdate={project.projectUpdate} preparing={project.preparingPreview} activity={project.productionActivity?.label} onPreview={project.preparePreview} onQuick={change=>void project.updateQuick(change)} onExample={text=>{project.setDraft(text);show('chat');focusComposer()}}/>
    <ConversationSidebar project={project}/>
   </div>
  </main>;

@@ -50,10 +50,10 @@ export function validateNewDelivery(input:DeliveryInput){
  * through the same generic visual agent and renderer, so all of them qualify. */
 export const mvpProfile={styleSlugs:listStyles().map(style=>style.id) as readonly string[],aspect:'16:9',minDurationSec:20,maxDurationSec:30,languages:['zh-CN','en'] as readonly string[]} as const;
 /** User-facing reason the current preferences fall outside the MVP profile, or undefined when supported. */
-export function mvpProfileGap(understanding:Pick<Understanding,'preferences'>):string|undefined{
+export function mvpProfileGap(understanding:Pick<Understanding,'preferences'>,options:{portrait?:boolean}={}):string|undefined{
  const p=understanding.preferences;
- if(!p.styleSlug||!mvpProfile.styleSlugs.includes(p.styleSlug))return '先选一种画风，就能先看效果。';
- if(p.aspect!==mvpProfile.aspect)return '当前版本先支持横屏（16:9）视频。';
+ if(!p.styleSlug||!mvpProfile.styleSlugs.includes(p.styleSlug))return '先选一种画风，就能开始做视频。';
+ if(p.aspect!==mvpProfile.aspect&&!(options.portrait&&p.aspect==='9:16'))return '当前版本先支持横屏（16:9）视频。';
  if(p.durationSec<mvpProfile.minDurationSec||p.durationSec>mvpProfile.maxDurationSec)return `当前版本先支持 ${mvpProfile.minDurationSec}–${mvpProfile.maxDurationSec} 秒的视频，告诉我想要多长就行。`;
  if(!mvpProfile.languages.includes(p.language))return '当前版本先支持中文或英文。';
  return undefined;
@@ -67,9 +67,11 @@ export function soundGap(understanding:Pick<Understanding,'preferences'>):string
 }
 /** First reason a new preview cannot be delivered under the configured profile. Applies to new previews only. */
 export function deliveryGap(understanding:Pick<Understanding,'preferences'>,env:Record<string,string|undefined>=process.env):{code:'MVP_PROFILE_UNSUPPORTED'|'SOUND_DISABLED';message:string}|undefined{
- const profile=env.VIDEO_DELIVERY_PROFILE==='mvp'?mvpProfileGap(understanding):undefined;
+ // The quick flow renders portrait too, and ignores narration preferences (its music comes from the library).
+ const quick=env.VIDEO_FLOW?env.VIDEO_FLOW==='quick':env.VIDEO_DELIVERY_PROFILE==='mvp';
+ const profile=env.VIDEO_DELIVERY_PROFILE==='mvp'?mvpProfileGap(understanding,{portrait:quick}):undefined;
  if(profile)return{code:'MVP_PROFILE_UNSUPPORTED',message:profile};
- const sound=soundEnabled(env)?undefined:soundGap(understanding);
+ const sound=soundEnabled(env)||quick?undefined:soundGap(understanding);
  return sound?{code:'SOUND_DISABLED',message:sound}:undefined;
 }
 export function assertMvpProfile(understanding:Understanding){

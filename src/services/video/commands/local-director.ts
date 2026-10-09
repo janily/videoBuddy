@@ -16,7 +16,7 @@ import {TextAnalysis} from '@/services/video/assets/analysis';
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import {deferDirectorFeedback} from '@/services/video/revisions/pending-feedback';
 import {canonicalHash} from '@/services/video/domain/hash';
-import {readResultManifest} from '@/services/video/results/publish';
+import {readAnyResultManifest as readResultManifest} from '@/services/video/results/publish';
 import {prepareMusicChangeDraft,revalidateMusicChangeDraft} from '@/services/video/revisions/music-change-plan';
 interface FrozenDirectorInput{control:ProjectControl;messages:ArchivedMessage[];understanding:Understanding;context:SourceMessage[];classificationContext?:Pick<DirectorProjectContext,'currentTurnUserMessageIds'|'currentResult'>}
 interface DirectorInputRecord{schemaVersion:5;input:FrozenDirectorInput;sha256:string}

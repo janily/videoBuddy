@@ -7,6 +7,13 @@ import {Icon} from './icons';
 /** Which styles the server can deliver now; null until known (or when the check fails), then nothing is marked. */
 type Availability={profile:'mvp'|'full';ids:Set<string>}|null;
 
+/** Optional sample frame at public/style-samples/<id>.jpg; hidden until one exists. */
+export function StyleSample({id}:{id:string}){
+ const [missing,setMissing]=useState(false);
+ if(missing)return null;
+ // eslint-disable-next-line @next/next/no-img-element -- static sample, sized by CSS
+ return<img className="style-sample" src={`/style-samples/${id}.jpg`} alt="" loading="lazy" onError={()=>setMissing(true)}/>;
+}
 export function StylePicker({onSelect,current,hint=''}:{onSelect:(style:StylePack)=>void;current?:string|null;hint?:string}){
  const dialog=useRef<HTMLDialogElement>(null),[query,setQuery]=useState(''),[category,setCategory]=useState(''),[availability,setAvailability]=useState<Availability>(null);
  const all=listStyles(),categories=[...new Set(all.map(s=>s.categoryZh))];
@@ -26,6 +33,7 @@ export function StylePicker({onSelect,current,hint=''}:{onSelect:(style:StylePac
  }
  function choose(style:StylePack){onSelect(style);dialog.current?.close()}
  const card=(s:StylePack,featured=false)=><button key={s.id} className={`style-card${featured?' is-featured':''}`} aria-pressed={s.id===current} onClick={()=>choose(s)}>
+  <StyleSample id={s.id}/>
   <span className="style-card-head"><strong>{s.nameZh}</strong>{partial&&(ready(s.id)?<span className="badge badge-ready">现在可做</span>:<span className="badge">即将支持</span>)}</span>
   <span className="style-en">{s.nameEn} · {s.categoryZh}</span>
   {styleFits[s.id]&&<small>适合：{styleFits[s.id].goodFor}</small>}

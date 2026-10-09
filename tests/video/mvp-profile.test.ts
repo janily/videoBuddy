@@ -31,12 +31,18 @@ describe('sound switch',()=>{
   expect(soundEnabled({})).toBe(true);
   expect(soundEnabled({VIDEO_SOUND:'off'})).toBe(false);
  });
- it('blocks a voiced brief only while sound is off, with a way forward',()=>{
+ it('blocks a voiced brief in the staged flow only while sound is off, with a way forward',()=>{
+  const voiced=understanding({styleSlug:'ink-wash',durationSec:30,voiceMode:'tts',musicMode:'composed'}),staged={VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_FLOW:'staged'};
+  expect(deliveryGap(voiced,staged)).toMatchObject({code:'SOUND_DISABLED',message:expect.stringContaining('不要声音')});
+  expect(deliveryGap(voiced,{...staged,VIDEO_SOUND:'on'})).toBeUndefined();
+  expect(deliveryGap(understanding({styleSlug:'ink-wash',durationSec:30,...silent}),staged)).toBeUndefined();
+  expect(deliveryGap(understanding({styleSlug:'ink-wash',durationSec:45,...silent}),staged)?.code).toBe('MVP_PROFILE_UNSUPPORTED');
+ });
+ it('lets the quick flow (default in MVP) ignore narration preferences and render portrait',()=>{
   const voiced=understanding({styleSlug:'ink-wash',durationSec:30,voiceMode:'tts',musicMode:'composed'});
-  expect(deliveryGap(voiced,{VIDEO_DELIVERY_PROFILE:'mvp'})).toMatchObject({code:'SOUND_DISABLED',message:expect.stringContaining('不要声音')});
-  expect(deliveryGap(voiced,{VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_SOUND:'on'})).toBeUndefined();
-  expect(deliveryGap(understanding({styleSlug:'ink-wash',durationSec:30,...silent}),{VIDEO_DELIVERY_PROFILE:'mvp'})).toBeUndefined();
-  expect(deliveryGap(understanding({styleSlug:'ink-wash',durationSec:45,...silent}),{VIDEO_DELIVERY_PROFILE:'mvp'})?.code).toBe('MVP_PROFILE_UNSUPPORTED');
+  expect(deliveryGap(voiced,{VIDEO_DELIVERY_PROFILE:'mvp'})).toBeUndefined();
+  expect(deliveryGap(understanding({styleSlug:'pixel-rpg',durationSec:25,aspect:'9:16'}),{VIDEO_DELIVERY_PROFILE:'mvp'})).toBeUndefined();
+  expect(deliveryGap(understanding({styleSlug:'pixel-rpg',durationSec:25,aspect:'9:16'}),{VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_FLOW:'staged'})?.code).toBe('MVP_PROFILE_UNSUPPORTED');
  });
 });
 

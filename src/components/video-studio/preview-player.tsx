@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelect}:{projectId:string;artifactId:string;label?:string;onSelect?:()=>void}){
+export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelect,portrait=false}:{projectId:string;artifactId:string;label?:string;onSelect?:()=>void;portrait?:boolean}){
  const [playback,setPlayback]=useState<{artifactId:string;url?:string;error?:string}>();
  const [reload,setReload]=useState(0);
  const videoRef=useRef<HTMLVideoElement>(null),resume=useRef<{time:number;playing:boolean}|null>(null),renewed=useRef(false);
@@ -22,7 +22,7 @@ export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelec
   void load();return()=>abort.abort();
  },[projectId,artifactId,reload]);
  const current=playback?.artifactId===artifactId?playback:undefined;
- return<div className={`preview-player${current?.url?' has-video':''}`}>
+ return<div className={`preview-player${current?.url?' has-video':''}${portrait?' is-portrait':''}`}>
   {current?.url?<video ref={videoRef} aria-label={label} controls playsInline preload="metadata" src={current.url} onFocus={onSelect} onPointerDown={onSelect} onTimeUpdate={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.time=event.currentTarget.currentTime}} onPlay={()=>{progress.current.playing=true}} onPause={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.playing=false}} onLoadedMetadata={()=>{
    const video=videoRef.current,saved=resume.current;if(!video||!saved)return;
    video.currentTime=Math.min(saved.time,Number.isFinite(video.duration)?video.duration:saved.time);resume.current=null;

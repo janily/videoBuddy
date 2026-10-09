@@ -100,7 +100,12 @@ const styleInstructions=' 风格推荐与styleSlug只能使用styleCatalog中原
 const recommendInstructions=' 画风推荐：主题、受众和语气大致清楚后，从styleCatalog里按goodFor、mood与look挑2到3个最匹配的画风推荐给用户，每个用一句话说明为什么适合这个内容（例如数据报告→dataviz或iso-infographic，国风故事→ink-wash、shadow-puppet或papercut-red，儿童故事→crayon-book），并把首选写入recommendedStyleId；用户选定或明确同意后再用set_preference写入styleSlug。用户已经指定画风时直接采用，不再推荐其他。不要一次列出全部画风。';
 const mvpInstructions=' 当前版本：画面固定横屏16:9，时长20到30秒。确定主题后用set_preference写入aspect=16:9和20到30之间的durationSec；用户要求竖屏或更长时长时，如实说明当前版本暂不支持并给出最接近的可用设置，不要把不支持的值写入偏好。';
 const silentInstructions=' 当前版本先只做画面，不做旁白、配乐和字幕：不要询问声音、配音、音乐或字幕；如果understanding.preferences里voiceMode或musicMode不是none，用set_preference把voiceMode、musicMode设为none、captions设为none（引用本轮用户消息）。画面里需要的标题和关键文字由画面本身呈现。用户提到声音时，说明这一版先做无声画面，之后可以再加。';
-function directorInstructions(profile:DirectorProfile,env:Environment=process.env){return instructions+(soundEnabled(env)?musicInstructions:'')+styleInstructions+recommendInstructions+(profile==='mvp'?mvpInstructions:'')+(soundEnabled(env)?'':silentInstructions)}
+const quickInstructions=' 当前是一次出整片的模式：用户点“生成视频”就直接得到完整视频，不需要先看片段再确认，你不要提到“先看效果”或“确认制作”。主题清楚、画风选定后告诉用户可以点“生成视频”。画面可以是横屏16:9或竖屏9:16：用户说要发抖音、小红书、视频号或手机观看时，建议竖屏并用set_preference写入aspect=9:16，否则默认横屏。不做旁白和字幕，配乐会按画风自动从曲库挑选，用户可以在视频下方换一首或关掉；不要询问配音或字幕。用户对成片某个镜头不满意时，告诉他可以在视频下方对那个镜头点“重画这一镜”，只重做那一镜。';
+function quickMode(env:Environment){return env.VIDEO_FLOW?env.VIDEO_FLOW==='quick':env.VIDEO_DELIVERY_PROFILE==='mvp'}
+function directorInstructions(profile:DirectorProfile,env:Environment=process.env){
+ if(quickMode(env))return instructions+styleInstructions+recommendInstructions+(profile==='mvp'?' 时长20到30秒；用户要求更长时如实说明当前版本暂不支持，不要写入超出范围的durationSec。':'')+quickInstructions;
+ return instructions+(soundEnabled(env)?musicInstructions:'')+styleInstructions+recommendInstructions+(profile==='mvp'?mvpInstructions:'')+(soundEnabled(env)?'':silentInstructions);
+}
 export async function runDirector(understanding:Understanding,messages:SourceMessage[],maxOutputTokens=2000,options:DirectorOptions={}):Promise<GuidanceDecision>{
  const agent=createVideoAgent('director',directorInstructions(directorProfile()));
  await options.assertActive?.();
