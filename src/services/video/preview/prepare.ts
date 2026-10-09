@@ -11,6 +11,7 @@ import {getStyle} from '@/services/video/styles/registry';
 import type {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {StartFailed,type Receipt} from '@/services/video/commands/submit';
 import {assertMediaStopsResolved} from '@/services/video/media/stop-state';
+import {assertMvpProfile} from '@/services/video/quality/delivery';
 import {ReviewedTreatmentSchema,validateReviewedTreatment,persistReviewedTreatment,type ReviewedTreatment} from './reviewed-treatment';
 interface Intent{frozenPreview?:FrozenPreview;frozenPreviewRequest?:PreparePreviewRequest;reviewedTreatmentRequest?:PreparePreviewRequest;reviewedTreatment?:ReviewedTreatment;hash:string;revisionId:string;previewId:string;receipt:Receipt}
 export interface PreviewOperation{
@@ -50,6 +51,8 @@ export async function preparePreview(projects:ProjectStore,queue:LocalOperationQ
  const understanding=UnderstandingSchema.parse((await projects.store.readFresh(control.understandingRef.key)).value);
  if(canonicalHash(understanding)!==control.understandingRef.sha256||Buffer.byteLength(canonicalJson(understanding))!==control.understandingRef.bytes||understanding.briefVersion!==request.expectedBriefVersion||control.briefVersion!==request.expectedBriefVersion)throw Error('BRIEF_CONFLICT');
  if(!understanding.subject.trim()||!understanding.preferences.styleSlug||understanding.unresolvedConflictIds.length)throw Error('PREVIEW_INPUT_INCOMPLETE');getStyle(understanding.preferences.styleSlug);
+ // Fail at submission, not minutes later in the worker, when MVP cannot deliver this profile.
+ if(!frozenPreview&&!reviewedTreatment&&process.env.VIDEO_DELIVERY_PROFILE==='mvp')assertMvpProfile(understanding);
  if(request.sourceMessageId&&!(await projects.messages(control)).some(message=>message.id===request.sourceMessageId&&message.role==='user'&&message.status==='completed'))throw Error('AUTHORIZATION_REQUIRED');
  const assertBaseline=(current:ProjectControl)=>{
   if(current.deletedAt||current.ownerKeyHash!==owner||Date.parse(current.expiresAt)<=Date.now())throw Error('ACCESS_NOT_FOUND');

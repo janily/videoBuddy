@@ -22,7 +22,7 @@ export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelec
   void load();return()=>abort.abort();
  },[projectId,artifactId,reload]);
  const current=playback?.artifactId===artifactId?playback:undefined;
- return<div className="preview-player">
+ return<div className={`preview-player${current?.url?' has-video':''}`}>
   {current?.url?<video ref={videoRef} aria-label={label} controls playsInline preload="metadata" src={current.url} onFocus={onSelect} onPointerDown={onSelect} onTimeUpdate={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.time=event.currentTarget.currentTime}} onPlay={()=>{progress.current.playing=true}} onPause={event=>{if(!event.currentTarget.error&&!resume.current)progress.current.playing=false}} onLoadedMetadata={()=>{
    const video=videoRef.current,saved=resume.current;if(!video||!saved)return;
    video.currentTime=Math.min(saved.time,Number.isFinite(video.duration)?video.duration:saved.time);resume.current=null;
@@ -30,8 +30,8 @@ export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelec
   }} onError={()=>{
    setPlayback(old=>old?{...old,error:'播放连接已失效，请重新载入视频。'}:old);
    if(!renewed.current){renewed.current=true;renew()}
-  }}/>:<p role="status">{current?.error||'正在载入视频…'}</p>}
-  {current?.url&&current.error&&<p role="status">{current.error}</p>}
-  {current?.error&&<button className="text-button" onClick={()=>{onSelect?.();renew()}}>重新载入视频</button>}
+  }}/>:<p role="status" className="player-state">{!current?.error&&<span className="spinner" aria-hidden="true"/>}{current?.error||'正在载入视频…'}</p>}
+  {current?.url&&current.error&&<p role="status" className="player-error">{current.error}</p>}
+  {current?.error&&<button className="text-button player-retry" onClick={()=>{onSelect?.();renew()}}>重新载入视频</button>}
  </div>;
 }

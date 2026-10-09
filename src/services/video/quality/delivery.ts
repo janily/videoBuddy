@@ -44,8 +44,20 @@ export function validateNewDelivery(input:DeliveryInput){
  return outcome;
 }
 
+/** The only profile the MVP pipeline can deliver. Kept in one place so the
+ * preview button, the director and the worker cannot disagree about it. */
+export const mvpProfile={styleSlugs:['crayon-book'],aspect:'16:9',minDurationSec:20,maxDurationSec:30,languages:['zh-CN','en']} as const;
+/** User-facing reason the current preferences fall outside the MVP profile, or undefined when supported. */
+export function mvpProfileGap(understanding:Pick<Understanding,'preferences'>):string|undefined{
+ const p=understanding.preferences;
+ if(!p.styleSlug||!(mvpProfile.styleSlugs as readonly string[]).includes(p.styleSlug))return '当前版本先支持“蜡笔儿童绘本”画风，选好后就能先看效果。';
+ if(p.aspect!==mvpProfile.aspect)return '当前版本先支持横屏（16:9）视频。';
+ if(p.durationSec<mvpProfile.minDurationSec||p.durationSec>mvpProfile.maxDurationSec)return `当前版本先支持 ${mvpProfile.minDurationSec}–${mvpProfile.maxDurationSec} 秒的视频，告诉我想要多长就行。`;
+ if(!(mvpProfile.languages as readonly string[]).includes(p.language))return '当前版本先支持中文或英文旁白。';
+ return undefined;
+}
 export function assertMvpProfile(understanding:Understanding){
- const p=understanding.preferences;if(p.styleSlug!=='crayon-book'||p.aspect!=='16:9'||p.durationSec<20||p.durationSec>30||!['zh-CN','en'].includes(p.language))throw Error('MVP_PROFILE_UNSUPPORTED');
+ if(mvpProfileGap(understanding))throw Error('MVP_PROFILE_UNSUPPORTED');
 }
 export function verifyFrozenDeliveryPolicy(timeline:FilmTimeline,raw:unknown,understanding:Understanding){
  const policy=DeliveryPolicySchema.parse(raw);if(policy.schemaVersion===2)assertMvpProfile(understanding);
