@@ -6,7 +6,7 @@ type Music=NonNullable<ProjectView['quick']>['music'];
 type Change={music:Music}|{redoShotId:string};
 
 /** Music and per-shot redraw for a quick-flow film. Each change re-generates only what it affects. */
-export function QuickPanel({view,info,busy,onChange}:{view:ProjectView;info:QuickResultInfo;busy:boolean;onChange:(change:Change)=>void}){
+export function QuickPanel({view,info,busy,onChange,musicOnly=false}:{view:ProjectView;info:QuickResultInfo;busy:boolean;onChange:(change:Change)=>void;musicOnly?:boolean}){
  const quick=view.quick,locked=busy||Boolean(view.activeProduction);
  const value=!quick?'auto':quick.music.mode==='track'?`track:${quick.music.trackId}`:quick.music.mode;
  return<div className="quick-panel">
@@ -21,13 +21,13 @@ export function QuickPanel({view,info,busy,onChange}:{view:ProjectView;info:Quic
    {info.music&&<p className="welcome-note">授权：{info.music.license}</p>}
    <p className="welcome-note">换配乐只重新混音，不会重画画面。</p>
   </section>
-  <section className="quick-section" aria-label="镜头">
+  {!musicOnly&&<section className="quick-section" aria-label="镜头">
    <div className="quick-heading"><h3>镜头</h3><span>哪一镜不满意，就只重画那一镜</span></div>
    <ol className="shot-list">{info.shots.map((shot,index)=><li key={shot.id}>
     <span className="shot-index" aria-hidden="true">{index+1}</span>
     <span className="shot-copy">{shot.scriptLine||`第 ${index+1} 镜`}{shot.take>0&&<small>已重画 {shot.take} 次</small>}</span>
     <button className="text-button" disabled={locked} onClick={()=>onChange({redoShotId:shot.id})}><Icon name="refresh"/>重画这一镜</button>
    </li>)}</ol>
-  </section>
+  </section>}
  </div>;
 }

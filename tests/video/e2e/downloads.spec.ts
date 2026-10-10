@@ -49,7 +49,7 @@ test('mobile keyboard downloads remain available during production without a thi
  let cancelled=false;
  await page.route(`**/operations/${op}`,r=>r.fulfill({json:{id:op,kind:'export',status:cancelled?'cancelled':'reserved',streamEpoch:0}}));
  await page.route(`**/operations/${op}/cancel`,r=>{expect(r.request().postDataJSON().scope).toBe('export');cancelled=true;return r.fulfill({json:{status:'cancelled'}})});
- await page.goto(`/video/${pid}`);await page.getByRole('textbox').fill('继续修改');await page.getByRole('button',{name:'看视频'}).click();
+ await page.goto(`/video/${pid}`);await page.getByRole('textbox').fill('继续修改');await page.getByRole('button',{name:/^画布/}).click();
  const summary=page.getByText('更多',{exact:true});await summary.focus();await page.keyboard.press('Enter');await expect(page.getByRole('button',{name:'下载工程包',exact:true})).toBeVisible();
  await page.getByRole('button',{name:'下载工程包',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'任务已保存'})).toBeVisible();expect(streams.size).toBeLessThanOrEqual(2);expect([...streams].some(url=>url.includes(op))).toBe(false);
  await page.getByRole('button',{name:'停止导出'}).click();await expect(page.getByRole('status').filter({hasText:'导出已停止'})).toBeVisible();await expect(page.getByRole('button',{name:'下载视频',exact:true})).toBeEnabled();
@@ -65,7 +65,7 @@ test('a failed SSE reports the actual export restriction while keeping the final
  await page.goto(`/video/${pid}`);await expect(page.getByRole('heading',{name:'视频已经准备好了。'})).toBeVisible();await expect(page.getByRole('alert').filter({hasText:'新版本质量检查未通过'})).toBeVisible();
  await page.getByText('更多',{exact:true}).click();await page.getByRole('button',{name:'下载工程包',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'分发许可'})).toBeVisible();await expect(page.getByRole('button',{name:'下载视频',exact:true})).toBeEnabled();
  await page.screenshot({path:'.video-local/ui-downloads-desktop.png'});
- await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:'看视频'}).click();await page.screenshot({path:'.video-local/ui-downloads-mobile.png'});
+ await page.setViewportSize({width:390,height:844});await page.getByRole('button',{name:/^画布/}).click();await page.screenshot({path:'.video-local/ui-downloads-mobile.png'});
 });
 test('reload replays an unacknowledged explicit export cancellation',async({page})=>{
  await setup(page);const clientCommandId=crypto.randomUUID(),cancelCommandId=crypto.randomUUID();
@@ -97,3 +97,5 @@ test('poster is an enabled real export action with a fresh private PNG download 
  await page.route('**/file?purpose=download&token=*',r=>r.fulfill({body:Buffer.from('poster protocol download fixture'),headers:{'Content-Type':'image/png','Content-Disposition':'attachment; filename="poster.png"'}}));
  await page.goto(`/video/${pid}`);await page.getByText('更多',{exact:true}).click();const button=page.getByRole('button',{name:'下载封面',exact:true});await expect(button).toBeEnabled();const download=page.waitForEvent('download');await button.click();expect((await download).suggestedFilename()).toBe('poster.png');
 });
+
+test.afterEach(async({page})=>{await expect(page.locator('dialog[open]')).toHaveCount(0)});

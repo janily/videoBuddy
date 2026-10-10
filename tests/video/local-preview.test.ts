@@ -28,7 +28,7 @@ it('missing native composition attestation is retained in terminal SSE and the r
   expect(last.payload).toMatchObject({status:'failed',errorCode:'COMPOSITION_PRODUCER_UNKNOWN'});
   const view=await new ProjectStore(new FileStore(f.root)).view('owner',f.projectId);
   expect(view.phase).toBe('attention');expect(view.activeProduction).toBeNull();
-  expect(view.productionFailure).toMatchObject({errorCode:'COMPOSITION_PRODUCER_UNKNOWN',message:'合成来源未通过核验，资料和已有视频已保留。请重新生成效果。'});
+  expect(view.productionFailure).toMatchObject({errorCode:'COMPOSITION_PRODUCER_UNKNOWN',message:'视频合成没有通过检查，资料和已有视频已保留，请重新生成。'});
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
 it.each([
@@ -206,14 +206,14 @@ it('a damaged queue record is reported while other queued operations continue',a
  }finally{await rm(f.root,{recursive:true,force:true})}
 });
 it.each([
- ['VISUAL_SOURCE_INVALID','画面源码未通过核验，资料和已生成画面已保留。'],
- ['PICTURE_RENDER_FAILED','画面渲染未通过，资料和已有内容已保留。'],
- ['ASR_TIMINGS_UNAVAILABLE','声音时序核验未通过，资料和已有片段已保留。'],
- ['MODEL_OUTPUT_INVALID','创作结果格式未通过核验，资料和已有内容已保留。'],
- ['AUDIO_EVENT_INVALID','音乐或音效的编排未通过核验，资料和已有声音已保留。'],
- ['AUDIO_PLAN_INVALID','音乐或音效的编排未通过核验，资料和已有声音已保留。'],
- ['AUDIO_TIMELINE_INVALID','音乐或音效的编排未通过核验，资料和已有声音已保留。'],
- ['POSTMIX_ASR_MISMATCH','声音核验未通过，资料和已有片段已保留。'],
+ ['VISUAL_SOURCE_INVALID','这个镜头没有画好，已画好的镜头都保留了，请重试。'],
+ ['PICTURE_RENDER_FAILED','这个镜头没有生成成功，已画好的镜头都保留了，请重试。'],
+ ['ASR_TIMINGS_UNAVAILABLE','声音时间没有对齐，资料和已有片段已保留，请重试。'],
+ ['MODEL_OUTPUT_INVALID','脚本内容没有通过检查，资料和已有内容已保留，请重试。'],
+ ['AUDIO_EVENT_INVALID','配乐安排没有通过检查，画面和已有声音已保留，请重试配乐。'],
+ ['AUDIO_PLAN_INVALID','配乐安排没有通过检查，画面和已有声音已保留，请重试配乐。'],
+ ['AUDIO_TIMELINE_INVALID','配乐时间没有对齐，画面和已有声音已保留，请重试配乐。'],
+ ['POSTMIX_ASR_MISMATCH','声音检查没有通过，资料和已有片段已保留，请重试。'],
 ])('persists %s as the real failure category without leaking native diagnostic details',async(code,message)=>{
  const f=await setup();try{
   let calls=0;const options={root:f.root,build:async()=>{calls++;throw Error(code+': /private/provider-secret diagnostics')}};

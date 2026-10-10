@@ -1,4 +1,5 @@
 'use client';
+import {trackCanvasEvent} from '@/services/video/analytics/client';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {z} from 'zod';
 import {CommandReceiptSchema,type ExportRequest,type StreamEvent} from '@/contracts/video/commands';
@@ -53,7 +54,7 @@ export function useExportDownload(projectId:string,artifactId:string,canFollowSs
     const result=ReadySchema.parse(body),access=validateDownloadAccess(result.access,projectId,result.artifactId,window.location.origin);
     const mime=value.request.format==='mp4'?'video/mp4':value.request.format==='poster'?'image/png':exportFiles[value.request.format].mime;
     if(access.mime!==mime||(value.request.format==='mp4'&&result.artifactId!==artifactId))throw Error('DOWNLOAD_ACCESS_INVALID');
-    if(download){const link=document.createElement('a');link.href=access.url;link.download=access.filename;document.body.append(link);link.click();link.remove()}
+    if(download){const link=document.createElement('a');link.href=access.url;link.download=access.filename;document.body.append(link);link.click();link.remove();if(value.request.format==='mp4')trackCanvasEvent(projectId,{name:'result_downloaded',payload:{}})}
     if(value.request.format!=='mp4')setState({phase:'ready',format:value.request.format,message:`${exportLabels[value.request.format]}已准备好，点击下载即可保存。`});
    }else if(response.status===202){
     const result=AcceptedSchema.parse(body);

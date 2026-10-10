@@ -26,7 +26,14 @@ import {prepareAudioPlanStage} from '@/services/video/preview/audio-plan-stage';
 it.each(['corrected','exhausted','transport','full','revoked'] as const)('bounds known audio-parameter correction, accounting and recovery: %s',async scenario=>{
  marks.count=0;marks.after=undefined;
  const root=await mkdtemp(join(tmpdir(),'vb-audio-correction-')),projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),operationId=randomUUID();
- const bundle=await seedPreviewBundle(projects,{projectId,briefVersion:1,durationSec:20,previewArtifactSha256:'a'.repeat(64)}),spec=(await projects.store.readFresh<FilmSpec>(bundle.filmSpecRef.key)).value,treatment=(await projects.store.readFresh<{planRef:FilmSpec['treatmentRef']}>(spec.treatmentRef.key)).value,manifest=(await projects.store.readFresh<{planRef:FilmSpec['treatmentRef'];timingDraftRef:FilmSpec['treatmentRef']}>(spec.audioManifestRef.key)).value,valid=(await projects.store.readFresh<AudioPlan>(manifest.planRef.key)).value;
+ const bundle=await seedPreviewBundle(projects,{projectId,briefVersion:1,durationSec:20,musicMode:'composed',previewArtifactSha256:'a'.repeat(64)}),spec=(await projects.store.readFresh<FilmSpec>(bundle.filmSpecRef.key)).value,treatment=(await projects.store.readFresh<{planRef:FilmSpec['treatmentRef']}>(spec.treatmentRef.key)).value,manifest=(await projects.store.readFresh<{planRef:FilmSpec['treatmentRef'];timingDraftRef:FilmSpec['treatmentRef']}>(spec.audioManifestRef.key)).value,template=(await projects.store.readFresh<AudioPlan>(manifest.planRef.key)).value;
+ // Explicit composed intent keeps this test on the real model adapter path;
+ // the fixture's default silent plan would correctly skip that call entirely.
+ const valid:AudioPlan={...template,
+  cues:[{id:'music-start',sourceShotId:'shot',requestedTimeUs:0,alignmentPolicy:'audio'}],
+  sources:[{id:'fixture-tone',kind:'synthesis',description:'Local correction fixture',material:'synthetic',recipe:{instrument:'sine',frequencyHz:220,attackMs:5,releaseMs:100}}],
+  music:[{eventId:'fixture-note',cueId:'music-start',source:'fixture-tone',durationSamples:48000,gainDb:-20,pan:0}],
+  intentionalSilenceRanges:[],reasoning:'Composed audio protocol fixture; no rendering or listening evidence is claimed.'};
  clock.mockResolvedValue({draftRef:manifest.timingDraftRef});await seedPreviewOperation(projects,operationId,bundle);await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,phase:'preparing_preview' as const,briefVersion:1,activeProduction:operationId}));
  const requests:Record<string,unknown>[]=[];
  const server=createServer(async(req,res)=>{

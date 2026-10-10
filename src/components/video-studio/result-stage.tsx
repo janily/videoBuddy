@@ -36,19 +36,19 @@ function preferenceLine(view:ProjectView){
 
 export function ResultStage({view,onExample,extra,onPreview,preparing=false,activity,restoration,approval:confirmation,projectUpdate,onSelectFeedback,onQuick}:{onQuick?:(change:Parameters<React.ComponentProps<typeof QuickPanel>['onChange']>[0])=>void;extra?:React.ReactNode;view:ProjectView|null;onExample:(text:string)=>void;onPreview?:()=>void;preparing?:boolean;activity?:string;restoration?:ReturnType<typeof useRestoreResult>;approval?:ReturnType<typeof useApprovePreview>;projectUpdate?:string;onSelectFeedback?:(artifactId:string,revisionId:string)=>void}){
  const confirming=confirmation?.state.phase==='submitting',approvalLocked=confirming||confirmation?.state.phase==='uncertain'||confirmation?.state.phase==='confirmed'&&confirmation.state.previewId===view?.currentPreview?.previewId;
- const confirmationStatus=<>{confirmation?.state.message&&<p className={confirmation.state.phase==='failed'?'error-box':'notice-inline'} role={confirmation.state.phase==='failed'?'alert':'status'} aria-live="polite">{confirmation.state.message}</p>}{confirmation?.state.phase==='uncertain'&&<button className="text-button" onClick={()=>void confirmation.reconnect()}><Icon name="refresh"/>重新连接制作</button>}</>;
+ const confirmationStatus=<>{confirmation?.state.message&&<p className={confirmation.state.phase==='failed'?'error-box':'notice-inline'} role={confirmation.state.phase==='failed'?'alert':undefined}>{confirmation.state.message}</p>}{confirmation?.state.phase==='uncertain'&&<button className="text-button" onClick={()=>void confirmation.reconnect()}><Icon name="refresh"/>重新连接制作</button>}</>;
  const failure=view?.productionFailure&&<p className="error-box" role="alert">{view.productionFailure.message}</p>;
- const running=(text:string)=><div className="status-row"><span className="spinner" aria-hidden="true"/><p role="status">{text}</p></div>;
+ const running=(text:string)=><div className="status-row"><span className="spinner" aria-hidden="true"/><p>{text}</p></div>;
  const previewEnabled=Boolean(view?.actions.some(a=>a.kind==='prepare_preview'&&a.enabled)),quick=Boolean(view?.quick);
  if(view?.currentResult&&(!view.currentPreview||view.phase!=='preview_ready')){
   const result=view.currentResult,quickInfo=result.kind==='quick'?result.quick:undefined,portrait=(quickInfo?.aspect||view.preferences.aspect)==='9:16';
   return<section className="work" aria-label="视频结果"><div className="work-inner"><FlowSteps view={view}/><span className="eyebrow">把想法带给更多人</span><h1 className="result-title">视频已经准备好了。</h1><p className="intro">播放看看。想调整哪里，继续在<Chat/>告诉我。</p>
-   {projectUpdate&&<p className="notice-inline" role="status" aria-live="polite">{projectUpdate}</p>}{failure}<div className={portrait&&quickInfo&&onQuick?'portrait-layout':undefined}><div className="portrait-media"><PreviewPlayer key={`player:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} label="完整视频" portrait={portrait} onSelect={()=>onSelectFeedback?.(result.artifactId,result.revisionId)}/>
+   {projectUpdate&&<p className="notice-inline">{projectUpdate}</p>}{failure}<div className={portrait&&quickInfo&&onQuick?'portrait-layout':undefined}><div className="portrait-media"><PreviewPlayer key={`player:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} label="完整视频" portrait={portrait} onSelect={()=>onSelectFeedback?.(result.artifactId,result.revisionId)}/>
    <p className="media-note">{quickInfo?resultLine(quickInfo):preferenceLine(view)}</p></div>
    {portrait&&quickInfo&&onQuick&&<QuickPanel view={view} info={quickInfo} busy={preparing} onChange={onQuick}/>}</div>
    {view.activeProduction&&running(activity||'新版本正在制作，已有视频仍可观看和下载。')}
    <ResultDownloads key={`downloads:${result.artifactId}`} projectId={view.projectId} artifactId={result.artifactId} productionActive={Boolean(view.activeProduction)} videoOnly={Boolean(quickInfo)} history={restoration&&<ResultHistory view={view} locked={['submitting','uncertain'].includes(restoration.state.phase)} onRestore={artifactId=>void restoration.restore(artifactId,view)} onSelectFeedback={onSelectFeedback}/>}/>
-   {restoration?.state.message&&<p className={restoration.state.phase==='failed'?'error-box':'notice-inline'} role={restoration.state.phase==='failed'?'alert':'status'} aria-live="polite">{restoration.state.message}</p>}
+   {restoration?.state.message&&<p className={restoration.state.phase==='failed'?'error-box':'notice-inline'} role={restoration.state.phase==='failed'?'alert':undefined}>{restoration.state.message}</p>}
    {restoration?.state.phase==='uncertain'&&<button className="text-button" onClick={()=>void restoration.reconnect()}><Icon name="refresh"/>重新连接恢复</button>}{confirmationStatus}
    {!portrait&&quickInfo&&onQuick&&<QuickPanel view={view} info={quickInfo} busy={preparing} onChange={onQuick}/>}
    <div className="secondary-row">{extra}
@@ -75,7 +75,7 @@ export function ResultStage({view,onExample,extra,onPreview,preparing=false,acti
   </div></section>;
  }
  if(view?.activeProduction)return<section className="work" aria-label="视频结果"><div className="work-inner"><FlowSteps view={view}/><span className="eyebrow">正在把想法变成画面</span><h1 className="result-title">{quick?'视频正在生成中。':'效果片段正在准备中。'}</h1>
-  <div className="preparing-surface"><span className="spinner" aria-hidden="true"/><p className="intro" role="status">{activity||'任务已经保存，正在准备效果。'}</p><p className="welcome-note">{quick?'会依次构思故事、画每个镜头、渲染、配乐，通常几分钟。':'通常需要几分钟。'}网络断开不会停止制作，你可以继续在<Chat/>聊天。</p></div>{extra}</div></section>;
+  <div className="preparing-surface"><span className="spinner" aria-hidden="true"/><p className="intro">{activity||'任务已经保存，正在准备效果。'}</p><p className="welcome-note">{quick?'会依次构思故事、画每个镜头、渲染、配乐，通常几分钟。':'通常需要几分钟。'}网络断开不会停止制作，你可以继续在<Chat/>聊天。</p></div>{extra}</div></section>;
  if(view){
   const reason=view.actions.find(a=>a.kind==='prepare_preview')?.disabledReason;
   return<section className="work" aria-label="视频结果"><div className="work-inner"><FlowSteps view={view}/><span className="eyebrow">我们正在一起完善</span><h1 className="result-title">想法，渐渐清楚了。</h1><p className="intro">不用填一张长表单。你继续聊，我来整理。</p>{failure}

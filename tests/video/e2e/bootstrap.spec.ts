@@ -25,3 +25,5 @@ for (const width of [360,390,768,960,1024,1280,1440,1920]) test(`companion width
  else await expect(page.getByRole('heading',{name:'创作助手'})).toBeVisible();
  await page.screenshot({path:`docs/engineering/screens/bootstrap-${width}.png`,fullPage:true});
 });
+
+test.afterEach(async({page})=>{await expect(page.locator('dialog[open]')).toHaveCount(0)});

@@ -30,8 +30,8 @@ export function PreviewPlayer({projectId,artifactId,label="效果预览",onSelec
   }} onError={()=>{
    setPlayback(old=>old?{...old,error:'播放连接已失效，请重新载入视频。'}:old);
    if(!renewed.current){renewed.current=true;renew()}
-  }}/>:<p role="status" className="player-state">{!current?.error&&<span className="spinner" aria-hidden="true"/>}{current?.error||'正在载入视频…'}</p>}
-  {current?.url&&current.error&&<p role="status" className="player-error">{current.error}</p>}
+  }}/>:<p className="player-state">{!current?.error&&<span className="spinner" aria-hidden="true"/>}{current?.error||'正在载入视频…'}</p>}
+  {current?.url&&current.error&&<p className="player-error">{current.error}</p>}
   {current?.error&&<button className="text-button player-retry" onClick={()=>{onSelect?.();renew()}}>重新载入视频</button>}
  </div>;
 }

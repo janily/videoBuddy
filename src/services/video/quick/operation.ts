@@ -1,3 +1,5 @@
+import {archiveAssistantMilestone,milestoneContent,type AssistantMilestone} from './milestones';
+import {applyPendingDirectorFeedback} from '@/services/video/revisions/pending-feedback';
 import {randomUUID} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import type {AtomicStore} from '@/services/video/storage/atomic-store';
@@ -13,7 +15,7 @@ import {persistArchiveObject} from '@/services/video/exports/archive-object';
 import type {ArtifactRecord} from '@/services/video/exports/access';
 import {parseQuickManifest,quickResultKey,type QuickResultManifest} from '@/services/video/results/publish';
 import {claimOperation} from '@/services/video/commands/claim';
-import {buildQuickFilm,type QuickFilmOutput} from './film';
+import {buildQuickFilm,type QuickFilmOutput,type Activity} from './film';
 
 // Error codes that may be shown to the person; anything else becomes PROVIDER_UNAVAILABLE.
 const publicCodes=new Set(['PICTURE_RENDER_FAILED','VISUAL_SOURCE_INVALID','MODEL_OUTPUT_INVALID','TREATMENT_INVALID','TREATMENT_OPTIONS_INVALID','TREATMENT_TIMELINE_INVALID','TREATMENT_FACT_INVALID','TREATMENT_BASELINE_CHANGED','BUDGET_EXCEEDED','MODEL_BUDGET_OVERRUN','MODEL_USAGE_UNCERTAIN','GENERATION_DISABLED','CONFIGURATION_REQUIRED','CAPABILITY_UNAVAILABLE','MUSIC_TRACK_MISSING','MUSIC_LIBRARY_INVALID','QA_FAILED','CONTEXT_LIMIT']);
@@ -30,14 +32,20 @@ export async function runQuickFilmOperation(store:AtomicStore,events:LocalEventL
  async function emit(type:string,payload:object){
   await events.append(StreamEventSchema.parse({schemaVersion:5,projectId,operationId,epoch:op.streamEpoch,eventId:randomUUID(),createdAt:new Date().toISOString(),type,payload}));
  }
- async function activity(stage:string,label:string){
+ const activity:Activity=async(stage,label,progress)=>{
   await updateJson(store,key,(value:PreviewOperation)=>{if(value.status!=='running')throw Error('PREVIEW_STALE');return{...value,stage}});
-  await emit('activity.updated',{stage,label});
+  await emit('activity.updated',{stage,label,...progress});
+ }
+ async function milestone(kind:AssistantMilestone){
+  const message=await archiveAssistantMilestone(projects,projectId,operationId,kind,milestoneContent(kind),kind==='film-started'?c=>c.activeProduction===operationId&&c.consentEpoch===op.consentEpoch:undefined);
+  if(message)await emit('message.committed',message);
  }
  type Outcome=NonNullable<ProjectControl['previewOutcomes']>[string];
  async function finish(outcome:Outcome){
   const saved=await createOrRead(store,key+'/preview-outcome',outcome);
   if(canonicalHash(saved)!==canonicalHash(outcome))throw Error('PREVIEW_OUTCOME_CHANGED');
+  if(outcome.status==='succeeded')await milestone('film-completed');
+  else if(outcome.status==='failed')await milestone('film-failed');
   await emit('operation.terminal',{...outcome,retryable:false});
   await updateJson(store,key,(value:PreviewOperation)=>({...value,...outcome}));
   // The durable copy lives with the operation; keep the control record small (it caps pending outcomes).
@@ -47,9 +55,12 @@ export async function runQuickFilmOperation(store:AtomicStore,events:LocalEventL
  if(resumed){await finish(resumed);return}
  if(!(await claimOperation(store,key,operationId)).claimed)return;
  try{
-  const film=await (options.build||buildQuickFilm)(projects,{projectId,operationId,expectedConsentEpoch:op.consentEpoch},options,activity);
-  await activity('publication','正在保存视频');
+  await milestone('film-started');
+  const film=await (options.build||buildQuickFilm)(projects,{projectId,operationId,expectedConsentEpoch:op.consentEpoch},{...options,onShot:shot=>emit('shot.updated',shot)},activity);
+  await activity('publication','正在保存视频',{completed:film.shots.length,total:film.shots.length,unit:'shots'});
   const result=await publishQuickFilm(projects,projectId,operationId,op,film,options.root);
+  try{await applyPendingDirectorFeedback(projects,projectId)}catch{/* Idle worker reconciliation retries next-version feedback. */}
+  await milestone('film-completed');
   await emit('result.ready',{artifactId:result.artifactId,revisionId:result.revisionId});
   await finish({status:'succeeded'});
  }catch(error){
@@ -59,6 +70,7 @@ export async function runQuickFilmOperation(store:AtomicStore,events:LocalEventL
    const owned=c.activeProduction===operationId,status=c.cancelRequestedProductionId===operationId?'cancelled' as const:owned&&c.consentEpoch===op.consentEpoch?'failed' as const:'superseded' as const;
    return{...c,controlVersion:c.controlVersion+1,previewOutcomes:{...c.previewOutcomes,[operationId]:{status,errorCode}},...(owned?{activeProduction:null,phase:c.currentResultId?'ready' as const:'attention' as const,latestPreviewOutcome:{operationId,briefVersion:op.briefVersion,consentEpoch:op.consentEpoch,controlVersion:c.controlVersion+1}}:{})};
   });
+  try{await applyPendingDirectorFeedback(projects,projectId)}catch{/* Idle worker reconciliation retries next-version feedback. */}
   await finish(failed.previewOutcomes![operationId]);
  }
 }

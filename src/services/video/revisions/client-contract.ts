@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {SendMessageRequestSchema,FeedbackTargetSchema,type FeedbackTarget} from '@/contracts/video/commands';
 import type {ProjectView} from '@/contracts/video/project';
-const Intent=z.strictObject({version:z.literal(1),projectId:z.uuid(),request:SendMessageRequestSchema});
+const Intent=z.strictObject({version:z.literal(1),projectId:z.uuid(),request:SendMessageRequestSchema,preserveDraft:z.boolean().optional()});
 export type MessageIntent=z.infer<typeof Intent>;
 export const FeedbackSelectionSchema=z.strictObject({version:z.literal(1),projectId:z.uuid(),target:FeedbackTargetSchema.extend({sourceTimeMs:z.null()})});
 export function parseMessageIntent(raw:string,projectId:string){
