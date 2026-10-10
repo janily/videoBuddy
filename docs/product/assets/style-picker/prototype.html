@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>画风选择原型</title>
+<style>
+:root{--canvas:#FAFBF8;--surface:#fff;--soft:#F0F3EC;--hover:#E8EDE3;--ink:#252C25;--secondary:#566151;--muted:#66705F;--line:#DFE5DA;--control:#87917E;--action:#2E402C;--accent:#49633F;--success:#396139;--success-bg:#EDF5EA;--warn:#785718;--warn-bg:#FAF3E3;--font:"Noto Sans CJK SC","Noto Sans SC",sans-serif}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--canvas);font:400 15px/1.8 var(--font);color:var(--ink);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}h1,h2,h3,p{margin:0}ol,ul{margin:0;padding:0;list-style:none}
+.topbar{height:64px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;letter-spacing:-.6px}.brand i{width:28px;height:28px;border-radius:8px;background:var(--action);display:grid;place-items:center}.brand i:after{content:"";border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;margin-left:2px}
+.brand small{font-size:14px;color:var(--muted);font-weight:400;letter-spacing:0;margin-left:18px}
+.top-actions{display:flex;gap:14px;align-items:center;font-size:14px}.top-actions .new{border:1px solid var(--line);border-radius:10px;padding:6px 14px}
+.shell{height:calc(100vh - 64px);display:grid;grid-template-columns:minmax(0,1fr) 388px}
+.work{overflow:auto;min-height:0;position:relative}
+.inner{max-width:912px;margin:0 auto;padding:40px 48px 48px}
+.chat{border-left:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;min-height:0}
+.chat header{padding:24px 24px 0}.chat h2{font-size:16px;font-weight:650}.chat header p{font-size:12px;color:var(--muted)}
+.msgs{flex:1;padding:18px 24px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.bubble{border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.75;max-width:92%}
+.bubble.me{align-self:flex-end;background:var(--soft);border-color:transparent}
+.chip-action{display:inline-flex;margin-top:8px;border:1px solid var(--control);border-radius:999px;padding:3px 12px;font-size:13px;color:var(--secondary)}
+.composer{margin:0 16px 16px;border:1px solid var(--control);border-radius:14px;padding:12px 14px;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;font-size:14px;color:var(--muted)}
+.composer .row{display:flex;justify-content:space-between;align-items:center}.send{width:40px;height:40px;border-radius:10px;background:var(--action)}
+/* welcome */
+.eyebrow{font-size:13px;color:var(--muted)}.welcome h1{font-size:40px;line-height:1.4;letter-spacing:-1.2px;font-weight:650;margin-top:6px}
+.intro{margin-top:14px;color:var(--secondary);font-size:16px}
+.examples{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px}.examples button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 16px;font-size:14px;color:var(--secondary)}
+.inspire{margin-top:40px;padding-top:28px;border-top:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:14px}
+.sec-head h2{font-size:17px;font-weight:650}.sec-head p{font-size:13px;color:var(--muted)}
+.link{font-size:14px;color:var(--accent);font-weight:550;white-space:nowrap;border-bottom:1px solid currentColor;line-height:1.3}
+/* tiles */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:16px}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.tile{position:relative;text-align:left;display:flex;flex-direction:column;border-radius:14px;background:var(--surface);border:1px solid var(--line);overflow:hidden;transition:border-color .14s,box-shadow .14s}
+.tile .thumb{aspect-ratio:16/9;display:block;width:100%}
+.tile .thumb svg{display:block;width:100%;height:100%}
+.tile .body{padding:10px 12px 12px}
+.tile strong{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:650;line-height:1.5}
+.tile small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;line-height:1.6;color:var(--muted);margin-top:2px;min-height:38px}
+.tile.compact small{-webkit-line-clamp:1;min-height:0}
+.tile.hover{border-color:var(--control);box-shadow:0 6px 20px rgba(37,44,37,.08)}
+.tile.hover .pick{opacity:1}
+.pick{position:absolute;right:8px;top:8px;opacity:0;background:rgba(255,255,255,.94);color:var(--action);font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px}
+.tile.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.tile.selected .check{position:absolute;right:8px;top:8px;width:24px;height:24px;border-radius:50%;background:var(--accent);display:grid;place-items:center}
+.tile.selected .check:after{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.badge{font-size:11px;font-weight:550;border-radius:999px;padding:1px 8px;background:var(--success-bg);color:var(--success);line-height:1.6}
+.reason{display:block;font-size:12.5px;line-height:1.65;color:var(--secondary);margin-top:4px}
+/* canvas card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:16px}
+.card.current{border-color:var(--control)}
+.card-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}.card-head h2{font-size:16px;font-weight:650;display:flex;gap:10px;align-items:center}
+.card-head h2 span{font-size:12px;color:var(--muted);font-weight:500}
+.status{font-size:12px;border-radius:999px;padding:2px 10px;background:var(--soft);color:var(--muted)}.status.need{background:var(--warn-bg);color:var(--warn)}.status.done{background:var(--success-bg);color:var(--success)}
+.card .note{font-size:13px;color:var(--muted);margin-bottom:14px}
+.card-foot{margin-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted)}
+.collapsed{display:flex;align-items:center;justify-content:space-between;font-size:14px;color:var(--secondary)}
+/* library */
+.lib-head{position:sticky;top:0;z-index:5;background:var(--canvas);padding:18px 48px 14px;border-bottom:1px solid transparent}
+.lib-head.scrolled{border-bottom-color:var(--line);box-shadow:0 8px 16px -14px rgba(37,44,37,.35)}
+.lib-head .bar{max-width:816px;margin:0 auto}
+.lib-top{display:flex;align-items:center;gap:14px}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--secondary);border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:5px 12px 5px 9px}
+.back:before{content:"";width:7px;height:7px;border-left:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);margin:0 2px 0 4px}
+.lib-top h1{white-space:nowrap;font-size:20px;font-weight:650;letter-spacing:-.3px}.lib-top h1 span{font-size:13px;color:var(--muted);font-weight:400;margin-left:8px}
+.search{flex:1;min-width:0;margin-left:8px;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--control);border-radius:12px;padding:0 14px;height:46px}
+.search svg{flex:none}.search input{border:0;outline:0;flex:1;font-size:15px;background:transparent}.search input::placeholder{color:var(--muted)}
+.search .count{font-size:12px;color:var(--muted);white-space:nowrap}
+.chips{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.chips button{font-size:13px;border-radius:999px;padding:2px 11px;border:1px solid var(--line);background:var(--surface);color:var(--secondary)}
+.chips button[aria-pressed=true]{background:var(--action);border-color:var(--action);color:#fff}
+.lib-body{max-width:912px;margin:0 auto;padding:8px 48px 48px}
+.group{margin-top:22px}.group h2{font-size:15px;font-weight:650;margin-bottom:12px;display:flex;gap:8px;align-items:baseline}.group h2 span{font-size:12px;color:var(--muted);font-weight:400}
+.empty{margin-top:40px;text-align:center;color:var(--secondary)}.empty h2{font-size:17px;font-weight:650;color:var(--ink)}.empty p{font-size:14px;margin-top:6px}
+.empty .chips{justify-content:center;margin-top:16px}
+.confirm{margin-top:14px;border:1px solid #E6D7B5;background:var(--warn-bg);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13.5px;color:var(--warn)}
+.confirm .btns{display:flex;gap:8px}.btn{border-radius:10px;padding:6px 14px;font-size:13px;font-weight:600}.btn.primary{background:var(--action);color:#fff}.btn.ghost{border:1px solid var(--control);color:var(--secondary);background:#fff}
+.toast{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);background:var(--action);color:#fff;border-radius:999px;padding:8px 18px;font-size:13.5px;box-shadow:0 10px 30px rgba(37,44,37,.25);white-space:nowrap}
+.toast b{font-weight:600;margin-left:10px;text-decoration:underline}
+/* mobile */
+.m .topbar{height:56px;padding:0 16px}.m .brand small{display:none}.m .top-actions .mine{display:none}
+.m .shell{grid-template-columns:1fr;height:calc(100vh - 56px - 52px)}.m .chat{display:none}
+.m .tabs{height:52px;display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);background:var(--surface);font-size:14px;text-align:center;align-items:center}
+.m .tabs .on{color:var(--action);font-weight:650}
+.m .lib-head{padding:12px 16px 10px}.m .lib-body{padding:4px 16px 32px}.m .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.m .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-16px;padding-right:16px}.m .chips button{flex:none}
+.m .tile .body{padding:8px 10px 10px}.m .tile small{font-size:11.5px}
+.m .search{height:42px;flex-basis:100%;margin:10px 0 0}.m .lib-top{flex-wrap:wrap;gap:10px}
+.m .pick{display:none}.tabs{display:none}.m .tabs{display:grid}
+</style></head>
+<body><div id="app"></div>
+<script>
+const STYLES=[{"id": "crayon-book", "name": "蜡笔儿童绘本", "cat": "手绘与绘画", "goodFor": "儿童故事、睡前故事、亲子教育、温柔的小品、公益宣传", "mood": "温柔、童趣、手绘"}, {"id": "watercolor", "name": "水彩笔刷", "cat": "手绘与绘画", "goodFor": "自然科普、植物与花艺、旅行手账、温柔的品牌故事", "mood": "清新、柔和、有书卷气"}, {"id": "ink-wash", "name": "中国水墨", "cat": "手绘与绘画", "goodFor": "国风文化、诗词、茶道、中医养生、山水旅游、传统节气", "mood": "空灵、写意、东方"}, {"id": "impasto", "name": "油画厚涂", "cat": "手绘与绘画", "goodFor": "艺术展览、情感叙事、名人故事、季节与风景", "mood": "浓烈、艺术、有温度"}, {"id": "one-line", "name": "一笔画", "cat": "手绘与绘画", "goodFor": "品牌理念、极简故事、情绪短片、婚礼与纪念", "mood": "极简、优雅、流动"}, {"id": "whiteboard", "name": "白板讲解", "cat": "手绘与绘画", "goodFor": "知识讲解、课程概念、商业分析、方法论、培训课件", "mood": "清楚、循序渐进、讲课感"}, {"id": "urban-sketch", "name": "钢笔淡彩", "cat": "手绘与绘画", "goodFor": "城市漫步、旅行日记、咖啡店/小店介绍、建筑与街区", "mood": "随性、文艺、生活感"}, {"id": "shadow-puppet", "name": "皮影戏", "cat": "东方传统", "goodFor": "民间故事、戏曲、历史典故、非遗文化", "mood": "古朴、神秘、戏剧性"}, {"id": "ukiyoe", "name": "浮世绘", "cat": "东方传统", "goodFor": "日本文化、海洋与自然、旅行、和风品牌", "mood": "雅致、平面、东方"}, {"id": "papercut-red", "name": "红色窗花剪纸", "cat": "东方传统", "goodFor": "春节、婚庆、喜事、民间吉祥文化、非遗剪纸", "mood": "喜庆、吉祥、传统"}, {"id": "paper-lantern", "name": "纸雕灯影", "cat": "东方传统", "goodFor": "传统节日（中秋、元宵、春节）、民俗故事、温暖的夜景故事", "mood": "温暖、梦幻、东方"}, {"id": "risograph", "name": "Risograph 丝网印刷", "cat": "印刷与版画", "goodFor": "独立品牌、文创与市集、活动海报、音乐节、设计工作室", "mood": "文艺、潮流、手作印刷"}, {"id": "halftone-dossier", "name": "复古半调案卷", "cat": "印刷与版画", "goodFor": "真相揭秘、案件复盘、品牌故事、调查报道、复古海报感宣传", "mood": "复古、戏剧化、报刊感"}, {"id": "woodcut", "name": "木刻版画", "cat": "印刷与版画", "goodFor": "严肃议题、历史与社会、劳动/匠人故事、有力量感的宣言", "mood": "厚重、有力、黑白对比"}, {"id": "engraving", "name": "铜版画", "cat": "印刷与版画", "goodFor": "历史人物、博物学/科学史、经典文学、学术讲座", "mood": "古典、严谨、学术"}, {"id": "silkscreen-poster", "name": "丝印旅行海报", "cat": "印刷与版画", "goodFor": "旅游目的地宣传、城市推广、户外活动、展会海报", "mood": "鲜明、大胆、海报感"}, {"id": "swiss-motion", "name": "瑞士动态排版", "cat": "图形与排版", "goodFor": "企业介绍、设计说明、观点陈述、数据要点、招聘", "mood": "专业、简洁、有力"}, {"id": "spy-titles", "name": "60s 间谍片头", "cat": "图形与排版", "goodFor": "活动开场、片头、悬念预告、品牌发布倒计时", "mood": "酷、悬念、节奏强"}, {"id": "art-deco", "name": "装饰艺术", "cat": "图形与排版", "goodFor": "高端品牌、酒店餐厅、周年庆典、复古发布会、颁奖", "mood": "华丽、隆重、复古"}, {"id": "blueprint", "name": "蓝图 / 工程制图", "cat": "图形与排版", "goodFor": "工程原理、产品结构拆解、建筑设计、机械/硬件介绍", "mood": "精确、理性、专业"}, {"id": "stained-glass", "name": "彩色玻璃窗", "cat": "图形与排版", "goodFor": "宗教与建筑文化、史诗故事、婚礼仪式、光影主题", "mood": "庄重、神圣、绚丽"}, {"id": "pictogram-motion", "name": "象形运动图形", "cat": "图形与排版", "goodFor": "体育赛事、运动项目介绍、规则说明、活动日程", "mood": "动感、清晰、节拍感"}, {"id": "ascii-crt", "name": "ASCII / CRT 终端", "cat": "图形与排版", "goodFor": "程序员话题、黑客/安全、开源项目、命令行工具、复古电脑", "mood": "极客、冷静、怀旧"}, {"id": "dataviz", "name": "数据叙事", "cat": "信息与发布", "goodFor": "数据报告、年度总结、调研结果、趋势分析、财报解读", "mood": "清晰、可信、理性"}, {"id": "iso-infographic", "name": "等距信息图", "cat": "信息与发布", "goodFor": "流程讲解、系统架构、城市/工厂运作、商业模式、供应链", "mood": "清晰、有序、全局视角"}, {"id": "dark-keynote", "name": "暗色科技发布", "cat": "信息与发布", "goodFor": "科技产品发布、软件/App介绍、SaaS功能演示、创业路演", "mood": "高级、克制、科技感"}, {"id": "living-screencast", "name": "活体实机录屏", "cat": "信息与发布", "goodFor": "软件操作教程、App上手指南、网站功能演示、SaaS引导", "mood": "亲切、直观、实用"}, {"id": "hologram-hud", "name": "科幻全息界面", "cat": "信息与发布", "goodFor": "科幻概念、智能硬件参数、汽车/无人机、未来科技展示", "mood": "未来、冷峻、精密"}, {"id": "rubber-hose", "name": "1930s 橡皮管卡通", "cat": "卡通与动画", "goodFor": "幽默广告、复古喜剧、轻松的品牌吉祥物故事", "mood": "滑稽、欢乐、复古"}, {"id": "cel-anime-80s", "name": "80 年代赛璐璐动画", "cat": "卡通与动画", "goodFor": "热血故事、青春怀旧、机甲/科幻冒险、音乐MV", "mood": "热血、怀旧、霓虹"}, {"id": "scifi-toon", "name": "科幻情景喜剧卡通", "cat": "卡通与动画", "goodFor": "科幻脑洞、搞笑科普、团队日常、平行世界设定", "mood": "荒诞、幽默、科幻"}, {"id": "midcentury-toon", "name": "50s 扁平卡通", "cat": "卡通与动画", "goodFor": "生活小知识、安全/礼仪教育、职场培训、复古广告", "mood": "轻松、复古、亲切"}, {"id": "pixel-rpg", "name": "16-bit 像素 RPG", "cat": "游戏", "goodFor": "游戏风宣传、成长/升级故事、任务式教程、团队招募", "mood": "怀旧、有趣、闯关感"}, {"id": "hd-2d", "name": "HD-2D", "cat": "游戏", "goodFor": "游戏宣传、奇幻冒险故事、城镇/地图介绍、像素怀旧", "mood": "奇幻、精致、怀旧"}, {"id": "microgame", "name": "微游戏快闪（瓦里奥制造式）", "cat": "游戏", "goodFor": "快节奏挑战、短视频互动、多要点速览、年轻人活动", "mood": "疯狂、好玩、快节奏"}, {"id": "game-show", "name": "综艺节奏扁平", "cat": "游戏", "goodFor": "知识竞答、活动预热、节日互动、抽奖与综艺式宣传", "mood": "热闹、欢快、节奏感"}, {"id": "silent-film", "name": "1920s 默片", "cat": "电影与时代", "goodFor": "老故事新讲、品牌百年历史、怀旧喜剧、经典桥段致敬", "mood": "怀旧、幽默、黑白"}, {"id": "backrooms", "name": "后室 / 新怪谈", "cat": "电影与时代", "goodFor": "悬疑短片、都市怪谈、密室解谜、恐怖氛围预告", "mood": "诡异、压抑、悬疑"}, {"id": "brick-toy", "name": "积木玩具", "cat": "材质与 3D", "goodFor": "儿童教育、亲子内容、玩具与积木、轻松的小故事、团队建设", "mood": "童趣、明快、手作感"}, {"id": "paper-popup", "name": "纸片立体书", "cat": "材质与 3D", "goodFor": "品牌故事、儿童科普、旅行回忆、产品诞生历程", "mood": "惊喜、手作、温馨"}, {"id": "tilt-shift", "name": "移轴微缩", "cat": "材质与 3D", "goodFor": "城市风光、交通与生活节奏、旅游宣传、建筑工地进度", "mood": "可爱、俯瞰、生活感"}, {"id": "lowpoly-island", "name": "低多边形等距", "cat": "材质与 3D", "goodFor": "旅游目的地、城市/园区介绍、游戏化说明、环保主题", "mood": "轻快、可爱、立体"}, {"id": "glass-product", "name": "玻璃质感产品", "cat": "材质与 3D", "goodFor": "硬件/消费电子、美妆与香水、高端产品展示、材质卖点", "mood": "精致、通透、高级"}];
+const PAL={'crayon-book':['#F4E3C6','#D9873F','#4F7FB8'],'watercolor':['#E8F0EC','#7FA99A','#E2A3A0'],'ink-wash':['#F2F0EA','#2E3330','#9AA39C'],'impasto':['#2D3A5C','#E9B949','#C4552E'],'one-line':['#FBF7F0','#2B2B2B','#D9A441'],'whiteboard':['#FFFFFF','#2E5AAC','#E05A47'],'urban-sketch':['#F6F0E4','#4A4038','#8DB0C8'],
+'shadow-puppet':['#E9C46A','#3A2412','#B23A22'],'ukiyoe':['#F1E6CF','#1F4E79','#D7553B'],'papercut-red':['#F7EFE4','#B3261E','#E8B04B'],'paper-lantern':['#1E2235','#F2A541','#F7D58B'],
+'risograph':['#F5F0E6','#FF5C8A','#2E6BD9'],'halftone-dossier':['#EDE4D3','#2A2A2A','#C2412D'],'woodcut':['#EFE9DD','#1C1C1C','#8A7F6E'],'engraving':['#F3EEE2','#3B3426','#A39272'],'silkscreen-poster':['#F6E7C8','#E4572E','#17607D'],
+'swiss-motion':['#F5F5F2','#E1251B','#111111'],'spy-titles':['#E8D9B8','#1B1B1B','#D9411E'],'art-deco':['#14231F','#D4AF37','#F2E6C2'],'blueprint':['#1E4E8C','#E8F1FB','#8FB8E8'],'stained-glass':['#1F2A44','#E2B23C','#3E8E7E'],'pictogram-motion':['#FFFFFF','#0B5FB0','#F2A900'],'ascii-crt':['#0D1A12','#57E389','#2E7D4F'],
+'dataviz':['#F7F8F6','#2F6F9F','#E3A33B'],'iso-infographic':['#EEF4F8','#3D7EA6','#F2B544'],'dark-keynote':['#14171F','#E6E9F0','#6C8CFF'],'living-screencast':['#F3F5F8','#3A72F0','#FFFFFF'],'hologram-hud':['#06141C','#38E1F0','#1A6C80'],
+'rubber-hose':['#F2E8D0','#1D1D1D','#D2483E'],'cel-anime-80s':['#2A1E4A','#FF5FA2','#5CE1E6'],'scifi-toon':['#1E3B4F','#9BE15D','#F0E14A'],'midcentury-toon':['#F4E9D5','#E2703A','#2F8F86'],
+'pixel-rpg':['#7EC850','#3B6E3B','#F2D16B'],'hd-2d':['#2B3A67','#F2C14E','#8E6CB8'],'microgame':['#FFE14D','#FF3D7F','#2B2B2B'],'game-show':['#5B2BD9','#FFD23F','#FF5E5B'],
+'silent-film':['#D9D6CF','#1E1E1E','#8C8A84'],'backrooms':['#D8C979','#8A7B32','#F3EDC0'],
+'brick-toy':['#FFD43B','#E03131','#1971C2'],'paper-popup':['#F6EFE3','#E8835A','#5BA7A0'],'tilt-shift':['#CFE3D0','#4F8A5B','#F2C14E'],'lowpoly-island':['#9FD8E8','#56A65B','#F2D16B'],'glass-product':['#E9EEF5','#9FB3CC','#FFFFFF']};
+function motif(s){const [b,f,a]=PAL[s.id]||['#EEE','#888','#555'];const W=320,H=180;let g='';
+ switch(s.cat){
+ case '手绘与绘画':g=`<circle cx="92" cy="98" r="54" fill="${a}" opacity=".55"/><circle cx="210" cy="82" r="40" fill="${f}" opacity=".45"/><path d="M28 146 C 90 112, 150 172, 210 132 S 290 118, 300 140" stroke="${f}" stroke-width="7" fill="none" stroke-linecap="round"/>`;break;
+ case '东方传统':g=`<circle cx="236" cy="56" r="26" fill="${a}"/><path d="M0 150 L70 84 L120 126 L176 70 L250 140 L320 104 L320 180 L0 180Z" fill="${f}" opacity=".9"/><path d="M0 164 L90 128 L170 160 L260 132 L320 150 L320 180 L0 180Z" fill="${f}"/>`;break;
+ case '印刷与版画':{let d='';for(let y=12;y<H;y+=16)for(let x=12;x<W;x+=16){const r=2+5*(x/W);d+=`<circle cx="${x}" cy="${y}" r="${r.toFixed(1)}"/>`}g=`<g fill="${f}" opacity=".85">${d}</g><rect x="40" y="52" width="120" height="76" fill="${a}" style="mix-blend-mode:multiply"/>`;break}
+ case '图形与排版':g=`<rect x="0" y="118" width="320" height="18" fill="${f}"/><rect x="36" y="22" width="22" height="136" fill="${a}"/><circle cx="214" cy="70" r="44" fill="none" stroke="${f}" stroke-width="10"/><rect x="170" y="140" width="110" height="10" fill="${a}"/>`;break;
+ case '信息与发布':{let bars='';[60,96,72,124,140].forEach((h,i)=>bars+=`<rect x="${44+i*48}" y="${156-h}" width="28" height="${h}" rx="4" fill="${i===4?a:f}" opacity="${i===4?1:.75}"/>`);g=`<g stroke="${f}" opacity=".18">${[40,72,104,136].map(y=>`<line x1="24" x2="296" y1="${y}" y2="${y}"/>`).join('')}</g>${bars}`;break}
+ case '卡通与动画':g=`<circle cx="160" cy="98" r="58" fill="${f}"/><circle cx="140" cy="88" r="12" fill="#fff"/><circle cx="180" cy="88" r="12" fill="#fff"/><circle cx="143" cy="90" r="5" fill="#111"/><circle cx="183" cy="90" r="5" fill="#111"/><path d="M138 116 Q160 134 182 116" stroke="${a}" stroke-width="6" fill="none" stroke-linecap="round"/>`;break;
+ case '游戏':{let p='';const m=['0011100','0111110','1101011','1111111','0101010'];m.forEach((r,y)=>[...r].forEach((c,x)=>{if(c==='1')p+=`<rect x="${104+x*16}" y="${46+y*16}" width="16" height="16"/>`}));g=`<rect y="140" width="320" height="40" fill="${f}"/><g fill="${a}">${p}</g>`;break}
+ case '电影与时代':g=`<rect x="0" y="0" width="320" height="18" fill="${f}" opacity=".85"/><rect x="0" y="162" width="320" height="18" fill="${f}" opacity=".85"/>${[...Array(12)].map((_,i)=>`<rect x="${8+i*27}" y="5" width="14" height="8" rx="2" fill="${b}"/><rect x="${8+i*27}" y="167" width="14" height="8" rx="2" fill="${b}"/>`).join('')}<circle cx="160" cy="90" r="46" fill="${a}" opacity=".7"/><rect x="0" y="0" width="320" height="180" fill="url(#vig)"/>`;break;
+ default:g=`<path d="M160 36 L232 76 L160 116 L88 76Z" fill="${a}"/><path d="M88 76 L160 116 L160 160 L88 120Z" fill="${f}"/><path d="M232 76 L160 116 L160 160 L232 120Z" fill="${f}" opacity=".7"/>`;}
+ return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="vig"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".35"/></radialGradient></defs><rect width="${W}" height="${H}" fill="${b}"/>${g}</svg>`}
+const by=id=>STYLES.find(s=>s.id===id);
+function tile(s,o={}){return `<button class="tile ${o.selected?'selected':''} ${o.hover?'hover':''} ${o.compact?'compact':''}" aria-pressed="${!!o.selected}"><span class="thumb">${motif(s)}</span>${o.selected?'<span class="check"></span>':'<span class="pick">选这个</span>'}<span class="body"><strong>${s.name}${o.rec?'<span class="badge">推荐</span>':''}</strong>${o.reason?`<span class="reason">${o.reason}</span>`:`<small>${s.goodFor}</small>`}</span></button>`}
+const searchIcon='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#66705F" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>';
+const cats=['全部','为你推荐',...new Set(STYLES.map(s=>s.cat))];
+function chat(msgs){return `<aside class="chat"><header><h2>创作助手</h2><p>边聊边完善，不必一次想清楚。</p></header><div class="msgs">${msgs.map(m=>`<div class="bubble ${m.me?'me':''}">${m.t}</div>`).join('')}</div><div class="composer"><span>继续说说你的想法…</span><div class="row"><span>添加资料</span><span class="send"></span></div></div></aside>`}
+function page(main,msgs,mobile){return `<header class="topbar"><div class="brand"><i></i>VideoBuddy<small>边聊边做视频</small></div><div class="top-actions"><span class="mine">我的视频</span><span class="new">+ 新建</span></div></header><div class="shell">${main}${chat(msgs)}</div><nav class="tabs"><span class="on">画布</span><span>助手</span></nav>`}
+const recIds=['whiteboard','iso-infographic','dark-keynote'];
+const reasons={whiteboard:'边画边讲，适合把「Agent 是什么」一步步讲清楚',"iso-infographic":'用小场景拆解 Agent 的感知、计划、执行流程',"dark-keynote":'更像科技发布会，适合讲新产品和趋势'};
+const views={
+welcome(){const picks=['crayon-book','paper-lantern','dataviz','risograph','pixel-rpg','brick-toy'];
+ return page(`<main class="work"><div class="inner welcome"><span class="eyebrow">一个想法，就可以开始</span><h1>先聊聊，你想做什么视频？</h1><p class="intro">不用先写脚本，也不用一次想清楚。说说想法，或者发些资料，我们一起慢慢完善。</p>
+ <div class="examples"><button>给我的咖啡店做一支介绍视频</button><button>把这份资料讲成一个小故事</button><button>做一段让人看懂的知识科普</button></div>
+ <section class="inspire"><div class="sec-head"><div><h2>能做出这样的视频</h2><p>聊完想法后，助手会从 43 种画风里挑 3 种给你。</p></div><button class="link">逛逛全部画风</button></div>
+ <div class="grid three">${picks.map(id=>tile(by(id),{compact:true})).join('')}</div></section></div></main>`,[{t:'你想讲什么，讲给谁看？<br>有资料也可以一起发来。'}])},
+card(){return page(`<main class="work"><div class="inner">
+ <section class="card"><div class="card-head"><h2><span>01</span>想法</h2><span class="status done">已完成</span></div><div class="collapsed">给大学生讲清楚什么是 AI Agent · 60 秒 · 横屏 16:9<button class="link">展开</button></div></section>
+ <section class="card current"><div class="card-head"><h2><span>02</span>画风</h2><span class="status need">需要你选</span></div>
+ <p class="note">根据「给大学生讲清楚什么是 AI Agent」挑了 3 种，点一下就能选。</p>
+ <div class="grid three">${recIds.map((id,i)=>tile(by(id),{rec:i===0,reason:reasons[id],hover:i===1})).join('')}</div>
+ <div class="card-foot"><span>都不太对？</span><button class="link">浏览全部 43 种画风</button></div></section>
+ <section class="card"><div class="card-head"><h2><span>03</span>脚本</h2><span class="status">待开始</span></div><p class="note" style="margin:0">选好画风后，这里会写出分镜脚本。</p></section>
+ </div></main>`,[{me:1,t:'我想做一个 Agent 的科普视频'},{t:'好的！是讲给谁看呢？大概多长？'},{me:1,t:'给大学生，一分钟左右'},{t:'明白了。左边给你挑了 3 种画风，第一种「白板讲解」最适合一步步讲概念。都不喜欢也可以说说想要的感觉。<br><span class="chip-action">看全部画风</span>'}])},
+library(){const groups=[...new Set(STYLES.map(s=>s.cat))];
+ return page(`<main class="work" id="w"><div class="lib-head scrolled"><div class="bar"><div class="lib-top"><button class="back">返回画布</button><h1>画风库<span>43 种</span></h1><label class="search">${searchIcon}<input placeholder="搜索用途或感觉，如：儿童、国风、科技"><span class="count"></span></label></div>
+ <div class="chips">${cats.map((c,i)=>`<button aria-pressed="${i===0}">${c}</button>`).join('')}</div></div></div>
+ <div class="lib-body">${groups.slice(1,4).map(g=>`<section class="group"><h2>${g}<span>${STYLES.filter(s=>s.cat===g).length} 种</span></h2><div class="grid">${STYLES.filter(s=>s.cat===g).map(s=>tile(s,{selected:s.id==='blueprint',hover:s.id==='woodcut',rec:recIds.includes(s.id)})).join('')}</div></section>`).join('')}</div></main>`,[{me:1,t:'给大学生，一分钟左右'},{t:'左边给你挑了 3 种画风，都不喜欢也可以说说想要的感觉。'}])},
+search(){const hits=STYLES.filter(s=>/儿童|亲子|孩子/.test(s.goodFor+s.name));
+ return page(`<main class="work"><div class="lib-head"><div class="bar"><div class="lib-top"><button class="back">返回画布</button><h1>画风库<span>43 种</span></h1><label class="search">${searchIcon}<input value="儿童"><span class="count">找到 ${hits.length} 种</span></label></div>
+ <div class="chips">${cats.map((c,i)=>`<button aria-pressed="${i===0}">${c}</button>`).join('')}</div></div></div>
+ <div class="lib-body"><div class="grid" style="margin-top:14px">${hits.map(s=>tile(s,{selected:s.id==='crayon-book'})).join('')}</div>
+ <div class="confirm"><span>已经写好脚本了，换成「蜡笔儿童绘本」会重画所有镜头。</span><span class="btns"><button class="btn ghost">先不换</button><button class="btn primary">换成这个</button></span></div>
+ <div class="empty" style="margin-top:56px"><h2>没找到「赛博朋克」</h2><p>试试这些词，或者直接在右边告诉助手你想要的感觉。</p><div class="chips"><button>科技</button><button>未来</button><button>霓虹</button><button>游戏</button></div></div></div></main>`,[{t:'左边给你挑了 3 种画风，都不喜欢也可以说说想要的感觉。'}])},
+selected(){return page(`<main class="work" style="position:relative"><div class="inner">
+ <section class="card"><div class="card-head"><h2><span>02</span>画风</h2><span class="status done">已完成</span></div>
+ <div style="display:grid;grid-template-columns:200px 1fr auto;gap:18px;align-items:center"><span class="tile" style="border:0"><span class="thumb" style="border-radius:10px;overflow:hidden">${motif(by('whiteboard'))}</span></span><div><strong style="font-size:16px">白板讲解</strong><p style="font-size:13px;color:var(--muted);margin-top:2px">清楚、循序渐进、讲课感 · 适合知识讲解、课程概念</p></div><button class="btn ghost">换一个</button></div></section>
+ <section class="card current"><div class="card-head"><h2><span>03</span>脚本</h2><span class="status">进行中</span></div><p class="note" style="margin:0">正在按「白板讲解」写分镜脚本…</p></section>
+ </div><div class="toast">已选「白板讲解」<b>撤销</b></div></main>`,[{t:'好的，用「白板讲解」。我先写脚本，写好了你看看。'}])}
+};
+const v=new URLSearchParams(location.search).get('v')||'welcome';if(new URLSearchParams(location.search).get('m'))document.body.classList.add('m');
+document.getElementById('app').innerHTML=views[v]();
+if(v==='library'){const w=document.getElementById('w');w.querySelector('.lib-body').style.marginTop='0';w.scrollTop=360}
+</script></body></html>
