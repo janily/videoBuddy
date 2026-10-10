@@ -17,6 +17,20 @@ const Id=z.string().uuid(),Digest=z.string().regex(/^[a-f0-9]{64}$/);
 const Check=z.strictObject({ruleId:z.string().min(1),result:z.enum(['pass','fail','not_checked','not_applicable','waived']),severity:z.enum(['blocking','warning']),evidenceRefs:z.array(z.string().min(1)),reason:z.string().optional(),waiverActor:z.string().optional()});
 const Manifest=z.strictObject({resultId:Id,artifactId:Id,revisionId:Id,previewId:Id,approvalId:Id,bundleHash:Digest,mp4Sha256:Digest,mp4Bytes:z.number().int().positive(),qualityPolicy:DeliveryPolicySchema,qualityChecks:z.array(Check),createdAt:z.string().datetime({offset:true})});
 export type ResultManifest=z.input<typeof Manifest>;
+/** A film made by the quick flow: no preview, approval or staged quality package. */
+const QuickManifest=z.strictObject({kind:z.literal('quick'),resultId:Id,artifactId:Id,revisionId:Id,operationId:Id,bundleHash:Digest,mp4Sha256:Digest,mp4Bytes:z.number().int().positive(),briefVersion:z.number().int().nonnegative(),styleSlug:z.string().min(1),aspect:z.enum(['16:9','9:16']),durationSec:z.number().int().positive(),
+ shots:z.array(z.strictObject({id:z.string().min(1),scriptLine:z.string(),startFrame:z.number().int().nonnegative(),endFrame:z.number().int().positive(),take:z.number().int().nonnegative()})).min(1).max(80),
+ music:z.strictObject({trackId:z.string(),title:z.string(),license:z.string()}).nullable(),aiLabel:z.literal(true),createdAt:z.string().datetime({offset:true})});
+export type QuickResultManifest=z.infer<typeof QuickManifest>;
+export type AnyResultManifest=(z.infer<typeof Manifest>&{kind?:undefined})|QuickResultManifest;
+/** Reads either kind. Use where only the shared fields (artifact, revision, file hash) matter. */
+export async function readAnyResultManifest(projects:ProjectStore,projectId:string,resultId:string):Promise<AnyResultManifest>{
+ const raw=(await projects.store.readFresh<{kind?:string}>(key(projectId,resultId))).value;
+ const result=raw?.kind==='quick'?QuickManifest.parse(raw):Manifest.parse(raw);
+ if(result.resultId!==resultId)throw Error('RESULT_INVALID');return result;
+}
+export function quickResultKey(projectId:string,resultId:string){return key(projectId,resultId)}
+export function parseQuickManifest(raw:unknown){return QuickManifest.parse(raw)}
 function key(projectId:string,resultId:string){return`projects/${projectId}/results/${resultId}/manifest`}
 export async function readResultManifest(projects:ProjectStore,projectId:string,resultId:string){
  const result=Manifest.parse((await projects.store.readFresh<unknown>(key(projectId,resultId))).value);

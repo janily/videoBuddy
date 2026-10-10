@@ -8,7 +8,7 @@ import {Understanding} from '@/contracts/video/domain';
 import {StreamEventSchema} from '@/contracts/video/commands';
 import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budget/model-budget';
-import {runDirector,runDirectorStream,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext,type DirectorProjectContext} from '@/mastra/video/director';
+import {directorProfile,runDirector,runDirectorStream,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext,type DirectorProjectContext} from '@/mastra/video/director';
 import {guardImageUnderstanding,ImageAnalysisRecordSchema} from '@/contracts/video/image-understanding';
 import {readNarrationJson} from '@/services/video/audio/narration-package';
 import {TextAnalysis} from '@/services/video/assets/analysis';
@@ -16,7 +16,7 @@ import {TextAnalysis} from '@/services/video/assets/analysis';
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import {deferDirectorFeedback} from '@/services/video/revisions/pending-feedback';
 import {canonicalHash} from '@/services/video/domain/hash';
-import {readResultManifest} from '@/services/video/results/publish';
+import {readAnyResultManifest as readResultManifest} from '@/services/video/results/publish';
 import {prepareMusicChangeDraft,revalidateMusicChangeDraft} from '@/services/video/revisions/music-change-plan';
 interface FrozenDirectorInput{control:ProjectControl;messages:ArchivedMessage[];understanding:Understanding;context:SourceMessage[];classificationContext?:Pick<DirectorProjectContext,'currentTurnUserMessageIds'|'currentResult'>}
 interface DirectorInputRecord{schemaVersion:5;input:FrozenDirectorInput;sha256:string}
@@ -99,7 +99,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
   const frozen=verifyInput(await createOrRead(store,`${opKey}/director-input`,{schemaVersion:5 as const,input,sha256:canonicalHash(input)}),projectId,operationId);
   control=frozen.control;messages=frozen.messages;understanding=frozen.understanding;context=frozen.context;
   const projectContext={phase:control.phase,activeProductionId:control.activeProduction??null,briefVersion:control.briefVersion,consentEpoch:control.consentEpoch,...frozen.classificationContext};
-  const bytes=Buffer.byteLength(JSON.stringify(directorContext(understanding,context,projectContext)));if(bytes>60000)throw Error('CONTEXT_LIMIT');
+  const bytes=Buffer.byteLength(JSON.stringify(directorContext(understanding,context,projectContext,directorProfile())));if(bytes>60000)throw Error('CONTEXT_LIMIT');
   const assertActive=async()=>{const latest=(await store.readFresh<ProjectControl>(`${p}/control`)).value,current=(await store.readFresh<{status:string}>(opKey)).value;if(latest.deletedAt||latest.activeConversation!==operationId||current.status!=='running')throw Error('ACCESS_NOT_FOUND');if(!Number.isFinite(Date.parse(latest.expiresAt))||Date.parse(latest.expiresAt)<=Date.now())throw Error('PROJECT_EXPIRED')};
   await assertActive();
   const reservation=await reserveModelBudget(store,projectId,`${operationId}-director`,{inputTokens:bytes+4096,outputTokens:2000},options.limits||modelLimits());

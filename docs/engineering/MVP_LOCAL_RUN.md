@@ -29,6 +29,8 @@ Web脚本在进程内读取 `.env.mvp.local`，避免将 `--env-file` 传进Next
 复制 `.env.local.example` 为 `.env.mvp.local`，填写绝对数据路径、至少32字符的随机 `VIDEO_SESSION_SIGNING_KEY`，保持 `VIDEO_APP_ORIGIN=http://localhost:3000`；配置真实模型、四个Agent角色与锁定镜像：
 
 - `VIDEO_DELIVERY_PROFILE=mvp`、`VIDEO_GENERATION_ENABLED=true`。
+- 出片流程：`VIDEO_FLOW` 未设置时 mvp 模式默认 `quick`，聊完点“生成视频”直接出完整视频（横屏或竖屏），不再先看片段再确认，详见 [极简出片](QUICK_FLOW.md)。配乐放在 `VIDEO_MUSIC_DIR` 曲库目录。
+- 声音：`VIDEO_SOUND` 未设置时，mvp 模式默认关闭声音，只做画面（无旁白、配乐、字幕），不需要配音和 ASR 镜像，也不调用 Audio 模型。需要恢复声音链路时设 `VIDEO_SOUND=on`。全部 43 种画风都可选，助手会按内容推荐。
 - `MODEL_PROVIDER=openai-compatible`、`MODEL_BASE_URL=https://grsaiapi.com/v1`；`MODEL_API_KEY` 为自己的私有Key。
 - Director/Visual/Audio/Critic使用已验证的 `gemini-3.8-flash`。
 - 媒体、配音、ASR各自的不可变镜像ID与64位runtime digest必须一致，不能使用latest标签。构建方式见runtime对应README。

@@ -6,6 +6,8 @@ import {writeWorkerHeartbeat} from '../../src/services/video/commands/worker-hea
 import {expirePendingUploads,runQueuedOnce} from '../../src/services/video/commands/local-worker';
 import {runDirectorOperation} from '../../src/services/video/commands/local-director';
 import {runPreviewOperation} from '../../src/services/video/commands/local-preview';
+import {runQuickFilmOperation} from '../../src/services/video/quick/operation';
+import {quickFlow} from '../../src/services/video/quick/settings';
 import {runApprovedRenderOperation} from '../../src/services/video/commands/local-render';
 import {runExportOperation} from '../../src/services/video/exports/operation';
 import {requireGeneration} from '../../src/services/video/config/environment';
@@ -24,7 +26,9 @@ async function main(){
    if(job.kind==='export'){await runExportOperation(store,events,job.projectId,job.operationId,{root});return}
    if(job.kind==='render'){await runApprovedRenderOperation(store,events,job.projectId,job.operationId,{root});return}
    requireGeneration();
-   if(job.kind==='preview')await runPreviewOperation(store,events,job.projectId,job.operationId,{root});else await runDirectorOperation(store,events,job.projectId,job.operationId,{root});
+   // Quick flow: a preview request produces the finished film directly.
+   if(job.kind==='preview'&&quickFlow())await runQuickFilmOperation(store,events,job.projectId,job.operationId,{root});
+   else if(job.kind==='preview')await runPreviewOperation(store,events,job.projectId,job.operationId,{root});else await runDirectorOperation(store,events,job.projectId,job.operationId,{root});
   })}catch{console.error('WORKER_JOB_NEEDS_RECONCILIATION')}
   await new Promise(resolve=>setTimeout(resolve,2000));
  }}finally{clearInterval(heartbeat);await heartbeatPending;await lease.release()}

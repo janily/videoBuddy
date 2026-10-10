@@ -6,7 +6,7 @@ import{inspectArtifact}from '@/services/video/exports/access';
 import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomic-store';
 import type{ProjectStore}from '@/services/video/storage/project-store';
-import{readResultManifest}from './publish';
+import{readAnyResultManifest as readResultManifest}from './publish';
 
 interface RestoreIntent{hash:string;fromResultId:string;toResultId:string;artifactId:string;completed:boolean}
 export async function restoreResult(projects:ProjectStore,owner:string,projectId:string,artifactId:string,untrusted:RestoreResultRequest,storageRoot:string){
