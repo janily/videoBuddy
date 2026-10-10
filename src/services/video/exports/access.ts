@@ -6,7 +6,7 @@ import{canonicalHash}from'@/services/video/domain/hash';
 import{StoreMissing}from'@/services/video/storage/atomic-store';
 import {ExportPublicationSchema} from './publication';
 import {exportFiles} from './formats';
-export interface ArtifactRecord{id:string;revisionId:string;objectRef:ObjectRef;qaPassed:boolean;uploaded:boolean;filename:string}
+export interface ArtifactRecord{quickShot?:{base:string;shotId:string};id:string;revisionId:string;objectRef:ObjectRef;qaPassed:boolean;uploaded:boolean;filename:string}
 export async function inspectArtifact(projects:ProjectStore,owner:string,projectId:string,artifactId:string){
  const control=await projects.access(owner,projectId);
  const artifact=(await projects.store.readFresh<ArtifactRecord>(`projects/${projectId}/artifacts/${artifactId}/manifest`)).value;
@@ -17,7 +17,13 @@ export async function inspectArtifact(projects:ProjectStore,owner:string,project
 export async function resolveArtifact(projects:ProjectStore,owner:string,projectId:string,artifactId:string){
  const artifact=await inspectArtifact(projects,owner,projectId,artifactId),control=await projects.access(owner,projectId);
  let published=false;
- if(control.currentPreviewId){
+ if(artifact.quickShot){
+  const {base,shotId}=artifact.quickShot;
+  if(!new RegExp(`^projects/${projectId}/quick/b[0-9]+/[a-f0-9]{16}$`).test(base))throw Error('ACCESS_NOT_FOUND');
+  try{const canvas=(await projects.store.readFresh<{shots:Record<string,{posterArtifactId?:string;clipArtifactId?:string}>}>(`${base}/canvas`)).value;const shot=canvas.shots[shotId];published=Boolean(shot&&(shot.posterArtifactId===artifactId||shot.clipArtifactId===artifactId))}catch(error){if(!(error instanceof StoreMissing))throw error}
+ }
+
+ if(control.currentPreviewId&&!published){
   const preview=await projects.store.readFresh<{previewArtifactId:string;revisionId:string}>(`projects/${projectId}/previews/${control.currentPreviewId}/manifest`);
   published=preview.value.previewArtifactId===artifactId&&preview.value.revisionId===artifact.revisionId;
  }

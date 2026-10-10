@@ -23,19 +23,19 @@ test('AT-023 submitting one draft never clears typing made while request is pend
 });
 test('a draft survives reload and mobile tab switches',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/video');const input=page.getByRole('textbox');await input.fill('这段草稿不能丢');
- await page.getByRole('button',{name:'看视频'}).click();await page.getByRole('button',{name:'聊想法'}).click();await expect(input).toHaveValue('这段草稿不能丢');
+ await page.getByRole('button',{name:/^画布/}).click();await page.getByRole('button',{name:'聊想法'}).click();await expect(input).toHaveValue('这段草稿不能丢');
  await page.reload();await expect(page.getByRole('textbox')).toHaveValue('这段草稿不能丢');
 });
-test('AT-074/027 style modal restores focus and keeps the creative draft',async({page})=>{
+test('inline style browsing keeps the creative draft without a modal',async({page})=>{
  await page.goto('/video');await page.getByRole('textbox').fill('保留我的想法');const trigger=page.getByRole('button',{name:'看看全部画风'});await trigger.click();
- await expect(page.getByRole('dialog')).toBeVisible();await page.getByRole('textbox',{name:'搜索画风'}).fill('水墨');await expect(page.getByRole('button',{name:/中国水墨/})).toBeVisible();
- await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).not.toBeVisible();await expect(trigger).toBeFocused();await expect(page.getByRole('textbox')).toHaveValue('保留我的想法');
+ await expect(page.locator('dialog')).toHaveCount(0);await page.getByRole('textbox',{name:'搜索画风'}).fill('水墨');await expect(page.getByRole('button',{name:/中国水墨/})).toBeVisible();
+ await trigger.click();await expect(page.getByRole('textbox',{name:'说说想法，或发点资料'})).toHaveValue('保留我的想法');
 });
 test('recent projects list uses only server-authorized project summaries',async({page})=>{
  await page.addInitScript(id=>localStorage.setItem('vb-recent-project-ids',JSON.stringify([id])),projectId);
  await page.route('**/api/video/projects/lookup',r=>r.fulfill({json:{projects:[{projectId,title:'我的真实项目',phase:'collecting',expiresAt:'2030-01-01T00:00:00Z'}]}}));
  await page.goto('/video');const trigger=page.getByRole('button',{name:'我的视频'});await trigger.click();
- await expect(page.getByRole('dialog',{name:'我的视频'})).toBeVisible();await expect(page.getByRole('link',{name:'我的真实项目'})).toHaveAttribute('href',`/video/${projectId}`);
+ await expect(page.getByRole('region',{name:'我的视频'})).toBeVisible();await expect(page.getByRole('link',{name:'我的真实项目'})).toHaveAttribute('href',`/video/${projectId}`);
  await page.keyboard.press('Escape');await expect(trigger).toBeFocused();
 });
 test('Markdown material is uploaded, confirmed, and sent without text after reload',async({page})=>{
@@ -100,3 +100,5 @@ test('a PDF stays pending until the source worker reports a real ready state',as
  await page.getByRole('button',{name:'发送'}).click();
  await expect.poll(()=>sent?.attachmentIds).toEqual([assetId]);
 });
+
+test.afterEach(async({page})=>{await expect(page.locator('dialog[open]')).toHaveCount(0)});

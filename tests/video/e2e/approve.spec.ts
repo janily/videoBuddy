@@ -61,3 +61,5 @@ test('a failed formal revision keeps a new preview action beside the previous pu
  await expect(page.getByLabel('完整视频',{exact:true})).toBeVisible();
  await expect(page.getByRole('button',{name:'下载视频',exact:true})).toBeEnabled();
 });
+
+test.afterEach(async({page})=>{await expect(page.locator('dialog[open]')).toHaveCount(0)});

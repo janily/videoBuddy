@@ -1,6 +1,6 @@
 // Trusted renderer baked into a pinned image. Never run generated scenes on the web host.
 import { chromium } from 'playwright';
-import { readFile, mkdir } from 'node:fs/promises';
+import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import {createRuntimeAssetServer,verifyRuntimeAssetInputs} from './runtime-assets.mjs';
 import { spawn } from 'node:child_process';
@@ -32,6 +32,9 @@ try{
  const samples=[...new Set([job.startFrame,Math.floor((job.startFrame+job.endFrame)/2),job.endFrame-1])],baseline=new Map();
  for(const frame of samples){await page.evaluate(t=>window.render(t),frame/job.fps);if(runtimeError)throw runtimeError;baseline.set(frame,await page.screenshot({animations:'disabled'}))}
  for(const frame of samples.toReversed()){await page.evaluate(t=>window.render(t),frame/job.fps);if(runtimeError)throw runtimeError;if(!baseline.get(frame).equals(await page.screenshot({animations:'disabled'})))throw Error('NONDETERMINISTIC_SCENE')}
+ // Publish the verified middle frame before full rendering; the host can show it immediately.
+ await writeFile(join(output,'poster.pending'),baseline.get(Math.floor((job.startFrame+job.endFrame)/2)));
+ await rename(join(output,'poster.pending'),join(output,'poster.png'));
  for(let f=job.startFrame;f<job.endFrame;f++){await page.evaluate(t=>window.render(t),f/job.fps);if(runtimeError)throw runtimeError;await page.screenshot({path:join(frames,`${String(f-job.startFrame).padStart(6,'0')}.png`),animations:'disabled'})}
  await browser.close();browser=null;
  await new Promise((resolve,reject)=>{const ff=spawn('ffmpeg',['-v','error','-threads','2','-filter_threads','2','-framerate',String(job.fps),'-i',join(frames,'%06d.png'),'-vf',`scale=${job.outputWidth}:${job.outputHeight}:flags=lanczos`,'-c:v','libx264','-threads','2','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-movflags','+faststart','-y',join(output,'picture.mp4')],{stdio:'inherit'});ff.on('error',reject);ff.on('exit',code=>code===0?resolve():reject(Error('ENCODE_FAILED')))});

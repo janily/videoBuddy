@@ -80,3 +80,10 @@ test('an acknowledgement without a result cannot clear identical later typing se
  view={...view,phase:'ready',controlVersion:2,currentResult:result(current)};await page.evaluate(()=>window.dispatchEvent(new Event('focus')));await expect(page.getByLabel('完整视频',{exact:true})).toBeVisible();await page.getByLabel('完整视频',{exact:true}).focus();await page.getByRole('textbox').fill('音乐调小');release();await expect(page.getByRole('button',{name:'发送',exact:true})).toBeEnabled();await expect(page.getByRole('textbox')).toHaveValue('音乐调小');
  }finally{release()}
 });
+test('closing the previous version returns chat feedback to the current video',async({page})=>{
+ const f=await setup(page);await page.route(`**/api/video/projects/${pid}/messages`,r=>{f.requests.push(r.request().postDataJSON());return r.fulfill({status:202,json:{}})});
+ await page.goto(`/video/${pid}`);await page.getByText('更多',{exact:true}).click();await page.getByRole('button',{name:'查看上个结果',exact:true}).click();await expect(page.getByText(/关于上个结果（整片）/)).toBeVisible();await page.getByRole('button',{name:'收起上个结果',exact:true}).click();await expect(page.getByText(/关于当前视频（整片）/)).toBeVisible();
+ await page.getByRole('textbox').fill('修改现在这版');await page.getByRole('button',{name:'发送',exact:true}).click();await expect.poll(()=>f.requests.length).toBe(1);expect(f.requests[0].target).toEqual({artifactId:current,revisionId:f.view.currentResult.revisionId,sourceTimeMs:null});
+});
+
+test.afterEach(async({page})=>{await expect(page.locator('dialog[open]')).toHaveCount(0)});

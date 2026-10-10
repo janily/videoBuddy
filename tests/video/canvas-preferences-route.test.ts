@@ -1,0 +1,40 @@
+import {it,expect,beforeEach,afterEach,vi} from 'vitest';
+import {randomUUID} from 'node:crypto';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {FileStore} from '@/services/video/storage/file-store';
+import {ProjectStore} from '@/services/video/storage/project-store';
+import {issueSession,ownerHash} from '@/services/video/access/session';
+import {updateJson} from '@/services/video/storage/atomic-store';
+import type {ProjectControl} from '@/contracts/video/project';
+import {POST} from '@/app/api/video/projects/[projectId]/preferences/route';
+let root:string,projects:ProjectStore,projectId:string;
+const origin='https://video.test',sid='1'.repeat(64),keys={current:'a'.repeat(64),keyId:'v1',environment:'test'};
+const input=()=>({schemaVersion:5,clientCommandId:randomUUID(),expectedBriefVersion:0,patch:{durationSec:25}});
+const request=(value:unknown=input(),session=sid,source=origin)=>new Request(`${origin}/api/video/projects/${projectId}/preferences`,{method:'POST',headers:{origin:source,'Content-Type':'application/json',cookie:`vb-session=${issueSession(keys,Date.now(),session).token}`},body:JSON.stringify(value)});
+const post=(r:Request)=>POST(r,{params:Promise.resolve({projectId})});
+beforeEach(async()=>{root=await mkdtemp(`${tmpdir()}/vb-preferences-route-`);for(const [k,v] of Object.entries({VIDEO_DATA_DIR:root,VIDEO_APP_ORIGIN:origin,VIDEO_SESSION_SIGNING_KEY:keys.current,VIDEO_SESSION_KEY_ID:keys.keyId,VIDEO_ENVIRONMENT:keys.environment,VIDEO_GENERATION_ENABLED:'false'}))vi.stubEnv(k,v);projects=new ProjectStore(new FileStore(root));({projectId}=await projects.create(ownerHash(sid,keys),{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}))});
+afterEach(async()=>{vi.unstubAllEnvs();await rm(root,{recursive:true,force:true})});
+it('checks CSRF and ownership, then returns the updated project without generation enabled',async()=>{
+ expect((await post(request(input(),sid,'https://evil.test'))).status).toBe(403);
+ expect((await post(request(input(),'2'.repeat(64)))).status).toBe(404);
+ expect((await post(request({...input(),patch:{durationSec:21}}))).status).toBe(400);
+ const command=input(),response=await post(request(command));expect(response.status).toBe(200);expect(response.headers.get('Cache-Control')).toContain('no-store');
+ const view=await response.json();expect(view.preferences.durationSec).toBe(25);expect(view.briefVersion).toBe(1);expect(view.messages).toHaveLength(2);expect(view.messages[0].origin).toBe('canvas');expect(view.activeProduction).toBeNull();
+ expect((await post(request(command))).status).toBe(200);expect((await post(request({...command,patch:{durationSec:20}}))).status).toBe(409);
+});
+it('returns a clear production-specific conflict rather than changing a running version',async()=>{
+ await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,activeProduction:randomUUID()}));
+ const response=await post(request());expect(response.status).toBe(409);expect((await response.json()).error).toMatchObject({code:'BUSY',message:expect.stringContaining('正在生成')});
+});
+it('queues only the new script when the project has a topic and style',async()=>{
+ vi.stubEnv('VIDEO_FLOW','quick');
+ const control=await projects.access(ownerHash(sid,keys),projectId);
+ const current=(await projects.store.readFresh<import('@/contracts/video/domain').Understanding>(control.understandingRef.key)).value;
+ const ref=await projects.index.immutable(`projects/${projectId}/understanding/test`,{...current,subject:'咖啡店介绍',preferences:{...current.preferences,styleSlug:'watercolor'}});
+ await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,understandingRef:ref}));
+ const response=await post(request());expect(response.status).toBe(200);
+ const view=await response.json();expect(view.activeProduction).toBeNull();expect(view.script).toMatchObject({briefVersion:1,state:'drafting'});
+ const operations=await projects.store.listKeys!(`projects/${projectId}/operations`,1);
+ expect(operations).toHaveLength(1);expect((await projects.store.readFresh(operations[0])).value).toMatchObject({kind:'script',briefVersion:1,status:'reserved'});
+});

@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import type {ProjectControl} from '@/contracts/video/project';
 import type {AtomicStore} from '@/services/video/storage/atomic-store';
 import {createOrRead,updateJson,StoreMissing} from '@/services/video/storage/atomic-store';
 import type {Environment} from '@/services/video/config/environment';
@@ -21,15 +22,27 @@ const defaults:QuickSettings={schemaVersion:1,music:{mode:'auto'},takes:{},takes
 function key(projectId:string){return`projects/${projectId}/quick/settings`}
 
 export async function readQuickSettings(store:AtomicStore,projectId:string):Promise<QuickSettings>{
- try{return QuickSettingsSchema.parse((await store.readFresh<unknown>(key(projectId))).value)}catch(error){if(error instanceof StoreMissing)return defaults;throw error}
+ let settings:QuickSettings;
+ try{settings=QuickSettingsSchema.parse((await store.readFresh<unknown>(key(projectId))).value)}catch(error){if(!(error instanceof StoreMissing))throw error;settings=defaults}
+ try{const control=(await store.readFresh<Pick<ProjectControl,'quickMusic'|'quickTakes'>>(`projects/${projectId}/control`)).value;return QuickSettingsSchema.parse({...settings,...(control.quickMusic?{music:control.quickMusic}:{}),...(control.quickTakes?{takes:control.quickTakes.takes,takesBriefVersion:control.quickTakes.briefVersion}:{})})}catch(error){if(!(error instanceof StoreMissing))throw error}
+ return settings;
 }
 /** Takes only apply to the brief they were made for; a new brief starts fresh. */
 export function takeFor(settings:QuickSettings,briefVersion:number,shotId:string){return settings.takesBriefVersion===briefVersion?settings.takes[shotId]||0:0}
 
 export async function updateQuickSettings(store:AtomicStore,projectId:string,change:{music?:MusicChoice;redoShotId?:string;briefVersion:number}){
+ // Existing standalone settings fixtures have no project control. Real projects
+ // share the same atomic music source used by canvas message publication.
+ const existing=await readQuickSettings(store,projectId);
+ if(change.music||change.redoShotId)try{await updateJson(store,`projects/${projectId}/control`,(control:ProjectControl)=>{
+  let quickTakes=control.quickTakes;
+  if(change.redoShotId){const prior=quickTakes??{briefVersion:existing.takesBriefVersion,takes:existing.takes},takes=prior.briefVersion===change.briefVersion?{...prior.takes}:{};takes[change.redoShotId]=Math.min(50,(takes[change.redoShotId]||0)+1);quickTakes={briefVersion:change.briefVersion,takes}}
+  return{...control,...(change.music?{quickMusic:change.music}:{}),...(quickTakes?{quickTakes}:{}),controlVersion:control.controlVersion+1};
+ })}catch(error){if(!(error instanceof StoreMissing))throw error}
  await createOrRead(store,key(projectId),defaults);
  return updateJson(store,key(projectId),(raw:unknown)=>{
-  const current=QuickSettingsSchema.parse(raw),sameBrief=current.takesBriefVersion===change.briefVersion;
+  const current=QuickSettingsSchema.parse(raw);
+  const sameBrief=current.takesBriefVersion===change.briefVersion;
   const takes=sameBrief?{...current.takes}:{};
   if(change.redoShotId)takes[change.redoShotId]=Math.min(50,(takes[change.redoShotId]||0)+1);
   return QuickSettingsSchema.parse({...current,...(change.music?{music:change.music}:{}),takes,takesBriefVersion:change.briefVersion});

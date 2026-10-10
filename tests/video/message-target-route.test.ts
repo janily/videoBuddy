@@ -15,16 +15,17 @@ beforeEach(async()=>{root=await mkdtemp(`${tmpdir()}/vb-message-target-`);for(co
 afterEach(async()=>{vi.unstubAllEnvs();await rm(root,{recursive:true,force:true})});
 it('archives the exact user feedback target and cold replay cannot silently retarget the same message',async()=>{
  const projects=new ProjectStore(new FileStore(root));const {projectId}=await projects.create(ownerHash(sid,keys),{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()});
- const target={artifactId:crypto.randomUUID(),revisionId:crypto.randomUUID(),sourceTimeMs:null},input={schemaVersion:5,clientCommandId:crypto.randomUUID(),clientMessageId:crypto.randomUUID(),text:'音乐调小一点',attachmentIds:[],target},context={params:Promise.resolve({projectId})};
+ const target={artifactId:crypto.randomUUID(),revisionId:crypto.randomUUID(),sourceTimeMs:null},input={schemaVersion:5,clientCommandId:crypto.randomUUID(),clientMessageId:crypto.randomUUID(),text:'音乐调小一点',attachmentIds:[],target,origin:'canvas'},context={params:Promise.resolve({projectId})};
  const request=(value:unknown=input,session=sid)=>new Request(`${origin}/api/video/projects/${projectId}/messages`,{method:'POST',headers:{origin,'Content-Type':'application/json',cookie:`vb-session=${issueSession(keys,Date.now(),session).token}`},body:JSON.stringify(value)});
  expect((await POST(request(input,'2'.repeat(64)),context)).status).toBe(404);
  expect((await POST(request(),context)).status).toBe(202);
  const cold=new ProjectStore(new FileStore(root)),control=await cold.access(ownerHash(sid,keys),projectId);
- expect((await cold.messages(control))[0]).toMatchObject({target,role:'user',text:input.text});
+ expect((await cold.messages(control))[0]).toMatchObject({target,role:'user',text:input.text,origin:'canvas'});
  expect((await POST(request(),context)).status).toBe(202);
  expect((await POST(request({...input,target:{...target,artifactId:crypto.randomUUID()}}),context)).status).toBe(409);
+ expect((await POST(request({...input,origin:undefined}),context)).status).toBe(409);
  const response=await GET(new Request(`${origin}/api/video/projects/${projectId}/messages`,{headers:{cookie:`vb-session=${issueSession(keys,Date.now(),sid).token}`}}),context);
- expect(response.status).toBe(200);expect((await response.json()).messages[0].target).toEqual(target);
+ expect(response.status).toBe(200);expect((await response.json()).messages[0]).toMatchObject({target,origin:'canvas'});
  expect((await cold.messages(await cold.access(ownerHash(sid,keys),projectId)))).toHaveLength(1);
  let calls=0;
  await runDirectorOperation(cold.store,new LocalEventLog(root),projectId,control.activeConversation!,{decide:async(_understanding,messages)=>{calls++;expect(messages[0].target).toEqual(target);return{action:'acknowledge',reply:'已收到你的修改反馈。',effect:'no_change',executionIntent:'none',evidenceMessageIds:[(await cold.messages(control))[0].id]}}});

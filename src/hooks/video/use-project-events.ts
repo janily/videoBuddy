@@ -4,9 +4,11 @@ import {StreamEventSchema,type StreamEvent}from '@/contracts/video/commands';
 import {streamHttpAction} from '@/services/video/stream/reconnect-policy';
 import {SseParser,parseCursor}from '@/services/video/stream/sse-parser';
 import {initialStreamState,reduceEvent,StreamMessage}from '@/services/video/stream/reducer';
+import {refreshesProjectView} from '@/services/video/stream/view-refresh';
+export type ProductionActivity=Extract<StreamEvent,{type:'activity.updated'}>['payload']&{operationId:string};
 export function useProjectEvents(projectId:string|undefined,operationId:string|undefined,epoch:number,onRefresh:(event?:StreamEvent)=>Promise<void>,recoverConversation=true){
  const[streamed,setStreamed]=useState<StreamMessage[]>([]);const[connection,setConnection]=useState('');
- const[activity,setActivity]=useState<{operationId:string;label:string}>();
+ const[activity,setActivity]=useState<ProductionActivity>();
  useEffect(()=>{
   if(!projectId||!operationId)return;
   const abort=new AbortController();let state=initialStreamState(operationId,epoch),stopped=false,retries=0,startupRetries=0,recoveryRequested=false;
@@ -22,10 +24,11 @@ export function useProjectEvents(projectId:string|undefined,operationId:string|u
      try{for(;;){const{done,value}=await reader.read();if(done)break;for(const record of parser.push(value)){
       const event=StreamEventSchema.parse(JSON.parse(record.data));if(event.projectId!==projectId||event.operationId!==operationId)throw Error('STREAM_SCOPE_INVALID');const cursor=parseCursor(record.id);const next=reduceEvent(state,event,cursor.index);
       if(next.needsCheckpoint){await onRefresh();stopped=true;break}
+      if(next===state)continue;
       state=next;setStreamed(Object.values(state.messages));
-      if(event.type==='activity.updated')setActivity({operationId:event.operationId,label:event.payload.label});
+      if(event.type==='activity.updated')setActivity({operationId:event.operationId,...event.payload});
       if(event.type==='operation.terminal'&&['failed','interrupted'].includes(event.payload.status))setConnection(event.payload.errorCode==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':event.payload.errorCode==='EFFECT_UNKNOWN'?'上次调用结果尚待核实，资料已保留。':event.payload.errorCode==='ASR_MISMATCH'?'声音核验未通过，资料和已有片段已保留。':'本次任务未完成，资料和已有内容已保留。');
-      if(['message.committed','understanding.updated','preview.ready','result.ready','operation.terminal'].includes(event.type))await onRefresh(event);
+      if(refreshesProjectView(event.type))await onRefresh(event);
       if(event.type==='operation.terminal')stopped=true;
      }if(stopped)break}}finally{await reader.cancel()}
     }catch{if(abort.signal.aborted)break;setConnection('正在重新连接，制作不会因此停止')}

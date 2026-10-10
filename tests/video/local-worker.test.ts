@@ -30,3 +30,42 @@ it('upload maintenance skips budget-only historical diagnostics without changing
  const root=dir,store=new FileStore(root),record={calls:1,inputTokens:100,outputTokens:50,reservations:{}};
  await store.create(`projects/${projectId}/budget`,record);await expect(expirePendingUploads(root,store)).resolves.toBeUndefined();expect((await store.readFresh(`projects/${projectId}/budget`)).value).toEqual(record);
 });
+
+it('admits saved chat after the quick model phase and blocks new media until that chat finishes',async()=>{
+ const {createWorkerLanes,runQueuedOnce,quickProductionAllowsChat}=await import('@/services/video/commands/local-worker');
+ const store=new FileStore(dir),queue=new LocalOperationQueue(store,dir),chatId='30000000-0000-4000-8000-000000000003',nextFilmId='40000000-0000-4000-8000-000000000004';
+ for(const id of [operationId,chatId,nextFilmId])await store.create(`projects/${projectId}/operations/${id}`,{id,projectId,kind:id===chatId?'chat':'preview',status:'running',stage:'visual'});
+ let releaseFilm!:()=>void,releaseChat!:()=>void;
+ const filmGate=new Promise<void>(resolve=>{releaseFilm=resolve}),chatGate=new Promise<void>(resolve=>{releaseChat=resolve}),calls:string[]=[];
+ const lanes=createWorkerLanes(async job=>{
+  calls.push(job.operationId);if(job.operationId===operationId)await filmGate;if(job.operationId===chatId)await chatGate;
+  const key=`projects/${projectId}/operations/${job.operationId}`,current=await store.readFresh(key);await store.cas(key,current.etag,{status:'succeeded'});
+ },error=>{throw error},{canRunChatAlongside:job=>quickProductionAllowsChat(store,job,{VIDEO_FLOW:'quick'})});
+ await queue.enqueue(projectId,operationId,'preview');
+ await runQueuedOnce(queue,store,job=>lanes.dispatch(job));expect(calls).toEqual([operationId]);
+ await queue.enqueue(projectId,chatId,'chat');await queue.enqueue(projectId,nextFilmId,'preview');
+ await runQueuedOnce(queue,store,job=>lanes.dispatch(job));expect(calls).toEqual([operationId]);
+ const key=`projects/${projectId}/operations/${operationId}`,current=await store.readFresh<Record<string,unknown>>(key);
+ await store.cas(key,current.etag,{...current.value,stage:'picture'});
+ expect(await quickProductionAllowsChat(store,{projectId,operationId,kind:'preview'},{VIDEO_FLOW:'staged'})).toBe(false);
+ await runQueuedOnce(queue,store,job=>lanes.dispatch(job));expect(calls).toEqual([operationId,chatId]);
+ releaseFilm();await runQueuedOnce(queue,store,job=>lanes.dispatch(job));await runQueuedOnce(queue,store,job=>lanes.dispatch(job));
+ expect(calls).toEqual([operationId,chatId]);
+ releaseChat();await lanes.drain();await runQueuedOnce(queue,store,job=>lanes.dispatch(job));await lanes.drain();
+ expect(calls).toEqual([operationId,chatId,nextFilmId]);
+});
+
+it('serializes by default and admits at most one model-using chat even across projects',async()=>{
+ const {createWorkerLanes}=await import('@/services/video/commands/local-worker');
+ let release!:()=>void;const gate=new Promise<void>(resolve=>{release=resolve}),calls:string[]=[];
+ const execute=async(job:{operationId:string})=>{calls.push(job.operationId);await gate};
+ const conservative=createWorkerLanes(execute,error=>{throw error});
+ await conservative.dispatch({projectId,operationId:'film',kind:'preview'});
+ await conservative.dispatch({projectId,operationId:'chat',kind:'chat'});expect(calls).toEqual(['film']);
+ release();await conservative.drain();
+ let releaseConcurrent!:()=>void;const concurrentGate=new Promise<void>(resolve=>{releaseConcurrent=resolve}),concurrentCalls:string[]=[];
+ const lanes=createWorkerLanes(async job=>{concurrentCalls.push(job.operationId);await concurrentGate},error=>{throw error},{canRunChatAlongside:async()=>true});
+ await lanes.dispatch({projectId,operationId:'film',kind:'preview'});
+ await Promise.all([lanes.dispatch({projectId,operationId:'chat-1',kind:'chat'}),lanes.dispatch({projectId:'another',operationId:'chat-2',kind:'chat'})]);
+ expect(concurrentCalls).toEqual(['film','chat-1']);releaseConcurrent();await lanes.drain();
+});
