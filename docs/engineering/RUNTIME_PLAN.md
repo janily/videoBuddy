@@ -1,11 +1,23 @@
 # VideoBuddy 视频 Runtime 重构技术方案：去掉 Docker 的极简出片链路
 
-- 版本：v1.0（2026-10-10）
+- 版本：v1.1（2026-10-10，已写入产品决策 D1–D3）
 - 范围：`runtime/` 目录（media / voice / asr / storage）以及 `src/services/video` 中所有调用它的地方
 - 基线代码：`main` @ `2fcdbbf`（PR #1、PR #2 合并后）
 - 读者：后端、部署负责人
 - 关联文档：`docs/engineering/QUICK_FLOW.md`、`docs/product/canvas-assistant-ux.md`、`deploy/README.md`
 - 性质：方案与开发文档，本文不改代码
+
+---
+
+## 决策记录（2026-10-10，产品已拍板）
+
+| # | 决策 | 对本方案的影响 |
+|---|---|---|
+| **D1** | **分步出片流程（staged：预览 → 审批 → 正式渲染）下线**，只保留一次出整片（quick） | 不再保留 docker 遗留实现，也没有过渡期。`MediaRuntime` 只做 `local` 一个实现，删除 `VIDEO_FLOW` 开关。删除与解耦清单见 §7.1 |
+| **D2** | **移除语音（voice）和字幕识别（asr）镜像**，连同旁白、字幕、混音母带链路 | 删除 `runtime/voice`、`runtime/asr`、`src/services/video/audio/*` 中的语音、识别、母带部分，以及 `VIDEO_SOUND` 开关。成片声音只有曲库配乐 |
+| **D3** | **先单机上线**（§10.4 路线 ①） | 按 §8 的 P0–P5 执行；Vercel 全托管（P6）暂不排期；存储仍是可选阶段 |
+
+阶段顺序因此调整为：**先删（P1），再换渲染（P2）**。先删掉 staged 和音频链路，需要迁到本地 runtime 的调用点会从约 30 个文件减到 quick 流程和素材处理的少数几个，迁移面和回归面都会小很多。
 
 ---
 
@@ -27,7 +39,7 @@
    - 开发机上 `npm run dev:mvp` 加 worker 就能出片，不需要 Docker。
 4. 配套简化：
    - 画布用 **iframe 沙箱实时预览**镜头场景：Agent 写完场景，用户立刻就能看到动起来，不必等服务器渲染。
-   - **voice / asr 镜像从默认部署中移除**（MVP 默认 `VIDEO_SOUND=off`，用不到）。
+   - **voice / asr 镜像和分步出片流程一并删除**（D1、D2）。
    - **Python storage 脚本换成 Node + SQLite**。这是可选的独立阶段。
 5. **部署形态**：方案 A 改完后，适合部署在一台 Linux 云主机上，**不能直接部署到 Vercel**。要上 Vercel，还得把存储改到 Postgres + Blob、把 worker 改成 Workflow、把渲染放进 Vercel Sandbox，见 §10。
 
@@ -213,10 +225,9 @@ flowchart LR
   Render -->|poster / 进度事件| UI
 ```
 
-- **MediaRuntime 接口**：在 `src/services/video/media/runtime.ts` 定义 `renderShot / assemble / probe / prepareImage`，提供两个实现：
-  - `local`：新的默认实现。
-  - `docker`：遗留实现，供 staged 流程过渡用。
-  - 用 `VIDEO_MEDIA_RUNTIME=local|docker` 切换，MVP 默认 `local`。
+- **MediaRuntime 接口**：在 `src/services/video/media/runtime.ts` 定义 `renderShot / assemble / probe / prepareImage`。
+  - 目前只有 `local` 一个实现（D1：不保留 docker 遗留实现）。
+  - 保留这个接口，是为了将来上 Vercel 时能加一个 `sandbox` 实现（§10.3），业务代码不用改。
 - **进程形态**：
   - 开发机：render 直接在 worker 进程内运行，零配置。
   - 生产：独立的 `videobuddy-render` systemd 单元，网络全禁（§5.5）。
@@ -268,7 +279,7 @@ ffmpeg -f concat -safe 0 -i list.txt [-stream_loop -1 -i music.m4a | -f lavfi -i
 - 音频滤镜照搬现有的 `quick/compose.ts`。
 - **换配乐**只重跑这一步，实测秒级。
 - **重画一镜**：只重跑该镜头的 `renderShot`，再跑一次 `assemble`。
-- `picture-sequence.ts` 的 concat filter 重编码在 quick 流程里不再使用，staged 流程过渡期仍走 docker 实现。
+- `picture-sequence.ts` 的 concat filter 重编码不再使用，随 docker 实现一起删除（§7.1）。
 
 ### 5.4 QA `probe`
 
@@ -340,8 +351,8 @@ ffmpeg -f concat -safe 0 -i list.txt [-stream_loop -1 -i music.m4a | -f lavfi -i
 |---|---|
 | `prepare-image.mjs` | 复用 render 进程里的 Chromium（单独一个 context 解码并规范化），**不引入新依赖** |
 | `analyze-pdf.mjs` | 改在 Node `worker_threads` 里运行 pdfjs-dist，设置 `resourceLimits`（如 512 MB）、单文件超时、≤100 页，并设置 `isEvalSupported:false`（规避 CVE-2024-4367 一类问题）。source worker 不再需要 Docker |
-| `sound.py`、`master.py`、`book-caption*` | 只有 staged/有声流程使用，冻结，随 staged 流程一起决定去留 |
-| `runtime/voice`、`runtime/asr` | 从默认部署和 README 中移除，代码移到 `archive/` 或直接删除（git 历史可追回）。将来恢复旁白时，优先选**返回逐字时间戳的云端 TTS**，这样字幕对齐就不需要 ASR。若坚持离线，同样用"本机进程"模式，不再用 Docker |
+| `sound.py`、`master.py`、`book-caption*` | **删除**（D1、D2）。配乐的响度归一和淡入淡出已经在 assemble 的 ffmpeg 滤镜里完成 |
+| `runtime/voice`、`runtime/asr` | **删除**（D2，git 历史可追回）。将来恢复旁白时，优先选**返回逐字时间戳的云端 TTS**，这样字幕对齐就不需要 ASR。若坚持离线，同样用"本机进程"模式，不再用 Docker |
 | `runtime/storage/*.py` | 见 §5.10 |
 
 ### 5.10 存储：Python flock → Node + SQLite（独立阶段，可选）
@@ -394,7 +405,7 @@ sequenceDiagram
 ## 7. 代码改动清单
 
 ### 新增
-- `src/services/video/media/runtime.ts`：`MediaRuntime` 接口，以及 `VIDEO_MEDIA_RUNTIME` 选择逻辑。
+- `src/services/video/media/runtime.ts`：`MediaRuntime` 接口（目前只有 local 实现）。
 - `src/services/video/media/local/renderer.ts`：浏览器池和 `renderShot`，逻辑由 `runtime/media/render.mjs` 迁移而来。
 - `src/services/video/media/local/ffmpeg.ts`：解析 ffmpeg 和 ffprobe 路径，`run(args, {signal, stdin, timeout})`。
 - `src/services/video/media/local/assemble.ts`：§5.3 的命令。
@@ -422,14 +433,74 @@ sequenceDiagram
   - 输出 runtimeDigest。
 - `README.md`、`deploy/README.md`、`.env.example`：删除 build 镜像和 digest 的步骤；默认安装只需要 `npm ci && npx playwright install chromium && apt install ffmpeg`。
 
-### 过渡期保留（staged 流程仍在用），P5 删除
-- `media/docker-executor.ts`、`owned-docker.ts`、`docker-journal.ts`、`picture-sequence.ts`
-- `preview/*`、`render/*` 中的 docker 分支
-- `runtime/media/Dockerfile`、`runner.py`
+### 删除（P2 完成、本地 runtime 接管后）
+- `media/docker-executor.ts`、`owned-docker.ts`、`docker-journal.ts`、`picture-sequence.ts`、`runtime-asset-image.ts`。
+- `runtime/media/Dockerfile`、`runner.py`、`test_runner.py`、`package*.json`；其中 `render.mjs`、`runtime-assets.mjs`、`prepare-image.mjs`、`analyze-pdf.mjs` 的逻辑已迁入 `src/services/video/media/local/`。
+- 环境变量 `VIDEO_MEDIA_IMAGE_REF`、`VIDEO_MEDIA_RUNTIME_DIGEST`。
+- P5（存储）完成后，删除 `runtime/storage/*.py`。
 
-### 删除（P5）
-- `runtime/voice/`、`runtime/asr/`，以及对应的 probe 脚本和环境变量（`VIDEO_VOICE_*`、`VIDEO_ASR_*`）。
-- P4 完成后，删除 `runtime/storage/*.py`。
+### 7.1 分步流程与音频链路下线：删除与解耦清单（P1）
+
+下面的清单由 esbuild 依赖图分析得出，基线是 `main@2fcdbbf`。分析方法：
+
+- **保留入口**：除 `preview/approve` 外的全部 API 路由和页面，`scripts/video/worker.ts`（已切断 staged 分支），`scripts/video/source-worker.ts`。
+- **staged 入口**：`commands/local-preview.ts`、`commands/local-render.ts`、`preview/approve/route.ts`。
+- 用前者能到达的模块和后者能到达的模块做差集。
+
+**A. 可直接删除（31 个文件，约 220 KB 源码，只被 staged 链路引用）**
+
+```
+src/app/api/video/projects/[projectId]/preview/approve/route.ts
+src/services/video/commands/local-preview.ts
+src/services/video/commands/local-render.ts
+src/services/video/domain/preview-policy.ts
+src/mastra/video/audio-plan.ts
+src/mastra/video/content-requirements.ts
+src/services/video/audio/{master,mix,narration,voice}.ts
+src/services/video/preview/{approve,artifact,audio-execution-stage,audio-plan-stage,composite-journal,
+  composite-stage,content-requirements-stage,excerpt-stage,film-package-stage,narration-package-stage,
+  picture-sequence-stage,picture-stage,pipeline,publish,select-excerpt,timing-stage,treatment-stage,
+  visual-stage,voice-stage}.ts
+src/services/video/quality/{composite-binding,visual-review-stage}.ts
+```
+
+另外要同步处理：
+
+- `scripts/video/worker.ts` 里的 `runPreviewOperation`、`runApprovedRenderOperation` 两个分支，以及 `quickFlow()` 判断（改为 preview 任务一律走 quick）。
+- 约 35 个 staged 或音频相关的 probe 脚本（`probe-{asr*,voice*,book-*,clear-*,frozen-preview,reviewed-*,preview-*,composition,subtitles,source-audio,new-theme}.ts` 等），以及 `package.json` 里对应的 `probe:video:*` 脚本。
+- `tests/video/` 中约 64 个引用了 preview、render、audio 或 docker 的测试文件。逐个判断：只覆盖 staged 的删除，覆盖共享逻辑的改写。
+
+**B. 必须先解耦，才能继续删除（核心代码 → staged 或音频模块的 import）**
+
+这些边让 `preview/*`、`render/*`、`audio/*` 中另外约 50 个文件仍然"看起来被用到"。每一处都要把 quick 真正需要的那一小部分**搬到中性位置**，或者**直接去掉**：
+
+| 解耦点 | 现在依赖 | 处理 |
+|---|---|---|
+| `results/publish.ts` | `render/mvp-publication`、`render/content-review`、`preview/commit`、`quality/publish-gate`、`quality/delivery` | quick 成片发布只需要"校验 final.mp4 → 写结果清单 → 发布 artifact"。新写一个精简的 `results/publish-film.ts`，`render/*` 随后整体删除 |
+| `preview/route.ts` → `preview/prepare.ts` → `frozen-preview` → `contracts/video/film-package` → `timeline/package`、`audio/execution-package` | staged 的冻结预览包 | 改由 quick route 直接入队（保留 `/preview` 路径，只作为兼容别名）。`prepare.ts` 只留 quick 用到的操作创建逻辑；`film-package`、`timeline/package`、`frozen-preview` 删除 |
+| `storage/project-store.ts` | `preview/action`、`preview/commit`、`quality/delivery` | ProjectView 去掉审批和预览相关字段；`mvpProfile` 和时长上限移到 `config/profile.ts` |
+| `mastra/video/director.ts`、`styles/route.ts` | `quality/delivery`（`soundEnabled`、`mvpProfile`） | 同上，改为引用 `config/profile.ts`；删除 `musicInstructions` 和有声相关的提示词分支 |
+| `mastra/video/visual-shot.ts`、`contracts/video/visual-shot.ts` | `preview/timing-draft`、`audio/book-font` | 把用到的时间轴工具函数和字体常量移到 `quick/` 或 `domain/` |
+| `quick/film.ts` | `preview/fence` | 把 `fence` 移到 `commands/` 或 `domain/` |
+| `commands/local-director.ts`、`assets/image-analysis-stage.ts`、`contracts/video/content-requirements-proof.ts` | `audio/narration-package` | 只引用了旁白相关的类型或校验，删除这些引用；director 去掉旁白修订分支 |
+| `commands/local-director.ts` → `revisions/music-change-plan` → `revisions/music-gain` | `audio/execution-package`、`contracts/video/audio-plan` | staged 的"调音乐音量"修订，删除。quick 的换配乐走 `quick/settings` |
+| `contracts/video/content-review.ts` | `audio/recognition-policy` | 去掉语音识别相关字段 |
+| `exports/{documents,poster,publication,source-archive,operation}.ts` | `preview/package`、`preview/commit`、`audio/*`、`quality/visual-evidence` | 导出只保留"成片 MP4 + 封面图"，删除源包或旁白归档导出（`source-archive`、`source-zip`、`documents`） |
+| `assets/audio-executor.ts`（source worker） | `audio/asr`、`audio/wav`、`docker-executor` | 上传音频素材的转写随 ASR 一起删除。前端上传入口目前只接受 `.md/.pdf`，资源预留接口同步拒绝 audio MIME |
+| `timeline/package.ts` | `media/book-caption-layer`、`audio/book-font` | 随 film-package 一起删除 |
+
+**C. 配置与界面**
+
+- 删除环境变量：`VIDEO_FLOW`、`VIDEO_SOUND`、`VIDEO_VOICE_*`、`VIDEO_ASR_*`。是否保留 `VIDEO_DELIVERY_PROFILE`，取决于 `full` 档还有没有含义；建议删除，统一使用 MVP 档的约束。
+- `src/components/video-studio/canvas/Canvas.tsx` 中的审批和预览分支，以及 `contracts/video/project.ts` 里的 `phase` 等相关状态，同步收敛。
+- README、`deploy/README.md`、`.env.local.example`、`docs/engineering/QUICK_FLOW.md` 中关于 staged、voice、asr 的说明同步删除。
+- **存量数据**：已有项目里处于"待审批"状态的预览，下线后无法继续。上线前跑一次迁移脚本，把这类项目的状态重置为"可重新生成"，并在画布上提示一句。
+
+**P1 验收**：
+
+- 用同样的方法重跑依赖图：`preview/*`、`render/*`、`audio/*` 只剩被 quick 实际使用并已经迁走的文件，其余目录为空或已删除。
+- `npm run typecheck`、`npm run lint`、`npm test` 全部通过。
+- 现有 quick-flow 测试不变且通过；本地用 Docker 实现仍能出整片（此时渲染还没切换）。
 
 ---
 
@@ -438,13 +509,15 @@ sequenceDiagram
 | 阶段 | 内容 | 预估 | 验收 |
 |---|---|---|---|
 | **P0 基准** | 用一个固定的 4 镜头样例同时跑 docker 链路和 local 链路，比较帧数、时长、SSIM（≥0.99）、体积和耗时；确定 preset 和 crf | 0.5 d | 出对照报告；local 链路耗时 ≤ docker 链路的 50% |
-| **P1 本地渲染** | `MediaRuntime`、`LocalRenderer`、ffmpeg 封装、本地 QA；quick 流程接入；`VIDEO_MEDIA_RUNTIME=local` 设为 MVP 默认 | 2–3 d | **没装 Docker 的机器上**，`npm run dev:mvp` 加 `npm run worker:mvp` 能出整片；现有 quick-flow 测试全部通过 |
-| **P2 合成与预览** | 标识前移、`concat -c copy`、换配乐只跑 assemble；画布 iframe 预览 | 1–2 d | 换配乐不触发视频编码（日志可证明）；单镜重画只渲染这一镜；预览 iframe 访问 `parent` 或 `fetch` 失败 |
-| **P3 部署** | render systemd 单元、专用用户、doctor 检查；文档 | 1 d | 在 Ubuntu 24.04 上 doctor 全部通过；`systemctl show` 能看到限额；worker 不在 `docker` 组里 |
-| **P4 存储** | SQLite 替换 Python storage（可选） | 2–3 d | 并发写测试（web + 2 个 worker）无丢失、无冲突；宿主机不再需要 Python |
-| **P5 清理** | 决定 staged 流程去留；删除 voice/asr 和 docker 实现 | 1 d | `grep -r "docker" src` 只剩历史文档；依赖和安装步骤精简 |
+| **P1 下线 staged 与音频** | 按 §7.1 执行 A、B、C 三部分；删除 `runtime/voice`、`runtime/asr` | 3–4 d | 见 §7.1 的 P1 验收 |
+| **P2 本地渲染** | `MediaRuntime`、`LocalRenderer`、ffmpeg 封装、本地 QA；quick 流程接入；删除 docker 实现和 `runtime/media` 镜像 | 2–3 d | **没装 Docker 的机器上**，`npm run dev:mvp` 加 `npm run worker:mvp` 能出整片；现有 quick-flow 测试全部通过；`grep -ri docker src scripts` 无结果 |
+| **P3 合成与预览** | 标识前移、`concat -c copy`、换配乐只跑 assemble；画布 iframe 预览 | 1–2 d | 换配乐不触发视频编码（日志可证明）；单镜重画只渲染这一镜；预览 iframe 访问 `parent` 或 `fetch` 失败 |
+| **P4 单机部署** | render systemd 单元、专用用户、doctor 检查；文档 | 1 d | 在 Ubuntu 24.04 上 doctor 全部通过；`systemctl show` 能看到限额；worker 不在 `docker` 组里 |
+| **P5 存储（可选）** | SQLite 替换 Python storage | 2–3 d | 并发写测试（web + 2 个 worker）无丢失、无冲突；宿主机不再需要 Python |
 
-**安全与健壮性测试用例**（放进 `tests/video/local-runtime.test.ts`，在 P1/P3 通过）：
+上线门槛是 P0–P4，合计约 **8–11 个工作日**；P5 可以上线后再做。
+
+**安全与健壮性测试用例**（放进 `tests/video/local-runtime.test.ts`，在 P2/P4 通过）：
 
 1. 场景里 `fetch('https://example.com')`、`new Image().src=外链`、`WebSocket`、`location.href=外链` 都被拦截；渲染要么正常完成（请求被拦），要么报 `RESOURCE_BLOCKED`；外部无任何访问。
 2. `render` 里写 `while(true){}`：单帧超时后报 `RENDER_FRAME_TIMEOUT`，浏览器被重启，下一个任务正常。
@@ -463,7 +536,7 @@ sequenceDiagram
 | R1 | **Chromium 沙箱启动依赖 unprivileged user namespace**。Ubuntu 23.10+ 默认用 AppArmor 限制它（`kernel.apparmor_restrict_unprivileged_userns=1`），以 root 运行也会失败（本环境以 root 测试时报 "Chromium sandboxing failed!"） | 以非 root 用户运行，并为 Playwright 的 Chromium 路径加一个 AppArmor profile（`userns,`），或使用 Chromium 自带的 setuid `chrome-sandbox`。doctor 检测并给出命令。**不允许**静默降级为 `--no-sandbox`；只允许开发环境显式设置 `VIDEO_UNSAFE_NO_SANDBOX=1`，并在界面上标红 |
 | R2 | 跨机器像素不完全一致（CPU 架构、Skia 版本） | runtimeDigest 进入缓存 key，不同机器不会误命中；验收只看同一 digest 内可复现 |
 | R3 | 多租户大规模开放时，隔离强度可能不够 | 接口不变，render 单元可以整体迁入 gVisor 或 microVM（§5.5 升级路线）；同时做排队和每用户配额 |
-| R4 | staged 流程（含旁白、字幕、绘本字幕）的去留 | 需要产品决策。建议：MVP 只保留 quick；staged 冻结在 `VIDEO_MEDIA_RUNTIME=docker` 下，一个版本周期后删除 |
+| R4 | ~~staged 流程的去留~~ | **已决策（D1）：下线**。剩余风险是存量的待审批项目，处理见 §7.1 C |
 | R5 | JPEG 中间帧带来的画质损失 | q92 加 x264 crf20 肉眼不可见。P0 用 SSIM 验证；不达标就改为 PNG 管道（约 114 ms/帧）或 CDP `optimizeForSpeed` |
 | R6 | 体积变大（preset 更快） | P0 调 preset 和 crf，目标是体积 ≤ 现状的 1.3 倍 |
 | R7 | 有人仍然想用 Docker 部署整个应用 | 完全可以把**整个应用**打成一个镜像（web + worker + render 同镜像，容器内用非 root 用户，并通过 seccomp profile 允许 Chromium 沙箱）。区别在于：不再需要从 worker 去调用 Docker，不需要 docker.sock，也不需要 docker-in-docker |
@@ -509,7 +582,7 @@ Vercel Sandbox 是给不可信代码用的 Firecracker microVM，每部片子一
 3. **零密钥**：
    - Sandbox 里不放任何凭据。Workflow 步骤通过 Sandbox SDK 写入 `scene.html`、job 和素材，执行渲染命令，再**由外部步骤读出**成片和 poster，上传到 Blob。
    - 是否能对 Sandbox 设置出网白名单或禁网，接入前需要按 Vercel 当前文档确认。若不支持，就依靠 §5.2 的 route 拦截、CSP 和 DNS 黑洞，并且保证里面没有任何值得外传的数据。
-4. **复用接口**：新增 `MediaRuntime` 的第三个实现 `sandbox`（`VIDEO_MEDIA_RUNTIME=local|docker|sandbox`），内部仍然调用同一份 `renderShot`/`assemble` 脚本。**渲染逻辑不重写**，只换托管方式。
+4. **复用接口**：新增 `MediaRuntime` 的第三个实现 `sandbox`（`VIDEO_MEDIA_RUNTIME=local|sandbox`），内部仍然调用同一份 `renderShot`/`assemble` 脚本。**渲染逻辑不重写**，只换托管方式。
 5. **单片成本粗估**（4 镜头、12 s、1080p，2 vCPU / 4 GB，墙钟约 45 s，Active CPU 约 80 vCPU·s）：
    - CPU 约 $0.003，内存约 $0.0014，**合计不到 1 美分**。
    - Hobby 的免费额度大约够 200 部（只看 CPU；Hobby 仅限个人非商业使用）。
@@ -519,11 +592,11 @@ Vercel Sandbox 是给不可信代码用的 Firecracker microVM，每部片子一
 
 | 路线 | 组成 | 改造量 | 运维 | 适用 |
 |---|---|---|---|---|
-| ① 单机 | 一台 Linux 云主机：Next.js + worker + 本地渲染（§5），本地磁盘 + SQLite/文件 | 最小，就是 §8 的 P0–P3 | 自己维护一台机器 | **MVP 上线、社区自部署（推荐先走这条）** |
+| ① 单机 | 一台 Linux 云主机：Next.js + worker + 本地渲染（§5），本地磁盘 + SQLite/文件 | 最小，就是 §8 的 P0–P4 | 自己维护一台机器 | **MVP 上线、社区自部署（推荐先走这条）** |
 | ② 混合 | Web 放 Vercel，渲染 worker 放云主机 | 存储也必须改到 Postgres + Blob（V1、V3） | 两边都要管 | 不推荐：改动量接近 ③，还多一台机器 |
 | ③ 全托管 | Vercel：Next.js + Postgres + Blob + Workflow + Sandbox | V1–V4 全做，粗估 **1.5–2 周**（存储 3–5 d、编排 3–5 d、Sandbox 渲染 2–3 d） | 几乎不用管 | 面向公众的托管服务 |
 
-**建议**：先按 ① 完成 §8 的 P0–P3 上线并验证需求；确定要做公开托管服务后，再按 ③ 增加 P6，阶段划分如下：
+**已决策（D3）**：先按 ① 完成 §8 的 P0–P4 上线并验证需求；确定要做公开托管服务后，再按 ③ 增加 P6，阶段划分如下：
 
 | 阶段 | 内容 | 验收 |
 |---|---|---|
