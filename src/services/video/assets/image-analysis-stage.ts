@@ -11,7 +11,7 @@ import type {ProjectStore} from '@/services/video/storage/project-store';
 import {StoreMissing,updateJson} from '@/services/video/storage/atomic-store';
 import {runEffect} from '@/services/video/commands/effect-ledger';
 import {canonicalHash} from '@/services/video/domain/hash';
-import {readNarrationJson} from '@/services/video/audio/narration-package';
+import {readVerifiedJson} from '@/services/video/storage/read-json';
 import {reserveModelBudget,modelLimits,type ModelLimits} from '@/services/video/budget/model-budget';
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import {LocalAssetBytes} from './local-bytes';
@@ -24,7 +24,7 @@ export async function prepareImageAnalysis(projects:ProjectStore,root:string,pro
  async function fence(){const c=(await projects.store.readFresh<ProjectControl>(key)).value,a=c.assets.find(a=>a.id===assetId);if(c.deletedAt||!Number.isFinite(Date.parse(c.expiresAt))||Date.parse(c.expiresAt)<=Date.now())throw Error('ACCESS_NOT_FOUND');if(!a||!['uploaded','analyzing','ready'].includes(a.status)||!a.rightsConfirmed||a.sha256!==input.sha256||a.bytes!==input.bytes||a.declaredMime!==input.mime||a.intendedUse!==input.intendedUse)throw Error('IMAGE_ASSET_CHANGED');const actual=await bytes.inspect(projectId,assetId,input.mime);if(actual.sha256!==input.sha256||actual.bytes!==input.bytes)throw Error('IMAGE_INPUT_CHANGED')}
  await fence();
  if(asset.status==='ready'){
-  if(!asset.analysisRef)throw Error('IMAGE_ANALYSIS_CHANGED');const record=ImageAnalysisRecordSchema.parse(await readNarrationJson(projects.store,asset.analysisRef,p+'/assets/'+assetId+'/analysis/'));
+  if(!asset.analysisRef)throw Error('IMAGE_ANALYSIS_CHANGED');const record=ImageAnalysisRecordSchema.parse(await readVerifiedJson(projects.store,asset.analysisRef,p+'/assets/'+assetId+'/analysis/'));
   if(record.schemaVersion!==5||record.assetId!==assetId||record.sha256!==input.sha256||record.mime!==input.mime||record.trust!=='untrusted_material')throw Error('IMAGE_ANALYSIS_CHANGED');guardImageUnderstanding(record.imageAnalysis,input);await fence();return asset;
  }
  const identity=canonicalHash(input),effectKey=p+'/assets/'+assetId+'/effects/image-understanding/'+identity;let prior:unknown;
@@ -40,6 +40,6 @@ export async function prepareImageAnalysis(projects:ProjectStore,root:string,pro
   if(!a||!['uploaded','analyzing','ready'].includes(a.status)||!a.rightsConfirmed||a.sha256!==input.sha256||a.bytes!==input.bytes||a.declaredMime!==input.mime||a.intendedUse!==input.intendedUse)throw Error('IMAGE_ASSET_CHANGED');
   if(a.status==='ready'){if(a.analysisRef?.sha256!==ref.sha256)throw Error('IMAGE_ANALYSIS_CHANGED');return c}
   const understanding=(await projects.store.readFresh<Understanding>(c.understandingRef.key)).value,briefVersion=c.briefVersion+1,updated={...understanding,briefVersion,assetUses:understanding.assetUses.filter(use=>use.assetId!==assetId).concat({assetId,purpose:a.intendedUse,required:false})},understandingRef=await projects.index.immutable(p+'/understanding/'+briefVersion+'/'+randomUUID(),updated),assets=c.assets.map(a=>a.id===assetId?{...a,status:'ready',analysisRef:ref,errorCode:undefined}:a);
-  return{...c,controlVersion:c.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(a=>['reserved','uploading','uploaded','analyzing'].includes(a.status)),previewState:c.previewState==='ready'?'stale':c.previewState};
+  return{...c,controlVersion:c.controlVersion+1,briefVersion,understandingRef,assets,inputPending:assets.some(a=>['reserved','uploading','uploaded','analyzing'].includes(a.status))};
  });await fence();return next.assets.find(a=>a.id===assetId)!;
 }

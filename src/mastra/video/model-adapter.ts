@@ -1,6 +1,6 @@
 import { Agent } from '@mastra/core/agent';
 import type { Environment } from '@/services/video/config/environment';
-export type AgentRole = 'director' | 'visual' | 'audio' | 'critic';
+export type AgentRole = 'director' | 'visual';
 export function configuredModel(role: AgentRole, env: Environment = process.env) {
   const provider = env.MODEL_PROVIDER || 'openai-compatible';
   let model = env[`VIDEO_${role.toUpperCase()}_MODEL`];

@@ -90,6 +90,6 @@ export async function applyPendingDirectorFeedback(projects:ProjectStore,project
    index=(await resolvePendingDirectorFeedback(projects,{...c,pendingFeedbackIndexRef:index},record.proposedPatch,next.briefVersion))!;
   }
   if(!applied)return c;
-  return{...c,controlVersion:c.controlVersion+1,briefVersion:next.briefVersion,understandingRef:await projects.index.immutable(`${p}/understanding/${next.briefVersion}`,next),pendingFeedbackIndexRef:index,previewState:c.previewState==='ready'&&next.briefVersion!==c.briefVersion?'stale':c.previewState};
+  return{...c,controlVersion:c.controlVersion+1,briefVersion:next.briefVersion,understandingRef:await projects.index.immutable(`${p}/understanding/${next.briefVersion}`,next),pendingFeedbackIndexRef:index};
  });
 }

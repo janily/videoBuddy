@@ -1,0 +1,2 @@
+# Keep pinned upstream font metadata and license bytes intact.
+runtime/fonts/** -whitespace

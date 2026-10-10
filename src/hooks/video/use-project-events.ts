@@ -27,7 +27,7 @@ export function useProjectEvents(projectId:string|undefined,operationId:string|u
       if(next===state)continue;
       state=next;setStreamed(Object.values(state.messages));
       if(event.type==='activity.updated')setActivity({operationId:event.operationId,...event.payload});
-      if(event.type==='operation.terminal'&&['failed','interrupted'].includes(event.payload.status))setConnection(event.payload.errorCode==='PREVIEW_QUALITY_BLOCKED'?'效果检查未通过，已有片段和资料已保留，请继续调整。':event.payload.errorCode==='EFFECT_UNKNOWN'?'上次调用结果尚待核实，资料已保留。':event.payload.errorCode==='ASR_MISMATCH'?'声音核验未通过，资料和已有片段已保留。':'本次任务未完成，资料和已有内容已保留。');
+      if(event.type==='operation.terminal'&&['failed','interrupted'].includes(event.payload.status))setConnection(event.payload.errorCode==='EFFECT_UNKNOWN'?'上次调用结果尚待核实，资料已保留。':'本次任务未完成，资料和已有内容已保留。');
       if(refreshesProjectView(event.type))await onRefresh(event);
       if(event.type==='operation.terminal')stopped=true;
      }if(stopped)break}}finally{await reader.cancel()}

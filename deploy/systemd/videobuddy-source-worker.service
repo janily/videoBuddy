@@ -1,21 +1,19 @@
 [Unit]
 Description=VideoBuddy PDF source analysis worker
-After=docker.service
-Requires=docker.service
+After=videobuddy-render.service
 
 [Service]
 Type=simple
 User=videobuddy
 Group=videobuddy
-SupplementaryGroups=docker
+SupplementaryGroups=videobuddy-media
 WorkingDirectory=/opt/videobuddy/current
 EnvironmentFile=/etc/videobuddy/video.env
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/node node_modules/tsx/dist/cli.mjs scripts/video/source-worker.ts
+ExecStart=/usr/bin/node --import tsx scripts/video/source-worker.ts
 Restart=on-failure
 RestartSec=5
-StateDirectory=videobuddy
-StateDirectoryMode=0700
+UMask=0077
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true

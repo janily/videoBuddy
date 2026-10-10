@@ -1,6 +1,0 @@
-node_modules
-.cache
-*.wav
-fetch_model.py
-__pycache__
-test/__pycache__

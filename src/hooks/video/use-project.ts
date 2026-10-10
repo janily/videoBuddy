@@ -4,7 +4,6 @@ import type {ProjectView,ArchivedMessage} from '@/contracts/video/project';
 import {draftKey,readDraft,saveDraft,useDraft} from './use-draft';
 import {rememberProject} from './recent-projects';
 import {useProjectEvents} from './use-project-events';
-import {useApprovePreview} from './use-approve-preview';
 import {useRestoreResult} from './use-restore-result';
 import {useProjectRevalidation} from './use-project-revalidation';
 import {feedbackTarget,FeedbackSelectionSchema,parseMessageIntent,type MessageIntent} from '@/services/video/revisions/client-contract';
@@ -13,7 +12,7 @@ import type {StreamEvent} from '@/contracts/video/commands';
 import type {FeedbackTarget} from '@/contracts/video/commands';
 function feedbackKey(projectId:string){return `vb-feedback:${projectId}`}
 function pendingMessageKey(projectId:string){return `vb-message:${projectId}`}
-function sameTarget(a:FeedbackTarget|null|undefined,b:FeedbackTarget|null|undefined){return a?.artifactId===b?.artifactId&&a?.revisionId===b?.revisionId&&a?.sourceTimeMs===b?.sourceTimeMs&&a?.previewTimeMs===b?.previewTimeMs}
+function sameTarget(a:FeedbackTarget|null|undefined,b:FeedbackTarget|null|undefined){return a?.artifactId===b?.artifactId&&a?.revisionId===b?.revisionId&&a?.sourceTimeMs===b?.sourceTimeMs}
 async function messageLock<T>(projectId:string,action:()=>T):Promise<T>{
  if(!navigator.locks)throw Error('此浏览器暂不支持消息恢复，草稿已保留。');
  return navigator.locks.request(pendingMessageKey(projectId),action);
@@ -60,8 +59,8 @@ export function useProject(initialProjectId?:string){
  const [pendingMessage,setPendingMessage]=useState<MessageIntent|null>(null);
  const feedbackSnapshot=useCallback(()=>{if(!projectId)return'';try{return localStorage.getItem(feedbackKey(projectId))||''}catch{return'invalid'}},[projectId]);
  const selection=parseSelection(useSyncExternalStore(subscribeFeedback,feedbackSnapshot,()=>''),projectId);
- const previewCommand=useRef<{briefVersion:number;commandId:string}|undefined>(undefined),previewBusy=useRef(false);
- const [preparingPreview,setPreparingPreview]=useState(false);
+ const generateCommand=useRef<{briefVersion:number;commandId:string}|undefined>(undefined),generateBusy=useRef(false);
+ const [generating,setGenerating]=useState(false);
  const key=draftKey(projectId),[draft,saveCurrentDraft]=useDraft(key);
  const feedback=feedbackTarget(view,selection);
  function selectFeedback(artifactId:string,revisionId:string){
@@ -91,7 +90,6 @@ export function useProject(initialProjectId?:string){
   }
  }catch(e){setError(e instanceof Error?e.message:'无法恢复项目。')}},[readProject]);
  const restoration=useRestoreResult(projectId,readProject);
- const approval=useApprovePreview(projectId,readProject);
  const projectUpdate=useProjectRevalidation(projectId,refresh);
  useEffect(()=>{if(initialProjectId)void readProject().catch(e=>setError(e instanceof Error?e.message:'无法恢复项目。'))},[initialProjectId,readProject]);
  const stream=useProjectEvents(projectId,view?.activeConversation?.id,view?.activeConversation?.streamEpoch||0,refresh);
@@ -171,28 +169,27 @@ export function useProject(initialProjectId?:string){
   finally{sendingRef.current=false;setSending(false)}
  }
  async function stopReply(){const op=view?.activeConversation;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'reply'});await refresh()}catch(e){setError(e instanceof Error?e.message:'无法停止回复。')}}
- async function preparePreview(current:ProjectView|null=view){
+ async function generateVideo(current:ProjectView|null=view){
   const view=current;
-  if(!projectId||!view||previewBusy.current||!view.actions.some(a=>a.kind==='prepare_preview'&&a.enabled))return;
-  previewBusy.current=true;setPreparingPreview(true);setError('');
-  const command=previewCommand.current?.briefVersion===view.briefVersion?previewCommand.current:{briefVersion:view.briefVersion,commandId:crypto.randomUUID()};previewCommand.current=command;
-  try{await api(`/api/video/projects/${projectId}/preview`,{schemaVersion:5,clientCommandId:command.commandId,expectedBriefVersion:command.briefVersion});previewCommand.current=undefined;await refresh()}
-  catch(e){setError(e instanceof Error?e.message:'效果请求未完成，资料和草稿已保留。');await refresh()}
-  finally{previewBusy.current=false;setPreparingPreview(false)}
+  if(!projectId||!view||generateBusy.current||!view.actions.some(a=>a.kind==='generate_video'&&a.enabled))return;
+  generateBusy.current=true;setGenerating(true);setError('');
+  const command=generateCommand.current?.briefVersion===view.briefVersion?generateCommand.current:{briefVersion:view.briefVersion,commandId:crypto.randomUUID()};generateCommand.current=command;
+  try{await api(`/api/video/projects/${projectId}/preview`,{schemaVersion:5,clientCommandId:command.commandId,expectedBriefVersion:command.briefVersion});generateCommand.current=undefined;await refresh()}
+  catch(e){setError(e instanceof Error?e.message:'生成请求未完成，资料和草稿已保留。');await refresh()}
+  finally{generateBusy.current=false;setGenerating(false)}
  }
  /** Quick flow: change the music or redraw one shot, then generate again (unchanged parts are reused). */
  async function updateQuick(change:{music:NonNullable<ProjectView['quick']>['music']}|{redoShotId:string}){
-  if(!projectId||previewBusy.current||quickBusy.current)return;quickBusy.current=true;setError('');
+  if(!projectId||generateBusy.current||quickBusy.current)return;quickBusy.current=true;setError('');
   const signature=JSON.stringify({change,briefVersion:view?.briefVersion});
   if(quickIntent.current?.signature!==signature)quickIntent.current={signature,commandId:crypto.randomUUID()};
-  try{const next=await api<ProjectView>(`/api/video/projects/${projectId}/quick`,{schemaVersion:5,...change,origin:'canvas',clientCommandId:quickIntent.current.commandId});setView(next);trackCanvasEvent(projectId,{name:'music'in change?'music_changed':'redo_shot',payload:{}});quickIntent.current=null;await preparePreview(next)}
+  try{const next=await api<ProjectView>(`/api/video/projects/${projectId}/quick`,{schemaVersion:5,...change,origin:'canvas',clientCommandId:quickIntent.current.commandId});setView(next);trackCanvasEvent(projectId,{name:'music'in change?'music_changed':'redo_shot',payload:{}});quickIntent.current=null;await generateVideo(next)}
   catch(e){setError(e instanceof Error?e.message:'暂时无法更新，已有视频仍可观看。')}
   finally{quickBusy.current=false}
  }
  const settingsBusy=useRef(false),settingsIntent=useRef<{signature:string;commandId:string}|null>(null);
  async function setPreferences(patch:{durationSec?:number;aspect?:'16:9'|'9:16'}):Promise<boolean>{
   if(!projectId||!view||settingsBusy.current)return false;
-  if(!view.quick)return send(false,{text:[patch.durationSec?`时长改成 ${patch.durationSec} 秒`:'',patch.aspect?`画面改成${patch.aspect==='9:16'?'竖屏':'横屏'}`:''].filter(Boolean).join('，'),origin:'canvas'});
   const signature=JSON.stringify({patch,briefVersion:view.briefVersion});
   if(settingsIntent.current?.signature!==signature)settingsIntent.current={signature,commandId:crypto.randomUUID()};
   settingsBusy.current=true;setSending(true);setError('');
@@ -212,5 +209,5 @@ export function useProject(initialProjectId?:string){
  async function stopProduction(){const op=view?.activeProduction;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'production'});await refresh()}catch(e){setError(e instanceof Error?e.message:'暂时无法停止，已完成的镜头会保留。')}}
  async function retryScript(){if(!projectId)return;try{await api(`/api/video/projects/${projectId}/script`,{schemaVersion:5});await refresh()}catch(e){setError(e instanceof Error?e.message:'脚本暂时没写好，想法已保留，请重试。')}}
  const messages:Array<Omit<ArchivedMessage,'status'>&{status:ArchivedMessage['status']|'streaming'}>=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,status:m.status==='committed'?'completed' as const:m.status,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:async()=>{await send()},sendText:(text:string,origin?:'canvas')=>send(false,{text,origin}),setPreferences,setQuickMusic,stopProduction,retryScript,retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,preparePreview:()=>preparePreview(),updateQuick,preparingPreview,restoration,approval,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection||scriptStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:async()=>{await send()},sendText:(text:string,origin?:'canvas')=>send(false,{text,origin}),setPreferences,setQuickMusic,stopProduction,retryScript,retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,generateVideo:()=>generateVideo(),updateQuick,generating,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection||scriptStream.connection,refresh};
 }

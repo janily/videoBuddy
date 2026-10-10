@@ -2,7 +2,7 @@ import {isAbsolute} from 'node:path';
 export type Environment = Record<string, string | undefined>;
 export const budgetKeys = [
   'VIDEO_PROJECT_MAX_MODEL_CALLS', 'VIDEO_PROJECT_MAX_INPUT_TOKENS',
-  'VIDEO_PROJECT_MAX_OUTPUT_TOKENS', 'VIDEO_PROJECT_MAX_TTS_CHARACTERS',
+  'VIDEO_PROJECT_MAX_OUTPUT_TOKENS',
   'VIDEO_PROJECT_MAX_MEDIA_SECONDS', 'VIDEO_DAILY_MAX_MODEL_CALLS',
   'VIDEO_DAILY_MAX_MEDIA_SECONDS',
 ] as const;

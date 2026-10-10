@@ -32,7 +32,7 @@ it('replays concurrent and cold duplicate commands once, even after the brief ha
  await expect(updateCanvasPreferences(projects,owner,projectId,{...request,patch:{durationSec:30}})).rejects.toThrow('IDEMPOTENCY_CONFLICT');
 });
 it('admits only one of two conflicting edits to the same brief version',async()=>{
- const results=await Promise.allSettled([updateCanvasPreferences(projects,owner,projectId,input({durationSec:20})),updateCanvasPreferences(projects,owner,projectId,input({durationSec:30}))]);
+ const results=await Promise.allSettled([updateCanvasPreferences(projects,owner,projectId,input({durationSec:20})),updateCanvasPreferences(projects,owner,projectId,input({durationSec:25}))]);
  expect(results.filter(r=>r.status==='fulfilled')).toHaveLength(1);expect(results.find(r=>r.status==='rejected')).toMatchObject({reason:{message:'BRIEF_CONFLICT'}});
  expect((await control()).briefVersion).toBe(1);expect(await projects.messages(await control())).toHaveLength(2);
 });
@@ -83,10 +83,10 @@ it('keeps regeneration enabled and the finished video visible after changing its
  await projects.store.create(`projects/${projectId}/results/${resultId}/manifest`,{kind:'quick',resultId,artifactId,revisionId:randomUUID(),operationId:randomUUID(),bundleHash:'a'.repeat(64),mp4Sha256:'b'.repeat(64),mp4Bytes:1,briefVersion:0,styleSlug:'watercolor',aspect:'16:9',durationSec:20,shots:[{id:'shot-1',scriptLine:'欢迎来喝咖啡',startFrame:0,endFrame:480,take:0}],music:null,aiLabel:true,createdAt:new Date().toISOString()});
  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,understandingRef:ref,currentResultId:resultId,phase:'ready' as const}));
  const before=await projects.view(owner,projectId);
- expect(before.actions.find(action=>action.kind==='prepare_preview')).toMatchObject({enabled:true});
+ expect(before.actions.find(action=>action.kind==='generate_video')).toMatchObject({enabled:true});
  await updateCanvasPreferences(projects,owner,projectId,input({durationSec:25,aspect:'9:16'}));
  const view=await projects.view(owner,projectId);
- expect(view.actions.find(action=>action.kind==='prepare_preview')).toMatchObject({enabled:true});
+ expect(view.actions.find(action=>action.kind==='generate_video')).toMatchObject({enabled:true});
  expect(view.phase).toBe('ready');expect(view.briefVersion).toBe(1);expect(view.preferences).toMatchObject({durationSec:25,aspect:'9:16'});
  expect(view.currentResult).toEqual(before.currentResult);expect(view.currentResult?.artifactId).toBe(artifactId);
  expect(view.activeProduction).toBeNull();

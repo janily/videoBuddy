@@ -5,7 +5,7 @@ import type {ObjectRef} from '@/contracts/video/domain';
 export interface AssetReservation{id:string;commandId:string;bodyHash:string;reservationId:string;filename:string;declaredBytes:number;declaredMime:string;intendedUse:string;rightsConfirmed:boolean;status:string;expiresAt:string;sha256?:string;bytes?:number;analysisRef?:ObjectRef;errorCode?:string;quotaReserved:boolean}
 export interface AssetsControl{assets:AssetReservation[];inputPending:boolean;deletedAt?:string;expiresAt?:string;lastUserActivityAt?:string}
 export interface UploadInput{filename:string;declaredBytes:number;declaredMime:string;intendedUse:string;rightsConfirmed:boolean}
-const limits:Record<string,number>={'text/markdown':1024*1024,'image/png':20*1024*1024,'image/jpeg':20*1024*1024,'image/webp':20*1024*1024,'application/pdf':20*1024*1024,'audio/wav':50*1024*1024,'audio/mpeg':50*1024*1024,'audio/mp4':50*1024*1024};
+const limits:Record<string,number>={'text/markdown':1024*1024,'image/png':20*1024*1024,'image/jpeg':20*1024*1024,'image/webp':20*1024*1024,'application/pdf':20*1024*1024};
 function pending(assets:AssetReservation[]){return assets.some(a=>['reserved','uploading','uploaded','analyzing'].includes(a.status))}
 function assertLive(c:AssetsControl){if(c.deletedAt)throw Error('ACCESS_NOT_FOUND');if(c.expiresAt&&(!Number.isFinite(Date.parse(c.expiresAt))||Date.parse(c.expiresAt)<=Date.now()))throw Error('PROJECT_EXPIRED')}
 function userActivity(c:AssetsControl){if(!c.lastUserActivityAt||!c.expiresAt)return{};const now=Date.now();return{lastUserActivityAt:new Date(now).toISOString(),expiresAt:new Date(now+30*86400000).toISOString()}}

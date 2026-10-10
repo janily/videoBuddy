@@ -162,3 +162,6 @@ runtime/voice/model/
 runtime/voice/*.wav
 runtime/asr/model/
 runtime/asr/*.wav
+
+# Exact pinned CJK bytes reassembled by postinstall from bundled parts.
+/runtime/fonts/notosanssc/NotoSansSC.ttf

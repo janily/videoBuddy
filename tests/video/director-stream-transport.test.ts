@@ -11,7 +11,7 @@ import {reserveModelBudget} from '@/services/video/budget/model-budget';
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import type {Understanding} from '@/contracts/video/domain';
 
-it.each([{invalidStyle:false,music:false},{invalidStyle:true,music:false},{invalidStyle:false,music:true}])('forwards native fragments and settles usage before semantic validation (invalid style: $invalidStyle; music: $music)',async({invalidStyle,music})=>{
+it.each([{invalidStyle:false,music:false},{invalidStyle:true,music:false}])('forwards native fragments and settles usage before semantic validation (invalid style: $invalidStyle; music: $music)',async({invalidStyle,music})=>{
  expect(typeof runDirectorStream).toBe('function');
  const root=await mkdtemp(join(tmpdir(),'vb-director-stream-')),store=new FileStore(root),projects=new ProjectStore(store);
  const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),control=(await store.readFresh<import('@/contracts/video/project').ProjectControl>('projects/'+projectId+'/control')).value;
@@ -35,7 +35,7 @@ const decision={action:music?'change':'ask',reply,effect:music?'pending_followup
  try{
   const reservation=(await reserveModelBudget(store,projectId,'stream',{inputTokens:1000,outputTokens:1000},{projectCalls:1,projectInputTokens:10000,projectOutputTokens:10000,dailyCalls:1})).reservation,fragments:string[]=[];
   const task=withAccountedModel(store,reservation,()=>runDirectorStream(understanding,[{id:userId,role:'user',text:music?'这版音乐调小一点':'做一段视频',...(music?{target:{artifactId,revisionId,sourceTimeMs:null}}:{})}],1000,async fragment=>{if(!fragments.length)expect(finished).toBe(false);fragments.push(fragment);release()},{MODEL_PROVIDER:'openai-compatible',MODEL_BASE_URL:'http://127.0.0.1:'+address.port+'/v1',MODEL_API_KEY:'unit-only',VIDEO_DIRECTOR_MODEL:'local-unit'},{projectContext:{phase:'ready',activeProductionId:null,briefVersion:0,consentEpoch:0,currentResult:{artifactId,revisionId},currentTurnUserMessageIds:[userId]}}));
-  if(invalidStyle)await expect(task).rejects.toThrow('STYLE_INVALID');else{const result=await task;expect(result.reply).toBe(reply);expect(result.canvasFocus).toBeUndefined();expect(result.quickReplies).toEqual([{label:'你定吧',text:'你定吧'}]);if(music)expect(result.musicChange).toEqual(decision.musicChange)}expect(fragments.join('')).toBe(reply);expect(calls).toBe(1);expect(body?.stream).toBe(true);
+  if(invalidStyle)await expect(task).rejects.toThrow('STYLE_INVALID');else{const result=await task;expect(result.reply).toBe(reply);expect(result.canvasFocus).toBeUndefined();expect(result.quickReplies).toEqual([{label:'你定吧',text:'你定吧'}]);}expect(fragments.join('')).toBe(reply);expect(calls).toBe(1);expect(body?.stream).toBe(true);
   expect((await store.readFresh<{accounting:Record<string,{state:string;inputTokens:number;outputTokens:number}>}>('projects/'+projectId+'/budget')).value.accounting[reservation.id]).toMatchObject({state:'settled',inputTokens:50,outputTokens:25});
  }finally{release();server.closeAllConnections();await new Promise<void>(resolve=>server.close(()=>resolve()));await rm(root,{recursive:true,force:true})}
 },15000);

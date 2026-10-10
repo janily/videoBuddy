@@ -19,7 +19,7 @@ beforeEach(async()=>{
 });
 afterEach(async()=>{vi.unstubAllEnvs();await rm(root,{recursive:true,force:true})});
 async function setup(){
- const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create(ownerHash(sid,keys),{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()}),u={...initialUnderstanding(),subject:'真实读书活动',preferences:{...initialUnderstanding().preferences,styleSlug:'crayon-book',voiceMode:'none' as const}};
+ const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create(ownerHash(sid,keys),{schemaVersion:5,clientCommandId:crypto.randomUUID(),clientCreateId:crypto.randomUUID()}),u={...initialUnderstanding(),subject:'真实读书活动',preferences:{...initialUnderstanding().preferences,styleSlug:'crayon-book'}};
  const ref=await projects.index.immutable(`projects/${projectId}/understanding/0`,u);
  await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,understandingRef:ref}));
  const input={schemaVersion:5,clientCommandId:crypto.randomUUID(),expectedBriefVersion:0},context={params:Promise.resolve({projectId})};

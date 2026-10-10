@@ -3,6 +3,7 @@ import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {chromium} from 'playwright';
+import {runtimeLaunchOptions} from '../../src/services/video/media/local/browser';
 import {FileStore} from '../../src/services/video/storage/file-store';
 import {ProjectStore} from '../../src/services/video/storage/project-store';
 import {LocalAssetBytes} from '../../src/services/video/assets/local-bytes';
@@ -13,11 +14,8 @@ import type {ProjectControl} from '../../src/contracts/video/project';
 import type {TextAnalysis} from '../../src/services/video/assets/analysis';
 
 async function main(){
- const image=process.env.VIDEO_MEDIA_IMAGE_REF,digest=process.env.VIDEO_MEDIA_RUNTIME_DIGEST;
- if(!image||!digest||image!==`sha256:${digest}`)throw Error('CONFIGURATION_REQUIRED: pinned PDF runtime');
- process.env.VIDEO_MEDIA_TIMEOUT_SECONDS='60';
  await assertPdfRuntime();
- const root=await mkdtemp(join(tmpdir(),'vb-pdf-probe-')),browser=await chromium.launch();
+ const root=await mkdtemp(join(tmpdir(),'vb-pdf-probe-')),browser=await chromium.launch(runtimeLaunchOptions(process.env));
  try{
   const page=await browser.newPage(),store=new FileStore(root),projects=new ProjectStore(store);
   await page.setContent('<html><body><h1>活动资料</h1><p>日期：10月8日</p><p>地点：上海</p></body></html>');
@@ -43,7 +41,7 @@ async function main(){
   await runSourceAnalysisOnce(store,root);
   const scannedControl=(await store.readFresh<ProjectControl>(`projects/${scannedProject}/control`)).value;
   if(scannedControl.assets[0].status!=='failed'||scannedControl.assets[0].errorCode!=='PDF_TEXT_UNAVAILABLE'||scannedControl.inputPending)throw Error('PDF_PROBE_FAILED: scanned PDF must fail visibly');
-  const evidence={runtimeDigest:digest,sourceSha256:wrote.sha256,bytes:wrote.bytes,pageCount:analysis.pages.length,assetStatus:output.status,briefVersion:control.briefVersion,inputPending:control.inputPending,containsShanghai:true,scannedPdf:{bytes:scannedBytes.bytes,status:scannedControl.assets[0].status,errorCode:scannedControl.assets[0].errorCode,inputPending:scannedControl.inputPending}};
+  const evidence={runtime:'local-pdf',sourceSha256:wrote.sha256,bytes:wrote.bytes,pageCount:analysis.pages.length,assetStatus:output.status,briefVersion:control.briefVersion,inputPending:control.inputPending,containsShanghai:true,scannedPdf:{bytes:scannedBytes.bytes,status:scannedControl.assets[0].status,errorCode:scannedControl.assets[0].errorCode,inputPending:scannedControl.inputPending}};
   if(process.argv.includes('--record'))await writeFile('docs/engineering/evidence/pdf-probe.json',JSON.stringify(evidence,null,2)+'\n');
   process.stdout.write(JSON.stringify(evidence)+'\n');
   await page.close();

@@ -7,7 +7,7 @@ import {updateJson} from '@/services/video/storage/atomic-store';
 import type {ProjectControl} from '@/contracts/video/project';
 import {issueSession,ownerHash} from '@/services/video/access/session';
 import {POST} from '@/app/api/video/projects/[projectId]/quick/route';
-import {quickResultKey} from '@/services/video/results/publish';
+import {quickResultKey} from '@/services/video/results/publish-film';
 import {readQuickSettings} from '@/services/video/quick/settings';
 let root:string;
 const origin='https://video.test',sid='1'.repeat(64),keys={current:'a'.repeat(64),keyId:'v1',environment:'test'};

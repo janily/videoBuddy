@@ -3,7 +3,7 @@ import {body,writeAccess,projectService,json,errorResponse} from '@/services/vid
 import {requireGeneration} from '@/services/video/config/environment';
 import {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {assertWorkerReady} from '@/services/video/commands/worker-heartbeat';
-import {preparePreview} from '@/services/video/preview/prepare';
+import {preparePreview} from '@/services/video/quick/prepare';
 export async function POST(request:Request,{params}:{params:Promise<{projectId:string}>}){
  try{
   const owner=writeAccess(request),input=await body(request,PreparePreviewRequestSchema),{projectId}=await params,projects=projectService();

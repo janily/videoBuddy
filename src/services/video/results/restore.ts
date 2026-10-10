@@ -6,7 +6,7 @@ import{inspectArtifact}from '@/services/video/exports/access';
 import{actualArtifactSha256}from '@/services/video/exports/verified-file';
 import{StoreMissing,createOrRead,updateJson}from '@/services/video/storage/atomic-store';
 import type{ProjectStore}from '@/services/video/storage/project-store';
-import{readAnyResultManifest as readResultManifest}from './publish';
+import{readAnyResultManifest as readResultManifest}from './publish-film';
 
 interface RestoreIntent{hash:string;fromResultId:string;toResultId:string;artifactId:string;completed:boolean}
 export async function restoreResult(projects:ProjectStore,owner:string,projectId:string,artifactId:string,untrusted:RestoreResultRequest,storageRoot:string){
@@ -30,7 +30,7 @@ export async function restoreResult(projects:ProjectStore,owner:string,projectId
  await updateJson(projects.store,`${p}/control`,(current:ProjectControl)=>{
   if(current.lastRestoreCommandId===request.clientCommandId)return current;
   if(current.deletedAt||current.ownerKeyHash!==owner||current.activeProduction||current.phase!=='ready'||current.currentResultId!==intent!.fromResultId||current.previousResultId!==intent!.toResultId)throw Error('RESULT_STALE');
-  return{...current,...userActivity(current),controlVersion:current.controlVersion+1,consentEpoch:current.consentEpoch+1,currentResultId:intent!.toResultId,previousResultId:intent!.fromResultId,lastRestoreCommandId:request.clientCommandId,previewState:current.previewState==='ready'?'stale' as const:current.previewState};
+  return{...current,...userActivity(current),controlVersion:current.controlVersion+1,consentEpoch:current.consentEpoch+1,currentResultId:intent!.toResultId,previousResultId:intent!.fromResultId,lastRestoreCommandId:request.clientCommandId};
  });
  await updateJson(projects.store,key,(value:RestoreIntent)=>({...value,completed:true}));
  return projects.view(owner,projectId);

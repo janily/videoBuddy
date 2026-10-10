@@ -1,0 +1,44 @@
+[Unit]
+Description=VideoBuddy isolated local media renderer
+After=local-fs.target
+
+[Service]
+Type=simple
+User=videobuddy-render
+Group=videobuddy-media
+WorkingDirectory=/opt/videobuddy/current
+# This file contains runtime paths only, never application/model/session credentials.
+EnvironmentFile=/etc/videobuddy/render.env
+# Clear manager/EnvironmentFile additions; only named values reach the render process.
+ExecStartPre=/usr/bin/rm -f -- /var/lib/videobuddy/media/render.sock
+ExecStart=/usr/bin/env -i PATH=/usr/local/bin:/usr/bin:/bin LANG=C.UTF-8 NODE_ENV=production VIDEO_DATA_DIR=${VIDEO_DATA_DIR} VIDEO_RENDER_SOCKET=${VIDEO_RENDER_SOCKET} VIDEO_FFMPEG_PATH=${VIDEO_FFMPEG_PATH} VIDEO_FFPROBE_PATH=${VIDEO_FFPROBE_PATH} VIDEO_MUSIC_DIR=${VIDEO_MUSIC_DIR} PLAYWRIGHT_BROWSERS_PATH=${PLAYWRIGHT_BROWSERS_PATH} /usr/bin/node --import tsx scripts/video/render-worker.ts
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+KillMode=control-group
+UMask=0007
+MemoryMax=6G
+MemorySwapMax=0
+CPUQuota=200%
+TasksMax=256
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+PrivateNetwork=yes
+IPAddressDeny=any
+IPAddressAllow=localhost
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+ReadOnlyPaths=/opt/videobuddy /var/lib/videobuddy/assets /var/lib/videobuddy/music
+ReadWritePaths=/var/lib/videobuddy/media
+# Chromium needs user namespaces. Do not add RestrictNamespaces or a namespace syscall filter.
+
+[Install]
+WantedBy=multi-user.target

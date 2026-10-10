@@ -1,9 +1,9 @@
 import{it,expect,beforeEach,afterEach}from'vitest';import{mkdtemp,mkdir,writeFile,rm}from'node:fs/promises';import{tmpdir}from'node:os';import{join}from'node:path';import{createHash}from'node:crypto';
 import{FileStore}from'@/services/video/storage/file-store';import{ProjectStore}from'@/services/video/storage/project-store';import{getArtifactAccess}from'@/services/video/exports/access';
-import{updateJson}from'@/services/video/storage/atomic-store';import type{ProjectControl}from'@/contracts/video/project';import{mandatoryDeliveryRules}from'@/services/video/quality/delivery';
+import{updateJson}from'@/services/video/storage/atomic-store';import type{ProjectControl}from'@/contracts/video/project';
 let dir:string;beforeEach(async()=>{dir=await mkdtemp(join(tmpdir(),'vb-artifact-'))});afterEach(async()=>{await rm(dir,{recursive:true,force:true})});
 async function pointAtResult(store:FileStore,projectId:string,artifactId:string,revisionId:string,sha256:string,bytes:number){
- const resultId=crypto.randomUUID();await store.create(`projects/${projectId}/results/${resultId}/manifest`,{resultId,artifactId,revisionId,previewId:crypto.randomUUID(),approvalId:crypto.randomUUID(),bundleHash:'a'.repeat(64),mp4Sha256:sha256,mp4Bytes:bytes,qualityPolicy:{schemaVersion:1,audioIntent:'voiced',captions:true,requiredRules:[...mandatoryDeliveryRules]},qualityChecks:[],createdAt:new Date().toISOString()});
+ const resultId=crypto.randomUUID();await store.create(`projects/${projectId}/results/${resultId}/manifest`,{kind:'quick',resultId,artifactId,revisionId,operationId:crypto.randomUUID(),bundleHash:'a'.repeat(64),mp4Sha256:sha256,mp4Bytes:bytes,briefVersion:1,styleSlug:'watercolor',aspect:'16:9',durationSec:20,shots:[{id:'s1',scriptLine:'Protocol fixture',startFrame:0,endFrame:480,take:0}],music:null,aiLabel:true,createdAt:new Date().toISOString()});
  await updateJson(store,`projects/${projectId}/control`,(control:ProjectControl)=>({...control,currentResultId:resultId,phase:'ready' as const}));
 }
 it('a QA-approved local artifact gets a same-origin expiring URL without Blob credentials',async()=>{

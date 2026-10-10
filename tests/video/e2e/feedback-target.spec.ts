@@ -1,7 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 const pid='10000000-0000-4000-8000-000000000001',current='20000000-0000-4000-8000-000000000002',previous='60000000-0000-4000-8000-000000000006';
 const result=(artifactId:string)=>({artifactId,resultId:crypto.randomUUID(),revisionId:crypto.randomUUID(),bundleHash:'a'.repeat(64),createdAt:new Date().toISOString()});
-const initial={projectId:pid,title:'反馈目标协议测试',controlVersion:1,briefVersion:0,phase:'ready',understanding:{summary:[],subject:'测试'},preferences:{durationSec:45,aspect:'16:9',language:'zh-CN',styleSlug:null,voiceMode:'none',musicMode:'none',captions:'none'},assets:[],messages:[] as {id:string;clientMessageId:string;role:'user';text:string;status:'completed';ordinal:number;contentVersion:number}[],currentPreview:null,currentResult:result(current),previousResult:result(previous),activeConversation:null,activeProduction:null,pendingInputs:[],actions:[],expiresAt:'2030-01-01T00:00:00Z'};
+const initial={projectId:pid,title:'反馈目标协议测试',controlVersion:1,briefVersion:0,phase:'ready',understanding:{summary:[],subject:'测试'},preferences:{durationSec:30,aspect:'16:9',language:'zh-CN',styleSlug:null},assets:[],messages:[] as {id:string;clientMessageId:string;role:'user';text:string;status:'completed';ordinal:number;contentVersion:number}[],currentResult:result(current),previousResult:result(previous),activeConversation:null,activeProduction:null,pendingInputs:[],actions:[],expiresAt:'2030-01-01T00:00:00Z'};
 async function setup(page:Page){
  let view=structuredClone(initial);const requests:Array<Record<string,unknown>>=[];
  await page.route(`**/api/video/projects/${pid}`,r=>r.fulfill({json:view}));
@@ -15,7 +15,7 @@ test('current and explicitly opened previous results supply the exact whole-film
  await page.goto(`/video/${pid}`);await expect(page.getByText(/关于当前视频（整片）/)).toBeVisible();
  await page.getByRole('textbox').fill('音乐调小');await page.getByRole('button',{name:'发送',exact:true}).click();await expect.poll(()=>f.requests.length).toBe(1);
  expect(f.requests[0].target).toEqual({artifactId:current,revisionId:f.view.currentResult.revisionId,sourceTimeMs:null});
- await page.getByText('更多',{exact:true}).click();await page.getByRole('button',{name:'查看上个结果',exact:true}).click();
+ await page.getByRole('button',{name:'查看上个结果',exact:true}).click();
  await expect(page.getByText(/关于上个结果（整片）/)).toBeVisible();await page.getByRole('textbox').fill('这版再调整');
  await page.screenshot({path:'.video-local/feedback-target-desktop.png'});
  await page.setViewportSize({width:390,height:844});await page.screenshot({path:'.video-local/feedback-target-mobile.png'});
@@ -61,7 +61,7 @@ test('a late acknowledgement in one tab cannot erase another tab’s newer uncer
 test('selecting another result cannot silently resend an uncertain message against the original result',async({page})=>{
  const f=await setup(page);await page.route(`**/api/video/projects/${pid}/messages`,r=>{f.requests.push(r.request().postDataJSON());return f.requests.length===1?r.abort('failed'):r.fulfill({status:202,json:{status:'accepted'}})});
  await page.goto(`/video/${pid}`);await page.getByRole('textbox').fill('音乐调小');await page.getByRole('button',{name:'发送',exact:true}).click();await expect(page.getByRole('button',{name:'重发上一条'})).toBeEnabled();
- await page.getByText('更多',{exact:true}).click();await page.getByRole('button',{name:'查看上个结果',exact:true}).click();await expect(page.getByText(/关于上个结果（整片）/)).toBeVisible();
+ await page.getByRole('button',{name:'查看上个结果',exact:true}).click();await expect(page.getByText(/关于上个结果（整片）/)).toBeVisible();
  await page.getByRole('button',{name:'发送',exact:true}).click();await expect(page.getByRole('status').filter({hasText:'上一条消息还未确认，请先重发上一条'})).toBeVisible();expect(f.requests).toHaveLength(1);
  await page.getByRole('button',{name:'重发上一条'}).click();await expect.poll(()=>f.requests.length).toBe(2);expect(f.requests[1]).toEqual(f.requests[0]);await expect(page.getByRole('textbox')).toHaveValue('音乐调小');
 });
@@ -82,7 +82,7 @@ test('an acknowledgement without a result cannot clear identical later typing se
 });
 test('closing the previous version returns chat feedback to the current video',async({page})=>{
  const f=await setup(page);await page.route(`**/api/video/projects/${pid}/messages`,r=>{f.requests.push(r.request().postDataJSON());return r.fulfill({status:202,json:{}})});
- await page.goto(`/video/${pid}`);await page.getByText('更多',{exact:true}).click();await page.getByRole('button',{name:'查看上个结果',exact:true}).click();await expect(page.getByText(/关于上个结果（整片）/)).toBeVisible();await page.getByRole('button',{name:'收起上个结果',exact:true}).click();await expect(page.getByText(/关于当前视频（整片）/)).toBeVisible();
+ await page.goto(`/video/${pid}`);await page.getByRole('button',{name:'查看上个结果',exact:true}).click();await expect(page.getByText(/关于上个结果（整片）/)).toBeVisible();await page.getByRole('button',{name:'收起上个结果',exact:true}).click();await expect(page.getByText(/关于当前视频（整片）/)).toBeVisible();
  await page.getByRole('textbox').fill('修改现在这版');await page.getByRole('button',{name:'发送',exact:true}).click();await expect.poll(()=>f.requests.length).toBe(1);expect(f.requests[0].target).toEqual({artifactId:current,revisionId:f.view.currentResult.revisionId,sourceTimeMs:null});
 });
 

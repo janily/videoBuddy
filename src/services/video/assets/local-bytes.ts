@@ -14,9 +14,7 @@ function signature(bytes:Uint8Array,mime:string){
   mime==='image/jpeg'?bytes.length>=4&&prefix[0]===255&&prefix[1]===216&&prefix[2]===255:
   mime==='image/webp'?bytes.length>=16&&prefix.toString('ascii',0,4)==='RIFF'&&prefix.toString('ascii',8,12)==='WEBP':
   mime==='application/pdf'?bytes.length>=12&&prefix.toString('ascii',0,5)==='%PDF-'&&tail.includes(Buffer.from('%%EOF')):
-  mime==='audio/wav'?bytes.length>=44&&prefix.toString('ascii',0,4)==='RIFF'&&prefix.toString('ascii',8,12)==='WAVE':
-  mime==='audio/mpeg'?bytes.length>=4&&(prefix.toString('ascii',0,3)==='ID3'||prefix[0]===255&&(prefix[1]&224)===224):
-  mime==='audio/mp4'?bytes.length>=12&&prefix.toString('ascii',4,8)==='ftyp':false;
+  false;
  if(!valid)throw Error('ASSET_INVALID: MIME mismatch');
 }
 
@@ -32,8 +30,12 @@ export class LocalAssetBytes{
  async put(projectId:string,assetId:string,request:Request,meta:{declaredMime:string;declaredBytes:number}){
   const path=this.path(projectId,assetId),directory=join(this.root,'assets',projectId);
   if(!request.body||!Number.isSafeInteger(meta.declaredBytes)||meta.declaredBytes<1||meta.declaredBytes>50*1024*1024)throw Error('ASSET_INVALID');
-  await mkdir(directory,{recursive:true,mode:0o700});const temp=join(directory,assetId+'.'+randomUUID()+'.tmp');
-  const file=await open(temp,'wx',0o600),reader=request.body.getReader(),hash=createHash('sha256');let size=0;
+  await mkdir(directory,{recursive:true,mode:0o2750});
+  // Keep application state private under umask0077, while explicitly granting
+  // the dedicated renderer read/search on this owned asset directory.
+  const dir=await open(directory,constants.O_RDONLY|constants.O_DIRECTORY|constants.O_NOFOLLOW);try{await dir.chmod(0o2750)}finally{await dir.close()}
+  const temp=join(directory,assetId+'.'+randomUUID()+'.tmp');
+  const file=await open(temp,'wx',0o640);await file.chmod(0o640);const reader=request.body.getReader(),hash=createHash('sha256');let size=0;
   try{
    for(;;){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>meta.declaredBytes){await reader.cancel();throw Error('ASSET_INVALID: byte limit')}hash.update(value);await file.writeFile(value)}
    if(!size)throw Error('ASSET_INVALID');await file.sync();await file.close();

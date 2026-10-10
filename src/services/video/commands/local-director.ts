@@ -13,14 +13,13 @@ import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {reserveModelBudget,modelLimits,ModelLimits} from '@/services/video/budget/model-budget';
 import {directorProfile,runDirector,runDirectorStream,applyUnderstandingPatch,GuidanceDecisionSchema,guardGuidance,SourceMessage,directorContext,type DirectorProjectContext} from '@/mastra/video/director';
 import {guardImageUnderstanding,ImageAnalysisRecordSchema} from '@/contracts/video/image-understanding';
-import {readNarrationJson} from '@/services/video/audio/narration-package';
+import {readVerifiedJson} from '@/services/video/storage/read-json';
 import {TextAnalysis} from '@/services/video/assets/analysis';
 
 import {withAccountedModel} from '@/services/video/budget/model-call';
 import {deferDirectorFeedback,applyPendingDirectorFeedback,pendingFeedbackMessageIds,resolvePendingDirectorFeedback} from '@/services/video/revisions/pending-feedback';
 import {canonicalHash} from '@/services/video/domain/hash';
-import {readAnyResultManifest as readResultManifest} from '@/services/video/results/publish';
-import {prepareMusicChangeDraft,revalidateMusicChangeDraft} from '@/services/video/revisions/music-change-plan';
+import {readAnyResultManifest as readResultManifest} from '@/services/video/results/publish-film';
 interface FrozenDirectorInput{control:ProjectControl;messages:ArchivedMessage[];understanding:Understanding;context:SourceMessage[];classificationContext?:Pick<DirectorProjectContext,'currentTurnUserMessageIds'|'currentResult'|'scriptDraft'|'pendingFeedbackMessageIds'>}
 interface DirectorInputRecord{schemaVersion:5;input:FrozenDirectorInput;sha256:string}
 function verifyInput(record:DirectorInputRecord,projectId:string,operationId:string){
@@ -39,8 +38,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
  };
  if((await store.readFresh<ProjectControl>(`${p}/control`)).value.deletedAt){await finishDeleted();return}
  const projects=new ProjectStore(store),candidateId=randomUUID();
- const planId=randomUUID();
- const op=await updateJson(store,opKey,(value:{assistantMessageId?:string;musicChangePlanId?:string;streamEpoch:number;status:string})=>({...value,assistantMessageId:value.assistantMessageId||candidateId,musicChangePlanId:value.musicChangePlanId||planId}));
+ const op=await updateJson(store,opKey,(value:{assistantMessageId?:string;streamEpoch:number;status:string})=>({...value,assistantMessageId:value.assistantMessageId||candidateId}));
  let control=(await store.readFresh<ProjectControl>(`${p}/control`)).value;
  let messages=await projects.messages(control),understanding=(await store.readFresh<Understanding>(control.understandingRef.key)).value;
  const assistantId=op.assistantMessageId!,ordinal=control.ordinalReservations[operationId]?.assistant||control.nextOrdinal;
@@ -86,11 +84,11 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    ...(message.role==='user'&&message.target!==undefined?{target:message.target}:{}),
    ...(message.attachmentIds?.length?{attachments:await Promise.all(message.attachmentIds.map(async assetId=>{
     const asset=control.assets.find(item=>item.id===assetId);
-    if(!asset||asset.status!=='ready'||!['text/markdown','application/pdf','audio/wav','audio/mpeg','audio/mp4','image/png','image/jpeg','image/webp'].includes(asset.declaredMime)||!asset.analysisRef)throw Error('SOURCE_INVALID');
-    const analysis:TextAnalysis=asset.declaredMime.startsWith('image/')?ImageAnalysisRecordSchema.parse(await readNarrationJson(store,asset.analysisRef,`${p}/assets/${assetId}/analysis/`)):(await store.readFresh<TextAnalysis>(asset.analysisRef.key)).value;
-    if(analysis.assetId!==assetId||analysis.sha256!==asset.sha256||analysis.mime!==asset.declaredMime||analysis.trust!=='untrusted_material'||(asset.declaredMime==='application/pdf'&&!analysis.pages?.length)||(asset.declaredMime.startsWith('audio/')&&(!analysis.segments?.length||!analysis.language)))throw Error('SOURCE_INVALID');
+    if(!asset||asset.status!=='ready'||!['text/markdown','application/pdf','image/png','image/jpeg','image/webp'].includes(asset.declaredMime)||!asset.analysisRef)throw Error('SOURCE_INVALID');
+    const analysis:TextAnalysis=asset.declaredMime.startsWith('image/')?ImageAnalysisRecordSchema.parse(await readVerifiedJson(store,asset.analysisRef,`${p}/assets/${assetId}/analysis/`)):(await store.readFresh<TextAnalysis>(asset.analysisRef.key)).value;
+    if(analysis.assetId!==assetId||analysis.sha256!==asset.sha256||analysis.mime!==asset.declaredMime||analysis.trust!=='untrusted_material'||(asset.declaredMime==='application/pdf'&&!analysis.pages?.length))throw Error('SOURCE_INVALID');
     const imageAnalysis=asset.declaredMime.startsWith('image/')?guardImageUnderstanding(analysis.imageAnalysis,{assetId,mime:asset.declaredMime as 'image/png'|'image/jpeg'|'image/webp',sha256:asset.sha256!,bytes:asset.bytes!,intendedUse:asset.intendedUse}):undefined;
-    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(imageAnalysis?{imageAnalysis}:{}),...(analysis.pages?{pages:analysis.pages}:{}),...(analysis.segments?{segments:analysis.segments}:{})};
+    return{assetId,filename:asset.filename,mime:asset.declaredMime,sha256:analysis.sha256,text:analysis.text,...(imageAnalysis?{imageAnalysis}:{}),...(analysis.pages?{pages:analysis.pages}:{})};
    }))}:{}),
   })));
   let classificationContext=savedInput?.classificationContext;
@@ -122,26 +120,12 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    await updateJson(store,`${p}/control`,(value:ProjectControl)=>({...value,activeConversation:value.activeConversation===operationId?null:value.activeConversation,controlVersion:value.controlVersion+1}));
    await emit('message.stopped',{messageId:assistantId,contentVersion:1});await emit('operation.terminal',{status:'cancelled',retryable:false});return;
   }
-  if(decision.musicChange){
-   const latest=await projects.access(control.ownerKeyHash,projectId);
-   if(latest.consentEpoch!==control.consentEpoch||latest.briefVersion!==control.briefVersion||latest.currentResultId!==control.currentResultId||latest.activeProduction)throw Error('CHANGE_STALE');
-   const root=options.root??process.env.VIDEO_DATA_DIR;if(!root)throw Error('CONFIGURATION_REQUIRED');
-   const change=decision.musicChange,original=messages.find(message=>message.id===change.sourceMessageId)!;
-   const ref=await prepareMusicChangeDraft(projects,control.ownerKeyHash,projectId,{schemaVersion:5,changePlanId:op.musicChangePlanId,sourceMessageId:change.sourceMessageId,targetArtifactId:change.targetArtifactId,revisionId:change.revisionId,operations:[{field:'musicGainDb',value:change.musicGainDb,valueMode:change.gainMode}],factsChanged:false,reason:change.reason},root);
-   const draft=await revalidateMusicChangeDraft(projects,control.ownerKeyHash,projectId,ref,root);
-   if(draft.sourceMessageSha256!==canonicalHash(original)||draft.baseline.consentEpoch!==control.consentEpoch||draft.baseline.briefVersion!==control.briefVersion||draft.baseline.resultId!==control.currentResultId)throw Error('CHANGE_STALE');
-   await updateJson(store,opKey,(value:typeof op&{musicChangeDraftRef?:typeof ref})=>{
-    if(value.status!=='running')throw Error('CHANGE_STALE');
-    if(value.musicChangeDraftRef&&canonicalHash(value.musicChangeDraftRef)!==canonicalHash(ref))throw Error('CHANGE_STALE');return{...value,musicChangeDraftRef:ref};
-   });
-  }
   if(!decision.reply.startsWith(streamedText))throw Error('DIRECTOR_STREAM_CHANGED');
   if(decision.reply.length>streamedText.length)await onDelta(decision.reply.slice(streamedText.length));
   const message:ArchivedMessage={id:assistantId,ordinal,role:'assistant',text:decision.reply,...(Object.keys(guidanceUI(decision,decision.reply)).length?{ui:guidanceUI(decision,decision.reply)}:{}),status:'completed',contentVersion:1,operationId};
   const messageRef=await projects.index.immutable(`${p}/messages/${assistantId}/1`,message);
   await updateJson(store,`${p}/control`,async(value:ProjectControl)=>{
    if(value.deletedAt||(value as ProjectControl&{replyCancelOperationIds?:string[]}).replyCancelOperationIds?.includes(operationId)||value.activeConversation!==operationId)throw Error('ACCESS_NOT_FOUND');
-   if(decision.musicChange&&(value.consentEpoch!==control.consentEpoch||value.briefVersion!==control.briefVersion||value.currentResultId!==control.currentResultId||value.activeProduction))throw Error('CHANGE_STALE');
    const latest=(await store.readFresh<Understanding>(value.understandingRef.key)).value;
    if(decision.understandingPatch&&!control.activeProduction&&value.consentEpoch!==control.consentEpoch)throw Error('CHANGE_STALE');
    const deferred=Boolean((decision.understandingPatch||decision.effect==='pending_followup')&&(control.activeProduction||value.activeProduction));
@@ -150,7 +134,7 @@ export async function runDirectorOperation(store:AtomicStore,events:LocalEventLo
    if(deferred&&decision.understandingPatch)applyUnderstandingPatch(understanding,decision.understandingPatch,context);
    const next=decision.understandingPatch&&!deferred?applyUnderstandingPatch(latest,decision.understandingPatch,context):latest;
    const pendingFeedbackIndexRef=deferred?await deferDirectorFeedback(projects,value,control.activeProduction?control:{...control,activeProduction:value.activeProduction},operationId,messages,decision.understandingPatch):decision.understandingPatch&&next.briefVersion>latest.briefVersion?await resolvePendingDirectorFeedback(projects,value,decision.understandingPatch,next.briefVersion):value.pendingFeedbackIndexRef;
-   return{...value,...(pendingFeedbackIndexRef?{pendingFeedbackIndexRef}:{}),controlVersion:value.controlVersion+1,briefVersion:next.briefVersion,previewState:next.briefVersion!==value.briefVersion&&value.previewState==='ready'?'stale':value.previewState,understandingRef:deferred?value.understandingRef:await projects.index.immutable(`${p}/understanding/${next.briefVersion}`,next),messagesIndexRef:await projects.index.append(`${p}/indexes/messages`,value.messagesIndexRef,{id:assistantId,ordinal,ref:messageRef}),activeConversation:null};
+   return{...value,...(pendingFeedbackIndexRef?{pendingFeedbackIndexRef}:{}),controlVersion:value.controlVersion+1,briefVersion:next.briefVersion,understandingRef:deferred?value.understandingRef:await projects.index.immutable(`${p}/understanding/${next.briefVersion}`,next),messagesIndexRef:await projects.index.append(`${p}/indexes/messages`,value.messagesIndexRef,{id:assistantId,ordinal,ref:messageRef}),activeConversation:null};
   });
   await applyPendingDirectorFeedback(projects,projectId).catch(()=>null);
   // Script generation is a separate recoverable job. Queue failures must never

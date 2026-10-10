@@ -1,43 +1,43 @@
-import{it,expect}from'vitest';
-import{mkdtemp,mkdir,readFile,rm,writeFile}from'node:fs/promises';
-import{tmpdir}from'node:os';
-import{join}from'node:path';
-import{validateOutputPath,validateSource}from'@/services/video/media/executor';
-it.each(['/etc/passwd','../control.json','output/../../secret','output/evil\u0000.mp4','output/link.mp4'])('AT-078 rejects unsafe output %s',path=>expect(()=>validateOutputPath({path,symlink:path.endsWith('link.mp4'),hardlinks:1},'output')).toThrow('OUTPUT_INVALID'));
-it('valid output still needs independent probing; source cannot certify its own QA',()=>{
- expect(validateOutputPath({path:'output/film.mp4',symlink:false,hardlinks:1},'output')).toBe('output/film.mp4');
- expect(()=>validateSource('window.READY=true;window.render=(t)=>{};fetch("https://example.com")')).toThrow('SOURCE_INVALID');
+import {it,expect} from 'vitest';
+import {mkdtemp,mkdir,rm,writeFile,symlink,link} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {randomUUID} from 'node:crypto';
+import {validateSource} from '@/services/video/media/local/source';
+import {fileIdentity} from '@/services/video/media/local/files';
+import {validateRenderJob,requireRuntimePath} from '@/services/video/media/local/renderer';
+import {computeStageKey} from '@/services/video/media/runtime';
+import {readVideoCache,videoManifest} from '@/services/video/media/local/cache';
+import {canonicalHash} from '@/services/video/domain/hash';
+import {encoderPolicy} from '@/services/video/media/local/arguments';
+import type {RuntimeVersion} from '@/services/video/media/runtime-version';
+
+it.each(['/etc/passwd','../control.json','/safe/output/../../secret'])('AT-078 rejects output outside the runtime: %s',path=>expect(()=>requireRuntimePath('/safe/output',path)).toThrow('MEDIA_PATH_INVALID'));
+it('checks actual files, rejecting symbolic and hard links instead of trusting claimed metadata',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-file-'));
+ try{const path=join(root,'clip.mp4');await writeFile(path,'verified bytes');const identity=await fileIdentity(path);expect(identity.bytes).toBe(14);await symlink(path,join(root,'link.mp4'));await expect(fileIdentity(join(root,'link.mp4'))).rejects.toThrow('MEDIA_PATH_INVALID');await link(path,join(root,'hard.mp4'));await expect(fileIdentity(path)).rejects.toThrow('MEDIA_FILE_INVALID')}
+ finally{await rm(root,{recursive:true,force:true})}
+});
+it('source cannot access networking or certify its own QA',()=>{
+ expect(()=>validateSource('window.READY=true;window.render=()=>{};fetch("https://example.com")')).toThrow('SOURCE_INVALID');
  expect(()=>validateSource('process.env.MODEL_API_KEY')).toThrow('SOURCE_INVALID');
 });
-it('self-hosted Docker render uses a pinned image, no network, no secrets, and bounded resources',async()=>{
- const {dockerConfiguration,dockerArguments}=await import('@/services/video/media/docker-executor');
- const config=dockerConfiguration({VIDEO_MEDIA_IMAGE_REF:'sha256:'+'a'.repeat(64),VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'600'},'operation-one');
- const args=dockerArguments(config,'/persistent/stage','c'.repeat(64));
- expect(args).toContain('--network');expect(args).toContain('none');expect(args).toContain('--read-only');expect(args).toContain('--cap-drop');expect(args).toContain('ALL');expect(args).toContain('--pids-limit');
- expect(args).toContain('VIDEO_RENDER_TIMEOUT_SECONDS=600');expect(args.filter(value=>value.includes('readonly'))).toHaveLength(2);
- expect(args.join(' ')).not.toContain(',rw');
- expect(args.join(' ')).not.toMatch(/MODEL_API_KEY|VERCEL|BLOB_READ_WRITE_TOKEN/);
- expect(()=>dockerConfiguration({VIDEO_MEDIA_IMAGE_REF:'latest'},'op')).toThrow('CAPABILITY_UNAVAILABLE');
- expect(()=>dockerConfiguration({VIDEO_MEDIA_IMAGE_REF:'sha256:'+'a'.repeat(64),VIDEO_MEDIA_RUNTIME_DIGEST:'b'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'600'},'op')).toThrow('CAPABILITY_UNAVAILABLE');
+it('rejects oversized frame dimensions before starting a renderer',()=>{
+ const input={projectId:randomUUID(),operationId:randomUUID(),attemptId:randomUUID(),bundleHash:'b'.repeat(64),runtimeDigest:'c'.repeat(64),sourceHtml:'<script>window.READY=true;window.render=()=>{}</script>',logicalWidth:100000,logicalHeight:180,outputWidth:320,outputHeight:180,fps:24 as const,startFrame:0,endFrame:24,seed:1,fence:1};
+ expect(()=>validateRenderJob({...input,stageKey:computeStageKey(input)},input.runtimeDigest)).toThrow('RENDER_JOB_INVALID');
 });
-it('rejects oversized frame dimensions before starting Docker',async()=>{
- const {DockerExecutor}=await import('@/services/video/media/docker-executor');
- const sourceHtml='<script>window.READY=true;window.render=()=>{}</script>';
- await expect(new DockerExecutor('/tmp').submit({projectId:'p',operationId:'o',attemptId:'a',stageKey:'a'.repeat(64),bundleHash:'b'.repeat(64),runtimeDigest:'c'.repeat(64),sourceHtml,logicalWidth:100000,logicalHeight:180,outputWidth:320,outputHeight:180,fps:24,startFrame:0,endFrame:24,seed:1,fence:1})).rejects.toThrow('RENDER_JOB_INVALID');
-});
-it('stage key commits the source and render parameters',async()=>{
- const {computeStageKey}=await import('@/services/video/media/docker-executor');
+it('stage key commits the source and render parameters',()=>{
  const base={projectId:'p',bundleHash:'b'.repeat(64),runtimeDigest:'c'.repeat(64),sourceHtml:'<script>window.READY=true;window.render=()=>{}</script>',logicalWidth:320,logicalHeight:180,outputWidth:320,outputHeight:180,fps:24 as const,startFrame:0,endFrame:24,seed:1,fence:1};
- expect(computeStageKey(base)).toMatch(/^[a-f0-9]{64}$/);
- expect(computeStageKey({...base,sourceHtml:base.sourceHtml+' '})).not.toBe(computeStageKey(base));
- expect(computeStageKey({...base,fence:2})).not.toBe(computeStageKey(base));
+ expect(computeStageKey(base)).toMatch(/^[a-f0-9]{64}$/);expect(computeStageKey({...base,sourceHtml:base.sourceHtml+' '})).not.toBe(computeStageKey(base));expect(computeStageKey({...base,fence:2})).not.toBe(computeStageKey(base));
 });
-it('recovers a crash after the scene file was written but before the job commit',async()=>{
- const {writeStageInputs}=await import('@/services/video/media/docker-executor');
- const root=await mkdtemp(join(tmpdir(),'vb-stage-')),stage=join(root,'stage');
- try{await mkdir(stage);await writeFile(join(stage,'scene.html'),'source');
-  await writeStageInputs(stage,'source','{"job":1}');
-  expect(await readFile(join(stage,'job.json'),'utf8')).toBe('{"job":1}');
-  await expect(writeStageInputs(stage,'changed','{"job":1}')).rejects.toThrow('STAGE_UNKNOWN');
+it('cold recovery rejects incomplete publication, altered bytes and a mismatched runtime',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'vb-cache-')),key='a'.repeat(64),stage=join(root,key);
+ const version:RuntimeVersion={schemaVersion:1,playwright:'test',chromium:'test',ffmpeg:'test',fonts:'b'.repeat(64),renderer:'c'.repeat(64),encoder:{...encoderPolicy,frameFormat:'png'},platform:'linux',architecture:'x64',cpu:'fixture',sandbox:true},digest=canonicalHash(version),inputHash='d'.repeat(64);
+ try{
+  expect(await readVideoCache(stage,key,digest,inputHash)).toBeNull();await mkdir(stage);await writeFile(join(stage,'final.mp4'),'complete-media');await expect(readVideoCache(stage,key,digest,inputHash)).rejects.toThrow('MEDIA_CACHE_INVALID');
+  const result={...await fileIdentity(join(stage,'final.mp4')),key,kind:'final' as const,runtimeDigest:digest,outputPath:join(stage,'final.mp4'),manifestPath:join(stage,'manifest.json'),width:320,height:180,durationSec:1,fps:24,frameCount:24,audio:true,videoCodec:'h264',pixelFormat:'yuv420p',colorSpace:'bt709',tags:{}};
+  await writeFile(result.manifestPath,JSON.stringify(videoManifest(key,version,result,inputHash)));expect(await readVideoCache(stage,key,digest,inputHash)).toEqual(result);
+  await expect(readVideoCache(stage,key,'f'.repeat(64),inputHash)).rejects.toThrow('MEDIA_CACHE_INVALID');
+  await writeFile(result.outputPath,'corrupt-media');await expect(readVideoCache(stage,key,digest,inputHash)).rejects.toThrow('MEDIA_HASH_MISMATCH');
  }finally{await rm(root,{recursive:true,force:true})}
 });

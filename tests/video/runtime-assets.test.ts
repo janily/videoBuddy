@@ -4,7 +4,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
 import {prepareRuntimeAssets,runtimeAssetUrl,verifyRuntimeAssets} from '@/services/video/media/runtime-assets';
-import {computeStageKey} from '@/services/video/media/docker-executor';
+import {computeStageKey} from '@/services/video/media/runtime';
 const png=Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489','hex');
 const digest=(bytes:Uint8Array)=>createHash('sha256').update(bytes).digest('hex');
 async function fixture(){const root=await mkdtemp(join(tmpdir(),'vb-assets-')),projectId=randomUUID(),id=randomUUID(),stage=join(root,'media','a'.repeat(64));await mkdir(join(root,'assets',projectId),{recursive:true});await mkdir(stage,{recursive:true});await writeFile(join(root,'assets',projectId,id+'.bin'),png);return{root,projectId,id,stage,asset:{id,mime:'image/png' as const,sha256:digest(png),bytes:png.length}}}
@@ -20,8 +20,4 @@ it('rejects symlinked input directories without writing through them',async()=>{
 it('binds asset identities and bytes to render stage keys while retaining legacy empty jobs',()=>{
  const base={projectId:randomUUID(),bundleHash:'b'.repeat(64),runtimeDigest:'c'.repeat(64),sourceHtml:'scene',logicalWidth:320,logicalHeight:180,outputWidth:320,outputHeight:180,fps:24 as const,startFrame:0,endFrame:24,seed:1,fence:1},asset={id:randomUUID(),mime:'image/png' as const,sha256:digest(png),bytes:png.length};
  expect(computeStageKey({...base,assets:[]})).toBe(computeStageKey(base));expect(computeStageKey({...base,assets:[asset]})).not.toBe(computeStageKey(base));expect(computeStageKey({...base,assets:[{...asset,sha256:'d'.repeat(64)}]})).not.toBe(computeStageKey({...base,assets:[asset]}));
-});
-it('mounts selected immutable resources read only without changing legacy mounts',async()=>{
- const {dockerArguments,dockerConfiguration}=await import('@/services/video/media/docker-executor'),config=dockerConfiguration({VIDEO_MEDIA_IMAGE_REF:'sha256:'+'a'.repeat(64),VIDEO_MEDIA_RUNTIME_DIGEST:'a'.repeat(64),VIDEO_MEDIA_TIMEOUT_SECONDS:'600'},'op');
- expect(dockerArguments(config,'/data/media/'+'b'.repeat(64),'b'.repeat(64),true)).toContain('type=bind,src=/data/media/'+'b'.repeat(64)+'/assets,dst=/work/'+'b'.repeat(64)+'/assets,readonly');
 });

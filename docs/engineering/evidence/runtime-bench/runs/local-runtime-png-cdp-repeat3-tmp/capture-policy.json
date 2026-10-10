@@ -1,0 +1,24 @@
+{
+  "implementationBase": "dfe5177",
+  "captureChangeCommit": "1153af8",
+  "benchmarkDependencyCherryPick": "7038581",
+  "runtimeDigest": "0cb8c433d29a87dc095276b8b3caa41a0d91eefd0b00706dce66de7ce15c8dcb",
+  "rendererHash": "f3a4a47f41417174ce0b5e7b300de8e5c3249ecfd3d90ddf284cf83eae40620a",
+  "capturePolicy": {
+    "cdpCommand": "Page.captureScreenshot",
+    "options": {
+      "format": "png",
+      "optimizeForSpeed": true,
+      "captureBeyondViewport": false,
+      "fromSurface": true
+    },
+    "fallback": "Existing Playwright screenshot with animations disabled when animations, input/textarea/contenteditable, or shadow roots are present; JPEG policy unchanged."
+  },
+  "policyEvidence": "Source-inspected implementation policy. No fast-path invocation counter is exposed by the runtime. The fixed Canvas fixture has no animations, editable elements, or shadow roots.",
+  "encodePolicyChanged": false,
+  "qaRemoved": false,
+  "allFinalHashesMatchSerialReference": true,
+  "serialReferenceFinalSha256": "de2f0806399ee4b2b2741a49374b56511ab10f0b9f5c36714dc7e2b15767dc96",
+  "productionSandboxVerified": false,
+  "twoVcpuPerformanceVerified": false
+}
