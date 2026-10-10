@@ -26,10 +26,10 @@ test('a draft survives reload and mobile tab switches',async({page})=>{
  await page.getByRole('button',{name:/^画布/}).click();await page.getByRole('button',{name:'聊想法'}).click();await expect(input).toHaveValue('这段草稿不能丢');
  await page.reload();await expect(page.getByRole('textbox')).toHaveValue('这段草稿不能丢');
 });
-test('inline style browsing keeps the creative draft without a modal',async({page})=>{
- await page.goto('/video');await page.getByRole('textbox').fill('保留我的想法');const trigger=page.getByRole('button',{name:'看看全部画风'});await trigger.click();
+test('secondary style library keeps the creative draft without a modal',async({page})=>{
+ await page.goto('/video');await page.getByRole('textbox').fill('保留我的想法');const trigger=page.getByRole('button',{name:'逛逛全部画风 ↗'});await trigger.click();
  await expect(page.locator('dialog')).toHaveCount(0);await page.getByRole('textbox',{name:'搜索画风'}).fill('水墨');await expect(page.getByRole('button',{name:/中国水墨/})).toBeVisible();
- await trigger.click();await expect(page.getByRole('textbox',{name:'说说想法，或发点资料'})).toHaveValue('保留我的想法');
+ await page.getByRole('button',{name:'← 返回画布'}).click();await expect(page.getByRole('textbox',{name:'说说想法，或发点资料'})).toHaveValue('保留我的想法');
 });
 test('recent projects list uses only server-authorized project summaries',async({page})=>{
  await page.addInitScript(id=>localStorage.setItem('vb-recent-project-ids',JSON.stringify([id])),projectId);

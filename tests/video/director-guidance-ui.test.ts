@@ -42,3 +42,7 @@ it('derives readiness and delegation from current user context without executing
  expect(directorContext({...understanding,audience:'家人'},[])).toMatchObject({guidance:{brief:'enough',deferToAssistant:false}});
  expect(directorContext(understanding,[])).toMatchObject({guidance:{brief:'partial'}});
 });
+it('links the complete style library through the existing canvas reference protocol',()=>{
+ const decision=GuidanceDecisionSchema.parse({...base,reply:'都不太对的话，看全部画风。',canvasRefs:[{text:'看全部画风',target:'style-library'}]});
+ guardGuidance(decision,[],false);expect(decision.canvasRefs).toEqual([{text:'看全部画风',target:'style-library'}]);
+});

@@ -1,0 +1,15 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>给生活留一杯时间</title><style>html,body{margin:0;width:640px;height:360px;overflow:hidden;background:#f8f5ed}svg{display:block;width:640px;height:360px;font-family:'Noto Sans SC','Noto Sans SC',sans-serif}text{font-kerning:normal}</style></head><body><svg viewBox="0 0 640 360" role="img" aria-label="给生活留一杯时间"><defs>
+ <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)"><path d="M0 0L0 6" fill="none" stroke="#313d39" stroke-width="1.3" /></pattern>
+ <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="#313d39" /></pattern>
+ <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#313d39" stroke-width="0.5" opacity=".15"/></pattern>
+ <filter id="soft"><feGaussianBlur stdDeviation="9"/></filter>
+ <filter id="glow"><feGaussianBlur stdDeviation="3"/></filter>
+ <filter id="shadow" x="-30%" y="-30%" width="180%" height="180%"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-opacity=".24"/></filter>
+ <linearGradient id="metal"><stop stop-color="#866c3e"/><stop offset=".4" stop-color="#f7e6ad"/><stop offset=".6" stop-color="#ba965a"/><stop offset=".82" stop-color="#ffeabc"/><stop offset="1" stop-color="#8e7449"/></linearGradient>
+ <linearGradient id="glass"><stop stop-color="#b3e5ff" stop-opacity=".45"/><stop offset=".22" stop-color="#70add2" stop-opacity=".03"/><stop offset=".7" stop-color="#2b365a" stop-opacity=".05"/><stop offset="1" stop-color="#b0edf4" stop-opacity=".5"/></linearGradient>
+ <radialGradient id="light"><stop stop-color="#bb785a" stop-opacity=".6"/><stop offset="1" stop-color="#f8f5ed" stop-opacity="0"/></radialGradient>
+ <clipPath id="cupClip"><path d="M-70 -43 L-57 43 Q-52 68 0 68 Q52 68 57 43 L70 -43Z" fill="white" stroke="none" stroke-width="1" /></clipPath>
+ </defs><rect x="0" y="0" width="640" height="360" fill="#f8f5ed" /><text x="42" y="74" font-size="26" fill="#313d39" font-weight="600" >给生活留一杯时间</text><text x="42" y="100" font-size="10" fill="#313d39" letter-spacing="3" opacity=".7">COFFEE BREAK</text><path d="M36 276C130 279 205 277 288 277C349 278 523 306 531 273C536 250 325 245 320 272C316 291 511 302 514 272C465 283 365 283 367 255L354 171C354 148 502 144 509 169C510 193 356 195 354 171C355 151 508 153 509 174L497 250C495 270 373 274 367 255C504 278 488 184 508 185C575 167 556 240 501 230C444 209 464 152 446 134C419 107 467 97 446 76" fill="none" stroke="#313d39" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg><script>
+window.render=function(t){const steam=document.getElementById('steam');if(steam){steam.style.transform='translateY('+(-Math.sin(t*2*Math.PI/3)*2).toFixed(4)+'px)';steam.style.opacity=String(.8+Math.cos(t*2*Math.PI/3)*.1)}};
+Promise.all([document.fonts.load('32px "Noto Sans SC"'),document.fonts.load('32px "Noto Sans SC"')]).then(function(){window.render(1.5);window.READY=true});
+</script></body></html>

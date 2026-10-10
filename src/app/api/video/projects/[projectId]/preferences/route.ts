@@ -13,7 +13,7 @@ export async function POST(request:Request,{params}:{params:Promise<{projectId:s
   await scheduleScriptDraft(projects,new LocalOperationQueue(projects.store,process.env.VIDEO_DATA_DIR!),projectId).catch(()=>null);
   return json(await projects.view(owner,projectId));
  }catch(error){
-  if(error instanceof CanvasPreferencesBusy)return json({error:{code:'BUSY',message:error.lane==='production'?'视频正在生成，这次设置尚未保存。请等生成结束后，再调整下一版的时长或比例。':'助手正在回复，这次设置尚未保存。请等回复结束后再调整。',retryable:true,requestId:crypto.randomUUID()}},409);
+  if(error instanceof CanvasPreferencesBusy)return json({error:{code:'BUSY',message:error.lane==='production'?'视频正在生成，这次设置尚未保存。请等生成结束后，再调整下一版的画风、时长或比例。':'助手正在回复，这次设置尚未保存。请等回复结束后再调整。',retryable:true,requestId:crypto.randomUUID()}},409);
   return errorResponse(error);
  }
 }
