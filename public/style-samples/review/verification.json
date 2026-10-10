@@ -1,0 +1,51 @@
+{
+  "checkedOn": "2026-10-10",
+  "samples": 43,
+  "format": "progressive JPEG",
+  "width": 640,
+  "height": 360,
+  "minBytes": 15729,
+  "maxBytes": 45905,
+  "totalBytes": 1160441,
+  "byteLimit": 60000,
+  "jpegQuality": 88,
+  "checks": {
+    "formatDimensionsProgressiveAndSize": 43,
+    "manifestSourceAndPosterHashes": 43,
+    "stylePackRuleHashes": 43,
+    "coldRenderExactSourceMatches": 43,
+    "coldRenderExactPosterMatches": 43
+  },
+  "runtimeDigest": "0cb8c433d29a87dc095276b8b3caa41a0d91eefd0b00706dce66de7ce15c8dcb",
+  "runtimeVersion": {
+    "schemaVersion": 1,
+    "playwright": "1.63.0",
+    "chromium": "153.0.8010.0",
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+    "fonts": "4d7a888107c342cce1ac628551acc8bfd81c46eee8b2d7d16f664d3c160092c6",
+    "renderer": "f3a4a47f41417174ce0b5e7b300de8e5c3249ecfd3d90ddf284cf83eae40620a",
+    "encoder": {
+      "codec": "libx264",
+      "preset": "faster",
+      "crf": 20,
+      "pixelFormat": "yuv420p",
+      "color": "bt709",
+      "jpegQuality": 92,
+      "version": "local-video-v1",
+      "frameFormat": "png"
+    },
+    "platform": "linux",
+    "architecture": "x64",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "sandbox": false
+  },
+  "fontLockSha256": "4d7a888107c342cce1ac628551acc8bfd81c46eee8b2d7d16f664d3c160092c6",
+  "productionSandboxVerified": false,
+  "modelsUsed": [],
+  "videoFiles": 0,
+  "visualReview": [
+    "contact-sheet.jpg (all 43)",
+    "representatives.jpg (9 full-size)"
+  ],
+  "scope": "Same-environment cold rendering reproducibility; static style studies, not model generation or full motion validation."
+}

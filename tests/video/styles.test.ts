@@ -15,3 +15,13 @@ it('AT-026 style rules available before Treatment, demo cannot be read',async()=
 it('untested profiles remain unavailable rather than falsely advertised',()=>{
  for(const s of listStyles()){expect(s.supportedProfiles).toEqual([]);expect(s.deliveryStatus).toBe('not_run')}
 });
+
+import {searchStyleFits,styleFits} from '@/services/video/styles/recommendations';
+it('searches uses, mood, keywords and bilingual identities with a distinct sample palette for all styles',()=>{
+ expect(searchStyleFits('国风').map(style=>style.id)).toContain('ink-wash');
+ expect(searchStyleFits('黑客').map(style=>style.id)).toContain('ascii-crt');
+ expect(searchStyleFits('Watercolor').map(style=>style.id)).toContain('watercolor');
+ expect(searchStyleFits('荒诞').map(style=>style.id)).toContain('scifi-toon');
+ expect(searchStyleFits('没有这种风格')).toEqual([]);
+ for(const style of listStyles())expect(styleFits[style.id].swatch).toHaveLength(3);
+});

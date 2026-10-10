@@ -1,3 +1,4 @@
+import {getStyle,listStyles} from '@/services/video/styles/registry';
 import {randomUUID} from 'node:crypto';
 import {z} from 'zod';
 import {UpdatePreferencesRequestSchema} from '@/contracts/video/commands';
@@ -10,7 +11,7 @@ import {assertLiveProject,userActivity} from './user-activity';
 
 /** The canvas intentionally offers a smaller choice than the general brief contract. */
 export const CanvasPreferencesRequestSchema=UpdatePreferencesRequestSchema.extend({
- patch:z.strictObject({durationSec:z.union([z.literal(20),z.literal(25),z.literal(30)]).optional(),aspect:z.enum(['9:16','16:9']).optional()}).refine(p=>p.durationSec!==undefined||p.aspect!==undefined),
+ patch:z.strictObject({durationSec:z.union([z.literal(20),z.literal(25),z.literal(30)]).optional(),aspect:z.enum(['9:16','16:9']).optional(),styleSlug:z.string().refine(id=>listStyles().some(style=>style.id===id)).nullable().optional()}).refine(p=>p.durationSec!==undefined||p.aspect!==undefined||p.styleSlug!==undefined),
 });
 export type CanvasPreferencesRequest=z.infer<typeof CanvasPreferencesRequestSchema>;
 export class CanvasPreferencesBusy extends Error{
@@ -38,10 +39,10 @@ export async function updateCanvasPreferences(projects:ProjectStore,owner:string
   if(c.activeConversation)throw new CanvasPreferencesBusy('conversation');
   const understanding=UnderstandingSchema.parse((await projects.store.readFresh(c.understandingRef.key)).value);
   if(understanding.briefVersion!==c.briefVersion||canonicalHash(understanding)!==c.understandingRef.sha256)throw Error('BRIEF_CONFLICT');
-  const changed=(input.patch.durationSec!==undefined&&input.patch.durationSec!==understanding.preferences.durationSec)||(input.patch.aspect!==undefined&&input.patch.aspect!==understanding.preferences.aspect);
+  const changed=(input.patch.durationSec!==undefined&&input.patch.durationSec!==understanding.preferences.durationSec)||(input.patch.aspect!==undefined&&input.patch.aspect!==understanding.preferences.aspect)||(input.patch.styleSlug!==undefined&&input.patch.styleSlug!==understanding.preferences.styleSlug);
   if(c.controlVersion>=Number.MAX_SAFE_INTEGER||c.nextOrdinal>Number.MAX_SAFE_INTEGER-2||changed&&c.briefVersion>=Number.MAX_SAFE_INTEGER)throw Error('CONTROL_SIZE_LIMIT');
   const briefVersion=c.briefVersion+(changed?1:0);
-  const parts=[...(input.patch.durationSec===undefined?[]:[`时长改成 ${input.patch.durationSec} 秒`]),...(input.patch.aspect===undefined?[]:[`比例改成${input.patch.aspect==='9:16'?'竖屏（9:16）':'横屏（16:9）'}`])];
+  const parts=[...(input.patch.styleSlug===undefined?[]:[input.patch.styleSlug===null?'撤销画风选择':`画风用「${getStyle(input.patch.styleSlug).nameZh}」`]),...(input.patch.durationSec===undefined?[]:[`时长改成 ${input.patch.durationSec} 秒`]),...(input.patch.aspect===undefined?[]:[`比例改成${input.patch.aspect==='9:16'?'竖屏（9:16）':'横屏（16:9）'}`])];
   const user:ArchivedMessage={id:intent.userMessageId,role:'user',origin:'canvas',ordinal:c.nextOrdinal,text:parts.join('，'),attachmentIds:[],clientMessageId:input.clientCommandId,status:'completed',contentVersion:1};
   const assistant:ArchivedMessage={id:intent.assistantMessageId,role:'assistant',ordinal:c.nextOrdinal+1,text:changed?`已更新：${parts.join('，')}。准备好后，点击画布上的“生成视频”。`:'已经是这个设置，想法和已有内容保持不变。',status:'completed',contentVersion:1};
   let messagesIndexRef=c.messagesIndexRef;

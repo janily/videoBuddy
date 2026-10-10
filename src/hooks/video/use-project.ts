@@ -67,7 +67,7 @@ export function useProject(initialProjectId?:string){
   const id=idRef.current;if(!id)return;
   try{const value=FeedbackSelectionSchema.parse({version:1,projectId:id,target:{artifactId,revisionId,sourceTimeMs:null}});localStorage.setItem(feedbackKey(id),JSON.stringify(value));window.dispatchEvent(new Event('vb-feedback'))}catch{setError('无法保存反馈对象，请检查浏览器存储后重试。')}
  }
- function setDraft(text:string){if(selection===undefined&&feedback.target)selectFeedback(feedback.target.artifactId,feedback.target.revisionId);saveCurrentDraft(text)}
+ function setDraft(text:string){if(selection===undefined&&feedback.target)selectFeedback(feedback.target.artifactId,feedback.target.revisionId);if(idRef.current&&idRef.current!==projectId)saveDraft(draftKey(idRef.current),text);saveCurrentDraft(text)}
  const attachmentSnapshot=useCallback(()=>projectId?localStorage.getItem(attachmentKey(projectId))||'[]':'[]',[projectId]);
  const attachments=parseAttachments(useSyncExternalStore(subscribeAttachments,attachmentSnapshot,()=> '[]'));
  const readProject=useCallback(async(minimumControlVersion=0)=>{
@@ -187,16 +187,22 @@ export function useProject(initialProjectId?:string){
   catch(e){setError(e instanceof Error?e.message:'暂时无法更新，已有视频仍可观看。')}
   finally{quickBusy.current=false}
  }
+ const preferencesReceipt=useRef<{projectId:string;briefVersion:number;styleSlug:string|null}|null>(null);
  const settingsBusy=useRef(false),settingsIntent=useRef<{signature:string;commandId:string}|null>(null);
- async function setPreferences(patch:{durationSec?:number;aspect?:'16:9'|'9:16'}):Promise<boolean>{
-  if(!projectId||!view||settingsBusy.current)return false;
-  const signature=JSON.stringify({patch,briefVersion:view.briefVersion});
-  if(settingsIntent.current?.signature!==signature)settingsIntent.current={signature,commandId:crypto.randomUUID()};
+ async function setPreferences(patch:{durationSec?:number;aspect?:'16:9'|'9:16';styleSlug?:string|null},expectedBriefVersion?:number):Promise<boolean>{
+  if(settingsBusy.current)return false;
   settingsBusy.current=true;setSending(true);setError('');
-  try{const next=await api<ProjectView>(`/api/video/projects/${projectId}/preferences`,{schemaVersion:5,clientCommandId:settingsIntent.current.commandId,expectedBriefVersion:view.briefVersion,patch});setView(old=>old&&old.controlVersion>next.controlVersion?old:next);settingsIntent.current=null;return true}
-  catch(e){setError(e instanceof Error?e.message:'规格未保存，原来的设置已保留，请重试。');await refresh();return false}
+  try{
+   const id=projectId||await ensureProject();
+   const current=view||await api<ProjectView>(`/api/video/projects/${id}`);
+   const briefVersion=expectedBriefVersion??current.briefVersion,signature=JSON.stringify({patch,briefVersion});
+   if(settingsIntent.current?.signature!==signature)settingsIntent.current={signature,commandId:crypto.randomUUID()};
+   const next=await api<ProjectView>(`/api/video/projects/${id}/preferences`,{schemaVersion:5,clientCommandId:settingsIntent.current.commandId,expectedBriefVersion:briefVersion,patch});
+   preferencesReceipt.current={projectId:next.projectId,briefVersion:next.briefVersion,styleSlug:next.preferences.styleSlug};setView(old=>old&&old.controlVersion>next.controlVersion?old:next);settingsIntent.current=null;return true;
+  }catch(e){setError(e instanceof Error?e.message:'规格未保存，原来的设置已保留，请重试。');await refresh();return false}
   finally{settingsBusy.current=false;setSending(false)}
  }
+
  async function setQuickMusic(music:NonNullable<ProjectView['quick']>['music']):Promise<boolean>{
   if(!projectId||settingsBusy.current)return false;
   const signature=JSON.stringify({music});
@@ -209,5 +215,5 @@ export function useProject(initialProjectId?:string){
  async function stopProduction(){const op=view?.activeProduction;if(!projectId||!op)return;try{await api(`/api/video/projects/${projectId}/operations/${op.id}/cancel`,{schemaVersion:5,clientCommandId:crypto.randomUUID(),scope:'production'});await refresh()}catch(e){setError(e instanceof Error?e.message:'暂时无法停止，已完成的镜头会保留。')}}
  async function retryScript(){if(!projectId)return;try{await api(`/api/video/projects/${projectId}/script`,{schemaVersion:5});await refresh()}catch(e){setError(e instanceof Error?e.message:'脚本暂时没写好，想法已保留，请重试。')}}
  const messages:Array<Omit<ArchivedMessage,'status'>&{status:ArchivedMessage['status']|'streaming'}>=[...(view?.messages||[]),...stream.messages.filter(s=>!view?.messages.some(m=>m.id===s.id)).map(m=>({...m,status:m.status==='committed'?'completed' as const:m.status,role:'assistant' as const,attachmentIds:[] as string[]}))].sort((a,b)=>a.ordinal-b.ordinal);
- return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:async()=>{await send()},sendText:(text:string,origin?:'canvas')=>send(false,{text,origin}),setPreferences,setQuickMusic,stopProduction,retryScript,retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,generateVideo:()=>generateVideo(),updateQuick,generating,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection||scriptStream.connection,refresh};
+ return{projectId,view,draft,setDraft,error,setError,sending,uploading,attachments,uploadMaterial,removeAttachment,send:async()=>{await send()},sendText:(text:string,origin?:'canvas')=>send(false,{text,origin}),setPreferences,preferencesReceipt,setQuickMusic,stopProduction,retryScript,retryPendingMessage:()=>send(true),pendingMessage,feedback,selectFeedback,stopReply,generateVideo:()=>generateVideo(),updateQuick,generating,restoration,projectUpdate,productionActivity:productionStream.activity,messages,connection:stream.connection||productionStream.connection||scriptStream.connection,refresh};
 }

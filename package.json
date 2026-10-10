@@ -26,6 +26,8 @@
     "migrate:quick": "node --import tsx scripts/video/migrate-quick-only.ts",
     "bench:runtime": "node --import tsx scripts/video/bench-runtime.ts",
     "postinstall": "node scripts/runtime/prepare-fonts.mjs",
+    "samples:build": "node --import tsx scripts/video/build-style-samples.ts",
+    "samples:verify": "node --import tsx scripts/video/build-style-samples.ts --verify-only",
     "fonts:prepare": "node scripts/runtime/prepare-fonts.mjs"
   },
   "dependencies": {

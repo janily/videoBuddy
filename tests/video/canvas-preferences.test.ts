@@ -11,7 +11,7 @@ import {budgetKeys} from '@/services/video/config/environment';
 import {CanvasPreferencesRequestSchema,updateCanvasPreferences} from '@/services/video/commands/canvas-preferences';
 let dir:string,projects:ProjectStore,projectId:string;
 const owner='owner';
-const input=(patch:{durationSec?:20|25|30;aspect?:'16:9'|'9:16'}={durationSec:25})=>({schemaVersion:5 as const,clientCommandId:randomUUID(),expectedBriefVersion:0,patch});
+const input=(patch:{durationSec?:20|25|30;aspect?:'16:9'|'9:16';styleSlug?:string|null}={durationSec:25})=>({schemaVersion:5 as const,clientCommandId:randomUUID(),expectedBriefVersion:0,patch});
 const control=()=>projects.access(owner,projectId);
 const understanding=async()=>((await projects.store.readFresh<Understanding>((await control()).understandingRef.key)).value);
 beforeEach(async()=>{dir=await mkdtemp(`${tmpdir()}/vb-canvas-preferences-`);projects=new ProjectStore(new FileStore(dir));({projectId}=await projects.create(owner,{schemaVersion:5,clientCreateId:randomUUID(),clientCommandId:randomUUID()}))});
@@ -90,4 +90,15 @@ it('keeps regeneration enabled and the finished video visible after changing its
  expect(view.phase).toBe('ready');expect(view.briefVersion).toBe(1);expect(view.preferences).toMatchObject({durationSec:25,aspect:'9:16'});
  expect(view.currentResult).toEqual(before.currentResult);expect(view.currentResult?.artifactId).toBe(artifactId);
  expect(view.activeProduction).toBeNull();
+});
+
+it('selects a known style and undoes to an unselected brief with durable assistant confirmation',async()=>{
+ await updateCanvasPreferences(projects,owner,projectId,input({styleSlug:'ink-wash'}));
+ expect((await understanding()).preferences.styleSlug).toBe('ink-wash');
+ const undo={...input({styleSlug:null}),expectedBriefVersion:1};
+ await updateCanvasPreferences(projects,owner,projectId,undo);
+ await updateCanvasPreferences(projects,owner,projectId,undo);
+ expect((await understanding()).preferences.styleSlug).toBeNull();
+ expect((await control()).briefVersion).toBe(2);
+ const messages=await projects.messages(await control());expect(messages).toHaveLength(4);expect(messages.at(-1)?.text).toContain('撤销画风选择');
 });

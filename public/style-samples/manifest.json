@@ -1,0 +1,866 @@
+{
+  "schemaVersion": 1,
+  "theme": "给生活留一杯时间",
+  "content": "一杯咖啡和同一行标题",
+  "width": 640,
+  "height": 360,
+  "maxBytes": 60000,
+  "progressive": true,
+  "sourceTimeSec": 1.5,
+  "modelsUsed": [],
+  "sourceMethod": "deterministic SVG/HTML studies authored for a fixed theme, interpreting checked-in style packs",
+  "runtimeDigest": "0cb8c433d29a87dc095276b8b3caa41a0d91eefd0b00706dce66de7ce15c8dcb",
+  "runtimeVersion": {
+    "schemaVersion": 1,
+    "playwright": "1.63.0",
+    "chromium": "153.0.8010.0",
+    "ffmpeg": "ffmpeg version 6.1.1-3ubuntu5 Copyright (c) 2000-2023 the FFmpeg developers",
+    "fonts": "4d7a888107c342cce1ac628551acc8bfd81c46eee8b2d7d16f664d3c160092c6",
+    "renderer": "f3a4a47f41417174ce0b5e7b300de8e5c3249ecfd3d90ddf284cf83eae40620a",
+    "encoder": {
+      "codec": "libx264",
+      "preset": "faster",
+      "crf": 20,
+      "pixelFormat": "yuv420p",
+      "color": "bt709",
+      "jpegQuality": 92,
+      "version": "local-video-v1",
+      "frameFormat": "png"
+    },
+    "platform": "linux",
+    "architecture": "x64",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "sandbox": false
+  },
+  "fontLockSha256": "4d7a888107c342cce1ac628551acc8bfd81c46eee8b2d7d16f664d3c160092c6",
+  "unsafeNoSandbox": true,
+  "chromiumSandboxEnabled": false,
+  "productionSandboxVerified": false,
+  "review": "Programmatic constraints verified; visual representative review documented in README. These are style studies, not end-to-end generation certification.",
+  "samples": [
+    {
+      "id": "crayon-book",
+      "poster": "crayon-book.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "ba558478fe519fa6777fe28fa7d1980117297c7beb6fe2e366ef6f00688aa175",
+      "sourceSha256": "b6e3f2119691a73a8287fd994ed20263bd5135bd0ac2411b4a9eb30666eb728a",
+      "posterSha256": "5c29ab9afc8442752aaeda3c9315db1eaa3e725e9c61aea28e07225aef000a29",
+      "bytes": 24252,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f4efe3",
+        "#345f89",
+        "#e8a84c"
+      ],
+      "features": "纸齿、粗蜡笔笔触、越界涂色与童书构图"
+    },
+    {
+      "id": "watercolor",
+      "poster": "watercolor.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "662d57568408a7c82ef8f64980ca85798b8bb239df3dc3a6715283d7f4555ef0",
+      "sourceSha256": "e0a618072e06e5587ab665c77941f375ac3d8b61b93d04500eb1f9cf3ed68278",
+      "posterSha256": "02c21f63529ef791abfea9bc0608ba1c726728040e47e98740c86a032dad782a",
+      "bytes": 15729,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f3eddf",
+        "#658d8b",
+        "#ba7758"
+      ],
+      "features": "透明笔刷叠色、纸纹、深色水痕与无封闭轮廓杯体"
+    },
+    {
+      "id": "ink-wash",
+      "poster": "ink-wash.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "5d71598f0b9cf4034c6461956b0d8bd63bd33750b4045376044f0d956b01d645",
+      "sourceSha256": "2bc58875c4eec4c7db628f56247f8b32d84184fc974d159f9b8b428345c37501",
+      "posterSha256": "9b711484b14f4428a7e8e27c5127ee5b3cee3b9aee6afe67453e59349d806c6f",
+      "bytes": 18222,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f0eadb",
+        "#222c28",
+        "#b74738"
+      ],
+      "features": "宣纸留白、五阶墨色、没骨杯体、飞白与小朱印"
+    },
+    {
+      "id": "impasto",
+      "poster": "impasto.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "38a0dcb2808c2ff03ef721c1319b9145438b4074ed37ab7a09dcf20b7268e062",
+      "sourceSha256": "13010c7a503909c9687b2845cdb05dfc3f4ea209be42bef503d9aa0a579dd373",
+      "posterSha256": "ff86ea3fd679281b584a4f26205d92da95f2f5011c812682bccd968607ef433e",
+      "bytes": 40225,
+      "jpegQuality": 88,
+      "swatch": [
+        "#eac367",
+        "#264e67",
+        "#c45635"
+      ],
+      "features": "调色刀短厚笔触、隆起亮边、冷暖颜料分层"
+    },
+    {
+      "id": "one-line",
+      "poster": "one-line.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "69d26cb06f48ab6b03c12a76c2390d0945cdaddc38bc109b7d5e292b9af1399b",
+      "sourceSha256": "7142dac5247030a9e2ac9317c345c0e2ba8e5b63d44d6b437dabb72e1ac6d518",
+      "posterSha256": "821740e084ef3f96e95e3ec9e95e3d910d6eb6279ef6a66645ebdf1cc6137726",
+      "bytes": 16561,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f8f5ed",
+        "#313d39",
+        "#bb785a"
+      ],
+      "features": "同一连续路径画杯、碟与蒸汽，不填色不塑形"
+    },
+    {
+      "id": "whiteboard",
+      "poster": "whiteboard.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "1a3a707f94c2da8f014a14cf7860cd5414dcf1a9faa76c96104bb91ae1ac7ff5",
+      "sourceSha256": "c73d6423ef386ddc113c05bb676949115dee84f1fcf435a3bb479ca3773f2b22",
+      "posterSha256": "559d9b064d4caf76d3670a7c6e7f6d7114058a1e51e1dbb73e8c2868c5e18287",
+      "bytes": 22412,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f8faf5",
+        "#304b57",
+        "#d97859"
+      ],
+      "features": "白板笔线、步骤箭头、浮动笔与磁铁，不出现手"
+    },
+    {
+      "id": "urban-sketch",
+      "poster": "urban-sketch.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "2baf1a19f31b06e55d66d62e4c3449c7a2686c689190976f3e3d0cbdce2faa9a",
+      "sourceSha256": "e234c8cd902f82974fd5d7f5a7f2feb32e46966015671bd8a8dc34dd42f00001",
+      "posterSha256": "577189ae7b59bee2d1e56899e67086b3856d70df65231e0279cd8d6ac3be839b",
+      "bytes": 21842,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f4ecdd",
+        "#514236",
+        "#9fae98"
+      ],
+      "features": "断续钢笔线、错位淡彩、街角窗景与速写页边"
+    },
+    {
+      "id": "shadow-puppet",
+      "poster": "shadow-puppet.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "8be075a8262d5a3deea9b05684d8a9abdc1e54c0d90649bf14609ecb4106c3af",
+      "sourceSha256": "8f64414bd19ad2851c521dccce496c7fdfc532cebab7a0716375670a1423b09e",
+      "posterSha256": "42d99fb5496726dc28d49e4cfc768c8e17a1fd0700459a85281eafd0e811ec6b",
+      "bytes": 22429,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e8c98e",
+        "#5c3321",
+        "#b5582d"
+      ],
+      "features": "暖色布幕、透光皮革杯、镂空纹、关节铆钉与操纵杆"
+    },
+    {
+      "id": "ukiyoe",
+      "poster": "ukiyoe.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "a668f2bc5b0b74675c57819e75acc318417a77cb695fa89041b3ed78cb085655",
+      "sourceSha256": "bf0418ce0d9a4b5640ba0a3b9899a8e2dee580612e77ec7a4333279596b0aa62",
+      "posterSha256": "06de55aa280fddbc6ebbe7c2d56a5956df0f9a1cf26286480664694d2d00f1fc",
+      "bytes": 35658,
+      "jpegQuality": 88,
+      "swatch": [
+        "#eadbb8",
+        "#25465a",
+        "#b75b41"
+      ],
+      "features": "套色木版、叠层风景、木纹、双框和竖向题签"
+    },
+    {
+      "id": "papercut-red",
+      "poster": "papercut-red.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "65e317d83335e0cb34696b643e31ad9e46fb0bb93fd748c2e21d74358aea61ec",
+      "sourceSha256": "239f378ebe5870aa25ebf6834a537e80957e2a4904a50e62b1445eec32d854ed",
+      "posterSha256": "e0b1ed0fbc671715783c6db23fc400570cc66e03e967e3846b6e3920f2102318",
+      "bytes": 41928,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f5e9d2",
+        "#b83532",
+        "#d96e4a"
+      ],
+      "features": "不透明红纸、杯形负空间、花叶镂空与对称边饰"
+    },
+    {
+      "id": "paper-lantern",
+      "poster": "paper-lantern.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "6f3001ad45657262384b3012f441883ef5ac9c558b82d23e503d14e2f672ac91",
+      "sourceSha256": "7351f44a8e906f85f4edf2f29a548970f86f01caab7b5f16863de9cb767a14d9",
+      "posterSha256": "1151c225b0d74c86f63eedf0df8720d0142548a3fe393e9f9c07c8d3686c50f9",
+      "bytes": 29839,
+      "jpegQuality": 88,
+      "swatch": [
+        "#172f37",
+        "#f5d197",
+        "#779e99"
+      ],
+      "features": "多层纸雕拱形洞口、冷前景暖背光与层间投影"
+    },
+    {
+      "id": "risograph",
+      "poster": "risograph.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "c3d85c91a81b0afde091d964482749482adc66c12730afe124708f7b18b331a6",
+      "sourceSha256": "fecd58505166efca0eb4be46dee6c5336cc07108a61245d96b85397989ee8e40",
+      "posterSha256": "3feb400c957bf9405894d5e60604384d8cdd83a3bcadf7cb504242d3c95b113a",
+      "bytes": 32407,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f2e9d5",
+        "#d85c54",
+        "#3778a0"
+      ],
+      "features": "两块半透明专色、套印偏移、乘色重叠与针孔"
+    },
+    {
+      "id": "halftone-dossier",
+      "poster": "halftone-dossier.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "afe98514f065c9f924dda0a483388617122f38df99462025542d2f23d9eb7e3b",
+      "sourceSha256": "b13a332588511a765597bef2359e82afe0a48a5d533498cef463c93e37c77956",
+      "posterSha256": "e52bd6e8a8ba3cb151225967b591d9431d14a4ef7d0be5e8f4d763c65a785256",
+      "bytes": 33710,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e9debf",
+        "#252624",
+        "#b84736"
+      ],
+      "features": "案卷纸、半调网点、红色印戳与证物编排"
+    },
+    {
+      "id": "woodcut",
+      "poster": "woodcut.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "b96fda6eeac038137310cc0766d979c8d8a5f3ff6acd87bada5aa50d5136a6a0",
+      "sourceSha256": "f26c9e66bc698b8c18d30d7c1f88b2240e998a3998ef87a771a90d179807d728",
+      "posterSha256": "d00e3706734fa2d5fcf25e6132fb2e30262818e96de8cd734a13238c07c77861",
+      "bytes": 35963,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e8dfc8",
+        "#252b25",
+        "#bc5943"
+      ],
+      "features": "黑色木版、随形白色刀痕、粗雕刻光线与纸边"
+    },
+    {
+      "id": "engraving",
+      "poster": "engraving.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "0c6816b8b47163d158ae0ea668feecf53dcbef9d1310e27b9e797d9b9e7aac0d",
+      "sourceSha256": "e713f64f2f49acd8f24afe322841ed8b04cadd332cf0926f71ec533602b056f3",
+      "posterSha256": "6336ca7bd5317e521bf6ac147ab46fcba5dcc3aba4d051cdf89fce6d9fe66fe0",
+      "bytes": 24803,
+      "jpegQuality": 88,
+      "swatch": [
+        "#eee5d2",
+        "#3d3227",
+        "#9f7550"
+      ],
+      "features": "铜版压痕、随形细排线、留白高光与标本构图"
+    },
+    {
+      "id": "silkscreen-poster",
+      "poster": "silkscreen-poster.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "a8b3792efb1476b78493f86a033221b27f60c1927463cc435f8816e4d9eda148",
+      "sourceSha256": "dd6ecc6ba45fa7459b1bd0cf17f926cd6197febc12cf3d82da3216508f5ffee0",
+      "posterSha256": "26b3c46abe1e55ff70ba1fa20b61e00d621819c20af3b32625e18010b200a882",
+      "bytes": 22601,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e9d9ae",
+        "#263f47",
+        "#d16c42"
+      ],
+      "features": "四色不透明墨、阶梯天色、杯子与风景结合的旅行海报"
+    },
+    {
+      "id": "swiss-motion",
+      "poster": "swiss-motion.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "14ddeb6dc495e691a220497069a2ee4827d820f9ee7a3173de5846489ef41f57",
+      "sourceSha256": "30b12747a45dd487f2459735ae69acf3ceb3cbd6a63ca1167d7bacb62bda3ab9",
+      "posterSha256": "a9deb30d9eba3efc244415e78bbc825e218fa18efcb3dff3e6be9ca408715f6c",
+      "bytes": 22885,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f1efe7",
+        "#202b2a",
+        "#d85038"
+      ],
+      "features": "严谨网格、大比例文字、黑色结构线与单一红色"
+    },
+    {
+      "id": "spy-titles",
+      "poster": "spy-titles.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "ea6e9e9073af43ef0bb860e368f60b16ec32a91668386115a142907d92cb1f75",
+      "sourceSha256": "8760e4a1277590d0dabebdc96c7096aec65978711b899b8e282ec89ed6011957",
+      "posterSha256": "bf94a27598cb90d8b9488df9fc9377293bef9c92043b9d19a62d2fd5b8ee8342",
+      "bytes": 33585,
+      "jpegQuality": 88,
+      "swatch": [
+        "#eccc71",
+        "#202a2e",
+        "#b3503b"
+      ],
+      "features": "斜切纸片、轮廓杯、错落文字结构与四块平涂色"
+    },
+    {
+      "id": "art-deco",
+      "poster": "art-deco.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "d73b30c0fa6d153487549d32d8c6c599733cf5e7576badec862a12da6d284761",
+      "sourceSha256": "b1ae56169bb7297fe70c5a990158926250e56ca52ad86eebd318f4c2ed4ecf89",
+      "posterSha256": "b6a76890ffbdb35e5e61ca2e6ed9d73da3fc9fbd91e6bd16590b1f0d2024f16c",
+      "bytes": 39631,
+      "jpegQuality": 88,
+      "swatch": [
+        "#101e1c",
+        "#e7c884",
+        "#567264"
+      ],
+      "features": "中轴、金属金线、阶梯拱门与放射几何"
+    },
+    {
+      "id": "blueprint",
+      "poster": "blueprint.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "de01fc7fcb38b17b58eb017c9cdbcb36b9242b029435a33587614c93088e1717",
+      "sourceSha256": "ee238ac9080981832d1ba0081939657ba7c15e062bcb80f76c4480123563106d",
+      "posterSha256": "0940a5a511e7ad931d8d1a7994a170edf6bd47eb76772e7f72d4f6881b5de161",
+      "bytes": 28619,
+      "jpegQuality": 88,
+      "swatch": [
+        "#123d68",
+        "#d7e9ec",
+        "#75adcc"
+      ],
+      "features": "普鲁士蓝、正投影杯体、中心线与尺寸引线"
+    },
+    {
+      "id": "stained-glass",
+      "poster": "stained-glass.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "0f6551bd109a4127404068aa1e75f18f16b58c80b486c23480b3d193e597b060",
+      "sourceSha256": "e493cacfb5d476ca2d6055efed1f9b153cf8c97cb32eeda2484052d630a554d6",
+      "posterSha256": "bca756f7e3ce0ff628bccb7153e0701aa9320f067b14a5fa3ce1553deb1b4f41",
+      "bytes": 31457,
+      "jpegQuality": 88,
+      "swatch": [
+        "#252e39",
+        "#dc9b58",
+        "#497eaa"
+      ],
+      "features": "深色窗龛、铅线分块、背光彩玻璃与地面彩色投影"
+    },
+    {
+      "id": "pictogram-motion",
+      "poster": "pictogram-motion.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "e982606f3d7d132d320abdc1a74c226b1e0642b664a0c41582bc76fec646da1a",
+      "sourceSha256": "f9439019e9a824dcd6ea5f2112f2f086f6671e069888e1fd36176d695a82611b",
+      "posterSha256": "87c7b61b8bf77191c514959ca5ac8fcbe2beafa6d05159ce40b24b30656888f4",
+      "bytes": 20532,
+      "jpegQuality": 88,
+      "swatch": [
+        "#c7ddd9",
+        "#214f4b",
+        "#71aaa0"
+      ],
+      "features": "同色系圆/半圆网格、粗实心杯图标、超大文字"
+    },
+    {
+      "id": "ascii-crt",
+      "poster": "ascii-crt.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "cbe0b8957c785a165f85ccb3b8eba61c30c0462b32983db6a16c76046a2bb333",
+      "sourceSha256": "a510c64f625802c469a14c35a445e94859d26b25bfadcbc41fc9344c6fd8c71a",
+      "posterSha256": "e91b613453053df6859798bf5149646e6524d882788d13dff37f43025e87311d",
+      "bytes": 27872,
+      "jpegQuality": 88,
+      "swatch": [
+        "#08130d",
+        "#84e08b",
+        "#315f3b"
+      ],
+      "features": "真正等宽字符构成杯子、绿色磷光、扫描线"
+    },
+    {
+      "id": "dataviz",
+      "poster": "dataviz.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "e94013d5a7c548c8844598a671ff0b49bc78770696cbca0d8d00846336f3c67f",
+      "sourceSha256": "b41fb64ca0a66b6a5bfd0cb2bb549164f80a76a5fb3b4453c34b31dea80424cf",
+      "posterSha256": "b452f961a6c84182e382c8fc487cdff43330fe45dedd84dbf552cbb6f06e29fc",
+      "bytes": 20105,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f5f0e5",
+        "#244d7b",
+        "#d04f40"
+      ],
+      "features": "真实可数的一杯、单位图形、红蓝铅笔注释；不虚构统计"
+    },
+    {
+      "id": "iso-infographic",
+      "poster": "iso-infographic.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "17fc6b78512548483d8bf21723882a4fef6f1e266e4d173c883a2b45ef9ab0d2",
+      "sourceSha256": "1989744964f3cd08c48460f2332967f5930c5ecae5b82c28e116a3f0f24858bc",
+      "posterSha256": "48a69bce80270d95238d669f502c5ad5fe568c039386742e48db43ac09c965e1",
+      "bytes": 19103,
+      "jpegQuality": 88,
+      "swatch": [
+        "#edf2ec",
+        "#34594c",
+        "#e1ac53"
+      ],
+      "features": "固定等距台座、三面色阶、拆解引线与过程节点"
+    },
+    {
+      "id": "dark-keynote",
+      "poster": "dark-keynote.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "b0791b5e95f56bf46c621e6064d426ebbee810c7515fb87e951b73668a2a0d24",
+      "sourceSha256": "1ce42f8ad85cb6a671dbc0ea635b6ca38bb18fad55a5ebee3acd5af08c3b4e51",
+      "posterSha256": "2597dc9e91116b01acc54209ebcd924d7fecd172fe46ae260fec548664c6c7df",
+      "bytes": 26796,
+      "jpegQuality": 88,
+      "swatch": [
+        "#0e111b",
+        "#e9eefc",
+        "#a393fa"
+      ],
+      "features": "近黑网格、原创新软件界面、单一紫色强调"
+    },
+    {
+      "id": "living-screencast",
+      "poster": "living-screencast.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "91e75f666a6ab5122ead52aa5c47a603f83d0578bab0b9aa223cf83b639fbb16",
+      "sourceSha256": "75c2f60da255cb5bbd53941b74cd430f2333ca17641c78e2dd7bc81880669fb5",
+      "posterSha256": "c992b2006f93292543c6e02c31b5c426a991f79e17e7e467d4fdd0cfbea7c13b",
+      "bytes": 22989,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e4edf4",
+        "#253e52",
+        "#689ca0"
+      ],
+      "features": "原创高分辨率界面、低分辨率像素小助手和光标"
+    },
+    {
+      "id": "hologram-hud",
+      "poster": "hologram-hud.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "81e2c6b0ede2cc211a8dd676417a1ce5efda278514f273c5249165e38ff34573",
+      "sourceSha256": "d2f530de94f9efcd31d11445d842f1ce2c0d8b648669036fda28505e5b890a94",
+      "posterSha256": "68ca1d075523094eca9f0d0aa3bed1eea7c2f36782315df8b73cfeec01c4b7be",
+      "bytes": 31664,
+      "jpegQuality": 88,
+      "swatch": [
+        "#06171f",
+        "#66e9e4",
+        "#247986"
+      ],
+      "features": "发光线框杯、投影底座、扫描面与HUD标尺"
+    },
+    {
+      "id": "rubber-hose",
+      "poster": "rubber-hose.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "bf850f9cd22e68b2125fed00d1b9804e91479620b44420ba7ec50e570e472a94",
+      "sourceSha256": "ac1a2399384dece1a61211aebc4654762dd62082f046e4d42dc7acba6892624d",
+      "posterSha256": "0dfaa15012d3a9c9d913d5a249592dae494a64de1c03353d2b4fdbdc1e8c39b3",
+      "bytes": 19688,
+      "jpegQuality": 88,
+      "swatch": [
+        "#dfddce",
+        "#252b2a",
+        "#8a8b81"
+      ],
+      "features": "黑白杯角色、饼形眼、无关节软管手脚与胶片框"
+    },
+    {
+      "id": "cel-anime-80s",
+      "poster": "cel-anime-80s.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "1e16f5c6f90ebf09556ec94d37434400d309c978e00ee89e9d38dec476664eaf",
+      "sourceSha256": "584e386891521a3dccf35c82fd62c494b2689cb23cc02904e844d76f01587795",
+      "posterSha256": "995377270c28946cf73b878c0cc71f99d516123ebec8424d020cb9266eea593a",
+      "bytes": 32418,
+      "jpegQuality": 88,
+      "swatch": [
+        "#242847",
+        "#eaa3af",
+        "#70bfda"
+      ],
+      "features": "喷绘夜景、霓虹、两段硬阴影与彩色轮廓"
+    },
+    {
+      "id": "scifi-toon",
+      "poster": "scifi-toon.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "9a720a57ce50dc554e9237e698a979cdf7311527e6e6a0dad803278dfe8ad2ce",
+      "sourceSha256": "6463fbb144c8374a171b812190bb2b4dc7ca78c93e1f6b80e7abef108d1ffc87",
+      "posterSha256": "4034523207d6857edeaf9c850c5886da210bf4b870712e964807f4829ca11983",
+      "bytes": 31494,
+      "jpegQuality": 88,
+      "swatch": [
+        "#56655d",
+        "#f1df83",
+        "#83bd82"
+      ],
+      "features": "粗轮廓、巨大白眼、厨房式科幻传送门与硬阴影"
+    },
+    {
+      "id": "midcentury-toon",
+      "poster": "midcentury-toon.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "e73614b6f9e2f2e8ee279f4909da8429235b96f6d13a12345b6e57d5823c30b8",
+      "sourceSha256": "9a630781b679a1ffe52dd2049871c3502635e8e32ed8e5413bb35c9b810362b8",
+      "posterSha256": "4b275a85135251700a1e991f473a40ae5e286b824099e7ec3b9685b1849cb7c4",
+      "bytes": 22324,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e6cfa4",
+        "#354747",
+        "#c26448"
+      ],
+      "features": "豆形与星爆、套色偏移、细断线与50年代几何小景"
+    },
+    {
+      "id": "pixel-rpg",
+      "poster": "pixel-rpg.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "a935373e444a9d28954220e3bd725d40e9048dd1ca36eb3971faede78d23b4ea",
+      "sourceSha256": "9e1dc29e6ee332c0b4ba201d30d3c78ce2a7884a5e6d74fa7348bd176b095c92",
+      "posterSha256": "4fa34c91678a291b7cd2d53beb9c41a9885cf402451d19b7f91afc28bf0f7f7c",
+      "bytes": 27159,
+      "jpegQuality": 88,
+      "swatch": [
+        "#202540",
+        "#f4d9a3",
+        "#76ab86"
+      ],
+      "features": "原生像素网格、无平滑像素杯、RPG对话框和道具槽"
+    },
+    {
+      "id": "hd-2d",
+      "poster": "hd-2d.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "23c027f48b5342bb8ac5dcd3ea6e5baab901628d89f4ef6dd857764ce78c9c92",
+      "sourceSha256": "4da75e816f4748792cf4d863829cbe74de26cdab5d2442df388e3fd5649f8a82",
+      "posterSha256": "8441c82a4d4f66ceee7e3bb83112ce9ddcdb0884a8874528677c6e506ca6fd7b",
+      "bytes": 30324,
+      "jpegQuality": 88,
+      "swatch": [
+        "#172d38",
+        "#f8d798",
+        "#5f9787"
+      ],
+      "features": "像素咖啡道具、微缩房间、暖灯光与景深层次",
+      "limitation": "程序2.5D灯光示意，非完整3D像素游戏场景"
+    },
+    {
+      "id": "microgame",
+      "poster": "microgame.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "ce209dde1270d032436e02569857bed373cee86e45870bf853d4d8797dc719fb",
+      "sourceSha256": "6ebd6d920845a6fdaaf3447ad7593700bde3dda39c8f29a9220d94a19676ec1d",
+      "posterSha256": "04b91fd6486d7bdcf57b760d43f7698789ce8b828fc25b947d3de1b6771fd888",
+      "bytes": 38049,
+      "jpegQuality": 88,
+      "swatch": [
+        "#f34664",
+        "#25284e",
+        "#fde368"
+      ],
+      "features": "街机任务框、巨大的动作词、倒计时块与得分星"
+    },
+    {
+      "id": "game-show",
+      "poster": "game-show.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "027ed83dbee6596dbd255bcaf20275db18b41b4f7b8f2f5ef72d1d3ebf06ba8f",
+      "sourceSha256": "91aee61ecf931abeea43299589a4beb5a0a0bdc0f034c628e04d860160e58e5e",
+      "posterSha256": "4e1314dd662bd2224d819bc6252e0890bf178f9121510244c322b15cbfa38568",
+      "bytes": 45905,
+      "jpegQuality": 88,
+      "swatch": [
+        "#ffe164",
+        "#24223d",
+        "#e85c85"
+      ],
+      "features": "舞台放射纹、粗黑线拟人杯、节奏灯泡和欢快色块"
+    },
+    {
+      "id": "silent-film",
+      "poster": "silent-film.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "44633a4edd4ec6b84be809bd48b38503a75a71531112b3d28a52f27135012b20",
+      "sourceSha256": "9e607897ec346f604198094c8818e0dbae9425e635f8c1395d5af0d9139fc08a",
+      "posterSha256": "fc4353616d5745c3f7d78aec2a6a5b1f6cab9dc2a60db54376e23416d801d72a",
+      "bytes": 26528,
+      "jpegQuality": 88,
+      "swatch": [
+        "#1e211f",
+        "#d7d7c8",
+        "#777d73"
+      ],
+      "features": "4:3银灰画面、戏院侧幕、字幕卡式边框与胶片划痕"
+    },
+    {
+      "id": "backrooms",
+      "poster": "backrooms.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "621f204f5bc4576af497a169f2442b91caffee99046989a117ba06c6c1d572a0",
+      "sourceSha256": "550dc94d310ad6fde0413a4ed8fca7787909f8c70a72676822706f69cbc02ea0",
+      "posterSha256": "2d321450769afa6c8c84c8ffcfa66c9289ab76aa60904449309e063c2c473dc2",
+      "bytes": 21473,
+      "jpegQuality": 88,
+      "swatch": [
+        "#1c1b13",
+        "#c4bb7b",
+        "#69664d"
+      ],
+      "features": "4:3取景、重复空走廊、荧光灯、录像机标记",
+      "limitation": "程序绘制的空间示意，非真实摄影或完整3D场景"
+    },
+    {
+      "id": "brick-toy",
+      "poster": "brick-toy.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "29b23e846951856b722a698a03c9458cfc17b4fc71d044f45d773acf2a742768",
+      "sourceSha256": "596fa7502860aa882611c5d0ea83ed1f14ca7db9e8e1eaeff5ae5717ed255d05",
+      "posterSha256": "14be44e91532bed6b74b5abcea092256ed0f9c7d3a7b8dcd8816b6bac395b7d5",
+      "bytes": 21110,
+      "jpegQuality": 88,
+      "swatch": [
+        "#e5c38d",
+        "#bd4939",
+        "#5e9490"
+      ],
+      "features": "桌面、带凸粒积木拼杯、硬质高光与接缝",
+      "limitation": "SVG透视材质示意，非物理3D塑料渲染"
+    },
+    {
+      "id": "paper-popup",
+      "poster": "paper-popup.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "8e5c0ca430fd96b75c4d9c2af92a87c84d4d1af8cda64280a189c51279e1ee9b",
+      "sourceSha256": "3e97fd2249e6b00c772e6d4a87f42876a1d043049cdd7f3b455b5627931ae868",
+      "posterSha256": "356a34d320f5da111c93bd82dfb6196b16e1b5d640fdd4cc6aebf70bf4d1a72c",
+      "bytes": 18297,
+      "jpegQuality": 88,
+      "swatch": [
+        "#d9c4aa",
+        "#396856",
+        "#d79a61"
+      ],
+      "features": "展开书页、折线、直立纸片杯、厚纸边与落影",
+      "limitation": "程序2.5D纸材示意，非物理3D立体书"
+    },
+    {
+      "id": "tilt-shift",
+      "poster": "tilt-shift.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "131ae50c6bddd30922638cbd5f2fae5c047223360a3f6924b074b0db525a5c63",
+      "sourceSha256": "79e66340803d63f78155199db6aead71d5a44d195de5bda9b8bc9ff4f0e2b326",
+      "posterSha256": "4a49ef7d04e7c3de4cece8828f11aa36a0a5f54e1606f9f826b07e5a453fcc72",
+      "bytes": 25265,
+      "jpegQuality": 88,
+      "swatch": [
+        "#a6c4a6",
+        "#f3ead4",
+        "#bd7556"
+      ],
+      "features": "高俯瞰咖啡桌、窄清晰带、前后景模糊与微缩尺度",
+      "limitation": "程序插画式景深，不是照片级移轴摄影"
+    },
+    {
+      "id": "lowpoly-island",
+      "poster": "lowpoly-island.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "d87e56fd3677841e19f273352ea3481328a237403012ffa7ccb6089c97401702",
+      "sourceSha256": "289b34ccc0e5ac7f0a2282cdd8ef13fb4e6af41720392e9faea9a92307827163",
+      "posterSha256": "5d011981462c37a3c52b2126ef4c5499b794b060982c708c9c77afd91ae5ff9d",
+      "bytes": 16333,
+      "jpegQuality": 88,
+      "swatch": [
+        "#dceee8",
+        "#447d73",
+        "#d88c53"
+      ],
+      "features": "悬浮岛、平面多边形山石、正交构图与分面杯体",
+      "limitation": "SVG等距分面近似，非真实WebGL低多边形场景"
+    },
+    {
+      "id": "glass-product",
+      "poster": "glass-product.jpg",
+      "video": null,
+      "width": 640,
+      "height": 360,
+      "progressive": true,
+      "rulesSha256": "630fa80cde0930154ba64f15bce5c8ee0c8dcf48d921253f8c7e3194712c8fb5",
+      "sourceSha256": "24b00df3c084760fb51e4bf161a65de4dfd8eb1f34b00ac5be262da3832069bc",
+      "posterSha256": "3a4132ae4f87cf305fe5fbf07ed41a7115a4f131afeb3b3fce5043a1d6b61c8e",
+      "bytes": 20255,
+      "jpegQuality": 88,
+      "swatch": [
+        "#090f1b",
+        "#d8f4fd",
+        "#7eb6dd"
+      ],
+      "features": "黑色影棚、透明杯壁、窄条高光与折射色边",
+      "limitation": "程序渐变近似玻璃，非光线追踪折射"
+    }
+  ]
+}

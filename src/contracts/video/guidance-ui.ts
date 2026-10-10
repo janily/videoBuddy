@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const CanvasTargetSchema=z.enum(['brief','style','script','result']);
+export const CanvasTargetSchema=z.enum(['brief','style','script','result','style-library']);
 export const QuickReplySchema=z.strictObject({label:z.string().min(1).max(8),text:z.string().min(1).max(60)});
 export const StyleRecommendationSchema=z.strictObject({styleId:z.string().min(1),reason:z.string().min(1).max(30),primary:z.boolean()});
 export const CanvasRefSchema=z.strictObject({text:z.string().min(1),target:CanvasTargetSchema,shotId:z.string().min(1).optional()});

@@ -1,5 +1,5 @@
 import type {ProjectView} from '@/contracts/video/project';
-export type CanvasTarget='brief'|'style'|'script'|'result';
+export type CanvasTarget='brief'|'style'|'script'|'result'|'style-library';
 export type CanvasStage='S0'|'S1'|'S2'|'S3'|'S4'|'S5'|'S6';
 export type CardStatus='待开始'|'进行中'|'需要你选'|'已完成'|'已更新'|'需要更新';
 export function latestCanvasUI(view:ProjectView|null){return view?.messages.filter(m=>m.role==='assistant').at(-1)?.ui}
@@ -8,7 +8,7 @@ export function deriveCanvasState(view:ProjectView|null):{stage:CanvasStage;focu
  const stale=Boolean(view&&(view.currentResult?.briefVersion!==undefined&&view.currentResult.briefVersion<view.briefVersion||view.script&&(view.script.state==='stale'||view.script.briefVersion<view.briefVersion)));
  const stage:CanvasStage=!view||(!view.messages.some(m=>m.role==='user')&&!view.understanding.subject.trim()&&!view.currentResult&&!view.script&&!('legacyMigrationNotice' in view))?'S0':view.activeProduction?'S4':view.currentResult?(stale?'S6':'S5'):!briefReady?'S1':!view.preferences.styleSlug?'S2':'S3';
  const defaultFocus:CanvasTarget=stage==='S0'||stage==='S1'?'brief':stage==='S2'?'style':stage==='S3'||stage==='S4'?'script':'result';
- return {stage,focus:stage==='S4'||stage==='S5'||stage==='S6'?defaultFocus:latestCanvasUI(view)?.canvasFocus||defaultFocus,briefReady,stale};
+ return {stage,focus:stage==='S4'||stage==='S5'||stage==='S6'?defaultFocus:(latestCanvasUI(view)?.canvasFocus==='style-library'?'style':latestCanvasUI(view)?.canvasFocus)||defaultFocus,briefReady,stale};
 }
 export const productionSteps=[{id:'treatment',label:'构思'},{id:'visual',label:'画镜头'},{id:'picture',label:'渲染'},{id:'composition',label:'拼接'},{id:'music',label:'配乐'}] as const;
 export type ProductionActivity={label:string;stage?:string;completed?:number;total?:number;unit?:string};
