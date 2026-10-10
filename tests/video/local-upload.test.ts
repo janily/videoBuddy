@@ -25,3 +25,14 @@ it('rejects MIME mismatch, byte overflow and conflicting replay',async()=>{
  const bytes=Buffer.from('first');await store.put(project,asset,request(bytes),{declaredMime:'text/markdown',declaredBytes:bytes.length});
  await expect(store.put(project,asset,request(Buffer.from('other')),{declaredMime:'text/markdown',declaredBytes:5})).rejects.toThrow('ASSET_HASH_CONFLICT');
 });
+
+it('retains renderer group access under the private application umask',async()=>{
+ const previous=process.umask(0o077);
+ try{
+  const store=new LocalAssetBytes(root),bytes=Buffer.from('# shared source');
+  const result=await store.put(project,asset,request(bytes),{declaredMime:'text/markdown',declaredBytes:bytes.length});
+  const {stat}=await import('node:fs/promises');
+  expect((await stat(result.path)).mode&0o777).toBe(0o640);
+  expect((await stat(join(root,'assets',project))).mode&0o777).toBe(0o750);
+ }finally{process.umask(previous)}
+});

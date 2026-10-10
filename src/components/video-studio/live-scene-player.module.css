@@ -1,0 +1,9 @@
+.player { width: 100%; min-width: 0; }
+.viewport { position: relative; width: 100%; overflow: hidden; border-radius: 7px; background: #181b1c; }
+.viewport iframe { position: absolute; inset: 0; border: 0; transform-origin: top left; pointer-events: none; }
+.controls { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.controls button { min-height: 40px; min-width: 40px; }
+.controls input { flex: 1; min-width: 0; accent-color: var(--vb-accent); }
+.time { font-size: 11px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.note { color: var(--vb-muted); font-size: 12px; }
+.warning { position: relative; z-index: 10; padding: 10px 20px; background: #a52222; color: white; font-size: 14px; }

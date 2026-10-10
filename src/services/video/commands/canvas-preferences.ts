@@ -47,6 +47,6 @@ export async function updateCanvasPreferences(projects:ProjectStore,owner:string
   let messagesIndexRef=c.messagesIndexRef;
   for(const message of [user,assistant]){const ref=await projects.index.immutable(`${p}/messages/${message.id}/1`,message);messagesIndexRef=await projects.index.append(`${p}/indexes/messages`,messagesIndexRef,{id:message.id,ordinal:message.ordinal,ref})}
   const understandingRef=changed?await projects.index.immutable(`${p}/understanding/${briefVersion}`,{...understanding,briefVersion,preferences:{...understanding.preferences,...input.patch},sourceMessageIds:[...understanding.sourceMessageIds,intent.userMessageId]}):c.understandingRef;
-  return{...c,...userActivity(undefined,Math.max(Date.parse(c.lastUserActivityAt),intent.admittedAt)),controlVersion:c.controlVersion+1,briefVersion,understandingRef,messagesIndexRef,nextOrdinal:c.nextOrdinal+2,...(changed?{previewState:c.previewState==='ready'?'stale' as const:c.previewState,phase:c.currentResultId?'ready' as const:'collecting' as const}:{})};
+  return{...c,...userActivity(undefined,Math.max(Date.parse(c.lastUserActivityAt),intent.admittedAt)),controlVersion:c.controlVersion+1,briefVersion,understandingRef,messagesIndexRef,nextOrdinal:c.nextOrdinal+2,...(changed?{phase:c.currentResultId?'ready' as const:'collecting' as const}:{})};
  });
 }

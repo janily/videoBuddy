@@ -10,11 +10,11 @@ import {archiveAssistantMilestone,milestoneContent} from '@/services/video/quick
 import {runQuickFilmOperation} from '@/services/video/quick/operation';
 import {createOrRead,updateJson} from '@/services/video/storage/atomic-store';
 import type {ProjectControl} from '@/contracts/video/project';
-import type {PreviewOperation} from '@/services/video/preview/prepare';
+import type {PreviewOperation} from '@/services/video/quick/prepare';
 import type {QuickFilmOutput} from '@/services/video/quick/film';
 const roots:string[]=[];afterEach(async()=>{await Promise.all(roots.splice(0).map(root=>rm(root,{recursive:true,force:true})))});
 async function setup(){const root=await mkdtemp(join(tmpdir(),'vb-milestones-'));roots.push(root);const store=new FileStore(root),projects=new ProjectStore(store),events=new LocalEventLog(root);const{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()});return{root,store,projects,events,projectId}}
-async function prepare(s:Awaited<ReturnType<typeof setup>>){const operationId=randomUUID(),control=await s.projects.access('owner',s.projectId);const op:PreviewOperation={id:operationId,projectId:s.projectId,commandId:randomUUID(),kind:'preview',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,revisionId:randomUUID(),previewId:randomUUID(),briefVersion:0,consentEpoch:0,understandingRef:control.understandingRef};await createOrRead(s.store,`projects/${s.projectId}/operations/${operationId}`,op);await updateJson(s.store,`projects/${s.projectId}/control`,(c:ProjectControl)=>({...c,activeProduction:operationId,phase:'preparing_preview' as const}));return operationId}
+async function prepare(s:Awaited<ReturnType<typeof setup>>){const operationId=randomUUID(),control=await s.projects.access('owner',s.projectId);const op:PreviewOperation={id:operationId,projectId:s.projectId,commandId:randomUUID(),kind:'preview',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0,revisionId:randomUUID(),previewId:randomUUID(),briefVersion:0,consentEpoch:0,understandingRef:control.understandingRef};await createOrRead(s.store,`projects/${s.projectId}/operations/${operationId}`,op);await updateJson(s.store,`projects/${s.projectId}/control`,(c:ProjectControl)=>({...c,activeProduction:operationId,phase:'generating' as const}));return operationId}
 describe('durable assistant milestones',()=>{
  it('archives a sourced script summary exactly once, with valid references and reserved ordinal safety',async()=>{
   const s=await setup(),operationId=randomUUID();

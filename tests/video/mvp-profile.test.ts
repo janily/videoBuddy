@@ -1,48 +1,26 @@
 import {describe,expect,it} from 'vitest';
 import {initialUnderstanding} from '@/contracts/video/domain';
-import {assertMvpProfile,deliveryGap,mvpProfileGap,soundEnabled} from '@/services/video/quality/delivery';
+import {mvpProfileGap} from '@/services/video/config/profile';
 import {directorContext,directorProfile} from '@/mastra/video/director';
 import {displayTitle} from '@/services/video/storage/project-store';
 import {listStyles} from '@/services/video/styles/registry';
 import {recommendStyles,styleCatalogEntries,styleFits} from '@/services/video/styles/recommendations';
 
 function understanding(preferences:Partial<ReturnType<typeof initialUnderstanding>['preferences']>){const u=initialUnderstanding();u.subject='小猫的睡前故事';u.preferences={...u.preferences,...preferences};return u}
-const silent={voiceMode:'none' as const,musicMode:'none' as const,captions:'none' as const};
+
 
 describe('MVP delivery profile',()=>{
  it('accepts every style pack at 16:9 and 20–30 seconds',()=>{
   for(const style of listStyles()){
    const u=understanding({styleSlug:style.id,durationSec:25});
-   expect(mvpProfileGap(u)).toBeUndefined();expect(()=>assertMvpProfile(u)).not.toThrow();
+   expect(mvpProfileGap(u)).toBeUndefined();
   }
  });
  it('explains each unsupported preference instead of failing later in the worker',()=>{
-  for(const p of [{styleSlug:null},{styleSlug:'not-a-style',durationSec:20},{styleSlug:'watercolor',durationSec:45},{styleSlug:'ink-wash',durationSec:19},{styleSlug:'dataviz',durationSec:20,aspect:'9:16' as const}]){
-   const u=understanding(p);expect(mvpProfileGap(u)).toBeTruthy();expect(()=>assertMvpProfile(u)).toThrow('MVP_PROFILE_UNSUPPORTED');
+  for(const p of [{styleSlug:null},{styleSlug:'not-a-style',durationSec:20},{styleSlug:'watercolor',durationSec:45},{styleSlug:'ink-wash',durationSec:19}]){
+   const u=understanding(p);expect(mvpProfileGap(u)).toBeTruthy();
   }
   expect(mvpProfileGap(initialUnderstanding())).toBeDefined();
- });
-});
-
-describe('sound switch',()=>{
- it('is off by default in MVP and follows VIDEO_SOUND when set',()=>{
-  expect(soundEnabled({VIDEO_DELIVERY_PROFILE:'mvp'})).toBe(false);
-  expect(soundEnabled({VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_SOUND:'on'})).toBe(true);
-  expect(soundEnabled({})).toBe(true);
-  expect(soundEnabled({VIDEO_SOUND:'off'})).toBe(false);
- });
- it('blocks a voiced brief in the staged flow only while sound is off, with a way forward',()=>{
-  const voiced=understanding({styleSlug:'ink-wash',durationSec:30,voiceMode:'tts',musicMode:'composed'}),staged={VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_FLOW:'staged'};
-  expect(deliveryGap(voiced,staged)).toMatchObject({code:'SOUND_DISABLED',message:expect.stringContaining('不要声音')});
-  expect(deliveryGap(voiced,{...staged,VIDEO_SOUND:'on'})).toBeUndefined();
-  expect(deliveryGap(understanding({styleSlug:'ink-wash',durationSec:30,...silent}),staged)).toBeUndefined();
-  expect(deliveryGap(understanding({styleSlug:'ink-wash',durationSec:45,...silent}),staged)?.code).toBe('MVP_PROFILE_UNSUPPORTED');
- });
- it('lets the quick flow (default in MVP) ignore narration preferences and render portrait',()=>{
-  const voiced=understanding({styleSlug:'ink-wash',durationSec:30,voiceMode:'tts',musicMode:'composed'});
-  expect(deliveryGap(voiced,{VIDEO_DELIVERY_PROFILE:'mvp'})).toBeUndefined();
-  expect(deliveryGap(understanding({styleSlug:'pixel-rpg',durationSec:25,aspect:'9:16'}),{VIDEO_DELIVERY_PROFILE:'mvp'})).toBeUndefined();
-  expect(deliveryGap(understanding({styleSlug:'pixel-rpg',durationSec:25,aspect:'9:16'}),{VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_FLOW:'staged'})?.code).toBe('MVP_PROFILE_UNSUPPORTED');
  });
 });
 
@@ -65,13 +43,13 @@ describe('style recommendation',()=>{
 describe('director style catalog',()=>{
  const message={id:crypto.randomUUID(),role:'user' as const,text:'做个视频'};
  it('offers every style with what it is good for, in both profiles',()=>{
-  for(const profile of ['full','mvp'] as const){
+  for(const profile of ['mvp'] as const){
    const catalog=directorContext(initialUnderstanding(),[message],undefined,profile).styleCatalog;
    expect(catalog.map(s=>s.id)).toEqual(listStyles().map(s=>s.id));
    expect(catalog.every(s=>s.goodFor&&s.mood)).toBe(true);
   }
   expect(styleCatalogEntries(['ink-wash']).map(s=>s.id)).toEqual(['ink-wash']);
-  expect(directorProfile({VIDEO_DELIVERY_PROFILE:'mvp'})).toBe('mvp');expect(directorProfile({})).toBe('full');
+  expect(directorProfile({VIDEO_DELIVERY_PROFILE:'mvp'})).toBe('mvp');expect(directorProfile({})).toBe('mvp');
  });
 });
 

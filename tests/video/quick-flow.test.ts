@@ -3,41 +3,21 @@ import {mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {aiLabel,quickComposeArguments} from '@/services/video/quick/compose';
-import {quickFlow,readQuickSettings,takeFor,updateQuickSettings} from '@/services/video/quick/settings';
+import {aiMetadata,assembleArguments} from '@/services/video/media/local/arguments';
+import {readQuickSettings,takeFor,updateQuickSettings} from '@/services/video/quick/settings';
 import {loadMusicLibrary,pickTrack,type MusicLibrary} from '@/services/video/music/library';
 import {FileStore} from '@/services/video/storage/file-store';
 
-const image='sha256:'+'a'.repeat(64),key='b'.repeat(64);
-const base={picturePath:'/data/picture-sequence/x/output/picture.mp4',width:1080,height:1920,fps:24 as const,durationSec:30,title:'中秋祝福'};
-
-describe('quick flow switch',()=>{
- it('is on by default in MVP and follows VIDEO_FLOW',()=>{
-  expect(quickFlow({VIDEO_DELIVERY_PROFILE:'mvp'})).toBe(true);
-  expect(quickFlow({VIDEO_DELIVERY_PROFILE:'mvp',VIDEO_FLOW:'staged'})).toBe(false);
-  expect(quickFlow({})).toBe(false);
-  expect(quickFlow({VIDEO_FLOW:'quick'})).toBe(true);
- });
-});
-
 describe('final composition',()=>{
- it('adds a visible AI label and AIGC metadata, with looped, faded music',()=>{
-  const args=quickComposeArguments(image,'1000:1000',key,{...base,music:{path:'/music/calm-01.mp3',trackId:'calm-01'}},'/data/quick-compose/x/output');
-  const joined=args.join(' ');
-  expect(joined).toContain(`text=${aiLabel.text}`);expect(joined).toContain(`comment=${aiLabel.metadata}`);
-  expect(args).toContain('-stream_loop');expect(joined).toContain('afade=t=out');expect(joined).toContain('loudnorm');
-  expect(args.slice(args.indexOf('-t'),args.indexOf('-t')+2)).toEqual(['-t','30']);
-  expect(args).toContain('--network');expect(args[args.indexOf('--network')+1]).toBe('none');
-  expect(joined).toContain('dst=/input/music.mp3,readonly');
+ it('copies video while writing AIGC metadata and looped faded music',()=>{
+  const args=assembleArguments('/data/clips.txt','/data/final.mp4',{durationSec:30,title:'中秋祝福',musicPath:'/music/calm.mp3'}),joined=args.join(' ');
+  expect(args.slice(args.indexOf('-c:v'),args.indexOf('-c:v')+2)).toEqual(['-c:v','copy']);
+  expect(joined).toContain(`comment=${aiMetadata}`);expect(args).toContain('-stream_loop');expect(joined).toContain('afade=t=out');expect(joined).toContain('loudnorm');
+  expect(args.slice(args.indexOf('-t'),args.indexOf('-t')+2)).toEqual(['-t','30']);expect(joined).not.toContain('drawtext');
  });
  it('writes a silent stereo track when there is no music',()=>{
-  const args=quickComposeArguments(image,'1000:1000',key,{...base,music:null},'/data/quick-compose/x/output');
+  const args=assembleArguments('/data/clips.txt','/data/final.mp4',{durationSec:30,title:'film',musicPath:null});
   expect(args.join(' ')).toContain('anullsrc=r=48000:cl=stereo');expect(args).not.toContain('-stream_loop');
- });
- it('rejects unsafe paths and odd sizes',()=>{
-  expect(()=>quickComposeArguments(image,'1000:1000',key,{...base,music:{path:'relative.mp3',trackId:'x'}},'/out')).toThrow('COMPOSITION_INVALID');
-  expect(()=>quickComposeArguments(image,'1000:1000',key,{...base,width:1081,music:null},'/out')).toThrow('COMPOSITION_INVALID');
-  expect(()=>quickComposeArguments(image,'1000:1000',key,{...base,picturePath:'/data/$(x)/p.mp4',music:null},'/out')).toThrow('COMPOSITION_INVALID');
  });
 });
 

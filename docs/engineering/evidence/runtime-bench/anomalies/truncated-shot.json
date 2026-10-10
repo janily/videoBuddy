@@ -1,0 +1,13 @@
+{
+  "classification": "failed run; excluded from performance/quality results",
+  "cause": "unresolved; no broad process cleanup reported by root",
+  "observed": "The harness advanced past shot encoding, then concat failed because this shot had no moov atom. Successful close was inferred from advancement; pre-fix per-command stderr was not retained. Manual encode of identical PNG frames succeeded.",
+  "file": "truncated-shot.mp4",
+  "bytes": 786480,
+  "sha256": "02b8a2535e8537b0eb5f3580ff7983f7e485143f38afefff2c9e17e949587392",
+  "moovOffset": -1,
+  "mdatOffset": 44,
+  "ffprobeExitCode": 1,
+  "ffprobeStderr": "[mov,mp4,m4a,3gp,3g2,mj2 @ 0x55e33948b3c0] moov atom not found\ndocs/engineering/evidence/runtime-bench/anomalies/truncated-shot.mp4: Invalid data found when processing input\n",
+  "followup": "Harness now records per-command stderr/exit code and enables ffmpeg -xerror; fresh run required."
+}

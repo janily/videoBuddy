@@ -7,10 +7,7 @@ import {acquireWorkerLease} from '../../src/services/video/commands/worker-lease
 import {writeWorkerHeartbeat} from '../../src/services/video/commands/worker-heartbeat';
 import {expirePendingUploads,runQueuedOnce,createWorkerLanes,quickProductionAllowsChat} from '../../src/services/video/commands/local-worker';
 import {runDirectorOperation} from '../../src/services/video/commands/local-director';
-import {runPreviewOperation} from '../../src/services/video/commands/local-preview';
 import {runQuickFilmOperation} from '../../src/services/video/quick/operation';
-import {quickFlow} from '../../src/services/video/quick/settings';
-import {runApprovedRenderOperation} from '../../src/services/video/commands/local-render';
 import {runExportOperation} from '../../src/services/video/exports/operation';
 import {requireGeneration} from '../../src/services/video/config/environment';
 import {reconcileDeletedProjects} from '../../src/services/video/commands/delete-project';
@@ -22,11 +19,10 @@ async function main(){
  const lanes=createWorkerLanes(async job=>{
    if(job.kind==='script'){await runScriptOperation(new ProjectStore(store),events,job.projectId,job.operationId);return}
    if(job.kind==='export'){await runExportOperation(store,events,job.projectId,job.operationId,{root});return}
-   if(job.kind==='render'){await runApprovedRenderOperation(store,events,job.projectId,job.operationId,{root});return}
    requireGeneration();
    // Quick flow: a preview request produces the finished film directly.
-   if(job.kind==='preview'&&quickFlow())await runQuickFilmOperation(store,events,job.projectId,job.operationId,{root});
-   else if(job.kind==='preview')await runPreviewOperation(store,events,job.projectId,job.operationId,{root});else await runDirectorOperation(store,events,job.projectId,job.operationId,{root});
+   if(job.kind==='preview')await runQuickFilmOperation(store,events,job.projectId,job.operationId,{root});
+   else await runDirectorOperation(store,events,job.projectId,job.operationId,{root});
 
  },()=>console.error('WORKER_JOB_NEEDS_RECONCILIATION'),{canRunChatAlongside:job=>quickProductionAllowsChat(store,job)});
  let stop=false,lastExpirySweep=0;process.once('SIGTERM',()=>{stop=true});process.once('SIGINT',()=>{stop=true});

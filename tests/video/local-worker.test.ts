@@ -40,14 +40,13 @@ it('admits saved chat after the quick model phase and blocks new media until tha
  const lanes=createWorkerLanes(async job=>{
   calls.push(job.operationId);if(job.operationId===operationId)await filmGate;if(job.operationId===chatId)await chatGate;
   const key=`projects/${projectId}/operations/${job.operationId}`,current=await store.readFresh(key);await store.cas(key,current.etag,{status:'succeeded'});
- },error=>{throw error},{canRunChatAlongside:job=>quickProductionAllowsChat(store,job,{VIDEO_FLOW:'quick'})});
+ },error=>{throw error},{canRunChatAlongside:job=>quickProductionAllowsChat(store,job)});
  await queue.enqueue(projectId,operationId,'preview');
  await runQueuedOnce(queue,store,job=>lanes.dispatch(job));expect(calls).toEqual([operationId]);
  await queue.enqueue(projectId,chatId,'chat');await queue.enqueue(projectId,nextFilmId,'preview');
  await runQueuedOnce(queue,store,job=>lanes.dispatch(job));expect(calls).toEqual([operationId]);
  const key=`projects/${projectId}/operations/${operationId}`,current=await store.readFresh<Record<string,unknown>>(key);
  await store.cas(key,current.etag,{...current.value,stage:'picture'});
- expect(await quickProductionAllowsChat(store,{projectId,operationId,kind:'preview'},{VIDEO_FLOW:'staged'})).toBe(false);
  await runQueuedOnce(queue,store,job=>lanes.dispatch(job));expect(calls).toEqual([operationId,chatId]);
  releaseFilm();await runQueuedOnce(queue,store,job=>lanes.dispatch(job));await runQueuedOnce(queue,store,job=>lanes.dispatch(job));
  expect(calls).toEqual([operationId,chatId]);

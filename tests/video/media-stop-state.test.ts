@@ -1,6 +1,6 @@
 import {expect,it} from 'vitest';
 import {randomUUID} from 'node:crypto';
-import {assertMediaStopsResolved,unknownMediaStopMessage} from '@/services/video/media/stop-state';
+import {assertMediaStopsResolved,unknownMediaStopMessage} from '@/services/video/commands/media-stop-state';
 import {errorResponse} from '@/services/video/http/route-utils';
 it('keeps legacy absent and verified empty markers valid, but a physical unknown blocks new production',()=>{
  expect(()=>assertMediaStopsResolved({})).not.toThrow();expect(()=>assertMediaStopsResolved({unresolvedMediaStops:{}})).not.toThrow();

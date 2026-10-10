@@ -1,7 +1,7 @@
 import {describe,it,expect} from 'vitest';
 import {parseExportIntent,validateDownloadAccess} from '@/services/video/exports/client-contract';
 const projectId='10000000-0000-4000-8000-000000000001',artifactId='20000000-0000-4000-8000-000000000002';
-const request={schemaVersion:5,clientCommandId:crypto.randomUUID(),artifactId,format:'source_zip'};
+const request={schemaVersion:5,clientCommandId:crypto.randomUUID(),artifactId,format:'poster'};
 describe('export browser boundary',()=>{
  it('restores only a bounded, input-bound command, never a signed URL',()=>{
   expect(parseExportIntent(JSON.stringify({version:1,request}),artifactId)?.request).toEqual(request);

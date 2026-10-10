@@ -18,15 +18,14 @@ import type {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import type {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {loadStageKnowledge} from '@/services/video/styles/knowledge-loader';
 import {getStyle} from '@/services/video/styles/registry';
-import {quickFlow} from './settings';
 
 export interface ScriptOperation {id:string;projectId:string;kind:'script';canonicalRunId:string|null;status:'reserved'|'running'|'succeeded'|'failed'|'superseded';streamEpoch:number;briefVersion:number;understandingRef:ObjectRef;base:string;notBefore:number;stage?:string;errorCode?:string}
-export interface ShotProgress {state:NonNullable<ScriptShot['state']>;posterArtifactId?:string;clipArtifactId?:string;take?:number}
+export interface ShotProgress {state:NonNullable<ScriptShot['state']>;posterArtifactId?:string;clipArtifactId?:string;take?:number;sourceAvailable?:boolean;sourceOperationId?:string;sourceTake?:number}
 export interface CanvasProgress {shots:Record<string,ShotProgress>}
 export async function quickTreatmentContext(projects:ProjectStore,control:ProjectControl){
  const stored=UnderstandingSchema.parse((await projects.store.readFresh(control.understandingRef.key)).value);
  if(canonicalHash(stored)!==control.understandingRef.sha256||stored.briefVersion!==control.briefVersion)throw Error('PREVIEW_STALE');
- const understanding:Understanding={...stored,preferences:{...stored.preferences,voiceMode:'none',musicMode:'none',captions:'none'}};
+ const understanding:Understanding=stored;
  const style=getStyle(understanding.preferences.styleSlug!),knowledge=await loadStageKnowledge(style.slug,'style');
  // Shared with the complete film: script preview never creates a second cache namespace.
  const base=`projects/${control.projectId}/quick/b${understanding.briefVersion}/${canonicalHash({understanding:control.understandingRef.sha256,style:knowledge.sha256}).slice(0,16)}`;
@@ -48,7 +47,6 @@ export async function generateQuickTreatment(projects:ProjectStore,context:Await
 }
 /** Durable debounce: only the worker executes it, after this persisted deadline. */
 export async function scheduleScriptDraft(projects:ProjectStore,queue:LocalOperationQueue,projectId:string,options:{env?:Environment;now?:number;retry?:boolean}={}){
- if(!quickFlow(options.env||process.env))return null;
  const key=`projects/${projectId}/control`,control=(await projects.store.readFresh<ProjectControl>(key)).value;
  if(control.deletedAt||Date.parse(control.expiresAt)<=Date.now()||control.activeConversation||control.activeProduction)return null;
  const understanding=(await projects.store.readFresh<Understanding>(control.understandingRef.key)).value;

@@ -3,9 +3,7 @@ import {mkdir,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import type {Environment} from '../../../src/services/video/config/environment';
 export function probeEnvironment(root:string):Environment{
- return{...process.env,VIDEO_ENVIRONMENT:'local-probe',VIDEO_APP_ORIGIN:'http://localhost:3000',VIDEO_SESSION_SIGNING_KEY:randomBytes(32).toString('hex'),VIDEO_DATA_DIR:root,VIDEO_GENERATION_ENABLED:'true',VIDEO_PROJECT_MAX_MODEL_CALLS:'6',VIDEO_PROJECT_MAX_INPUT_TOKENS:'600000',VIDEO_PROJECT_MAX_OUTPUT_TOKENS:'80000',VIDEO_PROJECT_MAX_TTS_CHARACTERS:'1000',VIDEO_PROJECT_MAX_MEDIA_SECONDS:'120',VIDEO_DAILY_MAX_MODEL_CALLS:'6',VIDEO_DAILY_MAX_MEDIA_SECONDS:'120',
- VIDEO_VOICE_IMAGE_REF:'sha256:831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64',VIDEO_VOICE_RUNTIME_DIGEST:'831c0ff8261e75468b3a6868ca29f5b3fd1eee6b222031912eff4e13071e6e64',
- VIDEO_ASR_IMAGE_REF:'sha256:67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c',VIDEO_ASR_RUNTIME_DIGEST:'67786e6dbdd6b00f6177441e64272b622f844fc6c69b39970543afa92cc4895c',VIDEO_ASR_MODEL:'Systran/faster-whisper-small',
+ return{...process.env,VIDEO_ENVIRONMENT:'local-probe',VIDEO_APP_ORIGIN:'http://localhost:3000',VIDEO_SESSION_SIGNING_KEY:randomBytes(32).toString('hex'),VIDEO_DATA_DIR:root,VIDEO_GENERATION_ENABLED:'true',VIDEO_PROJECT_MAX_MODEL_CALLS:'6',VIDEO_PROJECT_MAX_INPUT_TOKENS:'600000',VIDEO_PROJECT_MAX_OUTPUT_TOKENS:'80000',VIDEO_PROJECT_MAX_MEDIA_SECONDS:'120',VIDEO_DAILY_MAX_MODEL_CALLS:'6',VIDEO_DAILY_MAX_MEDIA_SECONDS:'120',
  VIDEO_MEDIA_IMAGE_REF:'sha256:75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919',VIDEO_MEDIA_RUNTIME_DIGEST:'75ffd41e03d738cee7e10914aeaeb2605b9daf213409afec295ccb97bb06c919',VIDEO_MEDIA_TIMEOUT_SECONDS:'300'};
 }
 export interface ProbeRequest{model:string;maxTokens?:number;requestBytes?:number;stream?:boolean;imageCount?:number;transportCode?:string;status?:number;usage?:unknown;responseSha256?:string;responseFile?:string;startedAt:string;finishedAt?:string;timeoutMs:number;errorName?:string;evidenceErrorName?:string}

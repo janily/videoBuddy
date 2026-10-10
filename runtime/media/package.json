@@ -1,9 +1,0 @@
-{
-  "name": "videobuddy-media-runtime",
-  "private": true,
-  "type": "module",
-  "dependencies": {
-    "playwright": "1.63.0",
-    "pdfjs-dist": "6.3.289"
-  }
-}

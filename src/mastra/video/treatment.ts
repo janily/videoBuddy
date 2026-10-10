@@ -12,7 +12,7 @@ export async function runTreatment(understanding:Understanding,maxOutputTokens=5
  const pack=getStyle(understanding.preferences.styleSlug),knowledge=await loadStageKnowledge(pack.slug,'style');
  const context=JSON.stringify({understanding,style:{slug:pack.slug,packVersion:pack.packVersion,rulesHash:knowledge.sha256,rules:knowledge.rules}});
  if(Buffer.byteLength(context)>100000)throw Error('CONTEXT_LIMIT');
- const silent=understanding.preferences.voiceMode==='none'&&understanding.preferences.musicMode==='none';
+ const silent=true;
  // A visual-only film has no narration: scriptLine is the on-screen beat, not something spoken.
  const agent=createVideoAgent('director',instructions+(silent?' 这是无声影片，没有旁白、配乐和字幕。故事完全靠画面、动作和画面内的少量文字讲清楚：每镜的scriptLine写成这一镜画面要传达的一句话（标题、关键文字或动作要点），简短到观众一眼能读完；关键事实用画面内标题或标签呈现。三个方案的区别放在叙事结构、构图和运动上。镜头节奏按所选风格的运动语法安排。':' 本地旁白以自然语速发声，不能靠加速塞满镜头。中文每秒最多安排3个发声汉字，英文每秒最多2个单词；数字、年份、日期先展开读音再计算，并为每镜预留至少0.5秒呼吸。20秒视频应控制在约45个发声汉字内，优先准确保留关键事实，可减少镜头或情绪铺垫。不得在台词中使用不能读出的舞台说明。'),env);
  await markModelCallStarted();

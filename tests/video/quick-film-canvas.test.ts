@@ -16,10 +16,7 @@ vi.mock('@/services/video/config/environment',()=>({readConfiguration:vi.fn(),re
 vi.mock('@/services/video/budget/model-budget',()=>({modelLimits:()=>({}),reserveModelBudget:async()=>({reservation:{},maxOutputTokens:12000})}));
 vi.mock('@/services/video/budget/model-call',()=>({withAccountedModel:async(_s:unknown,_r:unknown,fn:()=>unknown)=>fn()}));
 vi.mock('@/mastra/video/visual-shot',()=>({runQuickVisualShot:boundary.visual,guardQuickVisualShot:(source:unknown)=>source,quickClock:()=>({}),RejectedVisualSource:class extends Error{}}));
-vi.mock('@/services/video/media/docker-executor',()=>({dockerConfiguration:()=>({runtimeDigest:'a'.repeat(64),image:'sha256:'+'a'.repeat(64),timeoutSeconds:30}),computeStageKey:()=> 'c'.repeat(64),DockerExecutor:class{}}));
-vi.mock('@/services/video/media/technical-qa',()=>({technicalVideoQa:async()=>({sha256:'b'.repeat(64),bytes:2048})}));
-vi.mock('@/services/video/media/picture-sequence',()=>({assemblePictureSequence:async()=>({outputPath:'/verified/sequence.mp4'})}));
-vi.mock('@/services/video/quick/compose',()=>({composeQuickFilm:async()=>({outputPath:'/verified/final.mp4',qa:{sha256:'d'.repeat(64),bytes:4096}})}));
+vi.mock('@/services/video/media/configuration',()=>({createMediaRuntime:async()=>({runtimeDigest:'a'.repeat(64),renderShot:async(_job:unknown,options:{onPoster:(data:Buffer)=>Promise<void>})=>{await options.onPoster(Buffer.from('poster'));return{key:'c'.repeat(64),outputPath:'/verified/clip.mp4',sha256:'b'.repeat(64),bytes:2048}},assemble:async()=>({outputPath:'/verified/final.mp4',sha256:'d'.repeat(64),bytes:4096}),close:async()=>{}})}));
 vi.mock('@/services/video/quick/shot-media',async original=>({...await original<typeof import('@/services/video/quick/shot-media')>(),publishShotArtifact:boundary.publish}));
 const roots:string[]=[];afterEach(async()=>{vi.clearAllMocks();await Promise.all(roots.splice(0).map(root=>rm(root,{recursive:true,force:true})))});
 describe('film consumes canvas script and publishes actual milestones',()=>{
@@ -28,16 +25,16 @@ describe('film consumes canvas script and publishes actual milestones',()=>{
   const {projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID(),preferences:{durationSec:20,styleSlug:'watercolor'}});
   const original=await projects.access('owner',projectId),understanding={...(await store.readFresh<Record<string,unknown>>(original.understandingRef.key)).value,subject:'咖啡店'};
   const ref=await projects.index.immutable(`projects/${projectId}/understanding/test`,understanding),operationId=randomUUID();
-  const control=await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,understandingRef:ref,phase:'preparing_preview' as const,activeProduction:operationId}));
+  const control=await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,understandingRef:ref,phase:'generating' as const,activeProduction:operationId}));
   await createOrRead(store,`projects/${projectId}/operations/${operationId}`,{revisionId:randomUUID()});
   const context=await quickTreatmentContext(projects,control);
   const plan={schemaVersion:1,briefVersion:0,styleSlug:'watercolor',styleRulesHash:context.knowledge.sha256,durationSec:20,aspect:'16:9',fps:24,summary:'咖啡店',options:['a','b','c'].map(id=>({id,concept:id,visualApproach:'温暖',soundApproach:'无',tradeoff:'简洁'})),selectedOptionId:'a',selectionReason:'适合邻里',shots:[{id:'shot-1',startFrame:0,endFrame:480,scriptLine:'来喝咖啡',visualIntent:'咖啡杯',factIds:[]}],script:['来喝咖啡']};
   await createOrRead(store,`${context.base}/treatment`,{value:plan});
-  boundary.visual.mockResolvedValue({shotId:'shot-1',startFrame:0,endFrame:480,sourceHtml:'<html>verified fixture</html>',assetIds:[]});
+  boundary.visual.mockResolvedValue({schemaVersion:1,briefVersion:0,styleSlug:'watercolor',styleRulesHash:context.knowledge.sha256,timingDraftHash:'b'.repeat(64),factIds:[],shotId:'shot-1',startFrame:0,endFrame:480,sourceHtml:'<html>'+('verified fixture '.repeat(10))+'</html>',assetIds:[]});
   const events:ShotUpdate[]=[],activity=vi.fn(async()=>{});
   const film=await buildQuickFilm(projects,{projectId,operationId,expectedConsentEpoch:0},{root,env:{},onShot:async shot=>{events.push(shot)}},activity);
   expect(boundary.treatment).not.toHaveBeenCalled();expect(film.shots[0].scriptLine).toBe('来喝咖啡');
-  expect(events.map(event=>event.state)).toEqual(['drawing','drawn','drawn','rendered']);
+  expect(events.map(event=>event.state)).toEqual(['drawing','drawn','rendering','drawn','rendered']);
   expect(boundary.publish.mock.calls).toHaveLength(2);
   expect(activity).toHaveBeenCalledWith('picture','第 1/1 个片段已完成',{completed:1,total:1,unit:'shots'});
  });

@@ -4,7 +4,6 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import {z} from 'zod';
 import {CommandReceiptSchema,type ExportRequest,type StreamEvent} from '@/contracts/video/commands';
 import {exportFailure,exportLabels,parseExportIntent,validateDownloadAccess,type ExportIntent} from '@/services/video/exports/client-contract';
-import {exportFiles} from '@/services/video/exports/formats';
 import {useProjectEvents} from './use-project-events';
 import {useDraft} from './use-draft';
 type State={phase:'idle'|'submitting'|'pending'|'ready'|'failed'|'uncertain';format?:ExportRequest['format'];operationId?:string;epoch?:number;message?:string};
@@ -52,7 +51,7 @@ export function useExportDownload(projectId:string,artifactId:string,canFollowSs
    }
    if(response.status===200){
     const result=ReadySchema.parse(body),access=validateDownloadAccess(result.access,projectId,result.artifactId,window.location.origin);
-    const mime=value.request.format==='mp4'?'video/mp4':value.request.format==='poster'?'image/png':exportFiles[value.request.format].mime;
+    const mime=value.request.format==='mp4'?'video/mp4':'image/png';
     if(access.mime!==mime||(value.request.format==='mp4'&&result.artifactId!==artifactId))throw Error('DOWNLOAD_ACCESS_INVALID');
     if(download){const link=document.createElement('a');link.href=access.url;link.download=access.filename;document.body.append(link);link.click();link.remove();if(value.request.format==='mp4')trackCanvasEvent(projectId,{name:'result_downloaded',payload:{}})}
     if(value.request.format!=='mp4')setState({phase:'ready',format:value.request.format,message:`${exportLabels[value.request.format]}已准备好，点击下载即可保存。`});
@@ -67,7 +66,7 @@ export function useExportDownload(projectId:string,artifactId:string,canFollowSs
   }catch(error){
    if(!signal.aborted&&(value.request.format==='mp4'||intent.current?.request.clientCommandId===value.request.clientCommandId)){
     const code=error instanceof Error?error.message:'';
-    const verifiedFailure=['EXPORT_NOT_APPLICABLE','ARCHIVE_ASSET_REDISTRIBUTION_REQUIRED','ARCHIVE_PRIVATE_DATA','RESULT_STALE','EXPORT_FENCED','CAPABILITY_UNAVAILABLE'].includes(code);
+    const verifiedFailure=['EXPORT_NOT_APPLICABLE','RESULT_STALE','EXPORT_FENCED','CAPABILITY_UNAVAILABLE'].includes(code);
     if(value.request.format==='mp4')setDownloadError('视频下载连接暂时不可用，请再次点击下载视频。');
     else setState(old=>({...old,format:old.format||value.request.format,phase:verifiedFailure?'failed':'uncertain',message:verifiedFailure?exportFailure(code):'下载连接暂时不可用。重新连接会继续同一项请求。'}));
    }
@@ -75,7 +74,7 @@ export function useExportDownload(projectId:string,artifactId:string,canFollowSs
  },[projectId,artifactId,persist,inspect,stopOperation]);
  useEffect(()=>{
   const restored=parseExportIntent(stored,artifactId);
-  if(restored&&!intent.current){intent.current=restored;void submit(restored,false)}
+  if(restored?.request.format==='poster'&&!intent.current){intent.current=restored;void submit(restored,false)}
  },[stored,artifactId,submit]);
  const refresh=useCallback(async(event?:StreamEvent)=>{
   const signal=abort.current?.signal,current=intent.current;if(!signal||signal.aborted||!current||!state.operationId)return;
@@ -85,7 +84,7 @@ export function useExportDownload(projectId:string,artifactId:string,canFollowSs
   }catch{if(!signal.aborted&&intent.current?.request.clientCommandId===current.request.clientCommandId&&activeOperation.current===state.operationId)setState(old=>({...old,phase:'uncertain',message:'导出进度暂时无法确认，请重新连接。'}))}
  },[inspect,state.operationId]);
  const events=useProjectEvents(canFollowSse&&state.phase==='pending'?projectId:undefined,state.operationId,state.epoch||0,refresh,false);
- async function download(format:ExportRequest['format']){
+ async function download(format:'mp4'|'poster'){
   if(busyRef.current)return;
   if(format!=='mp4'&&['pending','submitting','uncertain'].includes(state.phase))return;
   const same=intent.current?.request.format===format&&state.phase==='ready';

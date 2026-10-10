@@ -23,12 +23,9 @@ export async function resolveArtifact(projects:ProjectStore,owner:string,project
   try{const canvas=(await projects.store.readFresh<{shots:Record<string,{posterArtifactId?:string;clipArtifactId?:string}>}>(`${base}/canvas`)).value;const shot=canvas.shots[shotId];published=Boolean(shot&&(shot.posterArtifactId===artifactId||shot.clipArtifactId===artifactId))}catch(error){if(!(error instanceof StoreMissing))throw error}
  }
 
- if(control.currentPreviewId&&!published){
-  const preview=await projects.store.readFresh<{previewArtifactId:string;revisionId:string}>(`projects/${projectId}/previews/${control.currentPreviewId}/manifest`);
-  published=preview.value.previewArtifactId===artifactId&&preview.value.revisionId===artifact.revisionId;
- }
  for(const resultId of[control.currentResultId,control.previousResultId])if(resultId&&!published){
-  const result=await projects.store.readFresh<{artifactId:string;revisionId:string}>(`projects/${projectId}/results/${resultId}/manifest`);
+  const result=await projects.store.readFresh<{kind?:string;artifactId:string;revisionId:string}>(`projects/${projectId}/results/${resultId}/manifest`);
+  if(result.value.kind!=='quick')continue;
   published=result.value.artifactId===artifactId&&result.value.revisionId===artifact.revisionId;
   if(!published&&control.publishedExports?.[artifactId]){
    try{

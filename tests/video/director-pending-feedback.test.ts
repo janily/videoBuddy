@@ -47,7 +47,7 @@ it.each(['running','cancelled','new_baseline'])('defers chat corrections against
   const operationId=crypto.randomUUID(),productionId=crypto.randomUUID(),userId=crypto.randomUUID();
   await store.create(`projects/${projectId}/operations/${operationId}`,{id:operationId,projectId,kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
   await store.create(`projects/${projectId}/operations/${productionId}`,{id:productionId,kind:'render',status:'running',streamEpoch:0});
-  await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,phase:'rendering' as const,activeConversation:operationId,activeProduction:race?null:productionId,ordinalReservations:{[operationId]:{user:1,assistant:2}}}));
+  await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,phase:'generating' as const,activeConversation:operationId,activeProduction:race?null:productionId,ordinalReservations:{[operationId]:{user:1,assistant:2}}}));
   await projects.archiveMessage(projectId,{id:userId,ordinal:1,role:'user',text:'下一版换成水墨风格',status:'completed',contentVersion:1,operationId});
   const before=await projects.access('owner',projectId);
   let frozen=before;
@@ -83,7 +83,7 @@ it('recovers a completed Director effect after power loss and production cancell
   const operationId=crypto.randomUUID(),productionId=crypto.randomUUID(),userId=crypto.randomUUID(),prefix=`projects/${projectId}`;
   await store.create(`${prefix}/operations/${operationId}`,{id:operationId,projectId,kind:'chat',status:'reserved',canonicalRunId:null,streamEpoch:0,fence:0});
   await store.create(`${prefix}/operations/${productionId}`,{id:productionId,kind:'render',status:'running',canonicalRunId:productionId,streamEpoch:0,fence:0});
-  await updateJson(store,`${prefix}/control`,(c:ProjectControl)=>({...c,phase:'rendering' as const,activeConversation:operationId,activeProduction:productionId,ordinalReservations:{[operationId]:{user:1,assistant:2}}}));
+  await updateJson(store,`${prefix}/control`,(c:ProjectControl)=>({...c,phase:'generating' as const,activeConversation:operationId,activeProduction:productionId,ordinalReservations:{[operationId]:{user:1,assistant:2}}}));
   await projects.archiveMessage(projectId,{id:userId,ordinal:1,role:'user',text:'下一版换成水墨',status:'completed',contentVersion:1,operationId});
   let offline=false,calls=0;
   const durableCas=store.cas.bind(store),durableRead=store.readFresh.bind(store);

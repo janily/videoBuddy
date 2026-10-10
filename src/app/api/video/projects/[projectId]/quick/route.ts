@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {randomUUID} from 'node:crypto';
 import {body,writeAccess,projectService,json,errorResponse} from '@/services/video/http/route-utils';
-import {MusicChoiceSchema,quickFlow,updateQuickSettings,readQuickSettings,type MusicChoice} from '@/services/video/quick/settings';
+import {MusicChoiceSchema,updateQuickSettings,readQuickSettings,type MusicChoice} from '@/services/video/quick/settings';
 import {loadMusicLibrary} from '@/services/video/music/library';
-import {readAnyResultManifest} from '@/services/video/results/publish';
+import {readAnyResultManifest} from '@/services/video/results/publish-film';
 import {createOrRead,updateJson} from '@/services/video/storage/atomic-store';
 import {canonicalHash} from '@/services/video/domain/hash';
 import type {ProjectStore} from '@/services/video/storage/project-store';
@@ -43,7 +43,6 @@ async function canvasChange(projects:ProjectStore,owner:string,projectId:string,
  * everything that did not change is reused, so only the music mix or that one shot is redone. */
 export async function POST(request:Request,{params}:{params:Promise<{projectId:string}>}){
  try{
-  if(!quickFlow())throw Error('CAPABILITY_UNAVAILABLE');
   const owner=writeAccess(request),input=await body(request,RequestSchema),{projectId}=await params,projects=projectService(),control=await projects.access(owner,projectId);
   let trackTitle:string|undefined;
   if(input.music?.mode==='track'){const library=await loadMusicLibrary(),track=library?.tracks.find(track=>track.id===(input.music as {trackId:string}).trackId);if(!track)throw Error('VALIDATION_FAILED');trackTitle=track.title}

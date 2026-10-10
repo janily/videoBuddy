@@ -1,7 +1,7 @@
 import {userActivity} from '@/services/video/commands/user-activity';
 import {AtomicStore,updateJson} from '@/services/video/storage/atomic-store';
 import {ProjectControl} from '@/contracts/video/project';
-import {clearUnstartedMediaStop} from '@/services/video/media/stop-state';
+import {clearUnstartedMediaStop} from '@/services/video/commands/media-stop-state';
 const terminal=new Set(['succeeded','failed','cancelled','interrupted']);
 export async function cancelReply(store:AtomicStore,projectId:string,operationId:string){
  const p=`projects/${projectId}`;
@@ -17,12 +17,12 @@ export async function cancelReply(store:AtomicStore,projectId:string,operationId
 }
 export async function cancelProduction(store:AtomicStore,projectId:string,operationId:string){
  const p=`projects/${projectId}`;let owned=false;
- const before=(await store.readFresh<{kind?:string}>(`${p}/operations/${operationId}`)).value;
+ await store.readFresh(`${p}/operations/${operationId}`);
  await updateJson(store,`${p}/control`,(control:ProjectControl)=>{
   if(control.deletedAt)throw Error('ACCESS_NOT_FOUND');
   owned=control.activeProduction===operationId;
   if(!owned)return control;
-  return{...control,...userActivity(control),controlVersion:control.controlVersion+1,consentEpoch:control.consentEpoch+1,activeProduction:null,cancelRequestedProductionId:operationId,unresolvedMediaStops:{...control.unresolvedMediaStops,[operationId]:before.kind==='preview'?'preview' as const:'render' as const},phase:'cancelled' as const,previewState:control.previewState==='ready'?'stale' as const:control.previewState};
+  return{...control,...userActivity(control),controlVersion:control.controlVersion+1,consentEpoch:control.consentEpoch+1,activeProduction:null,cancelRequestedProductionId:operationId,unresolvedMediaStops:{...control.unresolvedMediaStops,[operationId]:'preview' as const},phase:'cancelled' as const};
  });
  const key=`${p}/operations/${operationId}`;
  if(!owned){const operation=(await store.readFresh<{status:string;canonicalRunId?:string|null}>(key)).value;if(operation.status==='cancelled'&&!operation.canonicalRunId)await clearUnstartedMediaStop(store,projectId,operationId);return operation.status==='cancelled'?'cancelled':operation.status==='cancelling'?'cancelling':'already_completed'}

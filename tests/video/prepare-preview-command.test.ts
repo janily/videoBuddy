@@ -3,7 +3,7 @@ import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
-import {preparePreview} from '@/services/video/preview/prepare';
+import {preparePreview} from '@/services/video/quick/prepare';
 import {FileStore} from '@/services/video/storage/file-store';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {LocalOperationQueue} from '@/services/video/commands/local-queue';
@@ -12,7 +12,7 @@ import {initialUnderstanding} from '@/contracts/video/domain';
 import type {ProjectControl} from '@/contracts/video/project';
 
 async function fixture(root:string){
- const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),understanding={...initialUnderstanding(),briefVersion:1,subject:'社区图书交换日',preferences:{...initialUnderstanding().preferences,styleSlug:'crayon-book',voiceMode:'none' as const}};
+ const projects=new ProjectStore(new FileStore(root)),{projectId}=await projects.create('owner',{schemaVersion:5,clientCommandId:randomUUID(),clientCreateId:randomUUID()}),understanding={...initialUnderstanding(),briefVersion:1,subject:'社区图书交换日',preferences:{...initialUnderstanding().preferences,styleSlug:'crayon-book'}};
  const understandingRef=await projects.index.immutable('projects/'+projectId+'/understanding/1',understanding);
  await updateJson(projects.store,'projects/'+projectId+'/control',(c:ProjectControl)=>({...c,briefVersion:1,understandingRef}));
  return{projects,projectId,queue:new LocalOperationQueue(projects.store,root),request:{schemaVersion:5 as const,clientCommandId:randomUUID(),expectedBriefVersion:1}};
@@ -22,7 +22,7 @@ it('authorizes a preview once, freezes its baseline and IDs, and replays a queue
   const {projects,queue,projectId,request}=await fixture(root),first=await preparePreview(projects,queue,'owner',projectId,request),again=await preparePreview(projects,queue,'owner',projectId,request);
   expect(first.status).toBe('accepted');expect(again).toMatchObject({operationId:first.operationId,status:'replayed'});expect(await queue.pending()).toEqual([{projectId,operationId:first.operationId,kind:'preview'}]);
   const control=(await projects.store.readFresh<ProjectControl>('projects/'+projectId+'/control')).value;
-  expect(control).toMatchObject({phase:'preparing_preview',activeProduction:first.operationId,briefVersion:1});expect(control.currentApprovalId).toBeUndefined();
+  expect(control).toMatchObject({phase:'generating',activeProduction:first.operationId,briefVersion:1});expect(control).not.toHaveProperty('currentApprovalId');
   expect((await projects.store.readFresh('projects/'+projectId+'/operations/'+first.operationId)).value).toMatchObject({kind:'preview',briefVersion:1,consentEpoch:0,understandingRef:control.understandingRef,revisionId:expect.any(String),previewId:expect.any(String)});
   await expect(preparePreview(projects,queue,'owner',projectId,{...request,expectedBriefVersion:2})).rejects.toThrow('IDEMPOTENCY_CONFLICT');
  }finally{await rm(root,{recursive:true,force:true})}

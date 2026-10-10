@@ -1,192 +1,128 @@
 import {afterEach,beforeEach,expect,it} from 'vitest';
-import {mkdtemp,mkdir,readFile,rm,writeFile} from 'node:fs/promises';
+import {mkdtemp,mkdir,readFile,rm,writeFile,symlink,link} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
-import {spawn} from 'node:child_process';
 import {FileStore} from '@/services/video/storage/file-store';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {LocalOperationQueue} from '@/services/video/commands/local-queue';
 import {LocalEventLog} from '@/services/video/stream/local-event-log';
 import {updateJson} from '@/services/video/storage/atomic-store';
-import {mandatoryDeliveryRules} from '@/services/video/quality/delivery';
 import {requestExport} from '@/services/video/exports/request';
 import {runExportOperation,cancelExport} from '@/services/video/exports/operation';
 import {getArtifactAccess} from '@/services/video/exports/access';
+import {prepareExportPoster} from '@/services/video/exports/poster';
+import {persistArchiveObject} from '@/services/video/exports/archive-object';
 import type {ProjectControl} from '@/contracts/video/project';
-import {seedPreviewBundle} from './fixtures/preview-package';
 import {writeWorkerHeartbeat} from '@/services/video/commands/worker-heartbeat';
+import {protocolPng} from './fixtures/png';
 let root:string;const owner='a'.repeat(64);const prior=process.env.VIDEO_SESSION_SIGNING_KEY;
 beforeEach(async()=>{root=await mkdtemp(join(tmpdir(),'vb-export-op-'));process.env.VIDEO_SESSION_SIGNING_KEY='s'.repeat(64);await writeWorkerHeartbeat(root)});
 afterEach(async()=>{await rm(root,{recursive:true,force:true});if(prior===undefined)delete process.env.VIDEO_SESSION_SIGNING_KEY;else process.env.VIDEO_SESSION_SIGNING_KEY=prior});
-async function fixture(input:{script?:string[]}={}){
+const hash=(bytes:Buffer)=>createHash('sha256').update(bytes).digest('hex');
+async function fixture(){
  const store=new FileStore(root),projects=new ProjectStore(store),queue=new LocalOperationQueue(store,root),events=new LocalEventLog(root),{projectId}=await projects.create(owner,{schemaVersion:5,clientCreateId:randomUUID(),clientCommandId:randomUUID()});
- const artifactId=randomUUID(),bytes=Buffer.from('protocol fixture only; not a real qualified movie'),sha256=createHash('sha256').update(bytes).digest('hex'),revisionId=randomUUID(),resultId=randomUUID();
- const bundle=await seedPreviewBundle(projects,{projectId,revisionId,durationSec:20,briefVersion:1,previewArtifactSha256:'b'.repeat(64),...input});
- await store.create(`projects/${projectId}/previews/${bundle.previewId}/manifest`,bundle);
+ const artifactId=randomUUID(),bytes=Buffer.alloc(2048,1),sha256=hash(bytes),revisionId=randomUUID(),resultId=randomUUID();
  const key=`projects/${projectId}/artifacts/${artifactId}/files/final.mp4`;await mkdir(join(root,'objects',`projects/${projectId}/artifacts/${artifactId}/files`),{recursive:true});await writeFile(join(root,'objects',key),bytes);
  await store.create(`projects/${projectId}/artifacts/${artifactId}/manifest`,{id:artifactId,revisionId,objectRef:{key,sha256,bytes:bytes.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'final.mp4'});
- const manifest={resultId,artifactId,revisionId,previewId:bundle.previewId,approvalId:randomUUID(),bundleHash:bundle.bundleHash,mp4Sha256:sha256,mp4Bytes:bytes.length,qualityPolicy:{schemaVersion:1,audioIntent:'silent',captions:false,requiredRules:[...mandatoryDeliveryRules]},qualityChecks:[...mandatoryDeliveryRules,'decoded_silence'].map(ruleId=>({ruleId,result:'pass',severity:'blocking',evidenceRefs:['protocol-fixture-not-real-QA']})),createdAt:new Date().toISOString()};
+ const manifest={kind:'quick' as const,resultId,artifactId,revisionId,operationId:randomUUID(),bundleHash:'b'.repeat(64),mp4Sha256:sha256,mp4Bytes:bytes.length,briefVersion:1,styleSlug:'watercolor',aspect:'16:9' as const,durationSec:20,shots:[{id:'s1',scriptLine:'Protocol fixture only',startFrame:0,endFrame:480,take:0}],music:null,aiLabel:true as const,createdAt:new Date().toISOString()};
  await store.create(`projects/${projectId}/results/${resultId}/manifest`,manifest);
  await updateJson(store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,phase:'ready' as const,currentResultId:resultId}));
- const request={schemaVersion:5 as const,clientCommandId:randomUUID(),artifactId,format:'source_zip' as const};
- return{store,projects,queue,events,projectId,artifactId,resultId,manifest,request};
+ const request={schemaVersion:5 as const,clientCommandId:randomUUID(),artifactId,format:'poster' as const};
+ return{store,projects,queue,events,projectId,artifactId,resultId,manifest,request,key};
 }
-it.each(['treatment','credits','quality'] as const)('T14 %s export uses its own durable slot and produces a private deterministic document',async format=>{
- const f=await fixture(),request={...f.request,format},started=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(started.status!==202)throw Error('TEST');
- const zip=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);expect(zip.operationId).not.toBe(started.operationId);
- await rm(join(root,'queue'),{recursive:true,force:true});await f.queue.reconcileExports();expect(await f.queue.pending()).toHaveLength(2);
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
- await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,started.operationId,{root});
- const completed=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(completed.status!==200)throw Error('TEST');
- const artifact=(await f.store.readFresh<{objectRef:{key:string;sha256:string;mime:string};filename:string}>(`projects/${f.projectId}/artifacts/${completed.artifactId}/manifest`)).value;
- const bytes=await readFile(join(root,'objects',artifact.objectRef.key));expect(createHash('sha256').update(bytes).digest('hex')).toBe(artifact.objectRef.sha256);
- if(format==='treatment')expect(bytes.toString()).toBe('活动预告\n\n上海的活动将在十月八日开始。\n');
- else if(format==='quality')expect(JSON.parse(bytes.toString())).toMatchObject({mp4Sha256:f.manifest.mp4Sha256,qualityChecks:f.manifest.qualityChecks});
- else expect(JSON.parse(bytes.toString())).toMatchObject({sources:[],revisionId:f.manifest.revisionId});
- expect((await f.events.readFrom(f.projectId,started.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
+// Explicit protocol PNG avoids pretending this unit test rendered real video.
+const png=protocolPng();
+const poster:typeof prepareExportPoster=(projects,owner,pid,aid,root,options)=>prepareExportPoster(projects,owner,pid,aid,root,{...options,extract:async()=>png});
+it('quick MP4 downloads immediately without requiring an export worker',async()=>{
+ const f=await fixture();await rm(join(root,'worker-heartbeat'));
+ const request={...f.request,format:'mp4' as const};
+ const first=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);
+ expect(first).toMatchObject({status:200,artifactId:f.artifactId,access:{mime:'video/mp4',purpose:'download'}});
+ expect((await requestExport(f.projects,f.queue,owner,f.projectId,request,root)).status).toBe(200);
+ expect(await f.queue.pending()).toEqual([]);
+});
+it.each(['source_zip','srt','treatment','credits','quality'])('rejects removed %s exports before creating work',async format=>{
+ const f=await fixture();await expect(requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format} as never,root)).rejects.toThrow();expect(await f.queue.pending()).toEqual([]);
+});
+it('poster dispatch is idempotent, cold replay builds once, and download remains private',async()=>{
+ const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(first.status!==202)throw Error('TEST');
+ expect(await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).toEqual(first);expect(await f.queue.pending()).toHaveLength(1);
+ let calls=0;const build:typeof poster=async(...args)=>{calls++;return poster(...args)};
+ await runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,poster:build});await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,first.operationId,{root,poster:build});expect(calls).toBe(1);
+ const completed=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(completed.status!==200)throw Error('TEST');
+ expect(completed.access).toMatchObject({mime:'image/png',filename:'VideoBuddy-poster.png'});
+ const artifact=(await f.store.readFresh<{objectRef:{key:string}}>(`projects/${f.projectId}/artifacts/${completed.artifactId}/manifest`)).value;expect(await readFile(join(root,'objects',artifact.objectRef.key))).toEqual(png);
+ expect((await f.events.readFrom(f.projectId,first.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
+ await expect(getArtifactAccess(f.projects,'foreign',f.projectId,completed.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
  await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'play')).rejects.toThrow('ACCESS_NOT_FOUND');
  await f.projects.tombstone(owner,f.projectId);await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
 });
-it('T14 subtitle export without frozen captions fails explicitly without publishing an empty file',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'srt'},root);if(started.status!==202)throw Error('TEST');
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
- expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('failed');
- expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'EXPORT_NOT_APPLICABLE'});
- expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
+it('rejects altered MP4 bytes and unqualified source before dispatch',async()=>{
+ const f=await fixture();await writeFile(join(root,'objects',f.key),Buffer.alloc(2048,2));
+ await expect(requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).rejects.toThrow('ARTIFACT_INVALID');expect(await f.queue.pending()).toEqual([]);
 });
-it('T14 refuses credentials in frozen treatment text before creating a public document',async()=>{
- const f=await fixture({script:['包含虚构访问凭据 sk-testprivatecredential123456']}),started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'treatment'},root);if(started.status!==202)throw Error('TEST');
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
- expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'ARCHIVE_PRIVATE_DATA'});
- expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
-});
-it('T14 refuses credentials in quality reasons without disclosing the failing content in SSE',async()=>{
- const f=await fixture(),key=`projects/${f.projectId}/results/${f.resultId}/manifest`,old=await f.store.readFresh(key);
- await f.store.cas(key,old.etag,{...f.manifest,qualityChecks:f.manifest.qualityChecks.map(check=>({...check,reason:'access_token=fakeprivatecredential123'}))});
- const started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'quality'},root);if(started.status!==202)throw Error('TEST');
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
- expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'ARCHIVE_PRIVATE_DATA'});
- expect(JSON.stringify(await f.events.readFrom(f.projectId,started.operationId,0))).not.toContain('fakeprivatecredential123');
- expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
-});
-it('T14 source ZIP request dispatches once, produces actual ZIP, replays SSE once and opens private download',async()=>{
- const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);
- expect(first.status).toBe(202);if(first.status!==202)throw Error('TEST');
- const repeated=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);expect(repeated).toEqual(first);
- expect(await f.queue.pending()).toHaveLength(1);
- let builds=0;const {prepareFrozenSourceArchive}=await import('@/services/video/exports/source-archive');
- const build:typeof prepareFrozenSourceArchive=async(...args)=>{builds++;return prepareFrozenSourceArchive(...args)};
- await runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,build});
- await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,first.operationId,{root,build});
- expect(builds).toBe(1);const completed=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);
- expect(completed.status).toBe(200);if(completed.status!==200)throw Error('TEST');
- expect(completed.access.mime).toBe('application/zip');const exportedId=completed.artifactId;
- const artifact=(await f.store.readFresh<{objectRef:{key:string}}>(`projects/${f.projectId}/artifacts/${exportedId}/manifest`)).value;
- expect((await readFile(join(root,'objects',artifact.objectRef.key))).subarray(0,4).toString('hex')).toBe('504b0304');
- expect((await f.events.readFrom(f.projectId,first.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
- expect((await f.projects.access(owner,f.projectId)).currentResultId).toBe(f.resultId);
- await expect(getArtifactAccess(f.projects,owner,f.projectId,exportedId,'play')).rejects.toThrow('ACCESS_NOT_FOUND');
- await f.projects.tombstone(owner,f.projectId);await expect(getArtifactAccess(f.projects,owner,f.projectId,exportedId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
-});
-it('T14 rejects unqualified or unpublished results and changed idempotency bodies before dispatch',async()=>{
- const f=await fixture();await expect(requestExport(f.projects,f.queue,'foreign',f.projectId,f.request,root)).rejects.toThrow('ACCESS_NOT_FOUND');
- await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);
+it('changed command body cannot be reused for another export',async()=>{
+ const f=await fixture();await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);
  await expect(requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'mp4'},root)).rejects.toThrow('IDEMPOTENCY_CONFLICT');
- const key=`projects/${f.projectId}/results/${f.resultId}/manifest`,old=await f.store.readFresh(key);await f.store.cas(key,old.etag,{...f.manifest,qualityChecks:[]});
- await expect(requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root)).rejects.toThrow('QUALITY_BLOCKED');
 });
-it('T14 preclaim export cancellation never builds and does not cancel production',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- const before=await f.projects.access(owner,f.projectId);expect(await cancelExport(f.projects,owner,f.projectId,started.operationId)).toBe('cancelled');
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,build:async()=>{throw Error('MUST_NOT_BUILD')}});
- expect((await f.projects.access(owner,f.projectId)).consentEpoch).toBe(before.consentEpoch);
-});
-it('T14 a lost cancellation ACK repairs terminal archive/SSE even after a new attempt replaces its slot',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- const original=f.store.cas.bind(f.store);let lost=false;
- f.store.cas=async(key,etag,value)=>{await original(key,etag,value);if(key===`projects/${f.projectId}/operations/${started.operationId}`&&(value as {status:string}).status==='cancelled'&&!lost){lost=true;throw Error('CANCEL_ACK_LOST')}};
- await expect(cancelExport(f.projects,owner,f.projectId,started.operationId,f.events)).rejects.toThrow('CANCEL_ACK_LOST');
- await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);
- const {runQueuedOnce}=await import('@/services/video/commands/local-worker');
- await runQueuedOnce(f.queue,f.store,async job=>{if(job.operationId===started.operationId)await runExportOperation(new FileStore(root),new LocalEventLog(root),job.projectId,job.operationId,{root,build:async()=>{throw Error('MUST_NOT_BUILD')}})});
- expect((await f.queue.pending()).some(job=>job.operationId===started.operationId)).toBe(false);
- expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'cancelled'});
- expect((await f.events.readFrom(f.projectId,started.operationId,0)).filter(({event})=>event.type==='operation.terminal')).toHaveLength(1);
-});
-it('T14 cold worker repairs a lost enqueue and concurrent different commands share the same export',async()=>{
- const f=await fixture(),lost={enqueue:async()=>{throw Error('LOST_ENQUEUE')}} as unknown as LocalOperationQueue;
- await expect(requestExport(f.projects,lost,owner,f.projectId,f.request,root)).rejects.toThrow('START_FAILED');
- expect(await f.queue.pending()).toEqual([]);await f.queue.reconcileExports();expect(await f.queue.pending()).toHaveLength(1);
- const a=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root),b=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);
- expect(a.operationId).toEqual(b.operationId);
-});
-it('T14 cold discovery repairs a missing operation file from the reserved result slot',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- await rm(join(root,`projects/${f.projectId}/operations/${started.operationId}.json`));await rm(join(root,'queue'),{recursive:true,force:true});
- await f.queue.reconcileExports();expect(await f.queue.pending()).toHaveLength(1);
- const {runQueuedOnce}=await import('@/services/video/commands/local-worker');await runQueuedOnce(f.queue,f.store,job=>runExportOperation(f.store,f.events,job.projectId,job.operationId,{root}));
- expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('succeeded');
-});
-it('T14 cold slot recovery binds the original command before another command can cancel and replace its attempt',async()=>{
- const f=await fixture(),originalCreate=f.store.create.bind(f.store);let lost=false;
- f.store.create=async(key,value)=>{await originalCreate(key,value);if(key.endsWith('/export-requests/source_zip')&&!lost){lost=true;throw Error('LOST_SLOT_ACK')}};
- await expect(requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).rejects.toThrow('LOST_SLOT_ACK');
- f.store.create=originalCreate;await f.queue.reconcileExports();const old=(await f.queue.pending())[0].operationId;
- const other=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);expect(other.operationId).toBe(old);
- await cancelExport(f.projects,owner,f.projectId,old,f.events);
- const replacement=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);expect(replacement.operationId).not.toBe(old);
- const retriedOriginal=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);expect(retriedOriginal.operationId).toBe(old);
-});
-it('T14 cancellation during archive creation blocks publication and terminal SSE reports cancelled',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- const {prepareFrozenSourceArchive}=await import('@/services/video/exports/source-archive');
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,build:async(...args)=>{const built=await prepareFrozenSourceArchive(...args);await cancelExport(f.projects,owner,f.projectId,started.operationId,f.events);return built}});
- expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('cancelled');
- expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
- expect((await f.events.readFrom(f.projectId,started.operationId,0)).at(-1)?.event.payload).toMatchObject({status:'cancelled'});
-});
-it('T14 cancellation after a prepared publication record wins the visibility CAS and denies orphan ZIP access',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- const original=f.store.create.bind(f.store);let orphanId='';
- f.store.create=async(key,value)=>{await original(key,value);if(key.endsWith('/exports/source_zip')){orphanId=(value as {artifactId:string}).artifactId;await cancelExport(f.projects,owner,f.projectId,started.operationId,f.events)}};
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root});
- expect(orphanId).not.toBe('');expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('cancelled');
- await expect(getArtifactAccess(f.projects,owner,f.projectId,orphanId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
- const retry=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);if(retry.status!==202)throw Error('TEST');
- expect(retry.operationId).not.toBe(started.operationId);await runExportOperation(f.store,f.events,f.projectId,retry.operationId,{root});
- expect((await f.projects.operation(f.projectId,retry.operationId))?.status).toBe('succeeded');
-});
-it('T14 explicit new commands may retry a cancelled export while the original command keeps its terminal identity',async()=>{
+it('cancel during poster generation blocks publication; new commands retry, original stays terminal',async()=>{
  const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(first.status!==202)throw Error('TEST');
- await cancelExport(f.projects,owner,f.projectId,first.operationId,f.events);
- const next=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);if(next.status!==202)throw Error('TEST');expect(next.operationId).not.toBe(first.operationId);
- const original=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);expect(original.operationId).toBe(first.operationId);
- expect((await f.projects.operation(f.projectId,first.operationId))?.status).toBe('cancelled');
+ await runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,poster:async(...args)=>{const built=await poster(...args);await cancelExport(f.projects,owner,f.projectId,first.operationId,f.events);return built}});
+ expect((await f.projects.operation(f.projectId,first.operationId))?.status).toBe('cancelled');expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
+ const next=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);expect(next.operationId).not.toBe(first.operationId);
+ expect((await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).operationId).toBe(first.operationId);
 });
-it('T14 resumes after a lost publication CAS acknowledgement with zero additional builders',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- const original=f.store.cas.bind(f.store);let lost=false,builds=0;
- f.store.cas=async(key,etag,value)=>{await original(key,etag,value);if(key===`projects/${f.projectId}/control`&&(value as ProjectControl).publishedExports&&!lost){lost=true;throw Error('LOST_PUBLICATION_ACK')}};
- const {prepareFrozenSourceArchive}=await import('@/services/video/exports/source-archive');
- const build:typeof prepareFrozenSourceArchive=async(...args)=>{builds++;return prepareFrozenSourceArchive(...args)};
- await expect(runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,build})).rejects.toThrow('LOST_PUBLICATION_ACK');
- await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,started.operationId,{root,build});expect(builds).toBe(1);
- expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('succeeded');
- expect((await f.events.readFrom(f.projectId,started.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
+it('cancellation after prepared publication denies the orphan poster and permits an explicit retry',async()=>{
+ const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(first.status!==202)throw Error('TEST');
+ const create=f.store.create.bind(f.store);let orphanId='';
+ f.store.create=async(key,value)=>{await create(key,value);if(key.endsWith('/exports/poster')){orphanId=(value as {artifactId:string}).artifactId;await cancelExport(f.projects,owner,f.projectId,first.operationId,f.events)}};
+ await runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,poster});expect(orphanId).not.toBe('');
+ await expect(getArtifactAccess(f.projects,owner,f.projectId,orphanId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
+ f.store.create=create;const retry=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root);if(retry.status!==202)throw Error('TEST');
+ await runExportOperation(f.store,f.events,f.projectId,retry.operationId,{root,poster});expect((await f.projects.operation(f.projectId,retry.operationId))?.status).toBe('succeeded');
 });
-it('T14 a deleted project settles a committed export after lost ACK, without recreating files or granting access',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(started.status!==202)throw Error('TEST');
- const original=f.store.cas.bind(f.store);let lost=false;
- f.store.cas=async(key,etag,value)=>{await original(key,etag,value);if(key===`projects/${f.projectId}/control`&&(value as ProjectControl).publishedExports&&!lost){lost=true;throw Error('LOST_PUBLICATION_ACK')}};
- await expect(runExportOperation(f.store,f.events,f.projectId,started.operationId,{root})).rejects.toThrow('LOST_PUBLICATION_ACK');
- await f.projects.tombstone(owner,f.projectId);await rm(join(root,'objects'),{recursive:true,force:true});
- const {runQueuedOnce}=await import('@/services/video/commands/local-worker');
- await runQueuedOnce(f.queue,f.store,job=>runExportOperation(new FileStore(root),new LocalEventLog(root),job.projectId,job.operationId,{root,build:async()=>{throw Error('MUST_NOT_BUILD')}}));
- expect(await f.queue.pending()).toEqual([]);expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('succeeded');
- await expect(requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).rejects.toThrow('ACCESS_NOT_FOUND');
+it('cold recovery repairs a slot saved before dispatch acknowledgement',async()=>{
+ const f=await fixture(),create=f.store.create.bind(f.store);let lost=false;
+ f.store.create=async(key,value)=>{await create(key,value);if(key.endsWith('/export-requests/poster')&&!lost){lost=true;throw Error('SLOT_ACK_LOST')}};
+ await expect(requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).rejects.toThrow('SLOT_ACK_LOST');
+ const store=new FileStore(root),queue=new LocalOperationQueue(store,root);await queue.reconcileExports();expect(await queue.pending()).toHaveLength(1);
+ const first=(await queue.pending())[0],replay=await requestExport(new ProjectStore(store),queue,owner,f.projectId,f.request,root);expect(replay.operationId).toBe(first.operationId);
 });
-it('T14 authenticated HTTP POST, worker and file route deliver real ZIP bytes and reject foreign sessions',async()=>{
+it.each([false,true])('lost publication acknowledgement settles without rebuilding (deleted=%s)',async deleted=>{
+ const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(first.status!==202)throw Error('TEST');
+ const cas=f.store.cas.bind(f.store);let lost=false,calls=0;const build:typeof poster=async(...args)=>{calls++;return poster(...args)};
+ f.store.cas=async(key,etag,value)=>{await cas(key,etag,value);if(key===`projects/${f.projectId}/control`&&(value as ProjectControl).publishedExports&&!lost){lost=true;throw Error('PUBLICATION_ACK_LOST')}};
+ await expect(runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,poster:build})).rejects.toThrow('PUBLICATION_ACK_LOST');
+ if(deleted){await f.projects.tombstone(owner,f.projectId);await rm(join(root,'objects'),{recursive:true,force:true})}
+ await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,first.operationId,{root,poster:build});expect(calls).toBe(1);expect((await f.projects.operation(f.projectId,first.operationId))?.status).toBe('succeeded');
+});
+it('rejects invalid or wrong-aspect PNG without publishing it',async()=>{
+ const f=await fixture();
+ for(const bytes of [Buffer.from('not png'),protocolPng(1080,1920)])await expect(prepareExportPoster(f.projects,owner,f.projectId,f.artifactId,root,{extract:async()=>bytes})).rejects.toThrow('EXPORT_POSTER_INVALID');
+});
+it('private immutable poster writer rejects symlink folders and unexpected hardlinks',async()=>{
+ const outside=await mkdtemp(join(tmpdir(),'vb-export-outside-'));try{
+  const key=`projects/${randomUUID()}/artifacts/${randomUUID()}/files/poster.png`;
+  await symlink(outside,join(root,'objects'));await expect(persistArchiveObject(root,key,hash(png),png)).rejects.toThrow('ARTIFACT_INVALID');
+  await rm(join(root,'objects'));await persistArchiveObject(root,key,hash(png),png);await link(join(root,'objects',key),join(outside,'poster.png'));
+  await expect(persistArchiveObject(root,key,hash(png),png)).rejects.toThrow('ARTIFACT_INVALID');expect(await readFile(join(outside,'poster.png'))).toEqual(png);
+ }finally{await rm(outside,{recursive:true,force:true})}
+});
+it('poster and source MP4 remain accessible when a previous quick result is restored idempotently',async()=>{
+ const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(first.status!==202)throw Error('TEST');
+ await runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,poster});
+ const ready=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(ready.status!==200)throw Error('TEST');
+ const nextResultId=randomUUID();await f.store.create(`projects/${f.projectId}/results/${nextResultId}/manifest`,{...f.manifest,resultId:nextResultId,artifactId:randomUUID(),revisionId:randomUUID()});
+ await updateJson(f.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,currentResultId:nextResultId,previousResultId:f.resultId}));
+ expect((await getArtifactAccess(f.projects,owner,f.projectId,ready.artifactId,'download')).mime).toBe('image/png');
+ const {restoreResult}=await import('@/services/video/results/restore'),command={schemaVersion:5 as const,clientCommandId:randomUUID()};
+ await restoreResult(f.projects,owner,f.projectId,f.artifactId,command,root);await restoreResult(f.projects,owner,f.projectId,f.artifactId,command,root);
+ expect((await f.projects.access(owner,f.projectId)).currentResultId).toBe(f.resultId);
+ expect((await getArtifactAccess(f.projects,owner,f.projectId,ready.artifactId,'download')).mime).toBe('image/png');
+ expect((await getArtifactAccess(f.projects,owner,f.projectId,f.artifactId,'play')).mime).toBe('video/mp4');
+});
+it('authenticated export HTTP, worker and range download reject foreign or expired owners',async()=>{
  const f=await fixture(),{issueSession,ownerHash,verifySession}=await import('@/services/video/access/session'),keys={current:'s'.repeat(64),environment:'local',keyId:'v1'},session=issueSession(keys),foreign=issueSession(keys),scope=ownerHash(verifySession(session.token,keys).sid,keys);
  await updateJson(f.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,ownerKeyHash:scope}));
  const environment={VIDEO_DATA_DIR:process.env.VIDEO_DATA_DIR,VIDEO_ENVIRONMENT:process.env.VIDEO_ENVIRONMENT,VIDEO_APP_ORIGIN:process.env.VIDEO_APP_ORIGIN};
@@ -194,65 +130,30 @@ it('T14 authenticated HTTP POST, worker and file route deliver real ZIP bytes an
  try{
   const {POST}=await import('@/app/api/video/projects/[projectId]/exports/route'),{GET}=await import('@/app/api/video/projects/[projectId]/artifacts/[artifactId]/file/route');
   const send=(token:string)=>POST(new Request(`https://video.test/api/video/projects/${f.projectId}/exports`,{method:'POST',headers:{origin:'https://video.test',cookie:`vb-session=${token}`,'content-type':'application/json'},body:JSON.stringify(f.request)}),{params:Promise.resolve({projectId:f.projectId})});
-  expect((await send(foreign.token)).status).toBe(404);
-  const accepted=await send(session.token);expect(accepted.status).toBe(202);const started=await accepted.json();expect(started.receipt.commandId).toBe(f.request.clientCommandId);
-  const {runQueuedOnce}=await import('@/services/video/commands/local-worker');
-  await runQueuedOnce(f.queue,f.store,job=>runExportOperation(f.store,f.events,job.projectId,job.operationId,{root}));
-  const completed=await send(session.token);expect(completed.status).toBe(200);const ready=await completed.json();
-  const request=new Request('https://video.test'+ready.access.url,{headers:{cookie:`vb-session=${session.token}`}}),params={params:Promise.resolve({projectId:f.projectId,artifactId:ready.artifactId})};
-  const file=await GET(request,params);expect(file.status).toBe(200);expect(file.headers.get('content-type')).toBe('application/zip');expect(file.headers.get('cache-control')).toBe('private,no-store');expect(Buffer.from(await file.arrayBuffer()).subarray(0,4).toString('hex')).toBe('504b0304');
-  const forged=await GET(new Request('https://video.test'+ready.access.url,{headers:{cookie:`vb-session=${foreign.token}`}}),params);expect(forged.status).toBe(404);
-  await f.projects.tombstone(scope,f.projectId);expect((await GET(request,params)).status).toBe(404);
+  expect((await send(foreign.token)).status).toBe(404);const accepted=await send(session.token);expect(accepted.status).toBe(202);const started=await accepted.json();
+  const {runQueuedOnce}=await import('@/services/video/commands/local-worker');await runQueuedOnce(f.queue,f.store,job=>runExportOperation(f.store,f.events,job.projectId,job.operationId,{root,poster}));
+  expect((await f.projects.operation(f.projectId,started.operationId))?.status).toBe('succeeded');const completed=await send(session.token);expect(completed.status).toBe(200);const ready=await completed.json();
+  const params={params:Promise.resolve({projectId:f.projectId,artifactId:ready.artifactId})};
+  const read=(token:string,range='bytes=0-7')=>GET(new Request('https://video.test'+ready.access.url,{headers:{cookie:`vb-session=${token}`,range}}),params);
+  const file=await read(session.token);expect(file.status).toBe(206);expect(file.headers.get('content-type')).toBe('image/png');expect(file.headers.get('cache-control')).toBe('private,no-store');expect(Buffer.from(await file.arrayBuffer())).toEqual(png.subarray(0,8));
+  expect((await read(session.token,'bytes=999999999-')).status).toBe(416);expect((await read(foreign.token)).status).toBe(404);
+  await updateJson(f.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,expiresAt:'2000-01-01T00:00:00.000Z'}));expect((await read(session.token)).status).toBe(410);
  }finally{for(const[name,value]of Object.entries(environment))if(value===undefined)delete process.env[name];else process.env[name]=value}
 });
-it('T14 rejects symlink object folders and unexplained hardlinks without overwriting external files',async()=>{
- const {persistArchiveObject}=await import('@/services/video/exports/archive-object'),{symlink,link}=await import('node:fs/promises'),outside=await mkdtemp(join(tmpdir(),'vb-export-outside-'));
- try{
-  const bytes=Buffer.from('bounded writer protocol'),digest=createHash('sha256').update(bytes).digest('hex'),projectId=randomUUID(),artifactId=randomUUID(),key=`projects/${projectId}/artifacts/${artifactId}/files/source.zip`;
-  await symlink(outside,join(root,'objects'));await expect(persistArchiveObject(root,key,digest,bytes)).rejects.toThrow('ARTIFACT_INVALID');
-  await rm(join(root,'objects'));await persistArchiveObject(root,key,digest,bytes);
-  const path=join(root,'objects',key);await link(path,join(outside,'unexplained.zip'));
-  await expect(persistArchiveObject(root,key,digest,bytes)).rejects.toThrow('ARTIFACT_INVALID');expect(await readFile(join(outside,'unexplained.zip'))).toEqual(bytes);
- }finally{await rm(outside,{recursive:true,force:true})}
+it('unqualified artifacts and retired preview-only artifacts cannot be exported',async()=>{
+ const f=await fixture(),key=`projects/${f.projectId}/artifacts/${f.artifactId}/manifest`,artifact=await f.store.readFresh<{qaPassed:boolean}>(key);
+ await f.store.cas(key,artifact.etag,{...artifact.value,qaPassed:false});
+ await expect(requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).rejects.toThrow('QUALITY_BLOCKED');expect(await f.queue.pending()).toEqual([]);
+ const latest=await f.store.readFresh(key);await f.store.cas(key,latest.etag,artifact.value);
+ await updateJson(f.store,`projects/${f.projectId}/control`,(c:ProjectControl)=>({...c,currentResultId:undefined}));
+ await expect(getArtifactAccess(f.projects,owner,f.projectId,f.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
+ await expect(requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,clientCommandId:randomUUID()},root)).rejects.toThrow('RESULT_STALE');
 });
-it('T14 the real worker boots with generation disabled and no model credentials for independent exports',async()=>{
- await rm(join(root,'worker-heartbeat'));
- const worker=spawn(process.execPath,['--import','tsx','scripts/video/worker.ts'],{cwd:process.cwd(),env:{NODE_ENV:'test',PATH:process.env.PATH,VIDEO_DATA_DIR:root,VIDEO_GENERATION_ENABLED:'false'},stdio:['ignore','ignore','pipe']});
- let errors='';worker.stderr.on('data',(part:Buffer)=>{errors+=part.toString('utf8')});
- const exited=new Promise<number|null>((resolve,reject)=>{worker.once('error',reject);worker.once('close',resolve)});
- try{
-  let ready=false;
-  for(let attempt=0;attempt<100;attempt++){
-   try{const heartbeat=await readFile(join(root,'worker-heartbeat'),'utf8');ready=Number.isFinite(Date.parse(heartbeat));if(ready)break}catch{}
-   if(worker.exitCode!==null)throw Error('WORKER_FAILED: '+errors);
-   await new Promise(resolve=>setTimeout(resolve,100));
-  }
-  expect(ready,errors).toBe(true);worker.kill('SIGTERM');expect(await exited,errors).toBe(0);
- }finally{if(worker.exitCode===null)worker.kill('SIGKILL');await exited}
-},15000);
-it('T14 poster uses a durable private PNG export, survives cold replay and cannot be played as video',async()=>{
- const f=await fixture(),request={...f.request,format:'poster' as const},started=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(started.status!==202)throw Error('TEST');
- const {prepareExportPoster}=await import('@/services/video/exports/poster'),{protocolPng}=await import('./fixtures/png');const png=protocolPng(),sha256=createHash('sha256').update(png).digest('hex');let calls=0;
- const poster:typeof prepareExportPoster=async(projects,owner,pid,aid,root,options)=>prepareExportPoster(projects,owner,pid,aid,root,{...options,extract:async(_root,film,frames,image,input)=>{calls++;expect(input?.publishedArtifact).toEqual({projectId:pid,artifactId:aid});expect(frames).toEqual([239]);return{schemaVersion:2,extractor:'ffmpeg-select-v2',stageKey:'f'.repeat(64),filmSha256:film.sha256,runtimeDigest:image.slice(7),width:film.width,height:film.height,frames:[{id:'frame-239',frame:239,sha256,bytes:png.length,filename:'frame-0001.png'}]}},readImages:async()=>new Map([['frame-239',png]])});
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,poster});
- await runExportOperation(new FileStore(root),new LocalEventLog(root),f.projectId,started.operationId,{root,poster});expect(calls).toBe(1);
- const completed=await requestExport(f.projects,f.queue,owner,f.projectId,request,root);if(completed.status!==200)throw Error('TEST');expect(completed.access).toMatchObject({mime:'image/png',filename:'VideoBuddy-poster.png',purpose:'download'});
- const artifact=(await f.store.readFresh<{objectRef:{key:string}}>(`projects/${f.projectId}/artifacts/${completed.artifactId}/manifest`)).value;expect(await readFile(join(root,'objects',artifact.objectRef.key))).toEqual(png);
- expect((await f.events.readFrom(f.projectId,started.operationId,0)).filter(e=>e.event.type==='operation.terminal')).toHaveLength(1);
- await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'play')).rejects.toThrow('ACCESS_NOT_FOUND');
- await f.projects.tombstone(owner,f.projectId);await expect(getArtifactAccess(f.projects,owner,f.projectId,completed.artifactId,'download')).rejects.toThrow('ACCESS_NOT_FOUND');
-});
-it('T14 rejects a poster extracted from a different film without publishing it',async()=>{
- const f=await fixture(),started=await requestExport(f.projects,f.queue,owner,f.projectId,{...f.request,format:'poster'},root);if(started.status!==202)throw Error('TEST');
- const {prepareExportPoster}=await import('@/services/video/exports/poster');
- const poster:typeof prepareExportPoster=async(projects,owner,pid,aid,root,options)=>prepareExportPoster(projects,owner,pid,aid,root,{...options,extract:async(_root,film)=>({schemaVersion:2,extractor:'ffmpeg-select-v2',stageKey:'f'.repeat(64),filmSha256:'0'.repeat(64),runtimeDigest:'a'.repeat(64),width:film.width,height:film.height,frames:[{id:'frame-239',frame:239,sha256:'1'.repeat(64),bytes:100,filename:'frame-0001.png'}]}),readImages:async()=>{throw Error('MUST_NOT_READ_WRONG_FILM')}});
- await runExportOperation(f.store,f.events,f.projectId,started.operationId,{root,poster});expect((await f.store.readFresh(`projects/${f.projectId}/operations/${started.operationId}/export-outcome`)).value).toEqual({status:'failed',errorCode:'EXPORT_POSTER_INVALID'});expect((await f.projects.access(owner,f.projectId)).publishedExports).toBeUndefined();
-});
-it('T14 poster cold recovery repairs a slot committed before the operation and enqueue ACK',async()=>{
- const f=await fixture(),request={...f.request,format:'poster' as const},create=f.store.create.bind(f.store);let lost=false;
- f.store.create=async(key,value)=>{await create(key,value);if(key.endsWith('/export-requests/poster')&&!lost){lost=true;throw Error('POSTER_SLOT_ACK_LOST')}};
- await expect(requestExport(f.projects,f.queue,owner,f.projectId,request,root)).rejects.toThrow('POSTER_SLOT_ACK_LOST');f.store.create=create;
- const slot=(await f.store.readFresh<{id:string}>(`projects/${f.projectId}/results/${f.resultId}/export-requests/poster`)).value,coldStore=new FileStore(root),cold=new LocalOperationQueue(coldStore,root);
- expect(await cold.reconcileExports()).toBeUndefined();expect(await cold.pending()).toEqual([{projectId:f.projectId,operationId:slot.id,kind:'export'}]);
- const replay=await requestExport(new ProjectStore(coldStore),cold,owner,f.projectId,request,root);expect(replay.operationId).toBe(slot.id);expect(await cold.pending()).toHaveLength(1);
+it('a completed poster whose bytes changed cannot be returned as a cached export',async()=>{
+ const f=await fixture(),first=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(first.status!==202)throw Error('TEST');
+ await runExportOperation(f.store,f.events,f.projectId,first.operationId,{root,poster});
+ const ready=await requestExport(f.projects,f.queue,owner,f.projectId,f.request,root);if(ready.status!==200)throw Error('TEST');
+ const artifact=(await f.store.readFresh<{objectRef:{key:string}}>(`projects/${f.projectId}/artifacts/${ready.artifactId}/manifest`)).value;
+ await writeFile(join(root,'objects',artifact.objectRef.key),Buffer.alloc(png.length,1));
+ await expect(requestExport(f.projects,f.queue,owner,f.projectId,f.request,root)).rejects.toThrow('ARTIFACT_INVALID');
 });

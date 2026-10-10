@@ -1,7 +1,6 @@
-import {quickFlow} from '@/services/video/quick/settings';
-import type {Environment} from '@/services/video/config/environment';
 import {applyPendingDirectorFeedback} from '@/services/video/revisions/pending-feedback';
 import {scheduleScriptDraft} from '@/services/video/quick/script';
+import type {ProjectControl} from '@/contracts/video/project';
 import {ProjectStore} from '@/services/video/storage/project-store';
 import {AtomicStore,StoreMissing} from '@/services/video/storage/atomic-store';
 import {readdir} from 'node:fs/promises';
@@ -11,7 +10,6 @@ import {LocalOperationQueue,QueuedOperation} from './local-queue';
 const terminal=new Set(['succeeded','failed','cancelled','interrupted','superseded']);
 export async function runQueuedOnce(queue:LocalOperationQueue,store:AtomicStore,execute:(job:QueuedOperation)=>Promise<void>){
  let failure=await queue.reconcilePreviews();
- const renderFailure=await queue.reconcileRenders();failure ||= renderFailure;
  const exportFailure=await queue.reconcileExports();failure ||= exportFailure;
  const scriptFailure=await reconcileScripts(queue,store);failure ||= scriptFailure;
  const inventory=await queue.pendingWithFailures();failure ||= inventory.failure;
@@ -20,8 +18,10 @@ export async function runQueuedOnce(queue:LocalOperationQueue,store:AtomicStore,
   const key=`projects/${job.projectId}/operations/${job.operationId}`;
   const before=(await store.readFresh<{status:string;notBefore?:number}>(key)).value;
   if(job.kind==='script'&&before.notBefore&&before.notBefore>Date.now())continue;
-  if(terminal.has(before.status)&&!['export','render'].includes(job.kind)){await queue.complete(job.projectId,job.operationId);continue}
-  if(!['chat','preview','export','render','script'].includes(job.kind))throw Error('CAPABILITY_UNAVAILABLE');
+  const recoveryControl=job.kind==='preview'&&before.status==='interrupted'?(await store.readFresh<ProjectControl>(`projects/${job.projectId}/control`)).value:undefined;
+  const recovering=Boolean(recoveryControl&&(recoveryControl.unresolvedMediaStops?.[job.operationId]||recoveryControl.previewOutcomes?.[job.operationId]));
+  if(terminal.has(before.status)&&!['export'].includes(job.kind)&&!recovering){await queue.complete(job.projectId,job.operationId);continue}
+  if(!['chat','preview','export','script'].includes(job.kind))throw Error('CAPABILITY_UNAVAILABLE');
   await execute(job);
   const after=(await store.readFresh<{status:string}>(key)).value;
   if(terminal.has(after.status))await queue.complete(job.projectId,job.operationId);
@@ -48,10 +48,10 @@ async function reconcileScripts(queue:LocalOperationQueue,store:AtomicStore){
 }
 
 /** The quick pipeline never calls a model after drawing all shot sources.
- * Staged production and unknown stages remain serialized with conversations.
+ * Unknown stages remain serialized with conversations.
  */
-export async function quickProductionAllowsChat(store:AtomicStore,job:QueuedOperation,env:Environment=process.env){
- if(!quickFlow(env)||job.kind!=='preview')return false;
+export async function quickProductionAllowsChat(store:AtomicStore,job:QueuedOperation){
+ if(job.kind!=='preview')return false;
  const op=(await store.readFresh<{id:string;projectId:string;kind:string;status:string;stage?:string}>(`projects/${job.projectId}/operations/${job.operationId}`)).value;
  return op.id===job.operationId&&op.projectId===job.projectId&&op.kind==='preview'&&op.status==='running'&&['picture','composition','music','publication'].includes(op.stage||'');
 }

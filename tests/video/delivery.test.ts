@@ -1,5 +1,5 @@
 import{it,expect}from'vitest';
-import{validateArchiveEntries,assertArtifactAccess}from'@/services/video/exports/export';
+import{assertArtifactAccess}from'@/services/video/exports/export';
 import{mkdtemp,mkdir,rm,writeFile}from'node:fs/promises';
 import{tmpdir}from'node:os';
 import{join}from'node:path';
@@ -9,11 +9,6 @@ import{ProjectStore}from'@/services/video/storage/project-store';
 import{updateJson}from'@/services/video/storage/atomic-store';
 import{restoreResult}from'@/services/video/results/restore';
 import type{ProjectControl}from'@/contracts/video/project';
-import{mandatoryDeliveryRules}from'@/services/video/quality/delivery';
-it.each(['.env.local','fonts/private.ttf','weights/model.onnx','cache/model.safetensors','../other/file','tmp/signed-url.txt'])('AT-044 excludes credentials, fonts, weights and temporary data: %s',path=>expect(()=>validateArchiveEntries([{path,bytes:100,symlink:false,hardlinks:1}],[])).toThrow('ARCHIVE_INVALID'));
-it('allowlisted source files can be included without claiming missing files exist',()=>{
- expect(validateArchiveEntries([{path:'source/scene.js',bytes:100,symlink:false,hardlinks:1}],['source/scene.js'])).toEqual(['source/scene.js']);
-});
 it('AT-089 tombstones and unvalidated media cannot acquire new signed download access',()=>{
  expect(()=>assertArtifactAccess({deletedAt:'now'}, {qaPassed:true,uploaded:true,mime:'video/mp4'})).toThrow('ACCESS_NOT_FOUND');
  expect(()=>assertArtifactAccess({}, {qaPassed:false,uploaded:true,mime:'video/mp4'})).toThrow('QUALITY_BLOCKED');
@@ -28,7 +23,7 @@ it('AT-087 restores the previous approved result by pointer, with one effect per
    const bytes=Buffer.from('ftyp previous media bytes '+item.resultId),sha=createHash('sha256').update(bytes).digest('hex'),key=`projects/${projectId}/artifacts/${item.artifactId}/files/final.mp4`;
    await mkdir(join(dir,'objects',`projects/${projectId}/artifacts/${item.artifactId}/files`),{recursive:true});await writeFile(join(dir,'objects',key),bytes);
    await projects.store.create(`projects/${projectId}/artifacts/${item.artifactId}/manifest`,{id:item.artifactId,revisionId:item.revisionId,objectRef:{key,sha256:sha,bytes:bytes.length,mime:'video/mp4'},qaPassed:true,uploaded:true,filename:'final.mp4'});
-   await projects.store.create(`projects/${projectId}/results/${item.resultId}/manifest`,{resultId:item.resultId,artifactId:item.artifactId,revisionId:item.revisionId,previewId:randomUUID(),approvalId:randomUUID(),bundleHash:'a'.repeat(64),mp4Sha256:sha,mp4Bytes:bytes.length,qualityPolicy:{schemaVersion:1,audioIntent:'voiced',captions:true,requiredRules:[...mandatoryDeliveryRules]},qualityChecks:mandatoryDeliveryRules.map(ruleId=>({ruleId,result:'pass',severity:'blocking',evidenceRefs:['old-qa']})),createdAt:new Date().toISOString()});
+   await projects.store.create(`projects/${projectId}/results/${item.resultId}/manifest`,{resultId:item.resultId,artifactId:item.artifactId,revisionId:item.revisionId,kind:'quick',operationId:randomUUID(),briefVersion:0,styleSlug:'ink-wash',aspect:'16:9',durationSec:30,shots:[{id:'one',scriptLine:'hello',startFrame:0,endFrame:720,take:0}],music:null,aiLabel:true,bundleHash:'a'.repeat(64),mp4Sha256:sha,mp4Bytes:bytes.length,createdAt:new Date().toISOString()});
   }
   await updateJson(projects.store,`projects/${projectId}/control`,(c:ProjectControl)=>({...c,phase:'ready' as const,currentResultId:b.resultId,previousResultId:a.resultId}));
   const request={schemaVersion:5 as const,clientCommandId:randomUUID()};

@@ -11,7 +11,7 @@ export const AnalyticsEventSchema=z.discriminatedUnion('name',[
  z.strictObject({name:z.literal('quick_reply_clicked'),payload:z.strictObject({index:z.number().int().min(0).max(3),labelLength:z.number().int().min(0).max(8)})}),
  z.strictObject({name:z.literal('script_ready'),payload:z.strictObject({ms:elapsed})}),
  z.strictObject({name:z.literal('generate_clicked'),payload:z.strictObject({stage})}),
- z.strictObject({name:z.literal('shot_state'),payload:z.strictObject({state:z.enum(['drawing','drawn','rendered'])})}),
+ z.strictObject({name:z.literal('shot_state'),payload:z.strictObject({state:z.enum(['drawing','drawn','rendering','rendered'])})}),
  z.strictObject({name:z.literal('result_ready'),payload:z.strictObject({ms:elapsed})}),
  z.strictObject({name:z.literal('result_downloaded'),payload:z.strictObject({})}),
  z.strictObject({name:z.literal('redo_shot'),payload:z.strictObject({})}),

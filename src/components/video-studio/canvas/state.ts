@@ -6,7 +6,7 @@ export function latestCanvasUI(view:ProjectView|null){return view?.messages.filt
 export function deriveCanvasState(view:ProjectView|null):{stage:CanvasStage;focus:CanvasTarget;briefReady:boolean;stale:boolean}{
  const briefReady=Boolean(view?.understanding.subject.trim()&&(view.understanding.audience?.trim()||view.understanding.objective?.trim()||view.messages.some(m=>m.role==='user'&&/就这些|就这样|够了|直接做/.test(m.text))||latestCanvasUI(view)?.readiness?.brief==='enough'));
  const stale=Boolean(view&&(view.currentResult?.briefVersion!==undefined&&view.currentResult.briefVersion<view.briefVersion||view.script&&(view.script.state==='stale'||view.script.briefVersion<view.briefVersion)));
- const stage:CanvasStage=!view||!view.messages.some(m=>m.role==='user')?'S0':view.activeProduction?'S4':view.currentResult?(stale?'S6':'S5'):!briefReady?'S1':!view.preferences.styleSlug?'S2':'S3';
+ const stage:CanvasStage=!view||(!view.messages.some(m=>m.role==='user')&&!view.understanding.subject.trim()&&!view.currentResult&&!view.script&&!('legacyMigrationNotice' in view))?'S0':view.activeProduction?'S4':view.currentResult?(stale?'S6':'S5'):!briefReady?'S1':!view.preferences.styleSlug?'S2':'S3';
  const defaultFocus:CanvasTarget=stage==='S0'||stage==='S1'?'brief':stage==='S2'?'style':stage==='S3'||stage==='S4'?'script':'result';
  return {stage,focus:stage==='S4'||stage==='S5'||stage==='S6'?defaultFocus:latestCanvasUI(view)?.canvasFocus||defaultFocus,briefReady,stale};
 }

@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 const projectId='10000000-0000-4000-8000-000000000091';
 const assistantId='10000000-0000-4000-8000-000000000092';
-const view={projectId,title:'中秋祝福',controlVersion:1,briefVersion:1,phase:'collecting',understanding:{subject:'中秋祝福',summary:['给家人的温暖祝福'],audience:'家人',objective:'节日祝福',facts:[]},preferences:{durationSec:30,aspect:'9:16',language:'zh-CN',styleSlug:null,voiceMode:'none',musicMode:'none',captions:'none'},assets:[],messages:[{id:assistantId,ordinal:2,role:'assistant',text:'想要什么感觉？',status:'completed',contentVersion:1,ui:{quickReplies:[{label:'温暖团圆',text:'希望温暖团圆'}]}}],currentPreview:null,currentResult:null,previousResult:null,activeConversation:null,activeProduction:null,pendingInputs:[],actions:[],expiresAt:'2030-01-01T00:00:00Z',quick:{music:{mode:'auto'},tracks:[]}};
+const view={projectId,title:'中秋祝福',controlVersion:1,briefVersion:1,phase:'collecting',understanding:{subject:'中秋祝福',summary:['给家人的温暖祝福'],audience:'家人',objective:'节日祝福',facts:[]},preferences:{durationSec:30,aspect:'9:16',language:'zh-CN',styleSlug:null},assets:[],messages:[{id:assistantId,ordinal:2,role:'assistant',text:'想要什么感觉？',status:'completed',contentVersion:1,ui:{quickReplies:[{label:'温暖团圆',text:'希望温暖团圆'}]}}],currentResult:null,previousResult:null,activeConversation:null,activeProduction:null,pendingInputs:[],actions:[],expiresAt:'2030-01-01T00:00:00Z',quick:{music:{mode:'auto'},tracks:[]}};
 test('quick reply sends its text without consuming the independent composer draft',async({page})=>{
  await page.route('**/api/video/session',r=>r.fulfill({json:{}}));
  await page.route(`**/api/video/projects/${projectId}`,r=>r.fulfill({json:view}));

@@ -7,14 +7,14 @@ const message={id,role:'user' as const,text:'开业日期改成10月8日'};
 it('T06 rejects invented style IDs in recommendations and source-authorized preference patches',()=>{
  expect(directorContext(initialUnderstanding(),[message]).styleCatalog.map(style=>style.id)).toEqual(listStyles().map(style=>style.id));
  expect(directorContext(initialUnderstanding(),[message]).styleCatalog).toHaveLength(43);
- const decision=GuidanceDecisionSchema.parse({action:'suggest_preview',reply:'先看效果',effect:'no_change',executionIntent:'none',evidenceMessageIds:[id],recommendedStyleId:'hand-drawn-crayon'});
+ const decision=GuidanceDecisionSchema.parse({action:'suggest_generate',reply:'先看效果',effect:'no_change',executionIntent:'none',evidenceMessageIds:[id],recommendedStyleId:'hand-drawn-crayon'});
  expect(()=>guardGuidance(decision,[message],false)).toThrow('STYLE_INVALID');
  const patch={baseBriefVersion:0,operations:[{op:'set_preference',field:'styleSlug',value:'hand-drawn-crayon',sourceMessageIds:[id]}]};
  expect(()=>applyUnderstandingPatch(initialUnderstanding(),patch,[message])).toThrow('STYLE_INVALID');
  for(const style of listStyles())expect(applyUnderstandingPatch(initialUnderstanding(),{...patch,operations:[{...patch.operations[0],value:style.slug}]},[message]).preferences.styleSlug).toBe(style.slug);
 });
 it('AT-020 quoted document instructions never count as user authorization',()=>{
- const decision=GuidanceDecisionSchema.parse({action:'acknowledge',reply:'资料已收到',effect:'no_change',executionIntent:'prepare_preview',evidenceMessageIds:[id]});
+ const decision=GuidanceDecisionSchema.parse({action:'acknowledge',reply:'资料已收到',effect:'no_change',executionIntent:'none',evidenceMessageIds:[id]});
  expect(()=>guardGuidance(decision,[{...message,role:'assistant'}],false)).toThrow('AUTHORIZATION_REQUIRED');
 });
 it('AT-021 status questions cannot change the running creative bundle',()=>{

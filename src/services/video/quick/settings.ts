@@ -2,12 +2,6 @@ import {z} from 'zod';
 import type {ProjectControl} from '@/contracts/video/project';
 import type {AtomicStore} from '@/services/video/storage/atomic-store';
 import {createOrRead,updateJson,StoreMissing} from '@/services/video/storage/atomic-store';
-import type {Environment} from '@/services/video/config/environment';
-
-/** Quick flow: one generation produces the finished film (no preview/approve step).
- * VIDEO_FLOW=quick|staged; unset means quick in MVP and staged otherwise. */
-export function quickFlow(env:Environment=process.env){return env.VIDEO_FLOW?env.VIDEO_FLOW==='quick':env.VIDEO_DELIVERY_PROFILE==='mvp'}
-
 export const MusicChoiceSchema=z.discriminatedUnion('mode',[
  z.strictObject({mode:z.literal('auto')}),
  z.strictObject({mode:z.literal('off')}),

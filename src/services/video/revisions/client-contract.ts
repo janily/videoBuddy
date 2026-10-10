@@ -8,10 +8,10 @@ export function parseMessageIntent(raw:string,projectId:string){
  if(raw.length>32768)return null;
  try{const value=Intent.safeParse(JSON.parse(raw));return value.success&&value.data.projectId===projectId?value.data:null}catch{return null}
 }
-export function feedbackTarget(view:Pick<ProjectView,'currentResult'|'previousResult'|'currentPreview'>|null,selection:FeedbackTarget|null|undefined){
- const current=view?.currentResult,previous=view?.previousResult,preview=view?.currentPreview;
- const candidates=[...(current?[{...current,label:'当前视频'}]:[]),...(previous?[{...previous,label:'上个结果'}]:[]),...(preview?[{artifactId:preview.previewArtifactId,revisionId:preview.revisionId,label:'效果片段'}]:[])];
- const defaultArtifact=current?.artifactId??preview?.previewArtifactId;
+export function feedbackTarget(view:Pick<ProjectView,'currentResult'|'previousResult'>|null,selection:FeedbackTarget|null|undefined){
+ const current=view?.currentResult,previous=view?.previousResult;
+ const candidates=[...(current?[{...current,label:'当前视频'}]:[]),...(previous?[{...previous,label:'上个结果'}]:[])];
+ const defaultArtifact=current?.artifactId;
  const match=selection===undefined?candidates.find(item=>item.artifactId===defaultArtifact):selection&&candidates.find(item=>item.artifactId===selection.artifactId&&item.revisionId===selection.revisionId);
  return match?{target:{artifactId:match.artifactId,revisionId:match.revisionId,sourceTimeMs:null},label:match.label,stale:false}:{target:null,label:'',stale:selection!==undefined};
 }

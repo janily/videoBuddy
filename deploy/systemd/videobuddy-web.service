@@ -7,14 +7,14 @@ Wants=network-online.target
 Type=simple
 User=videobuddy
 Group=videobuddy
+SupplementaryGroups=videobuddy-media
 WorkingDirectory=/opt/videobuddy/current
 EnvironmentFile=/etc/videobuddy/video.env
 Environment=NODE_ENV=production
 ExecStart=/usr/bin/node node_modules/next/dist/bin/next start -H 127.0.0.1 -p 3000
 Restart=on-failure
 RestartSec=5
-StateDirectory=videobuddy
-StateDirectoryMode=0700
+UMask=0077
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
